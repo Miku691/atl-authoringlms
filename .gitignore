@@ -1,0 +1,67 @@
+---
+
+## 🛡️ `.gitignore` (Main Directory)
+
+```gitignore
+
+# Authoringtool ignores
+Authoringtool/.idea/
+Authoringtool/target/
+Authoringtool/*.log
+
+# atl-auth-service ignores
+atl-auth-service/node_modules/
+atl-auth-service/dist/
+atl-auth-service/.env
+
+# Global ignores
+*.DS_Store
+*.log
+.env
+
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+release.properties
+
+# Spring Boot
+application.properties
+application.yml
+.env
+
+# Logs
+*.log
+logs/
+log/
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.env
+*.pid
+docker-compose.override.yml
+
+# Node (if frontend is added later)
+node_modules/
+dist/
+build/
+.env.local
