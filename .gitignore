@@ -34,8 +34,6 @@ pom.xml.versionsBackup
 release.properties
 
 # Spring Boot
-application.properties
-application.yml
 .env
 
 # Logs
