@@ -12,4 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AtlHeadingDto extends AtlSlideComponentDto {
     private String title;
+    private String type;
 }

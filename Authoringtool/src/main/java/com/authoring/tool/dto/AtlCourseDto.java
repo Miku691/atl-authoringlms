@@ -3,6 +3,8 @@ package com.authoring.tool.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +19,10 @@ public class AtlCourseDto {
 	private String title;
 	private String desc;
 	private String author;
+	
+	@JsonFormat(pattern = "dd/MM/YYYY")
 	private LocalDateTime createdOn;
+	@JsonFormat(pattern = "dd/MM/YYYY")
 	private LocalDateTime updatedOn;
 	private String status;
 	

@@ -13,4 +13,6 @@ public class AtlSlideComponentDto {
     private Long id;
     private int orderIndex;
     private String type;
+    
+    private AtlComponentStylesDto jsonStyle;
 }
