@@ -1,4 +1,4 @@
-package com.atl.auth.dto;
+package com.atl.auth.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AtlSingupResponseDto {
-    private String userName;
+public class ApiResponse<T> {
+    private String status;
+    private int statusCode;
+    private String message;
+    private T apiData;
 }
