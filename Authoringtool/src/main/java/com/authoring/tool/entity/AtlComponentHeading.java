@@ -20,6 +20,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AtlComponentHeading extends AtlSlideComponent{
 	private String title;
-
-
+	private String type;
 }

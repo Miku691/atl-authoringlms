@@ -7,6 +7,8 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,7 +18,9 @@ public class AtlCourseWOSlideDto {
     private String title;
     private String desc;
     private String author;
+    @JsonFormat(pattern = "dd/MM/YYYY")
     private LocalDateTime createdOn;
+    @JsonFormat(pattern = "dd/MM/YYYY")
     private LocalDateTime updatedOn;
     private String status;
 }
