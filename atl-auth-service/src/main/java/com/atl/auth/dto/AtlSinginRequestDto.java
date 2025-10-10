@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AtlSingupResponseDto {
-    private String userName;
+public class AtlSinginRequestDto {
+    private String username;
+    private String password;
 }

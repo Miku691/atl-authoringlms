@@ -1,13 +1,13 @@
-package com.atl.auth;
+package com.atl.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AtlAuthServiceApplication {
+public class AtlGatewayServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AtlAuthServiceApplication.class, args);
+		SpringApplication.run(AtlGatewayServiceApplication.class, args);
 	}
 
 }
