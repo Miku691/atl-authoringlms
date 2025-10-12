@@ -28,8 +28,8 @@ public class AtlSlides {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String title;
-	private String desc;
-	private Integer index;
+	private String description;
+	private Integer orderIndex;
 	
 	@ManyToOne
 	@JoinColumn(name = "course_id")

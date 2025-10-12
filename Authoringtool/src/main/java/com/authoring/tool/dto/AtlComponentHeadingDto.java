@@ -13,6 +13,7 @@ public class AtlComponentHeadingDto {
 
 	private Long Id;
 	private String title;
+    private String type;
 	
 	private AtlSlides slide;
 }

@@ -12,6 +12,6 @@ import lombok.Setter;
 public class AtlSlidesWithoutCourseDto {
 	private Long id;
 	private String title;
-	private String desc;
-	private Integer index;
+	private String description;
+	private Integer orderIndex;
 }

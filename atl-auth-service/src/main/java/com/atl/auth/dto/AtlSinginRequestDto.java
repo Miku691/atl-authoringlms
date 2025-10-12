@@ -11,5 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AtlSinginRequestDto {
     private String username;
+    private String email;
     private String password;
 }

@@ -14,8 +14,8 @@ import lombok.Setter;
 public class AtlSlidesDto {
 	private Long id;
 	private String title;
-	private String desc;
-	private Integer index;
+	private String description;
+	private Integer orderIndex;
 	
 	private AtlCourse course;
 }

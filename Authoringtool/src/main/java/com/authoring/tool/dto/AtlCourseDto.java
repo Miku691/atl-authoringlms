@@ -17,7 +17,7 @@ import lombok.Setter;
 public class AtlCourseDto {
 	private long id;
 	private String title;
-	private String desc;
+	private String description;
 	private String author;
 	
 	@JsonFormat(pattern = "dd/MM/YYYY")
