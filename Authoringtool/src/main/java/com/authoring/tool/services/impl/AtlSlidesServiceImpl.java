@@ -73,9 +73,9 @@ public class AtlSlidesServiceImpl implements AtlSlidesService {
         
         AtlSlidesWithComponentDto responseDto = new AtlSlidesWithComponentDto();
         responseDto.setId(slideObj.getId());
-        responseDto.setDesc(slideObj.getDesc());
+        responseDto.setDescription(slideObj.getDescription());
         responseDto.setTitle(slideObj.getTitle());
-        responseDto.setIndex(slideObj.getIndex());
+        responseDto.setOrderIndex(slideObj.getOrderIndex());
         responseDto.setComponents(componentDto);
 
         return responseDto;

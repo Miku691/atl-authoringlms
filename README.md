@@ -1,4 +1,4 @@
-# E-Learning Platform (Monorepo)
+# ATL - Authoring Tool and LMS Platform
 
 This repository contains the full-stack, cloud-based e-learning ecosystem built using Spring Boot microservices. It includes tools for course authoring and a custom LMS platform.
 

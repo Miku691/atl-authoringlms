@@ -11,4 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AtlSingupResponseDto {
     private String userName;
+    private String email;
 }

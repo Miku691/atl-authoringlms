@@ -33,7 +33,7 @@ public class AtlCourse {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	private String title;
-	private String desc;
+	private String description;
 	private String author;
 	
 	@CreatedDate

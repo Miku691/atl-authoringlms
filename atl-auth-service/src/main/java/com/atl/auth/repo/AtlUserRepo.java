@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface AtlUserRepo extends JpaRepository<AtlUser, Long> {
     Optional<AtlUser> findByUsername(String username);
+
+    Optional<AtlUser> findByEmail(String email);
 }

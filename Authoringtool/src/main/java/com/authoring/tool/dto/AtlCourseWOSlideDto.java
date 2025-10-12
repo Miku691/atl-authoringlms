@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 public class AtlCourseWOSlideDto {
     private long id;
     private String title;
-    private String desc;
+    private String description;
     private String author;
     @JsonFormat(pattern = "dd/MM/YYYY")
     private LocalDateTime createdOn;
