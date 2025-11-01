@@ -29,4 +29,13 @@ public class AtlComponentTextServiceImpl implements AtlComponentTextService {
 		return modelMapper.map(textObj, AtlComponentTextDto.class);
 	}
 
+    @Override
+    public AtlComponentTextDto updateTextData(AtlComponentTextDto textUpdateDto) {
+        AtlComponentText textObj = textRepo.findById(textUpdateDto.getId()).orElseThrow(() -> new DetailsNotFoundException("headingId", textUpdateDto.getId().toString()));
+
+        textObj.setText(textUpdateDto.getText());
+
+        return modelMapper.map(textRepo.save(textObj), AtlComponentTextDto.class);
+    }
+
 }

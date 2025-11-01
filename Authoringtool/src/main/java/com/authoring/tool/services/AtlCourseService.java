@@ -12,4 +12,6 @@ public interface AtlCourseService {
 	AtlCourseDto getAtlCourseById(Long courseId);
 
     ApiResponsePage<AtlCourseWOSlideDto> getPaginatedCoursed(int page, int size);
+
+    AtlCourseDto updateCourseInfo(AtlCourseDto course);
 }

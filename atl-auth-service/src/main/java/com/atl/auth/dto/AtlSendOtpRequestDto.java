@@ -9,7 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AtlSinginResponseDto {
+public class AtlSendOtpRequestDto {
     private String username;
-    private String email;
 }

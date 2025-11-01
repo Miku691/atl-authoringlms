@@ -55,4 +55,17 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNAUTHORIZED
         );
     }
+
+    @ExceptionHandler(OtpVerificationException.class)
+    public ResponseEntity<ApiResponse<String>> verifyOtpException(OtpVerificationException ex){
+        return new ResponseEntity<ApiResponse<String>>(
+                ApiResponse.<String>builder()
+                        .status(ApplicationConstant.API_FAILED)
+                        .statusCode(HttpStatus.UNAUTHORIZED.value())
+                        .message(ex.getMessage())
+                        .apiData(null)
+                        .build(),
+                HttpStatus.UNAUTHORIZED
+        );
+    }
 }

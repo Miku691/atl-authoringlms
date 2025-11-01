@@ -5,4 +5,6 @@ import com.authoring.tool.dto.AtlComponentTextDto;
 public interface AtlComponentTextService {
 	AtlComponentTextDto saveTextData(AtlComponentTextDto textDtp);
 	AtlComponentTextDto getTextData(Long id);
+
+    AtlComponentTextDto updateTextData(AtlComponentTextDto textUpdateDto);
 }

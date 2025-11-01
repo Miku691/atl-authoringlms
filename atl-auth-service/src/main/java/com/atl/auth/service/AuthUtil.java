@@ -11,6 +11,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 @Component
 public class AuthUtil {
@@ -34,5 +35,26 @@ public class AuthUtil {
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
                 .signWith(getSecretKey())
                 .compact();
+    }
+
+    public String returnMaskedEmail(String rowEmail){
+        if (rowEmail == null || !rowEmail.contains("@")) {
+            return rowEmail;
+        }
+
+        String[] parts = rowEmail.split("@");
+        String local = parts[0];
+        String domain = parts[1];
+
+        if (local.length() <= 2) {
+            return "***@" + domain;
+        }
+
+        String visible = local.substring(0, 2);
+        return visible + "***@" + domain;
+    }
+
+    public String generateRandomOtp() {
+        return String.valueOf(new Random().nextInt(900000) + 100000);
     }
 }

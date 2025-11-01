@@ -15,7 +15,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AtlCourseDto {
-	private long id;
+	private Long id;
 	private String title;
 	private String description;
 	private String author;

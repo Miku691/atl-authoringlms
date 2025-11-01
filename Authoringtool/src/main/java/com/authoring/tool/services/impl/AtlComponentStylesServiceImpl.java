@@ -11,6 +11,8 @@ import com.authoring.tool.services.AtlComponentStylesService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AtlComponentStylesServiceImpl implements AtlComponentStylesService{
@@ -26,7 +28,7 @@ public class AtlComponentStylesServiceImpl implements AtlComponentStylesService{
 	@Override
 	public AtlComponentStylesDto getStyleJson(Long id) {
 		AtlComponentStyles styleObj = styleRepo.findById(id).orElseThrow(() -> new DetailsNotFoundException("ID", id.toString()));
-		return modelMapper.map(styleObj, AtlComponentStylesDto.class);
+        return modelMapper.map(styleObj, AtlComponentStylesDto.class);
 	}
 
 }

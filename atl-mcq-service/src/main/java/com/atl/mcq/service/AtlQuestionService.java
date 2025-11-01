@@ -40,4 +40,8 @@ public class AtlQuestionService {
         return questionRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Question not found with id: " + id));
     }
+
+    public List<AtlQuestion> getQeustionBySlideId(Long slideId) {
+        return questionRepo.findBySlideId(slideId);
+    }
 }

@@ -69,14 +69,14 @@ public class AtlUserService{
 
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
             AtlUser user = userDetails.getAtlUser();
-            String token = authUtil.generateAccessToken(user);
+            //String token = authUtil.generateAccessToken(user);
+            String maskedEmail = authUtil.returnMaskedEmail(user.getEmail());
 
-            //return new AtlSinginResponseDto(user.getUsername(), token);
             return ApiResponse.<AtlSinginResponseDto>builder()
                     .status(ApplicationConstant.API_SUCCESS)
                     .message(ApplicationConstant.API_LOGIN_SUCCESS_MSG)
                     .statusCode(HttpStatus.OK.value())
-                    .apiData(new AtlSinginResponseDto(user.getUsername(), token))
+                    .apiData(new AtlSinginResponseDto(user.getUsername(), maskedEmail))
                     .build();
 
         }catch (BadCredentialsException e){

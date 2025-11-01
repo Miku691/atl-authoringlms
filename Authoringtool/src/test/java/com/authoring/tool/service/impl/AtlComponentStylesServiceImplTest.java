@@ -29,7 +29,7 @@ public class AtlComponentStylesServiceImplTest {
 	
 	@Test
 	void getStyleJsonSuccess() {
-		Long id = 1l;
+		Long id = 2l;
 		AtlComponentStylesDto styleDto = new AtlComponentStylesDto();
 		styleDto.setId(id);
 		styleDto.setComponentType("PDF");
@@ -43,7 +43,7 @@ public class AtlComponentStylesServiceImplTest {
 		
 		AtlComponentStylesDto returnedDto = styleObj.getStyleJson(id);
 		
-		Assertions.assertEquals(styleDto.getId(), returnedDto.getId());
+		Assertions.assertEquals(2l, returnedDto.getId());
 		Assertions.assertEquals(styleDto.getComponentType(), returnedDto.getComponentType());
 	}
 	

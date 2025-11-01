@@ -42,4 +42,10 @@ public class AtlQuestionController {
     public AtlQuestion getQuestionById(@PathVariable String id) {
         return atlQuestionService.getQuestionById(id);
     }
+
+    @GetMapping("/slide")
+    public List<AtlQuestion> getQuestionBySlideId(@RequestParam Long slideId){
+        return atlQuestionService.getQeustionBySlideId(slideId);
+    }
+
 }

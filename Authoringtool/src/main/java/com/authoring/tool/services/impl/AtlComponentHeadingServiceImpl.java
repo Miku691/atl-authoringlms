@@ -34,4 +34,14 @@ public class AtlComponentHeadingServiceImpl implements AtlComponentHeadingServic
 
 	}
 
+    @Override
+    public AtlComponentHeadingDto updateHeadingData(AtlComponentHeadingDto headingUpdate) {
+        AtlComponentHeading headingObj = headingRepo.findById(headingUpdate.getId()).orElseThrow(() -> new DetailsNotFoundException("headingId", headingUpdate.getId().toString()));
+
+        headingObj.setTitle(headingUpdate.getTitle());
+        headingObj.setType(headingUpdate.getType());
+
+        return modelMapper.map(headingRepo.save(headingObj), AtlComponentHeadingDto.class);
+    }
+
 }

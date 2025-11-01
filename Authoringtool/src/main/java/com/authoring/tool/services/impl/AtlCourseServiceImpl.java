@@ -4,6 +4,8 @@ import com.authoring.tool.dto.AtlCourseWOSlideDto;
 import com.authoring.tool.utility.ApiResponse;
 import com.authoring.tool.utility.ApiResponsePage;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,12 +31,14 @@ public class AtlCourseServiceImpl implements AtlCourseService {
 	private final AtlCourseRepo courseRepo;
 	
 	@Override
+    //@CachePut(value = "atl-course", key = "#result.id")
 	public AtlCourseDto saveAtlCourse(AtlCourseDto course) {
 		AtlCourse savedCourse = courseRepo.save(modelMapper.map(course, AtlCourse.class));
 		return modelMapper.map(savedCourse, AtlCourseDto.class);
 	}
 
     @Override
+   // @Cacheable(value = "atl-course", key = "#courseId")
 	public AtlCourseDto getAtlCourseById(Long courseId) {
 		AtlCourse courseObj = courseRepo.findById(courseId).orElseThrow(() -> new DetailsNotFoundException("courseId", courseId.toString()));
 		return modelMapper.map(courseObj, AtlCourseDto.class);
@@ -57,6 +61,17 @@ public class AtlCourseServiceImpl implements AtlCourseService {
         response.setLast(coursePage.isLast());
 
         return response;
+    }
+
+    @Override
+    //@CachePut(value = "atl-course", key = "#course.id")
+    public AtlCourseDto updateCourseInfo(AtlCourseDto course) {
+        AtlCourse courseObj = courseRepo.findById(course.getId()).orElseThrow(() -> new DetailsNotFoundException("courseId", course.getId().toString()));
+        courseObj.setStatus(course.getStatus());
+        courseObj.setTitle(course.getTitle());
+        courseObj.setDescription(course.getDescription());
+
+        return modelMapper.map(courseRepo.save(courseObj), AtlCourseDto.class);
     }
 
 }
