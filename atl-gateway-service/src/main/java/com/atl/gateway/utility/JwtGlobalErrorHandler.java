@@ -44,6 +44,9 @@ public class JwtGlobalErrorHandler extends AbstractErrorWebExceptionHandler {
         }else if (error instanceof io.jsonwebtoken.ExpiredJwtException) {
             status = HttpStatus.UNAUTHORIZED;
             message = "JWT token has expired";
+        }else if(error instanceof JwtUnauthorizedException){
+            status = HttpStatus.UNAUTHORIZED;
+            message = error.getMessage();
         }
 
         AtlErrorResponseDTO response = new AtlErrorResponseDTO(
@@ -58,4 +61,6 @@ public class JwtGlobalErrorHandler extends AbstractErrorWebExceptionHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(response);
     }
+
+
 }

@@ -1,0 +1,88 @@
+services:
+  gateway:
+    build:
+      context: ./atl-gateway-service
+    container_name: atl-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - ATL_JWT_SECRET=${JWT_SECRET}
+    networks:
+      - atl-network
+
+  auth:
+    build:
+      context: ./atl-auth-service
+    container_name: atl-auth
+#    ports:
+#      - "8081:8081"
+    environment:
+      - AUTH_JWT_SECRET=${JWT_SECRET}
+      - AUTH_MYSQL_URI=jdbc:mysql://mysql-db:3306/atl-auth-db?allowPublicKeyRetrieval=true&useSSL=false
+      - AUTH_MYSQL_USER=root
+      - AUTH_MYSQL_PASS=${MYSQL_PASSWORD}
+      - AUTH_EMAIL=mikui17112018@gmail.com
+      - AUTH_MAIL_PASS=${MAIL_PASSWORD}
+      - REDIS_URL=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - redis
+      - mysql-db
+    networks:
+      - atl-network
+
+  course:
+    build:
+      context: ./Authoringtool
+    container_name: atl-course
+#    ports:
+#      - "8082:8082"
+    environment:
+      - COURSE_MYSQL_URI=jdbc:mysql://mysql-db:3306/atl-course-db?allowPublicKeyRetrieval=true&useSSL=false
+      - COURSE_MYSQL_USER=root
+      - COURSE_MYSQL_PASS=${MYSQL_PASSWORD}
+      - REDIS_URL=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    depends_on:
+      - mysql-db
+    networks:
+      - atl-network
+
+  redis:
+    image: redis:latest
+    container_name: atl-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - atl-network
+    command:
+      - redis-server
+      - --requirepass
+      - ${REDIS_PASSWORD}
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
+  mysql-db:
+    image: mysql:latest
+    container_name: atl-mysql-db
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - ./mysql-init:/docker-entrypoint-initdb.d
+      - mysql-data:/var/lib/mysql
+    networks:
+      - atl-network
+
+
+volumes:
+  redis-data:
+  mysql-data:
+
+networks:
+  atl-network:
+    driver: bridge

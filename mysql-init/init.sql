@@ -1,0 +1,2 @@
+CREATE DATABASE IF NOT EXISTS `atl-auth-db`;
+CREATE DATABASE IF NOT EXISTS `atl-course-db`;

@@ -3,7 +3,9 @@ package com.atl.auth.service;
 import com.atl.auth.dto.AtlSinginRequestDto;
 import com.atl.auth.dto.AtlSinginResponseDto;
 import com.atl.auth.dto.AtlSingupResponseDto;
+import com.atl.auth.dto.AtlUpdateAtlUserDto;
 import com.atl.auth.entity.AtlUser;
+import com.atl.auth.entity.ImsTenants;
 import com.atl.auth.exception.ApiResponse;
 import com.atl.auth.exception.CustomAuthException;
 import com.atl.auth.exception.CustomUnauthorizedException;
@@ -33,6 +35,7 @@ public class AtlUserService{
     private final AuthenticationManager authManager;
     private final AuthUtil authUtil;
     private final AtlRoleService roleService;
+    private final AtlRedisService atlRedisService;
 
     public ApiResponse<AtlSingupResponseDto> userSingUpService(AtlSinginRequestDto requestDto){
 
@@ -50,12 +53,15 @@ public class AtlUserService{
         AtlUser savedObj = userRepo.save(altUserObj);
         //return modelMapper.map(savedObj, AtlSingupResponseDto.class);
 
-        return ApiResponse.<AtlSingupResponseDto>builder()
-                .message(ApplicationConstant.API_SIGNUP_SUCCESS_MSG)
-                .statusCode(HttpStatus.OK.value())
-                .status(ApplicationConstant.API_SUCCESS)
-                .apiData(modelMapper.map(savedObj, AtlSingupResponseDto.class))
-                .build();
+//        return ApiResponse.<AtlSingupResponseDto>builder()
+//                .message(ApplicationConstant.API_SIGNUP_SUCCESS_MSG)
+//                .statusCode(HttpStatus.OK.value())
+//                .status(ApplicationConstant.API_SUCCESS)
+//                .apiData(modelMapper.map(savedObj, AtlSingupResponseDto.class))
+//                .build();
+
+        return ApiResponse.success(HttpStatus.OK.value(),
+                ApplicationConstant.API_SIGNUP_SUCCESS_MSG, modelMapper.map(savedObj, AtlSingupResponseDto.class));
     }
 
 
@@ -72,12 +78,18 @@ public class AtlUserService{
             //String token = authUtil.generateAccessToken(user);
             String maskedEmail = authUtil.returnMaskedEmail(user.getEmail());
 
-            return ApiResponse.<AtlSinginResponseDto>builder()
-                    .status(ApplicationConstant.API_SUCCESS)
-                    .message(ApplicationConstant.API_LOGIN_SUCCESS_MSG)
-                    .statusCode(HttpStatus.OK.value())
-                    .apiData(new AtlSinginResponseDto(user.getUsername(), maskedEmail))
-                    .build();
+            String key = ApplicationConstant.LOGGED_IN_PREFIX + user.getUsername();
+            atlRedisService.saveValueToRedisWithTTL(key, "true", 5);
+
+//            return ApiResponse.<AtlSinginResponseDto>builder()
+//                    .status(ApplicationConstant.API_SUCCESS)
+//                    .message(ApplicationConstant.API_LOGIN_SUCCESS_MSG)
+//                    .statusCode(HttpStatus.OK.value())
+//                    .apiData(new AtlSinginResponseDto(user.getUsername(), maskedEmail))
+//                    .build();
+
+            return ApiResponse.success(HttpStatus.OK.value(),
+                    ApplicationConstant.API_LOGIN_SUCCESS_MSG, new AtlSinginResponseDto(user.getUsername(), maskedEmail));
 
         }catch (BadCredentialsException e){
             throw new CustomUnauthorizedException("Invalid username or password");
@@ -88,6 +100,15 @@ public class AtlUserService{
         }
     }
 
+    public String updateUserStatusOrTenantId(AtlUpdateAtlUserDto userDetails){
+        AtlUser altUserObj = userRepo.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UserNotFoundException(userDetails.getUsername()));
+        altUserObj.setStatus(userDetails.getStatus());
+        altUserObj.setTenant(userDetails.getTenant());
+
+        AtlUser updateUser = userRepo.save(altUserObj);
+
+        return "Details Updated Successfully";
+    }
 
     private void validateSingUpRequest(AtlSinginRequestDto requestDto) throws SQLIntegrityConstraintViolationException {
         Optional<AtlUser> userObjUsername = userRepo.findByUsername(requestDto.getUsername());

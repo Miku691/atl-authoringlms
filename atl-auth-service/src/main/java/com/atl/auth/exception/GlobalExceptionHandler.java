@@ -1,12 +1,16 @@
 package com.atl.auth.exception;
 
+import com.atl.auth.dto.AtlValidationErrorDto;
 import com.atl.auth.utility.ApplicationConstant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -22,11 +26,13 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<ApiResponse<String>>(
                 ApiResponse.<String>builder()
                         .status(ApplicationConstant.API_FAILED)
-                        .statusCode(HttpStatus.FORBIDDEN.value())
+                        .statusCode(HttpStatus.CONFLICT.value())
                         .message(e.getMessage())
                         .apiData(null)
                         .build(),
-                HttpStatus.FORBIDDEN
+
+
+                HttpStatus.CONFLICT
         );
     }
 
@@ -66,6 +72,41 @@ public class GlobalExceptionHandler {
                         .apiData(null)
                         .build(),
                 HttpStatus.UNAUTHORIZED
+        );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<List<AtlValidationErrorDto>>> handleValidationError(MethodArgumentNotValidException ex){
+        List<AtlValidationErrorDto> validationLst = new ArrayList<>();
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            validationLst.add(AtlValidationErrorDto
+                    .builder()
+                    .field(error.getField())
+                    .errorMsg(error.getDefaultMessage())
+                    .build()
+            );
+        });
+
+        return ResponseEntity.badRequest().body(
+                ApiResponse.<List<AtlValidationErrorDto>>builder()
+                        .status(ApplicationConstant.API_FAILED)
+                        .statusCode(HttpStatus.BAD_REQUEST.value())
+                        .message(ApplicationConstant.API_VALIDATION_FAILURE)
+                        .apiData(validationLst)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<String>> resourceNotFoundExceptionHandler(ResourceNotFoundException ex){
+        return new ResponseEntity<ApiResponse<String>>(
+                ApiResponse.<String>builder()
+                        .status(ApplicationConstant.API_FAILED)
+                        .statusCode(HttpStatus.NOT_FOUND.value())
+                        .message(ex.getMessage())
+                        .apiData(null)
+                        .build(),
+                HttpStatus.NOT_FOUND
         );
     }
 }

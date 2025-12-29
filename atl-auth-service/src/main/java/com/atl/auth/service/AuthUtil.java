@@ -32,7 +32,7 @@ public class AuthUtil {
                 .claim("userId", user.getId().toString())
                 .claim("roles", roles)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 10))
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
                 .signWith(getSecretKey())
                 .compact();
     }
@@ -57,4 +57,6 @@ public class AuthUtil {
     public String generateRandomOtp() {
         return String.valueOf(new Random().nextInt(900000) + 100000);
     }
+
+
 }

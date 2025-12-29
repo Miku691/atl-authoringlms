@@ -46,6 +46,12 @@
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+            <version>4.3.1</version>
+        </dependency>
+
         <!--        JWT Dependencies -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -81,7 +87,8 @@
 
 
 	<build>
-		<plugins>
+        <finalName>atl-gateway</finalName>
+        <plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

@@ -1,8 +1,11 @@
 package com.atl.mcq.service;
 
+import com.atl.mcq.client.AtlCourseClient;
+import com.atl.mcq.dto.AtlSaveQuestionIdDto;
+import com.atl.mcq.dto.SlideDto;
 import com.atl.mcq.entity.AtlQuestion;
 import com.atl.mcq.repo.AtlQuestionRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -10,12 +13,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AtlQuestionService {
-    @Autowired
-    private AtlQuestionRepo questionRepo;
+
+    private final AtlQuestionRepo questionRepo;
+    private final AtlCourseClient courseClient;
 
     public AtlQuestion addAtlQuestion(AtlQuestion AtlQuestion) {
-        return questionRepo.save(AtlQuestion);
+        AtlQuestion savedQuestion = questionRepo.save(AtlQuestion);
+
+        courseClient.saveQuestionIdToSlide(AtlSaveQuestionIdDto.builder()
+                        .mcqId(savedQuestion.getId())
+                        .slide(new SlideDto(AtlQuestion.getSlideId()))
+                .build());
+
+        return savedQuestion;
     }
 
     public List<AtlQuestion> getAllAtlQuestions() {

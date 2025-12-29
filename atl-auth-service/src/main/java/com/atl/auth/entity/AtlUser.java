@@ -27,6 +27,8 @@ public class AtlUser {
     @Column(nullable = false)
     private String password;
 
+    private String status;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "atl_user_role",
@@ -34,4 +36,9 @@ public class AtlUser {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<AtlRole> roles = new HashSet<>();
+
+    // TENANT RELATION
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_id")
+    private ImsTenants tenant;
 }
