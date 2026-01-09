@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>staff-service DB Structure</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-10 bg-gray-50 font-sans">
+
+<div class="max-w-5xl mx-auto">
+  <h1 class="text-3xl font-bold mb-4 text-blue-700">👥 staff-service – Database Reference</h1>
+  <p class="text-sm text-gray-600 mb-6">Click a table card to expand its schema. Active table is highlighted.</p>
+
+  <!-- Table Cards -->
+  <div id="cards" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+    <div id="card-staff" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('staff','card-staff')">
+      <h2 class="text-xl font-semibold text-blue-600">staff</h2>
+      <p class="text-gray-600 text-sm">Staff master (non-teaching, parents, operators)</p>
+    </div>
+
+    <div id="card-staff_roles" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('staff_roles','card-staff_roles')">
+      <h2 class="text-xl font-semibold text-blue-600">staff_roles</h2>
+      <p class="text-gray-600 text-sm">Mapping: staff ↔ role inside institution</p>
+    </div>
+
+    <div id="card-staff_documents" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('staff_documents','card-staff_documents')">
+      <h2 class="text-xl font-semibold text-blue-600">staff_documents</h2>
+      <p class="text-gray-600 text-sm">Staff personal & verification docs</p>
+    </div>
+
+  </div>
+
+  <!-- Detail Sections -->
+  <div id="details" class="mt-8 space-y-6">
+
+    <!-- STAFF -->
+    <section id="staff" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: staff</h3>
+      <p class="text-sm text-gray-600 mb-4">Stores details of non-teaching staff (office admin, operator, librarian, transport staff) and parents.</p>
+
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">FK / Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Primary key</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Institution reference</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+            <tr><td class="border px-3 py-2">user_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Auth user reference</td><td class="border px-3 py-2">FK → users(id)</td></tr>
+            <tr><td class="border px-3 py-2">first_name</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">—</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">last_name</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">—</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">relation_type</td><td class="border px-3 py-2">ENUM</td><td class="border px-3 py-2">parent/staff/management</td><td class="border px-3 py-2">Defines staff type</td></tr>
+            <tr><td class="border px-3 py-2">contact_number</td><td class="border px-3 py-2">VARCHAR(15)</td><td class="border px-3 py-2">Phone number</td><td class="border px-3 py-2">Indexed</td></tr>
+            <tr><td class="border px-3 py-2">email</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">Email address</td><td class="border px-3 py-2">Optional</td></tr>
+            <tr><td class="border px-3 py-2">status</td><td class="border px-3 py-2">ENUM</td><td class="border px-3 py-2">active/inactive</td><td class="border px-3 py-2">Default active</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- STAFF ROLES -->
+    <section id="staff_roles" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: staff_roles</h3>
+      <p class="text-sm text-gray-600 mb-4">Assigns internal roles such as librarian, accountant, transport manager, parent, etc.</p>
+
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">FK</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">staff_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Staff reference</td><td class="border px-3 py-2">FK → staff(id)</td></tr>
+            <tr><td class="border px-3 py-2">role_name</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">librarian/accountant/parent</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">assigned_at</td><td class="border px-3 py-2">DATETIME</td><td class="border px-3 py-2">Role assignment timestamp</td><td class="border px-3 py-2">UTC</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- STAFF DOCUMENTS -->
+    <section id="staff_documents" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: staff_documents</h3>
+      <p class="text-sm text-gray-600 mb-4">Stores verification files — ID proof, address proof, employment documents, etc.</p>
+
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">staff_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Staff reference</td><td class="border px-3 py-2">FK → staff(id)</td></tr>
+            <tr><td class="border px-3 py-2">document_type</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">Aadhaar/PAN/Experience</td><td class="border px-3 py-2">Enum recommended</td></tr>
+            <tr><td class="border px-3 py-2">file_url</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">S3/MinIO file link</td><td class="border px-3 py-2">Required</td></tr>
+            <tr><td class="border px-3 py-2">uploaded_at</td><td class="border px-3 py-2">DATETIME</td><td class="border px-3 py-2">Upload timestamp</td><td class="border px-3 py-2">UTC</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer Notes -->
+  <div class="mt-8 p-4 bg-white border rounded-lg text-sm text-gray-700">
+    <h4 class="font-semibold mb-2">Mapping & Implementation Notes</h4>
+    <ul class="list-disc pl-5 space-y-1">
+      <li><b>staff.user_id</b> → linked to <b>auth.users</b> (parents, operators, admins all login via auth-service).</li>
+      <li><b>staff_roles</b> enables institution-level RBAC separate from auth.roles.</li>
+      <li>Parent accounts are stored in staff-service with <b>relation_type = 'parent'</b>.</li>
+      <li>File URLs (documents) should be stored in S3/MinIO.</li>
+      <li>Index <b>contact_number</b> and <b>tenant_id</b> for fast lookup.</li>
+      <li>Use soft-delete for staff leaving the institution.</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+function openSection(sectionId, cardId) {
+  document.querySelectorAll('#details section').forEach(s => s.classList.add('hidden'));
+  document.querySelectorAll('.table-card').forEach(c => c.classList.remove('border-blue-500','ring','ring-blue-200'));
+  const sec = document.getElementById(sectionId);
+  if(sec) sec.classList.remove('hidden');
+  const card = document.getElementById(cardId);
+  if(card) card.classList.add('border-blue-500','ring','ring-blue-200');
+  setTimeout(() => sec.scrollIntoView({behavior:'smooth'}), 100);
+}
+</script>
+
+</body>
+</html>

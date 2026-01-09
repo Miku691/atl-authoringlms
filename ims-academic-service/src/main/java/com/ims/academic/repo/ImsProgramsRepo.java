@@ -10,4 +10,6 @@ public interface ImsProgramsRepo extends JpaRepository<ImsPrograms, String> {
     boolean existsByTenantIdAndCode(String tenantId, String code);
 
     List<ImsPrograms> findByTenantId(String tenantId);
+
+    long countByTenantId(String tenantId);
 }

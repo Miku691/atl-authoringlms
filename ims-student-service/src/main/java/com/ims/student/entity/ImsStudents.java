@@ -13,11 +13,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "IMS_STUDENTS",
-        indexes = {
-                @Index(name = "idx_students_tenant", columnList = "tenant_id"),
-                @Index(name = "idx_students_admission_no", columnList = "admission_no")
-        })
+@Table(name = "IMS_STUDENTS", indexes = {
+        @Index(name = "idx_students_tenant", columnList = "tenant_id"),
+        @Index(name = "idx_students_admission_no", columnList = "admission_no")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -70,12 +69,12 @@ public class ImsStudents {
     @Column(name = "profile_image_url")
     private String profileImageUrl;
 
-    // link to academic-service offering (store as UUID; no JPA relationship)
-    @Column(name = "current_offering_id")
-    private String currentOfferingId;
-
     @Column(name = "status", length = 50)
-    private String status; // ACTIVE / INACTIVE / TRANSFERRED
+    private String status; // ACTIVE / INACTIVE
+
+    @Column(name = "is_deleted")
+    @Builder.Default
+    private boolean isDeleted = false;
 
     @Column(name = "address", columnDefinition = "TEXT")
     private String address;
@@ -87,7 +86,6 @@ public class ImsStudents {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
-
 
     @PrePersist
     protected void onCreate() {

@@ -1,9 +1,8 @@
 package com.ims.student.service.impl;
 
-
-
 import com.ims.student.dto.ImsStudentDocumentsDto;
 import com.ims.student.entity.ImsStudentDocuments;
+import com.ims.student.entity.ImsStudents;
 import com.ims.student.exception.ResourceNotFoundException;
 import com.ims.student.repo.ImsStudentDocumentsRepo;
 import com.ims.student.repo.ImsStudentsRepo;
@@ -11,11 +10,17 @@ import com.ims.student.service.ImsStudentDocumentsService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +36,7 @@ public class ImsStudentDocumentsServiceImpl implements ImsStudentDocumentsServic
     private String baseUploadDir;
 
     @Override
+    @Transactional
     public ImsStudentDocumentsDto upload(String studentId, String documentType, MultipartFile file) {
 
         studentsRepo.findById(studentId)
@@ -41,9 +47,15 @@ public class ImsStudentDocumentsServiceImpl implements ImsStudentDocumentsServic
         }
 
         try {
-            String folderPath = baseUploadDir + "/students/" + studentId;
+            // Use absolute path to avoid relative path issues
+            String folderPath = new File(baseUploadDir).getAbsolutePath() + "/students/" + studentId;
             File folder = new File(folderPath);
-            if (!folder.exists()) folder.mkdirs();
+            if (!folder.exists()) {
+                boolean created = folder.mkdirs();
+                if (!created) {
+                    throw new IOException("Failed to create directory: " + folderPath);
+                }
+            }
 
             String filePath = folderPath + "/" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
             File destFile = new File(filePath);
@@ -56,10 +68,22 @@ public class ImsStudentDocumentsServiceImpl implements ImsStudentDocumentsServic
                     .build();
 
             ImsStudentDocuments saved = repo.save(doc);
+
+            // If it's a profile image, update the student record with the SERVING URL
+            if ("PROFILE_IMAGE".equalsIgnoreCase(documentType)) {
+                ImsStudents student = studentsRepo.findById(studentId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Student ID", studentId));
+                // URL Pattern: /ims-student/student-documents/view/{documentId}
+                String viewUrl = "/ims-student/student-documents/view/" + saved.getId();
+                student.setProfileImageUrl(viewUrl);
+                studentsRepo.save(student);
+            }
+
             return modelMapper.map(saved, ImsStudentDocumentsDto.class);
 
         } catch (IOException e) {
-            throw new RuntimeException("Error while uploading file");
+            e.printStackTrace(); // Log the error to console
+            throw new RuntimeException("Error while uploading file: " + e.getMessage(), e);
         }
     }
 
@@ -79,13 +103,36 @@ public class ImsStudentDocumentsServiceImpl implements ImsStudentDocumentsServic
     }
 
     @Override
+    @Transactional
     public void delete(String id) {
         ImsStudentDocuments doc = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Document ID", id));
 
+        // Delete from FS
         File file = new File(doc.getFileUrl());
-        if (file.exists()) file.delete();
+        if (file.exists()) {
+            file.delete();
+        }
 
         repo.delete(doc);
+    }
+
+    @Override
+    public Resource getFileResource(String id) {
+        ImsStudentDocuments doc = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Document ID", id));
+
+        try {
+            Path filePath = Paths.get(doc.getFileUrl());
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("Could not read file: " + doc.getFileUrl());
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
     }
 }

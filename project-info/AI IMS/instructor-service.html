@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>instructor-service DB Structure</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-10 bg-gray-50 font-sans">
+
+<div class="max-w-5xl mx-auto">
+  <h1 class="text-3xl font-bold mb-4 text-blue-700">👩‍🏫 instructor-service – Database Reference</h1>
+  <p class="text-sm text-gray-600 mb-6">Click a table card to expand its schema. Active table is highlighted.</p>
+
+  <!-- Table Cards -->
+  <div id="cards" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+    <div id="card-instructors" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('instructors','card-instructors')">
+      <h2 class="text-xl font-semibold text-blue-600">instructors</h2>
+      <p class="text-gray-600 text-sm">Teacher profile master</p>
+    </div>
+
+    <div id="card-instructor_subjects" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('instructor_subjects','card-instructor_subjects')">
+      <h2 class="text-xl font-semibold text-blue-600">instructor_subjects</h2>
+      <p class="text-gray-600 text-sm">Teacher ↔ Subject mapping</p>
+    </div>
+
+    <div id="card-instructor_documents" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('instructor_documents','card-instructor_documents')">
+      <h2 class="text-xl font-semibold text-blue-600">instructor_documents</h2>
+      <p class="text-gray-600 text-sm">Experience & qualification docs</p>
+    </div>
+
+  </div>
+
+  <!-- Detail Sections -->
+  <div id="details" class="mt-8 space-y-6">
+
+    <!-- INSTRUCTORS -->
+    <section id="instructors" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: instructors</h3>
+      <p class="text-sm text-gray-600 mb-4">Stores core profile info of instructors. Connected to auth.users via user_id.</p>
+
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">FK / Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Primary key</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Institution reference</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+            <tr><td class="border px-3 py-2">user_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Auth user reference</td><td class="border px-3 py-2">FK → users(id)</td></tr>
+            <tr><td class="border px-3 py-2">first_name</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">Teacher first name</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">last_name</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">Teacher last name</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">qualification</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">MSc, BTech, MEd, etc.</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">experience_years</td><td class="border px-3 py-2">INT</td><td class="border px-3 py-2">Experience in years</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">specialization</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Main subject expertise</td><td class="border px-3 py-2">Indexed</td></tr>
+            <tr><td class="border px-3 py-2">join_date</td><td class="border px-3 py-2">DATE</td><td class="border px-3 py-2">Joining date</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">status</td><td class="border px-3 py-2">ENUM</td><td class="border px-3 py-2">active/inactive</td><td class="border px-3 py-2">Default: active</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- INSTRUCTOR SUBJECTS -->
+    <section id="instructor_subjects" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: instructor_subjects</h3>
+      <p class="text-sm text-gray-600 mb-4">Maps instructors to the subjects they teach.</p>
+
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">FK</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">instructor_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Instructor reference</td><td class="border px-3 py-2">FK → instructors(id)</td></tr>
+            <tr><td class="border px-3 py-2">subject_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Subject taught</td><td class="border px-3 py-2">FK → academic.subjects(id)</td></tr>
+            <tr><td class="border px-3 py-2">level</td><td class="border px-3 py-2">ENUM</td><td class="border px-3 py-2">primary/secondary/higher-ed</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- INSTRUCTOR DOCUMENTS -->
+    <section id="instructor_documents" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: instructor_documents</h3>
+      <p class="text-sm text-gray-600 mb-4">Stores instructor proof documents: experience letters, certificates, ID proof, etc.</p>
+
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">instructor_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Instructor reference</td><td class="border px-3 py-2">FK → instructors(id)</td></tr>
+            <tr><td class="border px-3 py-2">document_type</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">Experience/Certificate/ID</td><td class="border px-3 py-2">Enum recommended</td></tr>
+            <tr><td class="border px-3 py-2">file_url</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">S3/MinIO path</td><td class="border px-3 py-2">Required</td></tr>
+            <tr><td class="border px-3 py-2">uploaded_at</td><td class="border px-3 py-2">DATETIME</td><td class="border px-3 py-2">Upload timestamp</td><td class="border px-3 py-2">UTC</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer Notes -->
+  <!-- Footer Notes -->
+<div class="mt-8 p-4 bg-white border rounded-lg text-sm text-gray-700">
+<h4 class="font-semibold mb-2">Mapping & Implementation Notes</h4>
+<ul class="list-disc pl-5 space-y-1">
+<li><b>instructors.user_id</b> → linked to <b>auth.users.id</b> (single source of truth for authentication).</li>
+<li><b>instructor_subjects.subject_id</b> → references <b>academic.subjects.id</b> in Academic Service.</li>
+<li>Store large files (instructor_documents.file_url) in S3/MinIO and keep only the path in DB.</li>
+<li>Index <b>specialization</b> and frequently queried FK columns for faster lookups.</li>
+<li>Use UTC for all timestamps (join_date, uploaded_at) and add audit fields (created_by, updated_by) if required.</li>
+<li>Consider soft-delete (is_active or deleted_at) for instructors instead of hard deletes to preserve historical data.</li>
+<li>For syncing with HR/Payroll (finance-service), expose API endpoints to fetch instructor basic profile and remuneration attributes securely.</li>
+</ul>
+</div>
+
+</div>
+
+<script>
+function openSection(sectionId, cardId) {
+  // hide all sections
+  document.querySelectorAll('#details section').forEach(s => s.classList.add('hidden'));
+  // remove highlight
+  document.querySelectorAll('.table-card').forEach(c => c.classList.remove('border-blue-500','ring','ring-blue-200'));
+  // show selected
+  const sec = document.getElementById(sectionId);
+  if(sec) sec.classList.remove('hidden');
+  // highlight card
+  const card = document.getElementById(cardId);
+  if(card) card.classList.add('border-blue-500','ring','ring-blue-200');
+  // scroll
+  setTimeout(() => sec.scrollIntoView({behavior: 'smooth'}), 100);
+}
+</script>
+</body>
+</html>

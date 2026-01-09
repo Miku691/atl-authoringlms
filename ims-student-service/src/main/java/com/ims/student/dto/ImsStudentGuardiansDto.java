@@ -20,6 +20,7 @@ public class ImsStudentGuardiansDto {
     private String email;
     private String occupation;
     private String address;
+    private boolean isDeleted;
     private Instant createdAt;
     private Instant updatedAt;
 }

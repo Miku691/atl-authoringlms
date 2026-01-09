@@ -28,8 +28,8 @@ public class ImsStudentsDto {
     private String category;
     private String religion;
     private String profileImageUrl;
-    private String currentOfferingId;
     private String status;
+    private boolean isDeleted;
     private String address;
     private Instant createdAt;
     private Instant updatedAt;

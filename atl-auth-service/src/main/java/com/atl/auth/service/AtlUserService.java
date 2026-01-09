@@ -3,9 +3,8 @@ package com.atl.auth.service;
 import com.atl.auth.dto.AtlSinginRequestDto;
 import com.atl.auth.dto.AtlSinginResponseDto;
 import com.atl.auth.dto.AtlSingupResponseDto;
-import com.atl.auth.dto.AtlUpdateAtlUserDto;
+import com.atl.auth.dto.*;
 import com.atl.auth.entity.AtlUser;
-import com.atl.auth.entity.ImsTenants;
 import com.atl.auth.exception.ApiResponse;
 import com.atl.auth.exception.CustomAuthException;
 import com.atl.auth.exception.CustomUnauthorizedException;
@@ -25,10 +24,11 @@ import org.springframework.stereotype.Service;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Optional;
+import com.atl.auth.service.AtlOtpService;
 
 @Service
 @RequiredArgsConstructor
-public class AtlUserService{
+public class AtlUserService {
     private final ModelMapper modelMapper;
     private final AtlUserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
@@ -36,8 +36,9 @@ public class AtlUserService{
     private final AuthUtil authUtil;
     private final AtlRoleService roleService;
     private final AtlRedisService atlRedisService;
+    private final AtlOtpService otpService;
 
-    public ApiResponse<AtlSingupResponseDto> userSingUpService(AtlSinginRequestDto requestDto){
+    public ApiResponse<AtlSingupResponseDto> userSingUpService(AtlSinginRequestDto requestDto) {
 
         try {
             validateSingUpRequest(requestDto);
@@ -51,57 +52,58 @@ public class AtlUserService{
         altUserObj.setRoles(roleService.setDefaultRole(ApplicationConstant.DEFAULT_ROLE));
         altUserObj.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         AtlUser savedObj = userRepo.save(altUserObj);
-        //return modelMapper.map(savedObj, AtlSingupResponseDto.class);
+        // return modelMapper.map(savedObj, AtlSingupResponseDto.class);
 
-//        return ApiResponse.<AtlSingupResponseDto>builder()
-//                .message(ApplicationConstant.API_SIGNUP_SUCCESS_MSG)
-//                .statusCode(HttpStatus.OK.value())
-//                .status(ApplicationConstant.API_SUCCESS)
-//                .apiData(modelMapper.map(savedObj, AtlSingupResponseDto.class))
-//                .build();
+        // return ApiResponse.<AtlSingupResponseDto>builder()
+        // .message(ApplicationConstant.API_SIGNUP_SUCCESS_MSG)
+        // .statusCode(HttpStatus.OK.value())
+        // .status(ApplicationConstant.API_SUCCESS)
+        // .apiData(modelMapper.map(savedObj, AtlSingupResponseDto.class))
+        // .build();
 
         return ApiResponse.success(HttpStatus.OK.value(),
                 ApplicationConstant.API_SIGNUP_SUCCESS_MSG, modelMapper.map(savedObj, AtlSingupResponseDto.class));
     }
 
-
     public ApiResponse<AtlSinginResponseDto> signInService(AtlSinginRequestDto requestDto) {
-        userRepo.findByUsername(requestDto.getUsername()).orElseThrow(() -> new UserNotFoundException(requestDto.getUsername()));
+        userRepo.findByUsername(requestDto.getUsername())
+                .orElseThrow(() -> new UserNotFoundException(requestDto.getUsername()));
 
-        try{
+        try {
             Authentication auth = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword())
-            );
+                    new UsernamePasswordAuthenticationToken(requestDto.getUsername(), requestDto.getPassword()));
 
             CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
             AtlUser user = userDetails.getAtlUser();
-            //String token = authUtil.generateAccessToken(user);
+            // String token = authUtil.generateAccessToken(user);
             String maskedEmail = authUtil.returnMaskedEmail(user.getEmail());
 
             String key = ApplicationConstant.LOGGED_IN_PREFIX + user.getUsername();
             atlRedisService.saveValueToRedisWithTTL(key, "true", 5);
 
-//            return ApiResponse.<AtlSinginResponseDto>builder()
-//                    .status(ApplicationConstant.API_SUCCESS)
-//                    .message(ApplicationConstant.API_LOGIN_SUCCESS_MSG)
-//                    .statusCode(HttpStatus.OK.value())
-//                    .apiData(new AtlSinginResponseDto(user.getUsername(), maskedEmail))
-//                    .build();
+            // return ApiResponse.<AtlSinginResponseDto>builder()
+            // .status(ApplicationConstant.API_SUCCESS)
+            // .message(ApplicationConstant.API_LOGIN_SUCCESS_MSG)
+            // .statusCode(HttpStatus.OK.value())
+            // .apiData(new AtlSinginResponseDto(user.getUsername(), maskedEmail))
+            // .build();
 
             return ApiResponse.success(HttpStatus.OK.value(),
-                    ApplicationConstant.API_LOGIN_SUCCESS_MSG, new AtlSinginResponseDto(user.getUsername(), maskedEmail));
+                    ApplicationConstant.API_LOGIN_SUCCESS_MSG,
+                    new AtlSinginResponseDto(user.getUsername(), maskedEmail));
 
-        }catch (BadCredentialsException e){
+        } catch (BadCredentialsException e) {
             throw new CustomUnauthorizedException("Invalid username or password");
-        }catch (UsernameNotFoundException e){
+        } catch (UsernameNotFoundException e) {
             throw new CustomUnauthorizedException("User not found");
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new CustomAuthException("Authentication failed: " + e.getMessage());
         }
     }
 
-    public String updateUserStatusOrTenantId(AtlUpdateAtlUserDto userDetails){
-        AtlUser altUserObj = userRepo.findByUsername(userDetails.getUsername()).orElseThrow(() -> new UserNotFoundException(userDetails.getUsername()));
+    public String updateUserStatusOrTenantId(AtlUpdateAtlUserDto userDetails) {
+        AtlUser altUserObj = userRepo.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new UserNotFoundException(userDetails.getUsername()));
         altUserObj.setStatus(userDetails.getStatus());
         altUserObj.setTenant(userDetails.getTenant());
 
@@ -112,9 +114,63 @@ public class AtlUserService{
 
     private void validateSingUpRequest(AtlSinginRequestDto requestDto) throws SQLIntegrityConstraintViolationException {
         Optional<AtlUser> userObjUsername = userRepo.findByUsername(requestDto.getUsername());
-        if(userObjUsername.isPresent()) throw new SQLIntegrityConstraintViolationException("Username Already Exist: "+ userObjUsername.get().getUsername());
+        if (userObjUsername.isPresent())
+            throw new SQLIntegrityConstraintViolationException(
+                    "Username Already Exist: " + userObjUsername.get().getUsername());
 
         Optional<AtlUser> userObjEmail = userRepo.findByEmail(requestDto.getEmail());
-        if(userObjEmail.isPresent()) throw new SQLIntegrityConstraintViolationException("Email Id Already Exist: "+ userObjEmail.get().getEmail());
+        if (userObjEmail.isPresent())
+            throw new SQLIntegrityConstraintViolationException(
+                    "Email Id Already Exist: " + userObjEmail.get().getEmail());
+    }
+
+    public ApiResponse<String> initiateForgotPassword(ForgotPasswordDto requestDto) {
+        AtlUser user = userRepo.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("Email: " + requestDto.getEmail()));
+
+        // Check if user is active/valid if needed
+
+        // Trigger OTP (Pass username as OtpService uses username to look up user to get
+        // email... circular but works)
+        otpService.generateOtpForPasswordReset(user.getUsername());
+
+        return ApiResponse.success(HttpStatus.OK.value(),
+                "OTP sent to your registered email",
+                "OTP sent successfully");
+    }
+
+    public ApiResponse<String> verifyOtpForReset(VerifyPasswordResetOtpDto requestDto) {
+        AtlUser user = userRepo.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("Email: " + requestDto.getEmail()));
+
+        boolean isValid = otpService.verifyOtpForPasswordReset(user.getUsername(), requestDto.getOtp());
+        if (!isValid) {
+            throw new CustomAuthException("Invalid or Expired OTP");
+        }
+
+        return ApiResponse.success(HttpStatus.OK.value(),
+                "OTP Verified Successfully",
+                "OTP Verified");
+    }
+
+    public ApiResponse<String> resetPassword(ResetPasswordDto requestDto) {
+        AtlUser user = userRepo.findByEmail(requestDto.getEmail())
+                .orElseThrow(() -> new UserNotFoundException("Email: " + requestDto.getEmail()));
+
+        // Verify OTP
+        boolean isValid = otpService.verifyOtpForPasswordReset(user.getUsername(), requestDto.getOtp());
+        if (!isValid) {
+            throw new CustomAuthException("Invalid or Expired OTP");
+        }
+
+        // Update Password
+        user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+        userRepo.save(user);
+
+        // Optionally clear OTP from Redis? It expires cleanly anyway.
+
+        return ApiResponse.success(HttpStatus.OK.value(),
+                "Password updated successfully",
+                "Password reset successfully");
     }
 }

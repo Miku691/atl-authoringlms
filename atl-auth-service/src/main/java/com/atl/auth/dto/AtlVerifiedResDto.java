@@ -1,8 +1,11 @@
 package com.atl.auth.dto;
 
+import com.atl.auth.enums.TenantType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Set;
 
 @Getter
 @Setter
@@ -10,4 +13,8 @@ import lombok.Setter;
 public class AtlVerifiedResDto {
     private String username;
     private String jwt;
+    private Set<String> roles;
+    private String tenantId;
+    private Boolean tenantSetupCompleted;
+    private TenantType tenantType;
 }

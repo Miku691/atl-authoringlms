@@ -5,7 +5,9 @@ import com.ims.academic.entity.ImsClasses;
 import com.ims.academic.exception.ResourceAlreadyExistException;
 import com.ims.academic.exception.ResourceNotFoundException;
 import com.ims.academic.repo.ImsClassesRepo;
+import com.ims.academic.repo.ImsOfferingsRepo;
 import com.ims.academic.service.ImsClassesService;
+import com.ims.academic.entity.ImsOfferings;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -18,10 +20,16 @@ import java.util.stream.Collectors;
 public class ImsClassesServiceImpl implements ImsClassesService {
 
     private final ImsClassesRepo repo;
+    private final ImsOfferingsRepo offeringsRepo;
     private final ModelMapper modelMapper;
 
     private ImsClassesDto toDto(ImsClasses entity) {
-        return modelMapper.map(entity, ImsClassesDto.class);
+        ImsClassesDto dto = modelMapper.map(entity, ImsClassesDto.class);
+        if (entity.getOffering() != null) {
+            dto.setOfferingId(entity.getOffering().getId());
+            dto.setOfferingName(entity.getOffering().getName());
+        }
+        return dto;
     }
 
     private ImsClasses toEntity(ImsClassesDto dto) {
@@ -33,11 +41,19 @@ public class ImsClassesServiceImpl implements ImsClassesService {
 
         if (repo.existsByTenantIdAndName(dto.getTenantId(), dto.getName())) {
             throw new ResourceAlreadyExistException(
-                    dto.getName(), "CLASS", "Name"
-            );
+                    dto.getName(), "CLASS", "Name");
         }
 
-        return toDto(repo.save(toEntity(dto)));
+        ImsClasses entity = toEntity(dto);
+
+        // Link Offering
+        if (dto.getOfferingId() != null) {
+            ImsOfferings offering = offeringsRepo.findById(dto.getOfferingId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Offering", dto.getOfferingId()));
+            entity.setOffering(offering);
+        }
+
+        return toDto(repo.save(entity));
     }
 
     @Override
@@ -48,6 +64,12 @@ public class ImsClassesServiceImpl implements ImsClassesService {
 
         existing.setName(dto.getName());
         existing.setCode(dto.getCode());
+
+        if (dto.getOfferingId() != null) {
+            ImsOfferings offering = offeringsRepo.findById(dto.getOfferingId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Offering", dto.getOfferingId()));
+            existing.setOffering(offering);
+        }
 
         return toDto(repo.save(existing));
     }
@@ -62,6 +84,14 @@ public class ImsClassesServiceImpl implements ImsClassesService {
     @Override
     public List<ImsClassesDto> getByTenant(String tenantId) {
         return repo.findByTenantId(tenantId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImsClassesDto> getByOffering(String offeringId) {
+        return repo.findByOfferingId(offeringId)
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());

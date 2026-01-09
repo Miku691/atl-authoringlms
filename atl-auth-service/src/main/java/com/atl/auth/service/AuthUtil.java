@@ -2,6 +2,8 @@ package com.atl.auth.service;
 
 import com.atl.auth.entity.AtlRole;
 import com.atl.auth.entity.AtlUser;
+
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,17 +29,21 @@ public class AuthUtil {
                 .map(AtlRole::getRoleName)
                 .toList();
 
-        return Jwts.builder()
+        JwtBuilder builder = Jwts.builder()
                 .subject(user.getUsername())
                 .claim("userId", user.getId().toString())
                 .claim("roles", roles)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
-                .signWith(getSecretKey())
-                .compact();
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60));
+
+        if (user.getTenant() != null) {
+            builder.claim("tenantId", user.getTenant().getId());
+        }
+
+        return builder.signWith(getSecretKey()).compact();
     }
 
-    public String returnMaskedEmail(String rowEmail){
+    public String returnMaskedEmail(String rowEmail) {
         if (rowEmail == null || !rowEmail.contains("@")) {
             return rowEmail;
         }
@@ -57,6 +63,5 @@ public class AuthUtil {
     public String generateRandomOtp() {
         return String.valueOf(new Random().nextInt(900000) + 100000);
     }
-
 
 }

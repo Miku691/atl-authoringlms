@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Flow - IMS Atlas</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="logo">IMS Atlas</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">System Overview</a></li>
+            <li><strong>Services</strong></li>
+            <li><a href="../services/atl-gateway-service.html">Gateway Service</a></li>
+            <li><a href="../services/atl-auth-service.html">Auth Service</a></li>
+            <li><a href="../services/atl-discovery-server.html">Discovery Server</a></li>
+            <li><a href="../services/atl-web-ui.html">Web UI</a></li>
+            <li><a href="../services/ims-academic-service.html">Academic Service</a></li>
+            <li><a href="../services/ims-student-service.html">Student Service</a></li>
+            <li><a href="../services/ims-instructor-service.html">Instructor Service</a></li>
+            <li><a href="../services/ims-staff-service.html">Staff Service</a></li>
+            <li><strong>Key Flows</strong></li>
+            <li><a href="auth-flow.html">Authentication Flow</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Authentication Flow</h1>
+            <p>Visualizing how users authenticate and obtain access tokens.</p>
+        </header>
+
+        <section class="diagram-card">
+            <h2>Sequence Diagram</h2>
+            <div class="mermaid">
+                sequenceDiagram
+                actor User
+                participant WebUI as Web UI
+                participant Gateway
+                participant Auth as Auth Service
+                participant DB as User DB
+
+                User->>WebUI: Enters Credentials
+                WebUI->>Gateway: POST /auth/login
+                Gateway->>Auth: Forward Request
+                Auth->>DB: Validate Credentials
+                DB-->>Auth: User Valid
+                Auth-->>Auth: Generate JWT
+                Auth-->>Gateway: Return Token
+                Gateway-->>WebUI: Return Token
+                WebUI-->>User: Login Success (Store Token)
+            </div>
+        </section>
+
+        <section>
+            <h2>Process Steps</h2>
+            <ol>
+                <li>User submits username/password via the Web UI login form.</li>
+                <li>Request is sent to the API Gateway.</li>
+                <li>Gateway routes the request to the `atl-auth-service`.</li>
+                <li>Auth Service validates credentials against the database.</li>
+                <li>If valid, a JWT (JSON Web Token) is generated containing user roles and tenant ID.</li>
+                <li>The token is returned to the client and stored for subsequent requests.</li>
+            </ol>
+        </section>
+    </main>
+</body>
+
+</html>

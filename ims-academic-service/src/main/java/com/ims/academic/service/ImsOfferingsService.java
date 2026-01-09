@@ -17,4 +17,16 @@ public interface ImsOfferingsService {
     List<ImsOfferingsDto> getByProgram(String programId);
 
     void delete(String id);
+
+    ImsOfferingsDto activate(String id);
+
+    ImsOfferingsDto deactivate(String id);
+
+    com.ims.academic.dto.InstructorAssignmentDto assignInstructor(com.ims.academic.dto.InstructorAssignmentDto dto);
+
+    com.ims.academic.dto.CoverageStatusDto getCoverageStatus(String offeringId);
+
+    java.util.List<ImsOfferingsDto> getByIds(java.util.List<String> ids);
+
+    boolean hasActiveOfferings(String tenantId);
 }

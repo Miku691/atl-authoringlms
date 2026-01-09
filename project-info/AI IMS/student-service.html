@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>student-service DB Structure</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-10 bg-gray-50 font-sans">
+
+<div class="max-w-5xl mx-auto">
+  <h1 class="text-3xl font-bold mb-4 text-blue-700">🎓 student-service – Database Reference</h1>
+  <p class="text-sm text-gray-600 mb-6">Click a table card to expand its schema. Active table is highlighted.</p>
+
+  <!-- Table Cards -->
+  <div id="cards" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+    <div id="card-students" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('students','card-students')">
+      <h2 class="text-xl font-semibold text-blue-600">students</h2>
+      <p class="text-gray-600 text-sm">Student master profile</p>
+    </div>
+
+    <div id="card-student_guardians" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('student_guardians','card-student_guardians')">
+      <h2 class="text-xl font-semibold text-blue-600">student_guardians</h2>
+      <p class="text-gray-600 text-sm">Links students to guardians</p>
+    </div>
+
+    <div id="card-student_enrollments" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('student_enrollments','card-student_enrollments')">
+      <h2 class="text-xl font-semibold text-blue-600">student_enrollments</h2>
+      <p class="text-gray-600 text-sm">Class & batch enrollment records</p>
+    </div>
+
+    <div id="card-student_documents" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('student_documents','card-student_documents')">
+      <h2 class="text-xl font-semibold text-blue-600">student_documents</h2>
+      <p class="text-gray-600 text-sm">Certificates & proof documents</p>
+    </div>
+
+    <div id="card-student_previous_academic_records" class="table-card bg-white shadow-md p-4 rounded-lg cursor-pointer border border-transparent" onclick="openSection('student_previous_academic_records','card-student_previous_academic_records')">
+      <h2 class="text-xl font-semibold text-blue-600">student_previous_academic_records</h2>
+      <p class="text-gray-600 text-sm">Past school marks & history</p>
+    </div>
+
+  </div>
+
+  <!-- Detail Sections -->
+  <div id="details" class="mt-8 space-y-6">
+
+    <!-- STUDENTS -->
+    <section id="students" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: students</h3>
+      <p class="text-sm text-gray-600 mb-4">Student master information. Linked to auth.users via user_id.</p>
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">FK / Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Primary key</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Institution</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+            <tr><td class="border px-3 py-2">user_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Auth user ID</td><td class="border px-3 py-2">FK → users(id)</td></tr>
+            <tr><td class="border px-3 py-2">admission_no</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">Admission number</td><td class="border px-3 py-2">Unique per tenant</td></tr>
+            <tr><td class="border px-3 py-2">first_name</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">—</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">last_name</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">—</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">dob</td><td class="border px-3 py-2">DATE</td><td class="border px-3 py-2">Birth date</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">gender</td><td class="border px-3 py-2">ENUM</td><td class="border px-3 py-2">Male/Female/Other</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">category</td><td class="border px-3 py-2">ENUM</td><td class="border px-3 py-2">SC/ST/OBC/GEN</td><td class="border px-3 py-2">Optional</td></tr>
+            <tr><td class="border px-3 py-2">status</td><td class="border px-3 py-2">ENUM</td><td class="border px-3 py-2">active/inactive/alumni</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">created_at</td><td class="border px-3 py-2">DATETIME</td><td class="border px-3 py-2">Timestamp</td><td class="border px-3 py-2">UTC</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- STUDENT GUARDIANS -->
+    <section id="student_guardians" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: student_guardians</h3>
+      <p class="text-sm text-gray-600 mb-4">Mapping table linking students with guardians (parents).</p>
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">FK</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">student_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Student reference</td><td class="border px-3 py-2">FK → students(id)</td></tr>
+            <tr><td class="border px-3 py-2">guardian_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Parent reference</td><td class="border px-3 py-2">FK → staff(id)</td></tr>
+            <tr><td class="border px-3 py-2">relationship</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">father/mother/guardian</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ENROLLMENTS -->
+    <section id="student_enrollments" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: student_enrollments</h3>
+      <p class="text-sm text-gray-600 mb-4">Stores the academic assignment (class/section/batch) for each student.</p>
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">FK</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">student_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Student</td><td class="border px-3 py-2">FK → students(id)</td></tr>
+            <tr><td class="border px-3 py-2">class_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Class/standard</td><td class="border px-3 py-2">FK → academic.classes(id)</td></tr>
+            <tr><td class="border px-3 py-2">section_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Section</td><td class="border px-3 py-2">FK → academic.sections(id)</td></tr>
+            <tr><td class="border px-3 py-2">batch_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Batch (for coaching)</td><td class="border px-3 py-2">FK → academic.batches(id)</td></tr>
+            <tr><td class="border px-3 py-2">roll_no</td><td class="border px-3 py-2">INT</td><td class="border px-3 py-2">Roll number in class</td><td class="border px-3 py-2">Optional</td></tr>
+            <tr><td class="border px-3 py-2">academic_year</td><td class="border px-3 py-2">VARCHAR(20)</td><td class="border px-3 py-2">YYYY-YYYY</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- STUDENT DOCUMENTS -->
+    <section id="student_documents" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: student_documents</h3>
+      <p class="text-sm text-gray-600 mb-4">Documents uploaded for authentication, verification, and record keeping.</p>
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">student_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Student</td><td class="border px-3 py-2">FK → students(id)</td></tr>
+            <tr><td class="border px-3 py-2">document_type</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">TC/ID Proof/Birth Certificate</td><td class="border px-3 py-2">Enum recommended</td></tr>
+            <tr><td class="border px-3 py-2">file_url</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">S3/MinIO path</td><td class="border px-3 py-2">Required</td></tr>
+            <tr><td class="border px-3 py-2">uploaded_at</td><td class="border px-3 py-2">DATETIME</td><td class="border px-3 py-2">Upload time</td><td class="border px-3 py-2">UTC</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PREVIOUS ACADEMIC RECORDS -->
+    <section id="student_previous_academic_records" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700 mb-3">Table: student_previous_academic_records</h3>
+      <p class="text-sm text-gray-600 mb-4">Contains student's past school information, marks, and achievements.</p>
+      <div class="overflow-auto">
+        <table class="w-full border-collapse text-left">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-3 py-2">Column</th>
+              <th class="border px-3 py-2">Type</th>
+              <th class="border px-3 py-2">Description</th>
+              <th class="border px-3 py-2">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">student_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Student</td><td class="border px-3 py-2">FK → students(id)</td></tr>
+            <tr><td class="border px-3 py-2">old_school_name</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Previous institute name</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">previous_class</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">Last class attended</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">marks</td><td class="border px-3 py-2">JSON</td><td class="border px-3 py-2">Subject-wise marks</td><td class="border px-3 py-2">Flexible structure</td></tr>
+            <tr><td class="border px-3 py-2">remarks</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">Optional remarks</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer Notes -->
+  <div class="mt-8 p-4 bg-white border rounded-lg text-sm text-gray-700">
+    <h4 class="font-semibold mb-2">Mapping Notes</h4>
+    <ul class="list-disc pl-5 space-y-1">
+      <li><b>students.user_id</b> → linked to <b>auth.users.id</b></li>
+      <li><b>student_guardians.guardian_id</b> → linked to <b>staff.id</b> (parent stored in staff service)</li>
+      <li><b>student_enrollments</b> references academic service tables</li>
+      <li>All file URLs stored in <b>student_documents</b> should be in S3/MinIO</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+function openSection(sectionId, cardId) {
+  // hide all sections
+  document.querySelectorAll('#details section').forEach(s => s.classList.add('hidden'));
+  // remove highlight
+  document.querySelectorAll('.table-card').forEach(c => c.classList.remove('border-blue-500','ring','ring-blue-200'));
+  // show selected
+  const sec = document.getElementById(sectionId);
+  if(sec) sec.classList.remove('hidden');
+  // highlight card
+  const card = document.getElementById(cardId);
+  if(card) card.classList.add('border-blue-500','ring','ring-blue-200');
+  // scroll
+  setTimeout(() => sec.scrollIntoView({behavior: 'smooth'}), 100);
+}
+</script>
+
+</body>
+</html>

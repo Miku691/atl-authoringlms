@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>ERP Microservice Architecture</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-10 font-sans">
+
+<h1 class="text-3xl font-bold text-center mb-2 text-gray-800">
+  🎓 Educational ERP – Microservices Architecture
+</h1>
+<p class="text-center text-gray-600 mb-10">
+  AI-Integrated • Multi-Tenant • Cloud-Native • Microservice-Based SaaS
+</p>
+
+<!-- CLIENT -->
+<div class="flex flex-col items-center mb-10">
+  <div class="bg-white shadow-lg rounded-xl px-10 py-4 text-center border border-gray-200">
+    <div class="text-2xl font-semibold text-gray-800">🧑‍💻 Client (Web & Mobile)</div>
+    <div class="text-sm text-gray-600 mt-1">React.js • Mobile App (Future)</div>
+  </div>
+
+  <div class="my-3 text-gray-500 text-lg">⬇</div>
+
+  <!-- GATEWAY -->
+  <div class="bg-white shadow-lg rounded-xl px-10 py-4 text-center border border-indigo-300">
+    <div class="text-2xl font-semibold text-indigo-700">🌐 gateway-service</div>
+    <div class="text-sm text-gray-600 mt-1">Request routing • Rate limiting • Authentication forwarding • Logging</div>
+  </div>
+
+  <div class="my-3 text-gray-500 text-lg">⬇</div>
+
+  <!-- AUTH -->
+  <a href="auth-service.html" class="bg-white shadow-lg rounded-xl px-10 py-4 text-center border border-blue-300 block hover:bg-blue-50">
+    <div class="text-2xl font-semibold text-blue-700">🔐 auth-service</div>
+    <div class="text-sm text-gray-600 mt-1">
+      User login • JWT issuing • OAuth2 • Role/Permission mapping • Tenant (school_id) resolution
+    </div>
+  </a>
+</div>
+
+
+<!-- CORE SERVICES -->
+<h2 class="text-2xl font-bold text-gray-800 mb-4">🏛️ Core Domain Microservices</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+  <a href="student-service.html" class="bg-white shadow-lg rounded-xl px-10 py-4 text-center border border-blue-300 block hover:bg-blue-50">
+    <div class="text-xl font-semibold text-blue-700">🎓 student-service</div>
+    <p class="text-sm text-gray-600 mt-2">
+      Handles student profiles, enrollment history, guardians, ID cards, academic lifecycle & status.
+    </p>
+  </a>
+
+  <a href="instructor-service.html" class="bg-white shadow-lg rounded-xl px-10 py-4 text-center border border-blue-300 block hover:bg-blue-50">
+    <div class="text-xl font-semibold text-blue-700">👩‍🏫 instructor-service</div>
+    <p class="text-sm text-gray-600 mt-2">
+      Teacher profiles, qualifications, subject specialization, workload, availability & schedules.
+    </p>
+  </a>
+
+  <a href="staff-service.html" class="bg-white shadow-lg rounded-xl px-10 py-4 text-center border border-blue-300 block hover:bg-blue-50">
+    <div class="text-xl font-semibold text-blue-700">👥 staff-service</div>
+    <p class="text-sm text-gray-600 mt-2">
+      Non-teaching staff, admin staff, operator roles, parents, and management-level employee profiles.
+    </p>
+  </a>
+
+  <a href="academic-service.html" class="bg-white shadow-lg rounded-xl px-10 py-4 text-center border border-blue-300 block hover:bg-blue-50">
+    <div class="text-xl font-semibold text-blue-700">📚 academic-service</div>
+    <p class="text-sm text-gray-600 mt-2">
+      Courses, classes, subjects, syllabus structures, chapters, batches, timetable rules & academic years.
+    </p>
+  </a>
+
+  <div class="bg-white shadow-lg rounded-xl p-6 border border-gray-200">
+    <div class="text-xl font-semibold text-blue-700">💰 finance-service</div>
+    <p class="text-sm text-gray-600 mt-2">
+      Fee structures, invoicing, fee collection, payment gateway integration, staff payroll, expenses & ledgers.
+    </p>
+  </div>
+
+  <div class="bg-white shadow-lg rounded-xl p-6 border border-gray-200">
+    <div class="text-xl font-semibold text-blue-700">🛠️ admin-service</div>
+    <p class="text-sm text-gray-600 mt-2">
+      Super-admin operations, school setup, configuration, institute branding, module permissions, system settings.
+    </p>
+  </div>
+
+</div>
+
+<!-- FLOW -->
+<div class="flex justify-center my-10 text-gray-600 text-3xl">⬇</div>
+
+<!-- CONTENT & AI -->
+<h2 class="text-2xl font-bold text-gray-800 mb-4">📝 Learning & AI Layer</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+  <div class="bg-white shadow-xl rounded-xl p-6 border border-blue-300">
+    <div class="text-2xl font-semibold text-blue-700">📝 content-service (LMS)</div>
+    <p class="text-sm text-gray-600 mt-2">
+      Stores lessons, notes, PDFs, videos, assignments, quizzes, submissions, content versioning,
+      and publishing workflow. Acts as the LMS core.
+    </p>
+  </div>
+
+  <div class="bg-white shadow-xl rounded-xl p-6 border border-purple-300">
+    <div class="text-2xl font-semibold text-purple-700">🤖 ai-service</div>
+    <p class="text-sm text-gray-600 mt-2">
+      AI-powered quiz generation, lesson creation, explanations, summaries, RAG-based answers, embeddings,
+      vector search, and per-school AI credit/token control.
+    </p>
+  </div>
+
+</div>
+
+<div class="flex justify-center my-10 text-gray-600 text-3xl">⬇</div>
+
+<!-- COMMUNICATION -->
+<div class="bg-white shadow-xl rounded-xl mx-auto px-12 py-6 border border-green-300 text-center w-full md:w-2/3">
+  <div class="text-2xl font-semibold text-green-700">📢 communication-service</div>
+  <p class="text-sm text-gray-600 mt-2">
+    Handles email, SMS, WhatsApp notifications, announcements, reminders, parent-teacher chats & alert routing.
+  </p>
+</div>
+
+
+<!-- TECH STACK -->
+<h2 class="text-2xl font-bold text-gray-800 mt-16 mb-4">🧰 Tech Stack & Tools</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+  <div class="bg-white p-6 shadow-lg rounded-xl border border-gray-200">
+    <h3 class="text-xl font-semibold text-gray-800 mb-2">Backend</h3>
+    <ul class="text-gray-700 text-sm space-y-1">
+      <li>✔ Spring Boot (Java 17+)</li>
+      <li>✔ Spring Security, Spring Data, Spring Cloud</li>
+      <li>✔ Spring AI for LLM integration</li>
+      <li>✔ Microservices architecture</li>
+      <li>✔ JWT & OAuth2</li>
+    </ul>
+  </div>
+
+  <div class="bg-white p-6 shadow-lg rounded-xl border border-gray-200">
+    <h3 class="text-xl font-semibold text-gray-800 mb-2">Databases</h3>
+    <ul class="text-gray-700 text-sm space-y-1">
+      <li>✔ MySQL → structured transactional data</li>
+      <li>✔ MongoDB → lesson content, AI logs, LMS data</li>
+      <li>✔ Redis → caching, sessions</li>
+      <li>✔ Elasticsearch → keyword search</li>
+      <li>✔ Vector DB (Milvus/Weaviate) → RAG search</li>
+      <li>✔ S3/MinIO → file storage</li>
+    </ul>
+  </div>
+
+  <div class="bg-white p-6 shadow-lg rounded-xl border border-gray-200">
+    <h3 class="text-xl font-semibold text-gray-800 mb-2">AI Stack</h3>
+    <ul class="text-gray-700 text-sm space-y-1">
+      <li>✔ OpenAI / Claude (cloud LLMs)</li>
+      <li>✔ Local models: Llama3 / Mistral (GPU server)</li>
+      <li>✔ Langchain4j (optional)</li>
+      <li>✔ Embeddings + RAG pipeline</li>
+      <li>✔ Prompt templates & caching</li>
+    </ul>
+  </div>
+
+  <div class="bg-white p-6 shadow-lg rounded-xl border border-gray-200">
+    <h3 class="text-xl font-semibold text-gray-800 mb-2">DevOps & Tools</h3>
+    <ul class="text-gray-700 text-sm space-y-1">
+      <li>✔ Docker + Compose</li>
+      <li>✔ Kubernetes (phase-2)</li>
+      <li>✔ Nginx API Gateway (or Spring Cloud Gateway)</li>
+      <li>✔ GitHub Actions / Jenkins CI/CD</li>
+      <li>✔ Grafana + Prometheus monitoring</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

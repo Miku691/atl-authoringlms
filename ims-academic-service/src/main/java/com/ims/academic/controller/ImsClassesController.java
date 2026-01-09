@@ -25,8 +25,7 @@ public class ImsClassesController {
                         .statusCode(HttpStatus.CREATED.value())
                         .message("Class created successfully")
                         .apiData(service.create(dto))
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/{id}")
@@ -37,8 +36,7 @@ public class ImsClassesController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Class fetched successfully")
                         .apiData(service.getById(id))
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/tenant/{tenantId}")
@@ -51,8 +49,20 @@ public class ImsClassesController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Classes fetched successfully")
                         .apiData(service.getByTenant(tenantId))
-                        .build()
-        );
+                        .build());
+    }
+
+    @GetMapping("/offering/{offeringId}")
+    public ResponseEntity<ApiResponse<List<ImsClassesDto>>> getByOffering(
+            @PathVariable String offeringId) {
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<ImsClassesDto>>builder()
+                        .status("SUCCESS")
+                        .statusCode(HttpStatus.OK.value())
+                        .message("Classes fetched successfully")
+                        .apiData(service.getByOffering(offeringId))
+                        .build());
     }
 
     @DeleteMapping("/{id}")
@@ -66,7 +76,6 @@ public class ImsClassesController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Class deleted successfully")
                         .apiData(null)
-                        .build()
-        );
+                        .build());
     }
 }

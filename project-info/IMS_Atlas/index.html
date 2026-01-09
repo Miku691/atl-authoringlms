@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMS Atlas - System Map</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="logo">IMS Atlas</div>
+        <ul class="nav-links">
+            <li><a href="index.html">System Overview</a></li>
+            <li><strong>Services</strong></li>
+            <li><a href="services/atl-gateway-service.html">Gateway Service</a></li>
+            <li><a href="services/atl-auth-service.html">Auth Service</a></li>
+            <li><a href="services/atl-discovery-server.html">Discovery Server</a></li>
+            <li><a href="services/atl-web-ui.html">Web UI</a></li>
+            <li><a href="services/ims-academic-service.html">Academic Service</a></li>
+            <li><a href="services/ims-student-service.html">Student Service</a></li>
+            <li><a href="services/ims-instructor-service.html">Instructor Service</a></li>
+            <li><a href="services/ims-staff-service.html">Staff Service</a></li>
+            <li><strong>Key Flows</strong></li>
+            <li><a href="flows/auth-flow.html">Authentication Flow</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>IMS Atlas System Map</h1>
+            <p>Welcome to the IMS Atlas. This living document explains the high-level architecture, services, and key
+                data flows of the ATL project.</p>
+        </header>
+
+        <section class="diagram-card">
+            <h2>System Architecture</h2>
+            <div class="mermaid">
+                graph TB
+                Client[Client Browser]
+                Gateway[API Gateway]
+                Auth[Auth Service]
+                Discovery[Discovery Server]
+                WebUI[Web UI]
+
+                subgraph "Core Services"
+                Academic[Academic Service]
+                Student[Student Service]
+                Instructor[Instructor Service]
+                Staff[Staff Service]
+                end
+
+                Client --> WebUI
+                Client --> Gateway
+                WebUI --> Gateway
+
+                Gateway --> Auth
+                Gateway --> Academic
+                Gateway --> Student
+                Gateway --> Instructor
+                Gateway --> Staff
+
+                Academic -.-> Discovery
+                Student -.-> Discovery
+                Instructor -.-> Discovery
+                Staff -.-> Discovery
+                Auth -.-> Discovery
+                Gateway -.-> Discovery
+            </div>
+        </section>
+
+        <section>
+            <h2>Service Directory</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>atl-gateway-service</h3>
+                    <p>The entry point for all API traffic. Handles routing, security headers, and initial authorization
+                        checks.</p>
+                    <a href="services/atl-gateway-service.html">View Details &rarr;</a>
+                </div>
+                <div class="card">
+                    <h3>atl-auth-service</h3>
+                    <p>Centralized identity and access management. Handles login, token issuance, and user roles.</p>
+                    <a href="services/atl-auth-service.html">View Details &rarr;</a>
+                </div>
+                <div class="card">
+                    <h3>atl-web-ui</h3>
+                    <p>The React-based frontend application providing the user interface for all tenant types.</p>
+                    <a href="services/atl-web-ui.html">View Details &rarr;</a>
+                </div>
+                <div class="card">
+                    <h3>ims-academic-service</h3>
+                    <p>Manages academic structures, including years, terms, subjects, and curriculum offerings.</p>
+                    <a href="services/ims-academic-service.html">View Details &rarr;</a>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

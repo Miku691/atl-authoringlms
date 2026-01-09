@@ -41,9 +41,15 @@ public class ImsTenants {
     @Column(name = "is_active")
     private Boolean isActive;
 
+    @Column(name = "setup_completed")
+    private Boolean setupCompleted = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private com.atl.auth.enums.TenantType type;
+
     @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<AtlUser> users = new ArrayList<>();
-
 
     @PrePersist
     protected void onCreate() {

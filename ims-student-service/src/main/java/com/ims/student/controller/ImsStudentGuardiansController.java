@@ -26,12 +26,12 @@ public class ImsStudentGuardiansController {
                         .statusCode(HttpStatus.CREATED.value())
                         .message("Guardian added successfully")
                         .apiData(saved)
-                        .build()
-        );
+                        .build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ImsStudentGuardiansDto>> update(@PathVariable String id, @RequestBody ImsStudentGuardiansDto dto) {
+    public ResponseEntity<ApiResponse<ImsStudentGuardiansDto>> update(@PathVariable String id,
+            @RequestBody ImsStudentGuardiansDto dto) {
         ImsStudentGuardiansDto updated = service.update(id, dto);
         return ResponseEntity.ok(
                 ApiResponse.<ImsStudentGuardiansDto>builder()
@@ -39,8 +39,7 @@ public class ImsStudentGuardiansController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Guardian updated successfully")
                         .apiData(updated)
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/{id}")
@@ -52,8 +51,7 @@ public class ImsStudentGuardiansController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Guardian details fetched successfully")
                         .apiData(dto)
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/student/{studentId}")
@@ -65,8 +63,7 @@ public class ImsStudentGuardiansController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Guardians fetched for student ID: " + studentId)
                         .apiData(list)
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping
@@ -78,8 +75,7 @@ public class ImsStudentGuardiansController {
                         .statusCode(HttpStatus.OK.value())
                         .message("All guardians fetched successfully")
                         .apiData(list)
-                        .build()
-        );
+                        .build());
     }
 
     @DeleteMapping("/{id}")
@@ -89,9 +85,8 @@ public class ImsStudentGuardiansController {
                 ApiResponse.<Void>builder()
                         .status("SUCCESS")
                         .statusCode(HttpStatus.OK.value())
-                        .message("Guardian deleted successfully")
+                        .message("Guardian removed successfully")
                         .apiData(null)
-                        .build()
-        );
+                        .build());
     }
 }

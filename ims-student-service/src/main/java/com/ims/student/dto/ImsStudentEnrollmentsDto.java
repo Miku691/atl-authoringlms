@@ -14,9 +14,9 @@ import java.time.Instant;
 public class ImsStudentEnrollmentsDto {
     private String id;
     private String studentId;
-    private String classId;
-    private String sectionId;
-    private String batchId;
+    private String offeringId;
+    private String status;
+    private boolean isDeleted;
     private Integer rollNo;
     private String academicYear;
     private Instant createdAt;

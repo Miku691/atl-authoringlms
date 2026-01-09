@@ -8,6 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import java.util.List;
 
@@ -32,8 +36,7 @@ public class ImsStudentDocumentsController {
                         .statusCode(HttpStatus.CREATED.value())
                         .message("Document uploaded successfully")
                         .apiData(saved)
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/student/{studentId}")
@@ -48,8 +51,7 @@ public class ImsStudentDocumentsController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Documents fetched successfully")
                         .apiData(list)
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/{id}")
@@ -61,8 +63,7 @@ public class ImsStudentDocumentsController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Document fetched successfully")
                         .apiData(dto)
-                        .build()
-        );
+                        .build());
     }
 
     @DeleteMapping("/{id}")
@@ -76,7 +77,21 @@ public class ImsStudentDocumentsController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Document deleted successfully")
                         .apiData(null)
-                        .build()
-        );
+                        .build());
+    }
+
+    @GetMapping("/view/{id}")
+    public ResponseEntity<Resource> viewFile(@PathVariable String id) throws IOException {
+        Resource resource = service.getFileResource(id);
+
+        // Determine content type
+        String contentType = Files.probeContentType(java.nio.file.Paths.get(resource.getURI()));
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .body(resource);
     }
 }

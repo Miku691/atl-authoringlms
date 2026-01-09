@@ -14,5 +14,7 @@ public interface ImsClassesService {
 
     List<ImsClassesDto> getByTenant(String tenantId);
 
+    List<ImsClassesDto> getByOffering(String offeringId);
+
     void delete(String id);
 }

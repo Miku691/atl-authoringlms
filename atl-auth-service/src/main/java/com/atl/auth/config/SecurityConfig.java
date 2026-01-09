@@ -23,31 +23,31 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf(csrf -> csrf.disable())
-                .sessionManagement(sessionConfig ->
-                        sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(
+                        sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .addFilterBefore(gatewayFilter, UsernamePasswordAuthenticationFilter.class)
 
-                .exceptionHandling(exceptionConfig ->
-                        exceptionConfig.authenticationEntryPoint(authenticationEntryPoint))
+                .exceptionHandling(
+                        exceptionConfig -> exceptionConfig.authenticationEntryPoint(authenticationEntryPoint))
 
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        //.requestMatchers("/auth/signin", "/auth/signup").permitAll()
-                        .requestMatchers("/auth/**", "/auth/otp/**").permitAll()
+                        // .requestMatchers("/auth/signin", "/auth/signup").permitAll()
+                        .requestMatchers("/auth/signin", "/auth/otp/**", "/auth/onboard-admin", "/auth/forgot-password/**").permitAll()
+                        .requestMatchers("/auth/signup").hasRole("TENANT_ADMIN")
 
                         .requestMatchers("/tenants/**").hasRole("TENANT_ADMIN")
                         .requestMatchers("/roles/**").hasRole("TENANT_ADMIN")
-                        .anyRequest().authenticated()
-                );
+                        .anyRequest().authenticated());
         return httpSecurity.build();
     }
 
     @Bean
-    PasswordEncoder passwordEncoder(){
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 

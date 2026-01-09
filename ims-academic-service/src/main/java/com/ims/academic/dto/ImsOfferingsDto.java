@@ -1,5 +1,6 @@
 package com.ims.academic.dto;
 
+import com.ims.academic.enums.OfferingStatus;
 import com.ims.academic.enums.OfferingType;
 import lombok.*;
 
@@ -20,4 +21,5 @@ public class ImsOfferingsDto {
     private LocalDate endDate;
     private Integer capacity;
     private String metadata;
+    private OfferingStatus status;
 }

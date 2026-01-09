@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web UI - IMS Atlas</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="logo">IMS Atlas</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">System Overview</a></li>
+            <li><strong>Services</strong></li>
+            <li><a href="atl-gateway-service.html">Gateway Service</a></li>
+            <li><a href="atl-auth-service.html">Auth Service</a></li>
+            <li><a href="atl-discovery-server.html">Discovery Server</a></li>
+            <li><a href="atl-web-ui.html">Web UI</a></li>
+            <li><a href="ims-academic-service.html">Academic Service</a></li>
+            <li><a href="ims-student-service.html">Student Service</a></li>
+            <li><a href="ims-instructor-service.html">Instructor Service</a></li>
+            <li><a href="ims-staff-service.html">Staff Service</a></li>
+            <li><strong>Key Flows</strong></li>
+            <li><a href="../flows/auth-flow.html">Authentication Flow</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Web UI (`atl-web-ui`)</h1>
+            <p>The single-page application (SPA) built with React and TypeScript.</p>
+        </header>
+
+        <section class="diagram-card">
+            <h2>Context Map</h2>
+            <div class="mermaid">
+                graph TB
+                User[User] --> WebUI[Web UI]
+                WebUI --> Gateway[API Gateway]
+            </div>
+        </section>
+
+        <section>
+            <h2>Responsibilities</h2>
+            <ul>
+                <li>Provide user interface for all personas (Admin, Staff, Student, etc.).</li>
+                <li>Handle client-side routing via React Router.</li>
+                <li>Manage user session and JWT storage via Redux Persist.</li>
+                <li>Dynamic Sidebar configuration based on roles.</li>
+            </ul>
+        </section>
+
+        <section class="diagram-card">
+            <h2>Internal Architecture</h2>
+            <p>The Web UI follows a component-based architecture using React, Redux for state management, and
+                TailwindCSS for styling.</p>
+            <div class="mermaid">
+                classDiagram
+                class App {
+                +Router
+                +ReduxProvider
+                +Toaster
+                }
+                class Store {
+                +AuthSlice
+                +ThemeSlice
+                }
+                class Layouts {
+                +AdminLayout
+                +AuthLayout
+                +StudentLayout
+                }
+                class Pages {
+                +Dashboard
+                +UserManagement
+                +Academics
+                }
+                class Components {
+                +Sidebar
+                +Navbar
+                +DataGrid
+                +Forms
+                }
+
+                App --> Store
+                App --> Layouts
+                Layouts --> Components
+                Layouts --> Pages
+                Pages --> Components
+            </div>
+        </section>
+
+        <section class="diagram-card">
+            <h2>State Management Flow</h2>
+            <div class="mermaid">
+                flowchart TD
+                Action[User Action] --> Dispatch[Dispatch Action]
+                Dispatch --> Thunk[Redux Thunk / API Call]
+                Thunk -->|Request| API[Backend API]
+                API -->|Response| Thunk
+                Thunk --> Reducer[Redux Reducer]
+                Reducer --> Store[Global Store]
+                Store -->|Updates| Components[React Components]
+            </div>
+        </section>
+
+        <section>
+            <h2>Directory Structure</h2>
+            <ul style="font-family: monospace; background: #f4f6f8; padding: 20px; border-radius: 8px;">
+                <li>src/
+                    <ul>
+                        <li><strong>components/</strong> - Reusable UI components (Buttons, Inputs, Sidebar)</li>
+                        <li><strong>layouts/</strong> - Page wrappers (AdminLayout, AuthLayout)</li>
+                        <li><strong>pages/</strong> - Route-specific page components</li>
+                        <li><strong>store/</strong> - Redux configuration and slices</li>
+                        <li><strong>config/</strong> - Static configurations (SidebarConfig)</li>
+                        <li><strong>utils/</strong> - Helper functions and Axios interceptors</li>
+                    </ul>
+                </li>
+            </ul>
+
+        </section>
+    </main>
+</body>
+
+</html>

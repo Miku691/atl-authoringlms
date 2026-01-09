@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>academic-service – DB Reference</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-10 bg-gray-50 font-sans">
+
+<div class="max-w-6xl mx-auto">
+  <h1 class="text-3xl font-bold mb-3 text-blue-700">📚 academic-service – Database Reference</h1>
+  <p class="text-sm text-gray-600 mb-6">
+    Single Academic service supporting School / College / Coaching. Weekly timetable + Per-day attendance.
+    Click a card to view table schema. Phase indicates recommended implementation phase.
+  </p>
+
+  <!-- Table Cards -->
+  <div id="cards" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- Core Entities -->
+    <div id="card-programs" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('programs','card-programs')">
+      <div class="text-lg font-semibold text-blue-700">programs</div>
+      <div class="text-sm text-gray-600">Academic programs (e.g. 10th CBSE, B.Tech CSE)</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-offerings" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('offerings','card-offerings')">
+      <div class="text-lg font-semibold text-blue-700">offerings</div>
+      <div class="text-sm text-gray-600">Runs/cohorts: class-section, semester, coaching batch (type flagged)</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1 (core)</div>
+    </div>
+
+    <div id="card-classes" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('classes','card-classes')">
+      <div class="text-lg font-semibold text-blue-700">classes</div>
+      <div class="text-sm text-gray-600">School classes / standards (1..12) - optional alias to offerings</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-sections" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('sections','card-sections')">
+      <div class="text-lg font-semibold text-blue-700">sections</div>
+      <div class="text-sm text-gray-600">Sections within a class (A/B/...)</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-batches" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('batches','card-batches')">
+      <div class="text-lg font-semibold text-blue-700">batches</div>
+      <div class="text-sm text-gray-600">Coaching batches (short runs, rolling starts)</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-subjects" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('subjects','card-subjects')">
+      <div class="text-lg font-semibold text-blue-700">subjects</div>
+      <div class="text-sm text-gray-600">Academic subjects / courses</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-offering_subjects" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('offering_subjects','card-offering_subjects')">
+      <div class="text-lg font-semibold text-blue-700">offering_subjects</div>
+      <div class="text-sm text-gray-600">Which subjects belong to an offering</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-offering_instructors" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('offering_instructors','card-offering_instructors')">
+      <div class="text-lg font-semibold text-blue-700">offering_instructors</div>
+      <div class="text-sm text-gray-600">Which instructors teach an offering/subject</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-academic_years" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('academic_years','card-academic_years')">
+      <div class="text-lg font-semibold text-blue-700">academic_years</div>
+      <div class="text-sm text-gray-600">Institution academic sessions (e.g., 2024-2025)</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <!-- Syllabus -->
+    <div id="card-syllabus_packs" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('syllabus_packs','card-syllabus_packs')">
+      <div class="text-lg font-semibold text-blue-700">syllabus_packs</div>
+      <div class="text-sm text-gray-600">Curriculum template or board-specific syllabus pack</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-chapters" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('chapters','card-chapters')">
+      <div class="text-lg font-semibold text-blue-700">chapters</div>
+      <div class="text-sm text-gray-600">Chapters inside a syllabus pack</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-syllabus_items" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('syllabus_items','card-syllabus_items')">
+      <div class="text-lg font-semibold text-blue-700">syllabus_items</div>
+      <div class="text-sm text-gray-600">Topics / learning objectives inside chapters</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <!-- Timetable -->
+    <div id="card-timetable_masters" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('timetable_masters','card-timetable_masters')">
+      <div class="text-lg font-semibold text-blue-700">timetable_masters</div>
+      <div class="text-sm text-gray-600">Weekly timetable container per offering</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-timetable_slots" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('timetable_slots','card-timetable_slots')">
+      <div class="text-lg font-semibold text-blue-700">timetable_slots</div>
+      <div class="text-sm text-gray-600">Definition of repeatable weekly slots (day_of_week, start, end)</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-timetable_entries" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('timetable_entries','card-timetable_entries')">
+      <div class="text-lg font-semibold text-blue-700">timetable_entries</div>
+      <div class="text-sm text-gray-600">Slot → subject → instructor → room mapping</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <!-- Attendance -->
+    <div id="card-attendance_master" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('attendance_master','card-attendance_master')">
+      <div class="text-lg font-semibold text-blue-700">attendance_master</div>
+      <div class="text-sm text-gray-600">Per-day attendance header (per offering + date)</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-attendance_records" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('attendance_records','card-attendance_records')">
+      <div class="text-lg font-semibold text-blue-700">attendance_records</div>
+      <div class="text-sm text-gray-600">Student attendance records (status per day)</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <!-- Assignments -->
+    <div id="card-assignments" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('assignments','card-assignments')">
+      <div class="text-lg font-semibold text-blue-700">assignments</div>
+      <div class="text-sm text-gray-600">Teacher assignments linked to offering/subject</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-assignment_submissions" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('assignment_submissions','card-assignment_submissions')">
+      <div class="text-lg font-semibold text-blue-700">assignment_submissions</div>
+      <div class="text-sm text-gray-600">Student submissions & grading</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <!-- Settings & mappings -->
+    <div id="card-offering_class_mappings" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('offering_class_mappings','card-offering_class_mappings')">
+      <div class="text-lg font-semibold text-blue-700">offering_class_mappings</div>
+      <div class="text-sm text-gray-600">Optional mapping to treat some offerings as classes</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-instructor_class_mappings" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('instructor_class_mappings','card-instructor_class_mappings')">
+      <div class="text-lg font-semibold text-blue-700">instructor_class_mappings</div>
+      <div class="text-sm text-gray-600">Quick mapping instructor → class/section for roster view</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <div id="card-tenant_settings" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('tenant_settings','card-tenant_settings')">
+      <div class="text-lg font-semibold text-blue-700">tenant_settings</div>
+      <div class="text-sm text-gray-600">Feature flags & academic config per tenant</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 1</div>
+    </div>
+
+    <!-- Phase-2 / Optional tables (exams, grading) -->
+    <div id="card-exam_master" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('exam_master','card-exam_master')">
+      <div class="text-lg font-semibold text-blue-700">exam_master</div>
+      <div class="text-sm text-gray-600">(Phase-2) Exam definitions & types</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 2</div>
+    </div>
+
+    <div id="card-exam_schedules" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('exam_schedules','card-exam_schedules')">
+      <div class="text-lg font-semibold text-blue-700">exam_schedules</div>
+      <div class="text-sm text-gray-600">(Phase-2) Subject schedules inside an exam</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 2</div>
+    </div>
+
+    <div id="card-exam_results" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('exam_results','card-exam_results')">
+      <div class="text-lg font-semibold text-blue-700">exam_results</div>
+      <div class="text-sm text-gray-600">(Phase-2) Student marks & result blobs</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 2</div>
+    </div>
+
+    <div id="card-grading_rules" class="table-card bg-white p-4 rounded-lg shadow cursor-pointer border border-transparent"
+         onclick="openSection('grading_rules','card-grading_rules')">
+      <div class="text-lg font-semibold text-blue-700">grading_rules</div>
+      <div class="text-sm text-gray-600">(Phase-2) Tenant-specific grading & CGPA rules</div>
+      <div class="text-xs text-gray-400 mt-2">Phase: 2</div>
+    </div>
+
+  </div>
+
+  <!-- Detail Sections -->
+  <div id="details" class="mt-8 space-y-6">
+
+    <!-- programs -->
+    <section id="programs" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <div class="flex justify-between items-start">
+        <h3 class="text-2xl font-bold text-blue-700">Table: programs</h3>
+        <div class="text-sm text-gray-500">Phase: 1 • Core academic program definitions</div>
+      </div>
+      <p class="text-sm text-gray-600 mb-4">Program describes the curriculum concept (e.g., 10th CBSE, B.Tech CSE, IIT-JEE Course).</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">Notes / FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Which institution offers this program</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+            <tr><td class="border px-3 py-2">code</td><td class="border px-3 py-2">VARCHAR(64)</td><td class="border px-3 py-2">Short program code</td><td class="border px-3 py-2">Unique per tenant</td></tr>
+            <tr><td class="border px-3 py-2">title</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Program title</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">level</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">school/undergrad/postgrad/coaching</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">board</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">e.g., CBSE, StateBoard, University</td><td class="border px-3 py-2">Optional</td></tr>
+            <tr><td class="border px-3 py-2">description</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">Summary</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">created_at</td><td class="border px-3 py-2">DATETIME</td><td class="border px-3 py-2">Created timestamp</td><td class="border px-3 py-2">UTC</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- offerings -->
+    <section id="offerings" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <div class="flex justify-between items-start">
+        <h3 class="text-2xl font-bold text-blue-700">Table: offerings</h3>
+        <div class="text-sm text-gray-500">Phase: 1 • Central run/cohort entity (supports class, semester, batch)</div>
+      </div>
+      <p class="text-sm text-gray-600 mb-4">Every timetables, enrollments, attendance, exams, assignments attach to an offering. Key field: <b>type</b>.</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">Notes / FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Institution</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+            <tr><td class="border px-3 py-2">program_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Reference to program</td><td class="border px-3 py-2">FK → programs(id)</td></tr>
+            <tr><td class="border px-3 py-2">type</td><td class="border px-3 py-2">ENUM</td><td class="border px-3 py-2">SCHOOL_CLASS | COLLEGE_PROGRAM | COACHING_BATCH</td><td class="border px-3 py-2">Drives behavior</td></tr>
+            <tr><td class="border px-3 py-2">name</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Human-friendly (e.g., Class 10-A, B.Tech CSE Sem1)</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">start_date</td><td class="border px-3 py-2">DATE</td><td class="border px-3 py-2">Offering start</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">end_date</td><td class="border px-3 py-2">DATE</td><td class="border px-3 py-2">Offering end (nullable for rolling)</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">capacity</td><td class="border px-3 py-2">INT</td><td class="border px-3 py-2">Max students (optional)</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">metadata</td><td class="border px-3 py-2">JSON</td><td class="border px-3 py-2">Flexible settings (e.g., semester_no)</td><td class="border px-3 py-2">Use for custom configs</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- classes -->
+    <section id="classes" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: classes</h3>
+      <p class="text-sm text-gray-600 mb-4">Optional alias table for school class definitions to map to offerings easily.</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Institution</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+            <tr><td class="border px-3 py-2">name</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">Class name e.g. '10'</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">code</td><td class="border px-3 py-2">VARCHAR(32)</td><td class="border px-3 py-2">Optional code</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- sections -->
+    <section id="sections" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: sections</h3>
+      <p class="text-sm text-gray-600 mb-4">Sections tied to classes or offerings (A/B/...)</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Institution</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+            <tr><td class="border px-3 py-2">class_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Parent class</td><td class="border px-3 py-2">FK → classes(id)</td></tr>
+            <tr><td class="border px-3 py-2">name</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">Section label e.g. 'A'</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- batches -->
+    <section id="batches" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: batches</h3>
+      <p class="text-sm text-gray-600 mb-4">Explicit coaching batch table (if needed separately from offerings).</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">offering_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">If created as part of offering</td><td class="border px-3 py-2">FK → offerings(id)</td></tr>
+            <tr><td class="border px-3 py-2">start_date</td><td class="border px-3 py-2">DATE</td><td class="border px-3 py-2">Batch start</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">end_date</td><td class="border px-3 py-2">DATE</td><td class="border px-3 py-2">Batch end</td><td class="border px-3 py-2">Nullable</td></tr>
+            <tr><td class="border px-3 py-2">capacity</td><td class="border px-3 py-2">INT</td><td class="border px-3 py-2">Max seats</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- subjects -->
+    <section id="subjects" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: subjects</h3>
+      <p class="text-sm text-gray-600 mb-4">Subject master reused across programs/offering</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">code</td><td class="border px-3 py-2">VARCHAR(64)</td><td class="border px-3 py-2">Subject short code</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">title</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Subject name</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">subject_type</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">theory/practical/elective</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- offering_subjects -->
+    <section id="offering_subjects" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: offering_subjects</h3>
+      <p class="text-sm text-gray-600 mb-4">Map subjects to an offering with order & weight</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">offering_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Offering</td><td class="border px-3 py-2">FK → offerings(id)</td></tr>
+            <tr><td class="border px-3 py-2">subject_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Subject</td><td class="border px-3 py-2">FK → subjects(id)</td></tr>
+            <tr><td class="border px-3 py-2">order_index</td><td class="border px-3 py-2">INT</td><td class="border px-3 py-2">Sequence in syllabus</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">weight</td><td class="border px-3 py-2">DECIMAL(5,2)</td><td class="border px-3 py-2">Relative weight for grading (optional)</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- offering_instructors -->
+    <section id="offering_instructors" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: offering_instructors</h3>
+      <p class="text-sm text-gray-600 mb-4">Assign instructors to offering (maybe per subject)</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">offering_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Offering</td><td class="border px-3 py-2">FK → offerings(id)</td></tr>
+            <tr><td class="border px-3 py-2">instructor_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Instructor (from instructor-service)</td><td class="border px-3 py-2">FK → instructors(id)</td></tr>
+            <tr><td class="border px-3 py-2">subject_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Optional: instructing subject</td><td class="border px-3 py-2">FK → subjects(id)</td></tr>
+            <tr><td class="border px-3 py-2">role</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">lead/assistant</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- academic_years -->
+    <section id="academic_years" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: academic_years</h3>
+      <p class="text-sm text-gray-600 mb-4">Academic session entries to group offerings & schedules</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Institution</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+            <tr><td class="border px-3 py-2">label</td><td class="border px-3 py-2">VARCHAR(30)</td><td class="border px-3 py-2">e.g., 2024-2025</td><td class="border px-3 py-2">Unique per tenant</td></tr>
+            <tr><td class="border px-3 py-2">start_date</td><td class="border px-3 py-2">DATE</td><td class="border px-3 py-2">Session start</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">end_date</td><td class="border px-3 py-2">DATE</td><td class="border px-3 py-2">Session end</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- syllabus_packs -->
+    <section id="syllabus_packs" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: syllabus_packs</h3>
+      <p class="text-sm text-gray-600 mb-4">Pack of syllabus content per board/program — importable templates.</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Owner tenant (or global pack if null)</td><td class="border px-3 py-2">FK → tenants(id) optional</td></tr>
+            <tr><td class="border px-3 py-2">title</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Pack name</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">board</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">Optional board</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- chapters -->
+    <section id="chapters" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: chapters</h3>
+      <p class="text-sm text-gray-600 mb-4">Chapters inside a syllabus pack</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">syllabus_pack_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Parent pack</td><td class="border px-3 py-2">FK → syllabus_packs(id)</td></tr>
+            <tr><td class="border px-3 py-2">title</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Chapter title</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">order_index</td><td class="border px-3 py-2">INT</td><td class="border px-3 py-2">Sequence</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- syllabus_items -->
+    <section id="syllabus_items" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: syllabus_items</h3>
+      <p class="text-sm text-gray-600 mb-4">Atomic learning items / topics mapped to chapters</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">chapter_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Parent chapter</td><td class="border px-3 py-2">FK → chapters(id)</td></tr>
+            <tr><td class="border px-3 py-2">title</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Topic title</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">summary</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">Optional description</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- timetable_masters -->
+    <section id="timetable_masters" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: timetable_masters</h3>
+      <p class="text-sm text-gray-600 mb-4">Weekly timetable container per offering + academic year</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">offering_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Offering associated</td><td class="border px-3 py-2">FK → offerings(id)</td></tr>
+            <tr><td class="border px-3 py-2">academic_year_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Session</td><td class="border px-3 py-2">FK → academic_years(id)</td></tr>
+            <tr><td class="border px-3 py-2">name</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Label e.g., 'Weekly Timetable 2024-25'</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">timezone</td><td class="border px-3 py-2">VARCHAR(64)</td><td class="border px-3 py-2">Use to render local times</td><td class="border px-3 py-2">Default tenant timezone</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- timetable_slots -->
+    <section id="timetable_slots" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: timetable_slots</h3>
+      <p class="text-sm text-gray-600 mb-4">Define weekly repeating timeslots (day_of_week based)</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">timetable_master_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Parent timetable</td><td class="border px-3 py-2">FK → timetable_masters(id)</td></tr>
+            <tr><td class="border px-3 py-2">day_of_week</td><td class="border px-3 py-2">TINYINT</td><td class="border px-3 py-2">0=Sun..6=Sat</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">start_time</td><td class="border px-3 py-2">TIME</td><td class="border px-3 py-2">HH:MM:SS</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">end_time</td><td class="border px-3 py-2">TIME</td><td class="border px-3 py-2">HH:MM:SS</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">slot_label</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">Optional name e.g. 'Period 1'</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- timetable_entries -->
+    <section id="timetable_entries" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: timetable_entries</h3>
+      <p class="text-sm text-gray-600 mb-4">Links slot → subject → instructor → room</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">timetable_slot_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Slot</td><td class="border px-3 py-2">FK → timetable_slots(id)</td></tr>
+            <tr><td class="border px-3 py-2">offering_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Offering (class/batch)</td><td class="border px-3 py-2">FK → offerings(id)</td></tr>
+            <tr><td class="border px-3 py-2">subject_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Subject</td><td class="border px-3 py-2">FK → subjects(id)</td></tr>
+            <tr><td class="border px-3 py-2">instructor_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Instructor</td><td class="border px-3 py-2">FK → instructors(id)</td></tr>
+            <tr><td class="border px-3 py-2">room</td><td class="border px-3 py-2">VARCHAR(100)</td><td class="border px-3 py-2">Optional room/venue</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- attendance_master -->
+    <section id="attendance_master" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: attendance_master</h3>
+      <p class="text-sm text-gray-600 mb-4">Header per-offering per-date (per-day attendance model)</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">offering_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Offering for which attendance is taken</td><td class="border px-3 py-2">FK → offerings(id)</td></tr>
+            <tr><td class="border px-3 py-2">date</td><td class="border px-3 py-2">DATE</td><td class="border px-3 py-2">Attendance date</td><td class="border px-3 py-2">Indexed</td></tr>
+            <tr><td class="border px-3 py-2">status</td><td class="border px-3 py-2">VARCHAR(20)</td><td class="border px-3 py-2">open/locked/published</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">taken_by</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">User who took attendance</td><td class="border px-3 py-2">FK → users(id)</td></tr>
+            <tr><td class="border px-3 py-2">notes</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">Optional</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- attendance_records -->
+    <section id="attendance_records" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: attendance_records</h3>
+      <p class="text-sm text-gray-600 mb-4">One record per student per date (PER DAY model)</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">attendance_master_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Header row</td><td class="border px-3 py-2">FK → attendance_master(id)</td></tr>
+            <tr><td class="border px-3 py-2">student_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Student</td><td class="border px-3 py-2">FK → students(id)</td></tr>
+            <tr><td class="border px-3 py-2">status</td><td class="border px-3 py-2">ENUM</td><td class="border px-3 py-2">present/absent/leave/late</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">remarks</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">Optional reason</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- assignments -->
+    <section id="assignments" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: assignments</h3>
+      <p class="text-sm text-gray-600 mb-4">Teacher-assigned homework/assignment attached to offering/subject</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">offering_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Associated offering</td><td class="border px-3 py-2">FK → offerings(id)</td></tr>
+            <tr><td class="border px-3 py-2">subject_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Subject (nullable)</td><td class="border px-3 py-2">FK → subjects(id)</td></tr>
+            <tr><td class="border px-3 py-2">title</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Assignment title</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">description</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">Assignment text</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">due_date</td><td class="border px-3 py-2">DATETIME</td><td class="border px-3 py-2">Submission deadline</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">created_by</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Instructor who created</td><td class="border px-3 py-2">FK → users(id)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- assignment_submissions -->
+    <section id="assignment_submissions" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: assignment_submissions</h3>
+      <p class="text-sm text-gray-600 mb-4">Student uploads and grading info</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Description</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">assignment_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Assignment ref</td><td class="border px-3 py-2">FK → assignments(id)</td></tr>
+            <tr><td class="border px-3 py-2">student_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Student</td><td class="border px-3 py-2">FK → students(id)</td></tr>
+            <tr><td class="border px-3 py-2">file_url</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">Submission S3 path</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">submitted_at</td><td class="border px-3 py-2">DATETIME</td><td class="border px-3 py-2">Timestamp</td><td class="border px-3 py-2">UTC</td></tr>
+            <tr><td class="border px-3 py-2">score</td><td class="border px-3 py-2">DECIMAL(6,2)</td><td class="border px-3 py-2">Optional grade</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">feedback</td><td class="border px-3 py-2">TEXT</td><td class="border px-3 py-2">Instructor feedback</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- offering_class_mappings -->
+    <section id="offering_class_mappings" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: offering_class_mappings</h3>
+      <p class="text-sm text-gray-600 mb-4">Optional table that maps offerings to class/section entities for school-style view</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Desc</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">offering_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Offering</td><td class="border px-3 py-2">FK → offerings(id)</td></tr>
+            <tr><td class="border px-3 py-2">class_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Class</td><td class="border px-3 py-2">FK → classes(id)</td></tr>
+            <tr><td class="border px-3 py-2">section_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Section</td><td class="border px-3 py-2">FK → sections(id)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- instructor_class_mappings -->
+    <section id="instructor_class_mappings" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: instructor_class_mappings</h3>
+      <p class="text-sm text-gray-600 mb-4">Quick mapping instructor → class/section for roster & reporting</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Desc</th><th class="border px-3 py-2">FK</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td><td class="border px-3 py-2">—</td></tr>
+            <tr><td class="border px-3 py-2">instructor_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Instructor</td><td class="border px-3 py-2">FK → instructors(id)</td></tr>
+            <tr><td class="border px-3 py-2">class_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Class</td><td class="border px-3 py-2">FK → classes(id)</td></tr>
+            <tr><td class="border px-3 py-2">section_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Section</td><td class="border px-3 py-2">FK → sections(id)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- tenant_settings -->
+    <section id="tenant_settings" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: tenant_settings</h3>
+      <p class="text-sm text-gray-600 mb-4">Feature flags and academic-specific config per tenant</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Desc</th><th class="border px-3 py-2">Notes</th></tr></thead>
+          <tbody>
+            <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK / FK</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+            <tr><td class="border px-3 py-2">settings</td><td class="border px-3 py-2">JSON</td><td class="border px-3 py-2">e.g., {enable_semesters:false, attendance_mode:'PER_DAY'}</td><td class="border px-3 py-2">Use for all flags</td></tr>
+            <tr><td class="border px-3 py-2">updated_at</td><td class="border px-3 py-2">DATETIME</td><td class="border px-3 py-2">Last update</td><td class="border px-3 py-2">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Phase-2 Exam related tables -->
+    <section id="exam_master" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: exam_master <span class="text-sm text-gray-500">Phase-2</span></h3>
+      <p class="text-sm text-gray-600 mb-4">Exam definitions (term/unit tests) — implement in Phase-2</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse"><thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Desc</th></tr></thead><tbody>
+          <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td></tr>
+          <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+          <tr><td class="border px-3 py-2">offering_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Related offering</td></tr>
+          <tr><td class="border px-3 py-2">name</td><td class="border px-3 py-2">VARCHAR(255)</td><td class="border px-3 py-2">Exam name</td></tr>
+          <tr><td class="border px-3 py-2">type</td><td class="border px-3 py-2">VARCHAR(50)</td><td class="border px-3 py-2">Half-yearly/unit/quiz</td></tr>
+        </tbody></table>
+      </div>
+    </section>
+
+    <section id="exam_schedules" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: exam_schedules <span class="text-sm text-gray-500">Phase-2</span></h3>
+      <p class="text-sm text-gray-600 mb-4">Subject-wise schedule for exams</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse"><thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Desc</th></tr></thead><tbody>
+          <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td></tr>
+          <tr><td class="border px-3 py-2">exam_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">FK → exam_master(id)</td></tr>
+          <tr><td class="border px-3 py-2">subject_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">FK → subjects(id)</td></tr>
+          <tr><td class="border px-3 py-2">date</td><td class="border px-3 py-2">DATE</td><td class="border px-3 py-2">Exam date</td></tr>
+          <tr><td class="border px-3 py-2">start_time</td><td class="border px-3 py-2">TIME</td><td class="border px-3 py-2">Start time</td></tr>
+        </tbody></table>
+      </div>
+    </section>
+
+    <section id="exam_results" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: exam_results <span class="text-sm text-gray-500">Phase-2</span></h3>
+      <p class="text-sm text-gray-600 mb-4">Results per student; keep flexible JSON payload for extensibility</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse"><thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Desc</th></tr></thead><tbody>
+          <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td></tr>
+          <tr><td class="border px-3 py-2">exam_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">FK → exam_master(id)</td></tr>
+          <tr><td class="border px-3 py-2">student_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">Student</td></tr>
+          <tr><td class="border px-3 py-2">result_payload</td><td class="border px-3 py-2">JSON</td><td class="border px-3 py-2">Marks, grades, remarks</td></tr>
+        </tbody></table>
+      </div>
+    </section>
+
+    <section id="grading_rules" class="hidden bg-white p-6 rounded-lg shadow-inner border">
+      <h3 class="text-2xl font-bold text-blue-700">Table: grading_rules <span class="text-sm text-gray-500">Phase-2</span></h3>
+      <p class="text-sm text-gray-600 mb-4">Tenant-defined grade boundaries and CGPA rules</p>
+      <div class="overflow-auto">
+        <table class="w-full text-left border-collapse"><thead class="bg-gray-100"><tr><th class="border px-3 py-2">Column</th><th class="border px-3 py-2">Type</th><th class="border px-3 py-2">Desc</th></tr></thead><tbody>
+          <tr><td class="border px-3 py-2">id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">PK</td></tr>
+          <tr><td class="border px-3 py-2">tenant_id</td><td class="border px-3 py-2">UUID</td><td class="border px-3 py-2">FK → tenants(id)</td></tr>
+          <tr><td class="border px-3 py-2">rule_payload</td><td class="border px-3 py-2">JSON</td><td class="border px-3 py-2">E.g., [{min:90,max:100,grade:'A+'},...]</td></tr>
+        </tbody></table>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer mapping notes -->
+  <div class="mt-8 p-4 bg-white border rounded-lg text-sm text-gray-700">
+    <h4 class="font-semibold mb-2">Mapping & Implementation Notes</h4>
+    <ul class="list-disc pl-5 space-y-1">
+      <li>Use <b>offerings</b> as canonical run/cohort. All enrollments, timetable, attendance and assignments reference offering_id.</li>
+      <li>Set <b>offerings.type</b> = SCHOOL_CLASS | COLLEGE_PROGRAM | COACHING_BATCH to drive behavior. Avoid spreading type checks; encapsulate logic in domain services.</li>
+      <li>Store flexible configs in <b>tenant_settings.settings</b> JSON. Example defaults: <code>{ "attendance_mode":"PER_DAY", "timetable_mode":"WEEKLY" }</code>.</li>
+      <li>Index high-churn tables: <b>attendance_records(attendance_master_id)</b>, <b>offering_subjects(offering_id)</b>, <b>student_enrollments(offering_id)</b> (student_enrollments is in student-service but queries will reference offering).</li>
+      <li>Keep heavy, frequently-read views (e.g., current class roster) as materialized views or caches to minimize joins across services.</li>
+      <li>Exam tables are Phase-2. Start with assignments & attendance in Phase-1 to validate academic flows.</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+  // Toggle section visibility and highlight card
+  function openSection(sectionId, cardId) {
+    // hide all sections
+    document.querySelectorAll('#details section').forEach(s => s.classList.add('hidden'));
+    // remove highlight from all cards
+    document.querySelectorAll('.table-card').forEach(c => c.classList.remove('border-blue-500','ring','ring-blue-200'));
+    // show selected section
+    const sec = document.getElementById(sectionId);
+    if (sec) sec.classList.remove('hidden');
+    // highlight card
+    const card = document.getElementById(cardId);
+    if (card) card.classList.add('border-blue-500','ring','ring-blue-200');
+    // scroll into view
+    setTimeout(()=>{ sec && sec.scrollIntoView({behavior:'smooth', block:'start'}); }, 100);
+  }
+
+  // Make cards keyboard accessible
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.table-card').forEach(el => {
+      el.setAttribute('tabindex','0');
+      el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); el.click(); }});
+    });
+  });
+</script>
+
+</body>
+</html>

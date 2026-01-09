@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gateway Service - IMS Atlas</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="logo">IMS Atlas</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">System Overview</a></li>
+            <li><strong>Services</strong></li>
+            <li><a href="atl-gateway-service.html">Gateway Service</a></li>
+            <li><a href="atl-auth-service.html">Auth Service</a></li>
+            <li><a href="atl-discovery-server.html">Discovery Server</a></li>
+            <li><a href="atl-web-ui.html">Web UI</a></li>
+            <li><a href="ims-academic-service.html">Academic Service</a></li>
+            <li><a href="ims-student-service.html">Student Service</a></li>
+            <li><a href="ims-instructor-service.html">Instructor Service</a></li>
+            <li><a href="ims-staff-service.html">Staff Service</a></li>
+            <li><strong>Key Flows</strong></li>
+            <li><a href="../flows/auth-flow.html">Authentication Flow</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Gateway Service (`atl-gateway-service`)</h1>
+            <p>The centralized entry point for all API traffic, routing requests to appropriate microservices.</p>
+        </header>
+
+        <section class="diagram-card">
+            <h2>Context Map</h2>
+            <div class="mermaid">
+                graph LR
+                Client[Client] --> Gateway[Gateway Service]
+                Gateway --> Auth[Auth Service]
+                Gateway --> Academic[Academic Service]
+                Gateway --> Student[Student Service]
+                Gateway --> Instructor[Instructor Service]
+                Gateway --> Staff[Staff Service]
+                Gateway -.-> Discovery[Discovery Service]
+            </div>
+        </section>
+
+        <section>
+            <h2>Responsibilities</h2>
+            <ul>
+                <li><strong>Routing:</strong> Directs incoming API requests to the correct microservice based on the
+                    path.</li>
+                <li><strong>Security:</strong> Enforces security headers and initial CORS policies.</li>
+                <li><strong>Authentication:</strong> Validates JWT tokens for protected routes (via filter).</li>
+                <li><strong>Load Balancing:</strong> Distributes traffic across service instances (client-side load
+                    balancing via Discovery).</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Key Configurations</h2>
+            <ul>
+                <li>Routes are configured in `application.yml` / `properties`.</li>
+                <li>Uses Global Error Attributes for consistent error responses.</li>
+                <li>Integrates with Zipkin/Sleuth for distributed tracing (if enabled).</li>
+            </ul>
+        </section>
+    </main>
+</body>
+
+</html>

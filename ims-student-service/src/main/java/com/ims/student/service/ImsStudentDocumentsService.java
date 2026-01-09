@@ -8,7 +8,12 @@ import java.util.List;
 public interface ImsStudentDocumentsService {
 
     ImsStudentDocumentsDto upload(String studentId, String documentType, MultipartFile file);
+
     List<ImsStudentDocumentsDto> getByStudentId(String studentId);
+
     ImsStudentDocumentsDto getById(String id);
+
     void delete(String id);
+
+    org.springframework.core.io.Resource getFileResource(String id);
 }

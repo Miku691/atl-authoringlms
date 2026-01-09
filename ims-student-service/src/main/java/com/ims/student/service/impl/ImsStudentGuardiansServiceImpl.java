@@ -31,10 +31,12 @@ public class ImsStudentGuardiansServiceImpl implements ImsStudentGuardiansServic
 
     @Override
     public ImsStudentGuardiansDto create(ImsStudentGuardiansDto dto) {
-
         // Ensure student exists
         studentsRepo.findById(dto.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Student ID", dto.getStudentId()));
+
+        // No unique constraint check required as per design (allows siblings to have
+        // same guardian)
 
         ImsStudentGuardians saved = repo.save(toEntity(dto));
         return toDto(saved);
@@ -43,6 +45,7 @@ public class ImsStudentGuardiansServiceImpl implements ImsStudentGuardiansServic
     @Override
     public ImsStudentGuardiansDto update(String id, ImsStudentGuardiansDto dto) {
         ImsStudentGuardians existing = repo.findById(id)
+                .filter(g -> !g.isDeleted())
                 .orElseThrow(() -> new ResourceNotFoundException("Guardian ID", id));
 
         // Update allowed fields
@@ -59,26 +62,35 @@ public class ImsStudentGuardiansServiceImpl implements ImsStudentGuardiansServic
 
     @Override
     public ImsStudentGuardiansDto getById(String id) {
-        return repo.findById(id).map(this::toDto)
+        return repo.findById(id)
+                .filter(g -> !g.isDeleted())
+                .map(this::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Guardian ID", id));
     }
 
     @Override
     public List<ImsStudentGuardiansDto> getByStudentId(String studentId) {
         return repo.findByStudentId(studentId)
-                .stream().map(this::toDto).collect(Collectors.toList());
+                .stream()
+                .filter(g -> !g.isDeleted())
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<ImsStudentGuardiansDto> getAll() {
-        return repo.findAll().stream().map(this::toDto).collect(Collectors.toList());
+        return repo.findAll().stream()
+                .filter(g -> !g.isDeleted())
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void delete(String id) {
-        if (!repo.existsById(id)) {
-            throw new ResourceNotFoundException("Guardian ID", id);
-        }
-        repo.deleteById(id);
+        ImsStudentGuardians existing = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Guardian ID", id));
+
+        existing.setDeleted(true);
+        repo.save(existing);
     }
 }

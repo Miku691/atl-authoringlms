@@ -42,7 +42,6 @@ public class ImsPrograms {
         }
     }
 
-    // 🔹 Tenant reference (NO JPA relation — microservice safe)
     @Column(name = "tenant_id", nullable = false)
     private String tenantId;
 
@@ -67,25 +66,16 @@ public class ImsPrograms {
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 
-    /*
-     =====================================================
-     FUTURE ENTITY MAPPINGS (Academic-Service Only)
-     =====================================================
-
-     These entities will be created later.
-     DO NOT REMOVE — this is future-safe design.
-    */
-
     // Program → Offerings (Class / Batch / Degree Instance)
      @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
      private List<ImsOfferings> offerings;
 
     // Program → Subjects
-    // @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
-    // private List<ImsSubjects> subjects;
+     @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
+     private List<ImsSubjects> subjects;
 
     // Program → Academic Years
-    // @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
-    // private List<ImsAcademicYears> academicYears;
+     @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
+     private List<ImsAcademicYears> academicYears;
 }
 

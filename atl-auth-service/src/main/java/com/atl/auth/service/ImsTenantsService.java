@@ -22,11 +22,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ImsTenantsService{
+public class ImsTenantsService {
     private final ImsTenantsRepo repo;
     private final ModelMapper modelMapper;
     private final AtlUserService userService;
     private final AtlUserRepo userRepo;
+    private final com.atl.auth.client.AcademicClient academicClient;
 
     private ImsTenantsDto convertToDto(ImsTenants entity) {
         return modelMapper.map(entity, ImsTenantsDto.class);
@@ -40,12 +41,14 @@ public class ImsTenantsService{
         if (repo.existsByTenantCode(dto.getTenantCode())) {
             throw new ResourceAlreadyExistException("Tenant Code", dto.getTenantCode());
         }
-        AtlUser user = userRepo.findByUsername(dto.getBootstrapUsername()).orElseThrow(() -> new ResourceNotFoundException("User Id", dto.getBootstrapUsername()));
+        AtlUser user = userRepo.findByUsername(dto.getBootstrapUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("User Id", dto.getBootstrapUsername()));
 
         ImsTenants saved = repo.save(convertToEntity(dto));
 
-        if(saved.getId() != null){
-            userService.updateUserStatusOrTenantId(new AtlUpdateAtlUserDto(user.getUsername(), user.getEmail(), ApplicationConstant.USER_ACTIVE, saved));
+        if (saved.getId() != null) {
+            userService.updateUserStatusOrTenantId(new AtlUpdateAtlUserDto(user.getUsername(), user.getEmail(),
+                    ApplicationConstant.USER_ACTIVE, saved));
         }
 
         return ApiResponse.<ImsTenantsDto>builder()
@@ -88,5 +91,23 @@ public class ImsTenantsService{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tenant not found");
         }
         repo.deleteById(id);
+    }
+
+    public void verifySetup(String id, com.atl.auth.enums.TenantType type) {
+        ImsTenants tenant = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tenant", id));
+
+        // Verify with Academic Service
+        Boolean isSetupInAcademic = academicClient.checkSetupStatus(id);
+
+        if (Boolean.TRUE.equals(isSetupInAcademic)) {
+            tenant.setSetupCompleted(true);
+            if (type != null) {
+                tenant.setType(type);
+            }
+            repo.save(tenant);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tenant setup not completed in Academic Service");
+        }
     }
 }

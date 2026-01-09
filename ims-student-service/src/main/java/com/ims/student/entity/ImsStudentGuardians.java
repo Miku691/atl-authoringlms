@@ -12,10 +12,9 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.Instant;
 
 @Entity
-@Table(name = "IMS_STUDENT_GUARDIANS",
-        indexes = {
-                @Index(name = "idx_guardians_student", columnList = "student_id")
-        })
+@Table(name = "IMS_STUDENT_GUARDIANS", indexes = {
+        @Index(name = "idx_guardians_student", columnList = "student_id")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -54,6 +53,10 @@ public class ImsStudentGuardians {
 
     @Column(name = "address", columnDefinition = "TEXT")
     private String address;
+
+    @Column(name = "is_deleted")
+    @Builder.Default
+    private boolean isDeleted = false;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

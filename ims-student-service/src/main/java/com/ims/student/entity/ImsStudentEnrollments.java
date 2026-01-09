@@ -12,11 +12,10 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.Instant;
 
 @Entity
-@Table(name = "IMS_STUDENT_ENROLLMENTS",
-        indexes = {
-                @Index(name = "idx_enrollment_student", columnList = "student_id"),
-                @Index(name = "idx_enrollment_class", columnList = "class_id")
-        })
+@Table(name = "IMS_STUDENT_ENROLLMENTS", indexes = {
+        @Index(name = "idx_enrollment_student", columnList = "student_id"),
+        @Index(name = "idx_enrollment_class", columnList = "class_id")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -36,22 +35,23 @@ public class ImsStudentEnrollments {
     }
 
     @Column(name = "student_id", nullable = false)
-    private String studentId; // FK from students table
+    private String studentId;
 
-    @Column(name = "class_id")
-    private String classId; // academic-service class
+    @Column(name = "offering_id", nullable = false)
+    private String offeringId; // UUID of Offering (Class/Batch/Semester)
 
-    @Column(name = "section_id")
-    private String sectionId; // academic-service section
+    @Column(name = "status", length = 20)
+    private String status; // ACTIVE / COMPLETED / WITHDRAWN
 
-    @Column(name = "batch_id")
-    private String batchId; // academic-service batch (optional)
+    @Column(name = "is_deleted")
+    @Builder.Default
+    private boolean isDeleted = false;
 
     @Column(name = "roll_no")
     private Integer rollNo;
 
     @Column(name = "academic_year", length = 20)
-    private String academicYear; // YYYY-YYYY
+    private String academicYear;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

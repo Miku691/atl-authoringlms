@@ -37,6 +37,10 @@ public class ImsSubjects {
     @Column(name = "subject_type", nullable = false, length = 50)
     private SubjectType subjectType;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "program_id", nullable = false)
+    private ImsPrograms program;
+
     @PrePersist
     protected void onCreate() {
         if (this.id == null || this.id.isEmpty()) {

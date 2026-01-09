@@ -10,4 +10,6 @@ public interface ImsOfferingsRepo extends JpaRepository<ImsOfferings, String> {
     List<ImsOfferings> findByTenantId(String tenantId);
 
     List<ImsOfferings> findByProgramId(String programId);
+
+    long countByTenantId(String tenantId);
 }

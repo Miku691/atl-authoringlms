@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Service - IMS Atlas</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="logo">IMS Atlas</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">System Overview</a></li>
+            <li><strong>Services</strong></li>
+            <li><a href="atl-gateway-service.html">Gateway Service</a></li>
+            <li><a href="atl-auth-service.html">Auth Service</a></li>
+            <li><a href="atl-discovery-server.html">Discovery Server</a></li>
+            <li><a href="atl-web-ui.html">Web UI</a></li>
+            <li><a href="ims-academic-service.html">Academic Service</a></li>
+            <li><a href="ims-student-service.html">Student Service</a></li>
+            <li><a href="ims-instructor-service.html">Instructor Service</a></li>
+            <li><a href="ims-staff-service.html">Staff Service</a></li>
+            <li><strong>Key Flows</strong></li>
+            <li><a href="../flows/auth-flow.html">Authentication Flow</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Staff Service (`ims-staff-service`)</h1>
+            <p>Manages non-teaching staff profiles and roles within the institution.</p>
+        </header>
+
+        <section class="diagram-card">
+            <h2>Context Map</h2>
+            <div class="mermaid">
+                graph LR
+                Gateway --> Staff[Staff Service]
+                Staff --> DB[(Staff DB)]
+            </div>
+        </section>
+
+        <section>
+            <h2>Responsibilities</h2>
+            <ul>
+                <li><strong>Staff Profiles:</strong> Storing data for administrative and support staff.</li>
+                <li><strong>Role Management:</strong> Assigning specific functional roles to staff members.</li>
+            </ul>
+        </section>
+    </main>
+</body>
+
+</html>
