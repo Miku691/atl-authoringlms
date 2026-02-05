@@ -37,8 +37,12 @@ public class ImsTimetableMastersServiceImpl implements ImsTimetableMastersServic
         if (entity.getSlots() != null) {
             entity.getSlots().forEach(slot -> {
                 slot.setTimetableMaster(entity);
+                slot.setTenantId(entity.getTenantId()); // Cascade tenantId
                 if (slot.getEntries() != null) {
-                    slot.getEntries().forEach(entry -> entry.setTimetableSlot(slot));
+                    slot.getEntries().forEach(entry -> {
+                        entry.setTimetableSlot(slot);
+                        entry.setTenantId(entity.getTenantId()); // Cascade tenantId
+                    });
                 }
             });
         }
@@ -77,6 +81,14 @@ public class ImsTimetableMastersServiceImpl implements ImsTimetableMastersServic
     @Override
     public List<ImsTimetableMastersDto> getByOfferingId(String offeringId) {
         return repo.findByOfferingId(offeringId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImsTimetableMastersDto> getByOfferingIdAndTenantId(String offeringId, String tenantId) {
+        return repo.findByOfferingIdAndTenantId(offeringId, tenantId)
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());

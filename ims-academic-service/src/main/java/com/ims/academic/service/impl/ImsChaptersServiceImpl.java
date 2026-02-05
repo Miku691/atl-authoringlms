@@ -4,7 +4,9 @@ import com.ims.academic.dto.ImsChaptersDto;
 import com.ims.academic.entity.ImsChapters;
 import com.ims.academic.exception.ResourceNotFoundException;
 import com.ims.academic.repo.ImsChaptersRepo;
+import com.ims.academic.repo.ImsOfferingSubjectRepo;
 import com.ims.academic.service.ImsChaptersService;
+import com.ims.academic.entity.ImsOfferingSubject;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -17,28 +19,22 @@ import java.util.stream.Collectors;
 public class ImsChaptersServiceImpl implements ImsChaptersService {
 
     private final ImsChaptersRepo repo;
+    private final ImsOfferingSubjectRepo offeringSubjectRepo;
     private final ModelMapper modelMapper;
-
-    private ImsChaptersDto toDto(ImsChapters entity) {
-        return modelMapper.map(entity, ImsChaptersDto.class);
-    }
-
-    private ImsChapters toEntity(ImsChaptersDto dto) {
-        return modelMapper.map(dto, ImsChapters.class);
-    }
 
     @Override
     public ImsChaptersDto create(ImsChaptersDto dto) {
-        // Here we could add logic to ensure syllabusPackId exists using
-        // ImsSyllabusPacksRepo
-        // For now, assuming basic CRUD without cross-service/cross-repo validation
-        // unless strictly needed
-        return toDto(repo.save(toEntity(dto)));
+        ImsOfferingSubject offeringSubject = offeringSubjectRepo.findById(dto.getOfferingSubjectId())
+                .orElseThrow(() -> new ResourceNotFoundException("OfferingSubject ID", dto.getOfferingSubjectId()));
+
+        ImsChapters entity = modelMapper.map(dto, ImsChapters.class);
+        entity.setOfferingSubject(offeringSubject);
+
+        return toDto(repo.save(entity));
     }
 
     @Override
     public ImsChaptersDto update(String id, ImsChaptersDto dto) {
-
         ImsChapters existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Chapter ID", id));
 
@@ -56,8 +52,8 @@ public class ImsChaptersServiceImpl implements ImsChaptersService {
     }
 
     @Override
-    public List<ImsChaptersDto> getBySyllabusPackId(String syllabusPackId) {
-        return repo.findBySyllabusPackId(syllabusPackId)
+    public List<ImsChaptersDto> getByOfferingSubjectId(String offeringSubjectId) {
+        return repo.findByOfferingSubjectIdOrderByOrderIndexAsc(offeringSubjectId)
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
@@ -69,5 +65,13 @@ public class ImsChaptersServiceImpl implements ImsChaptersService {
             throw new ResourceNotFoundException("Chapter ID", id);
         }
         repo.deleteById(id);
+    }
+
+    private ImsChaptersDto toDto(ImsChapters entity) {
+        ImsChaptersDto dto = modelMapper.map(entity, ImsChaptersDto.class);
+        if (entity.getOfferingSubject() != null) {
+            dto.setOfferingSubjectId(entity.getOfferingSubject().getId());
+        }
+        return dto;
     }
 }

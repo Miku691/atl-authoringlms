@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -16,13 +17,21 @@ import java.time.Instant;
 public class ImsStaffDto {
     private String id;
     private String tenantId;
-    private String userId;
     private String firstName;
     private String lastName;
-    private RelationType relationType;
-    private String contactNumber;
+    private String phone;
+    private String employeeId;
+    private LocalDate joinDate;
+    private LocalDate dob;
+    private String gender;
+    private String address;
+    private String role;
+    private String department;
     private String email;
     private StaffStatus status;
     private Instant createdAt;
     private Instant updatedAt;
+    private Double monthlySalary;
+    private String qualification;
+    private String experience;
 }

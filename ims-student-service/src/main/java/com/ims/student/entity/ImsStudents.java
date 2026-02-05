@@ -79,6 +79,27 @@ public class ImsStudents {
     @Column(name = "address", columnDefinition = "TEXT")
     private String address;
 
+    @Column(name = "medical_history", columnDefinition = "TEXT")
+    private String medicalHistory;
+
+    @Column(name = "previous_education", columnDefinition = "TEXT")
+    private String previousEducation;
+
+    @Column(name = "birth_form_id", length = 50)
+    private String birthFormId;
+
+    @Column(name = "is_orphan")
+    private Boolean isOrphan;
+
+    @Column(name = "caste", length = 50)
+    private String caste;
+
+    @Column(name = "previous_school", length = 255)
+    private String previousSchool;
+
+    @Column(name = "admission_discount")
+    private Double admissionDiscount;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;

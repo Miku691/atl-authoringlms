@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "IMS-ACADEMIC-SERVICE")
 public interface AcademicClient {
 
-    @GetMapping("/ims-academic/bootstrap/status")
+    @GetMapping("/bootstrap/status")
     Boolean checkSetupStatus(@RequestParam("tenantId") String tenantId);
 }

@@ -1,0 +1,16 @@
+Fees Particulars Fields:
+
+- Target Audience (Dropdown: All Students, etc.)
+- Fee Names (Customizable Labels):
+    - Monthly Tuition Fee
+    - Admission Fee
+    - Registration Fee
+    - Art Material
+    - Transport
+    - Books
+    - Uniform
+    - Fine
+    - Others
+    - Previous Balance
+    - Discount in Fee (Fixed label)
+- Fee Amounts (Numeric fields for each label)

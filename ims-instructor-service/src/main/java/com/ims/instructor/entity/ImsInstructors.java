@@ -13,12 +13,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "IMS_INSTRUCTORS",
-        indexes = {
-                @Index(name = "idx_instructor_tenant", columnList = "tenant_id"),
-                @Index(name = "idx_instructor_user", columnList = "user_id"),
-                @Index(name = "idx_instructor_specialization", columnList = "specialization")
-        })
+@Table(name = "IMS_INSTRUCTORS", indexes = {
+        @Index(name = "idx_instructor_tenant", columnList = "tenant_id"),
+        @Index(name = "idx_instructor_user", columnList = "user_id"),
+        @Index(name = "idx_instructor_specialization", columnList = "specialization")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -61,8 +60,26 @@ public class ImsInstructors {
     @Column(name = "join_date")
     private LocalDate joinDate;
 
+    @Column(name = "email", length = 150)
+    private String email;
+
+    @Column(name = "phone", length = 20)
+    private String phone;
+
+    @Column(name = "employee_id", length = 50)
+    private String employeeId;
+
+    @Column(name = "dob")
+    private LocalDate dob;
+
+    @Column(name = "gender", length = 20)
+    private String gender;
+
+    @Column(name = "address", columnDefinition = "TEXT")
+    private String address;
+
     @Column(name = "status", length = 20)
-    private String status;  // active/inactive
+    private String status; // active/inactive
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

@@ -25,7 +25,7 @@ const RegisterInstitutePage: React.FC = () => {
         setIsLoading(true);
 
         try {
-            const response = await api.post('/atl-auth/auth/onboard-admin', formData);
+            const response = await api.post('/atl-auth-service/auth/onboard-admin', formData);
 
             if (response.data.status === 'CREATED' || response.status === 201 || response.data.status === 'SUCCESS') {
                 toast.success('Registration successful! Please sign in.');

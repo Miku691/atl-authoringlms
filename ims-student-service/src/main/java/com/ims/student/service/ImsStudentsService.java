@@ -16,4 +16,10 @@ public interface ImsStudentsService {
     List<ImsStudentsDto> getAll();
 
     void delete(String id);
+
+    ImsStudentsDto getStudentByUserId(String userId);
+
+    ImsStudentsDto getStudentByEmailAndTenantId(String email, String tenantId);
+
+    long countByTenant(String tenantId);
 }

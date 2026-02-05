@@ -9,18 +9,20 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/student-enrollments")
+@RequestMapping("/enrollments")
 @RequiredArgsConstructor
 public class ImsStudentEnrollmentsController {
 
         private final ImsStudentEnrollmentsService service;
 
         @PostMapping
+        @PreAuthorize("@securityService.canManageStudent()")
         public ResponseEntity<ApiResponse<ImsStudentEnrollmentsDto>> create(@RequestBody ImsStudentEnrollmentsDto dto) {
                 ImsStudentEnrollmentsDto saved = service.create(dto);
                 return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -33,6 +35,7 @@ public class ImsStudentEnrollmentsController {
         }
 
         @PutMapping("/{id}")
+        @PreAuthorize("@securityService.canManageStudent()")
         public ResponseEntity<ApiResponse<ImsStudentEnrollmentsDto>> update(
                         @PathVariable String id,
                         @RequestBody ImsStudentEnrollmentsDto dto) {
@@ -48,6 +51,7 @@ public class ImsStudentEnrollmentsController {
         }
 
         @GetMapping("/{id}")
+        @PreAuthorize("isAuthenticated()")
         public ResponseEntity<ApiResponse<ImsStudentEnrollmentsDto>> getById(@PathVariable String id) {
                 ImsStudentEnrollmentsDto dto = service.getById(id);
                 return ResponseEntity.ok(
@@ -60,6 +64,7 @@ public class ImsStudentEnrollmentsController {
         }
 
         @GetMapping("/student/{studentId}")
+        @PreAuthorize("@securityService.canViewStudent(#studentId)")
         public ResponseEntity<ApiResponse<List<ImsStudentEnrollmentsDto>>> getByStudentId(
                         @PathVariable String studentId) {
                 List<ImsStudentEnrollmentsDto> list = service.getByStudentId(studentId);
@@ -73,6 +78,7 @@ public class ImsStudentEnrollmentsController {
         }
 
         @GetMapping
+        @PreAuthorize("@securityService.canManageStudent()")
         public ResponseEntity<ApiResponse<List<ImsStudentEnrollmentsDto>>> getAll() {
                 List<ImsStudentEnrollmentsDto> list = service.getAll();
                 return ResponseEntity.ok(
@@ -97,9 +103,11 @@ public class ImsStudentEnrollmentsController {
         }
 
         @GetMapping("/offering/{offeringId}")
+        @PreAuthorize("isAuthenticated()")
         public ResponseEntity<ApiResponse<Page<com.ims.student.dto.StudentSummaryDto>>> getStudentsByOffering(
                         @PathVariable String offeringId,
                         @RequestParam(required = false, defaultValue = "ACTIVE") String status,
+                        @RequestHeader(name = "X-Tenant-Id", required = false) String tenantId,
                         @RequestParam(defaultValue = "0") int page,
                         @RequestParam(defaultValue = "10") int size) {
 
@@ -110,11 +118,13 @@ public class ImsStudentEnrollmentsController {
                                                 .status("SUCCESS")
                                                 .statusCode(HttpStatus.OK.value())
                                                 .message("Students fetched successfully")
-                                                .apiData(service.getStudentsByOffering(offeringId, status, pageable))
+                                                .apiData(service.getStudentsByOffering(offeringId, status, tenantId,
+                                                                pageable))
                                                 .build());
         }
 
         @GetMapping("/history/{studentId}")
+        @PreAuthorize("@securityService.canViewStudent(#studentId)")
         public ResponseEntity<ApiResponse<java.util.List<com.ims.student.dto.StudentAcademicHistoryDto>>> getAcademicHistory(
                         @PathVariable String studentId) {
 

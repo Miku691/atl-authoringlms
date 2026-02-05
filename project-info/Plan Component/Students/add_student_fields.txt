@@ -1,0 +1,23 @@
+Admission Form Fields:
+
+1. Student Information:
+- Student Name (Required)
+- Last Registration (Identifier/Number)
+- Select Class (Required, Dropdown)
+- Picture (Optional, File upload, Max size 100KB)
+- Date of Admission (Required, Date picker)
+- Discount in Fee (Optional, Numeric/Percentage)
+- Mobile No. for SMS/WhatsApp (Optional)
+
+2. Other Information:
+- Date Of Birth (Date picker)
+- Student Birth Form ID / NIC (National Identity Card number)
+- Orphan Student (Dropdown)
+- Gender (Dropdown)
+- Cast (Text)
+- OSC (Dropdown/Text)
+- Religion (Dropdown/Text)
+- Blood Group (Dropdown)
+- Previous School (Text)
+- Last Registration (Text/Number from previous school)
+- Address (Textarea)

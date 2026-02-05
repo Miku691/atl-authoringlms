@@ -30,8 +30,17 @@ public class ImsAttendanceRecords {
     @ToString.Exclude
     private ImsAttendanceMaster attendanceMaster;
 
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
+
     @Column(name = "student_id", nullable = false)
-    private String studentId;
+    private String personId;
+
+    @Column(name = "person_name")
+    private String personName;
+
+    @Column(name = "person_type", nullable = false, length = 20)
+    private String personType; // STUDENT, STAFF, INSTRUCTOR
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20)

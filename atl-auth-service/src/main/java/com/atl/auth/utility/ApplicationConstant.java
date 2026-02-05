@@ -1,7 +1,7 @@
 package com.atl.auth.utility;
 
 public class ApplicationConstant {
-    public static final String DEFAULT_ROLE = "USER";
+    public static final String DEFAULT_ROLE = "STUDENT";
     public static final String TENANT_ADMIN_ROLE = "TENANT_ADMIN";
 
     public static final String API_FAILED = "FAILED";
@@ -19,6 +19,7 @@ public class ApplicationConstant {
 
     public static final String USER_ID_HEADER = "X-User-Id";
     public static final String ROLES_HEADER = "X-Roles";
+    public static final String TENANT_ID_HEADER = "X-Tenant-Id";
 
     public static final String ROLE_CREATION_SUCCESS_MSG = "Role Imported Successfully";
     public static final String USER_ACTIVE = "Active";

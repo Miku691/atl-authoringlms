@@ -47,13 +47,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         const fetchState = async () => {
             try {
                 // Readiness
-                const r = await api.get('/ims-academic/readiness/status');
+                const r = await api.get('/ims-academic-service/readiness/status');
                 if (r.data?.status === 'SUCCESS') {
                     setReadiness(r.data.apiData);
                 }
 
                 // Active Offerings
-                const a = await api.get(`/ims-academic/offerings/tenant/${user.tenantId}/has-active`);
+                const a = await api.get(`/ims-academic-service/offerings/tenant/${user.tenantId}/has-active`);
                 if (a.data?.status === 'SUCCESS') {
                     setHasActiveOfferings(a.data.apiData);
                 }
@@ -158,7 +158,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                         </div>
                         <div className="overflow-hidden">
                             <h3 className="text-sm font-medium text-white truncate">{user?.username}</h3>
-                            <p className="text-xs text-slate-400 truncate">Administrator</p>
+                            <p className="text-xs text-slate-400 truncate">
+                                {user?.roles?.[0]?.replace('_', ' ') || 'User'}
+                            </p>
                         </div>
                     </div>
                 </div>

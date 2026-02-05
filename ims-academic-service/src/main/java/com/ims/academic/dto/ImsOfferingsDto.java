@@ -15,6 +15,7 @@ public class ImsOfferingsDto {
     private String id;
     private String tenantId;
     private String programId;
+    private String sessionId;
     private OfferingType type;
     private String name;
     private LocalDate startDate;

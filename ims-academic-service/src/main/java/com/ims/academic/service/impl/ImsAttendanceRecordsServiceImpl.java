@@ -1,5 +1,6 @@
 package com.ims.academic.service.impl;
 
+import com.ims.academic.dto.AttendanceSummaryDto;
 import com.ims.academic.dto.ImsAttendanceRecordsDto;
 import com.ims.academic.entity.ImsAttendanceMaster;
 import com.ims.academic.entity.ImsAttendanceRecords;
@@ -53,7 +54,8 @@ public class ImsAttendanceRecordsServiceImpl implements ImsAttendanceRecordsServ
         ImsAttendanceRecords existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Attendance Record ID", id));
 
-        existing.setStudentId(dto.getStudentId());
+        existing.setPersonId(dto.getPersonId());
+        existing.setPersonType(dto.getPersonType());
         existing.setStatus(dto.getStatus());
         existing.setRemarks(dto.getRemarks());
 
@@ -88,5 +90,15 @@ public class ImsAttendanceRecordsServiceImpl implements ImsAttendanceRecordsServ
             throw new ResourceNotFoundException("Attendance Record ID", id);
         }
         repo.deleteById(id);
+    }
+
+    @Override
+    public AttendanceSummaryDto getSummaryByStudentId(String studentId) {
+        long totalDays = repo.countByPersonId(studentId);
+        long presentDays = repo.countByPersonIdAndStatus(studentId, com.ims.academic.enums.AttendanceStatus.PRESENT);
+        return AttendanceSummaryDto.builder()
+                .totalDays(totalDays)
+                .presentDays(presentDays)
+                .build();
     }
 }

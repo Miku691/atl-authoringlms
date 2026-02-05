@@ -9,9 +9,13 @@ import lombok.*;
 public class ImsTimetableEntriesDto {
 
     private String id;
+    private String tenantId;
     private String timetableSlotId;
     private String offeringId;
     private String subjectId;
     private String instructorId;
     private String room;
+    private String offeringName;
+    private String subjectName;
+    private ImsTimetableSlotsDto slotDetails;
 }

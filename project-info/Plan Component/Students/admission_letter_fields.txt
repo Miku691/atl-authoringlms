@@ -1,0 +1,10 @@
+Admission Letter Fields:
+
+- Student Name
+- Registration / ID
+- Class
+- Admission Date
+- Account Status
+- Generated Username
+- Generated Password
+- Print Action

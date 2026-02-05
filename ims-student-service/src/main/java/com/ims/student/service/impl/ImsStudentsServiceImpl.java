@@ -88,6 +88,13 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
         existing.setProfileImageUrl(dto.getProfileImageUrl());
         existing.setStatus(dto.getStatus());
         existing.setAddress(dto.getAddress());
+        existing.setMedicalHistory(dto.getMedicalHistory());
+        existing.setPreviousEducation(dto.getPreviousEducation());
+        existing.setBirthFormId(dto.getBirthFormId());
+        existing.setIsOrphan(dto.getIsOrphan());
+        existing.setCaste(dto.getCaste());
+        existing.setPreviousSchool(dto.getPreviousSchool());
+        existing.setAdmissionDiscount(dto.getAdmissionDiscount());
 
         ImsStudents updated = repo.save(existing);
         return toDto(updated);
@@ -125,5 +132,26 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
         existing.setDeleted(true);
         existing.setStatus("INACTIVE");
         repo.save(existing);
+    }
+
+    @Override
+    public ImsStudentsDto getStudentByUserId(String userId) {
+        return repo.findByUserId(userId)
+                .filter(s -> !s.isDeleted())
+                .map(this::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("User Id", userId));
+    }
+
+    @Override
+    public ImsStudentsDto getStudentByEmailAndTenantId(String email, String tenantId) {
+        return repo.findByEmailAndTenantId(email, tenantId)
+                .filter(s -> !s.isDeleted())
+                .map(this::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Student Email", email));
+    }
+
+    @Override
+    public long countByTenant(String tenantId) {
+        return repo.countByTenantId(tenantId);
     }
 }

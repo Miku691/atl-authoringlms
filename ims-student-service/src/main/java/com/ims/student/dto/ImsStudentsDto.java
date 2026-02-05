@@ -31,6 +31,13 @@ public class ImsStudentsDto {
     private String status;
     private boolean isDeleted;
     private String address;
+    private String medicalHistory;
+    private String previousEducation;
+    private String birthFormId;
+    private Boolean isOrphan;
+    private String caste;
+    private String previousSchool;
+    private Double admissionDiscount;
     private Instant createdAt;
     private Instant updatedAt;
 }

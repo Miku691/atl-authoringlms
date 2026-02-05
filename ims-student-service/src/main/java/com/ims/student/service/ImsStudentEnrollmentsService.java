@@ -21,7 +21,7 @@ public interface ImsStudentEnrollmentsService {
 
     void delete(String id);
 
-    Page<StudentSummaryDto> getStudentsByOffering(String offeringId, String status, Pageable pageable);
+    Page<StudentSummaryDto> getStudentsByOffering(String offeringId, String status, String tenantId, Pageable pageable);
 
     List<StudentAcademicHistoryDto> getAcademicHistory(String studentId);
 }

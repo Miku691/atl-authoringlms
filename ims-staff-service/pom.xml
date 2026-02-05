@@ -69,6 +69,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>ims-staff</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

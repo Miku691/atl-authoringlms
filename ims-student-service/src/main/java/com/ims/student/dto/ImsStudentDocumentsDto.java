@@ -1,10 +1,6 @@
 package com.ims.student.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.time.Instant;
 
 @Data
@@ -12,10 +8,13 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImsStudentDocumentsDto {
-
     private String id;
+    private String tenantId;
     private String studentId;
     private String documentType;
-    private String fileUrl;
-    private Instant uploadedAt;
+    private String documentUrl;
+    private String verificationStatus;
+    private String uploadedBy;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

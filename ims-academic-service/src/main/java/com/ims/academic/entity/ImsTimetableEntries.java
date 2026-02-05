@@ -30,6 +30,9 @@ public class ImsTimetableEntries {
     @ToString.Exclude
     private ImsTimetableSlots timetableSlot;
 
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
+
     @Column(name = "offering_id")
     private String offeringId;
 

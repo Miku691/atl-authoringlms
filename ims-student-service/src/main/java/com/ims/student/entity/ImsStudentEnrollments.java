@@ -13,8 +13,9 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "IMS_STUDENT_ENROLLMENTS", indexes = {
+        @Index(name = "idx_enrollment_tenant", columnList = "tenant_id"),
         @Index(name = "idx_enrollment_student", columnList = "student_id"),
-        @Index(name = "idx_enrollment_class", columnList = "class_id")
+        @Index(name = "idx_enrollment_offering", columnList = "offering_id")
 })
 @Data
 @Builder
@@ -34,11 +35,17 @@ public class ImsStudentEnrollments {
         }
     }
 
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
+
     @Column(name = "student_id", nullable = false)
     private String studentId;
 
     @Column(name = "offering_id", nullable = false)
     private String offeringId; // UUID of Offering (Class/Batch/Semester)
+
+    @Column(name = "section_id")
+    private String sectionId; // UUID of Section (Optional)
 
     @Column(name = "status", length = 20)
     private String status; // ACTIVE / COMPLETED / WITHDRAWN

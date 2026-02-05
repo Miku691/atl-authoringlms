@@ -46,7 +46,7 @@ const CreateTenantPage: React.FC = () => {
                 bootstrapUsername: user?.username || '',
             };
 
-            const response = await api.post('/atl-auth/tenants', payload);
+            const response = await api.post('/atl-auth-service/tenants', payload);
 
             if (response.data.status === 'SUCCESS') {
                 const newTenantId = response.data.apiData.id;

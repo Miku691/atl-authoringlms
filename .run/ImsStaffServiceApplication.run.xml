@@ -1,0 +1,20 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ImsStaffServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <envs>
+      <env name="STAFF_MYSQL_PASS" value="my-secret-atl" />
+      <env name="STAFF_MYSQL_URI" value="jdbc:mysql://localhost:3306/ims-staff-db?allowPublicKeyRetrieval=true&amp;useSSL=false" />
+      <env name="STAFF_MYSQL_USER" value="root" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.ims.staff.ImsStaffServiceApplication" />
+    <module name="ims-staff-service" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.ims.staff.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

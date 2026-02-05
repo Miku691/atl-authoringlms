@@ -9,5 +9,7 @@ public interface ImsOfferingInstructorsRepo extends JpaRepository<ImsOfferingIns
 
     List<ImsOfferingInstructors> findByOfferingId(String offeringId);
 
+    List<ImsOfferingInstructors> findByInstructorId(String instructorId);
+
     boolean existsByOfferingIdAndInstructorIdAndSubjectId(String offeringId, String instructorId, String subjectId);
 }

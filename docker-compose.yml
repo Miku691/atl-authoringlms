@@ -1,4 +1,13 @@
 services:
+  discovery:
+    build:
+      context: ./atl-discovery-server
+    container_name: atl-discovery
+    environment:
+      - SERVER_PORT=8761
+    networks:
+      - atl-network
+
   gateway:
     build:
       context: ./atl-gateway-service
@@ -7,7 +16,10 @@ services:
       - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=dev
-      - ATL_JWT_SECRET=${JWT_SECRET}
+      - AUTH_JWT_SECRET=${JWT_SECRET}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://atl-discovery:8761/eureka/
+    depends_on:
+      - discovery
     networks:
       - atl-network
 
@@ -15,8 +27,6 @@ services:
     build:
       context: ./atl-auth-service
     container_name: atl-auth
-#    ports:
-#      - "8081:8081"
     environment:
       - AUTH_JWT_SECRET=${JWT_SECRET}
       - AUTH_MYSQL_URI=jdbc:mysql://mysql-db:3306/atl-auth-db?allowPublicKeyRetrieval=true&useSSL=false
@@ -26,34 +36,103 @@ services:
       - AUTH_MAIL_PASS=${MAIL_PASSWORD}
       - REDIS_URL=redis
       - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://atl-discovery:8761/eureka/
     depends_on:
+      - discovery
       - redis
       - mysql-db
     networks:
       - atl-network
 
-  course:
+  academic:
     build:
-      context: ./Authoringtool
-    container_name: atl-course
-#    ports:
-#      - "8082:8082"
+      context: ./ims-academic-service
+    container_name: ims-academic
     environment:
-      - COURSE_MYSQL_URI=jdbc:mysql://mysql-db:3306/atl-course-db?allowPublicKeyRetrieval=true&useSSL=false
-      - COURSE_MYSQL_USER=root
-      - COURSE_MYSQL_PASS=${MYSQL_PASSWORD}
-      - REDIS_URL=redis
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - ACADEMIC_MYSQL_URI=jdbc:mysql://mysql-db:3306/ims-academic-db?allowPublicKeyRetrieval=true&useSSL=false
+      - ACADEMIC_MYSQL_USER=root
+      - ACADEMIC_MYSQL_PASS=${MYSQL_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://atl-discovery:8761/eureka/
     depends_on:
+      - discovery
       - mysql-db
+    networks:
+      - atl-network
+
+  student:
+    build:
+      context: ./ims-student-service
+    container_name: ims-student
+    environment:
+      - STUDENT_MYSQL_URI=jdbc:mysql://mysql-db:3306/ims-student-db?allowPublicKeyRetrieval=true&useSSL=false
+      - STUDENT_MYSQL_USER=root
+      - STUDENT_MYSQL_PASS=${MYSQL_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://atl-discovery:8761/eureka/
+    depends_on:
+      - discovery
+      - mysql-db
+    networks:
+      - atl-network
+
+  instructor:
+    build:
+      context: ./ims-instructor-service
+    container_name: ims-instructor
+    environment:
+      - INSTRUCTOR_MYSQL_URI=jdbc:mysql://mysql-db:3306/ims-instructor-db?allowPublicKeyRetrieval=true&useSSL=false
+      - INSTRUCTOR_MYSQL_USER=root
+      - INSTRUCTOR_MYSQL_PASS=${MYSQL_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://atl-discovery:8761/eureka/
+    depends_on:
+      - discovery
+      - mysql-db
+    networks:
+      - atl-network
+
+  staff:
+    build:
+      context: ./ims-staff-service
+    container_name: ims-staff
+    environment:
+      - STAFF_MYSQL_URI=jdbc:mysql://mysql-db:3306/ims-staff-db?allowPublicKeyRetrieval=true&useSSL=false
+      - STAFF_MYSQL_USER=root
+      - STAFF_MYSQL_PASS=${MYSQL_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://atl-discovery:8761/eureka/
+    depends_on:
+      - discovery
+      - mysql-db
+    networks:
+      - atl-network
+
+  finance:
+    build:
+      context: ./ims-finance-service
+    container_name: ims-finance
+    environment:
+      - FINANCE_MYSQL_URI=jdbc:mysql://mysql-db:3306/ims-finance-db?allowPublicKeyRetrieval=true&useSSL=false
+      - FINANCE_MYSQL_USER=root
+      - FINANCE_MYSQL_PASS=${MYSQL_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://atl-discovery:8761/eureka/
+    depends_on:
+      - discovery
+      - mysql-db
+    networks:
+      - atl-network
+
+  web-ui:
+    build:
+      context: ./atl-web-ui
+    container_name: atl-web-ui
+    ports:
+      - "3000:80"
+    depends_on:
+      - gateway
     networks:
       - atl-network
 
   redis:
     image: redis:latest
     container_name: atl-redis
-    ports:
-      - "6379:6379"
     volumes:
       - redis-data:/data
     networks:
@@ -68,8 +147,6 @@ services:
   mysql-db:
     image: mysql:latest
     container_name: atl-mysql-db
-    ports:
-      - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
     volumes:
@@ -77,7 +154,6 @@ services:
       - mysql-data:/var/lib/mysql
     networks:
       - atl-network
-
 
 volumes:
   redis-data:

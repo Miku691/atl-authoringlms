@@ -1,0 +1,9 @@
+Mark Grading Fields:
+
+- Grade Label (e.g., A+, A, B)
+- Percentage From (Numeric)
+- Percentage Upto (Numeric)
+- Status (Dropdown: Pass/Fail)
+
+Fail Criteria Tab (Implicit):
+- Likely defines what constitutes a global failure.

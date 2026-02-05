@@ -6,6 +6,7 @@ import com.ims.academic.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class ImsOfferingsController {
         private final ImsOfferingsService service;
 
         @PostMapping
+        @PreAuthorize("@securityService.canManageAcademics()")
         public ResponseEntity<ApiResponse<ImsOfferingsDto>> create(@RequestBody ImsOfferingsDto dto) {
                 return ResponseEntity.status(HttpStatus.CREATED).body(
                                 ApiResponse.<ImsOfferingsDto>builder()
@@ -28,7 +30,21 @@ public class ImsOfferingsController {
                                                 .build());
         }
 
+        @PutMapping("/{id}")
+        @PreAuthorize("@securityService.canManageAcademics()")
+        public ResponseEntity<ApiResponse<ImsOfferingsDto>> update(@PathVariable String id,
+                        @RequestBody ImsOfferingsDto dto) {
+                return ResponseEntity.ok(
+                                ApiResponse.<ImsOfferingsDto>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Offering updated successfully")
+                                                .apiData(service.update(id, dto))
+                                                .build());
+        }
+
         @GetMapping("/{id}")
+        @PreAuthorize("isAuthenticated()")
         public ResponseEntity<ApiResponse<ImsOfferingsDto>> getById(@PathVariable String id) {
                 return ResponseEntity.ok(
                                 ApiResponse.<ImsOfferingsDto>builder()
@@ -40,6 +56,7 @@ public class ImsOfferingsController {
         }
 
         @GetMapping("/tenant/{tenantId}")
+        @PreAuthorize("isAuthenticated()")
         public ResponseEntity<ApiResponse<List<ImsOfferingsDto>>> getByTenant(@PathVariable String tenantId) {
                 return ResponseEntity.ok(
                                 ApiResponse.<List<ImsOfferingsDto>>builder()
@@ -61,7 +78,19 @@ public class ImsOfferingsController {
                                                 .build());
         }
 
+        @GetMapping("/instructor/{instructorId}")
+        public ResponseEntity<ApiResponse<List<ImsOfferingsDto>>> getByInstructor(@PathVariable String instructorId) {
+                return ResponseEntity.ok(
+                                ApiResponse.<List<ImsOfferingsDto>>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Offerings fetched successfully")
+                                                .apiData(service.getByInstructor(instructorId))
+                                                .build());
+        }
+
         @DeleteMapping("/{id}")
+        @PreAuthorize("@securityService.canManageAcademics()")
         public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
 
                 service.delete(id);
@@ -98,6 +127,7 @@ public class ImsOfferingsController {
         }
 
         @PostMapping("/{id}/instructors")
+        @PreAuthorize("@securityService.canManageAcademics()")
         public ResponseEntity<ApiResponse<com.ims.academic.dto.InstructorAssignmentDto>> assignInstructor(
                         @PathVariable String id,
                         @RequestBody com.ims.academic.dto.InstructorAssignmentDto dto) {

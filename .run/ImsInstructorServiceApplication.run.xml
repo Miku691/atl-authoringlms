@@ -1,0 +1,20 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ImsInstructorServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <envs>
+      <env name="INSTRUCTOR_MYSQL_PASS" value="my-secret-atl" />
+      <env name="INSTRUCTOR_MYSQL_URI" value="jdbc:mysql://localhost:3306/ims-instructor-db?allowPublicKeyRetrieval=true&amp;useSSL=false" />
+      <env name="INSTRUCTOR_MYSQL_USER" value="root" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.ims.instructor.ImsInstructorServiceApplication" />
+    <module name="ims-instructor-service" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.ims.instructor.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

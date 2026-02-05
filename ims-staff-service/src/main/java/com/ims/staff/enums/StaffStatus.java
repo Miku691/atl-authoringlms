@@ -2,5 +2,6 @@ package com.ims.staff.enums;
 
 public enum StaffStatus {
     ACTIVE,
-    INACTIVE
+    INACTIVE,
+    ON_LEAVE
 }

@@ -10,6 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AtlSingupResponseDto {
+    private String id;
     private String userName;
     private String email;
 }

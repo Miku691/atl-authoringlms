@@ -17,7 +17,7 @@ const RoleManagementPage: React.FC = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const response = await api.post('/atl-auth/roles/import-role', importRoleData);
+            const response = await api.post('/atl-auth-service/roles/import-role', importRoleData);
             if (response.status === 201 || response.data?.status === 'SUCCESS') {
                 toast.success('Role imported successfully!');
                 setImportRoleData({ roleCode: '' });
@@ -35,7 +35,7 @@ const RoleManagementPage: React.FC = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const response = await api.post('/atl-auth/roles/map-role', assignRoleData);
+            const response = await api.post('/atl-auth-service/roles/map-role', assignRoleData);
             if (response.status === 201 || response.data?.status === 'SUCCESS') {
                 toast.success('Role assigned to user successfully!');
                 setAssignRoleData({ username: '', roleCode: '' });

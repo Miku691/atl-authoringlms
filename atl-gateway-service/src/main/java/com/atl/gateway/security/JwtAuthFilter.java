@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
-public class JwtAuthFilter implements GlobalFilter {
+public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private final GatewaySecurityConfig securityConfig;
 
@@ -42,7 +43,11 @@ public class JwtAuthFilter implements GlobalFilter {
             return chain.filter(exchange);
         }
 
-        if (securityConfig.getPublicPaths().stream().anyMatch(path::startsWith)) {
+        if (securityConfig.getPublicPaths().stream().anyMatch(publicPath -> {
+            String cleanPath = path.replaceAll("/+", "/");
+            String cleanPublic = publicPath.trim().replaceAll("/+", "/");
+            return cleanPath.equals(cleanPublic) || cleanPath.startsWith(cleanPublic);
+        })) {
             return chain.filter(exchange);
         }
 
@@ -64,9 +69,18 @@ public class JwtAuthFilter implements GlobalFilter {
         List<String> roles = claims.get("roles", List.class);
 
         // --- START ROLE VALIDATION ---
+        String method = exchange.getRequest().getMethod().name();
+
         boolean isAuthorized = securityConfig.getRolePaths().entrySet().stream()
                 .filter(entry -> path.startsWith(entry.getKey()))
-                .allMatch(entry -> roles.stream().anyMatch(entry.getValue()::contains));
+                .allMatch(entry -> {
+                    // Industrial Standard: Allow GET requests for domain services at gateway level
+                    // Fine-grained authorization should be handled at the service level
+                    if (method.equals("GET")) {
+                        return true;
+                    }
+                    return roles.stream().anyMatch(entry.getValue()::contains);
+                });
 
         if (!isAuthorized) {
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
@@ -107,4 +121,8 @@ public class JwtAuthFilter implements GlobalFilter {
     // }
     // }
 
+    @Override
+    public int getOrder() {
+        return -10; // High priority - run before Discovery Locator rewrites paths
+    }
 }

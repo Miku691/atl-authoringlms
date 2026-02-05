@@ -1,0 +1,9 @@
+### Add Expense
+- Date [Required]
+- Description [Required]
+- Amount [Required]
+
+### Other Accounts Features (Observed in Sidebar)
+- Chart of Account
+- Add Income
+- Account Statement

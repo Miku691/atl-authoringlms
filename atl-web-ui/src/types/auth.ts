@@ -4,6 +4,8 @@ export interface User {
     tenantId?: string | null;
     tenantSetupCompleted?: boolean;
     tenantType?: 'SCHOOL' | 'COLLEGE' | 'COACHING';
+    email?: string;
+    id: string;
 }
 
 export interface AuthState {

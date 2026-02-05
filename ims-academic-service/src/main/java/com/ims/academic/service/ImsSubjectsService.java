@@ -1,18 +1,16 @@
 package com.ims.academic.service;
 
-import com.ims.academic.dto.ImsSubjectsDto;
+import com.ims.academic.dto.MessageDto;
+import com.ims.academic.dto.SubjectRequestDto;
+import com.ims.academic.dto.SubjectResponseDto;
 
 import java.util.List;
 
 public interface ImsSubjectsService {
 
-    ImsSubjectsDto create(ImsSubjectsDto dto);
+    MessageDto createSubject(String tenantId, SubjectRequestDto dto);
 
-    ImsSubjectsDto getById(String id);
+    List<SubjectResponseDto> getAllSubjects(String tenantId);
 
-    List<ImsSubjectsDto> getAll();
-
-    ImsSubjectsDto update(String id, ImsSubjectsDto dto);
-
-    void delete(String id);
+    MessageDto deleteSubject(String tenantId, String subjectId);
 }

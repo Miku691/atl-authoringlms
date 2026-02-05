@@ -1,0 +1,19 @@
+Classes Management Fields:
+
+1. Class Card (Summary View):
+- Class Name (Text)
+- Total Student Count
+- Gender Distribution Statistics:
+    - Boys Percentage and Count
+    - Girls Percentage and Count
+    - N/A / Others Percentage and Count
+- Actions:
+    - Edit Class
+    - Delete Class
+    - View Students (Graduation cap icon)
+
+2. Add/New Class (from Sidebar context):
+- Class Name
+- Fee Amount (often associated at class level in these systems)
+- Monthly Fee (often associated at class level in these systems)
+- Admission Fee (often associated at class level in these systems)

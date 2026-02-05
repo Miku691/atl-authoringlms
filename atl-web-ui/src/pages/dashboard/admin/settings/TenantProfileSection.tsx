@@ -42,7 +42,7 @@ const TenantProfileSection: React.FC = () => {
     const fetchTenantDetails = async () => {
         setIsLoading(true);
         try {
-            const response = await api.get(`/atl-auth/tenants/${tenantId}`);
+            const response = await api.get(`/atl-auth-service/tenants/${tenantId}`);
             if (response.data.status === 'SUCCESS') {
                 setFormData(response.data.apiData);
             }
@@ -62,7 +62,7 @@ const TenantProfileSection: React.FC = () => {
         e.preventDefault();
         setIsSaving(true);
         try {
-            const response = await api.put(`/atl-auth/tenants/${tenantId}`, formData);
+            const response = await api.put(`/atl-auth-service/tenants/${tenantId}`, formData);
             if (response.data.status === 'SUCCESS') {
                 toast.success('Institute settings updated successfully');
                 setFormData(response.data.apiData);

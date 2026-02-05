@@ -11,7 +11,8 @@ public class ImsAttendanceRecordsDto {
 
     private String id;
     private String attendanceMasterId;
-    private String studentId;
+    private String personId;
+    private String personType;
     private AttendanceStatus status;
     private String remarks;
 }

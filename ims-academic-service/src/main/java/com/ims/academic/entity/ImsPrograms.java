@@ -11,71 +11,65 @@ import java.time.Instant;
 import java.util.List;
 
 @Entity
-@Table(
-        name = "IMS_PROGRAMS",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "uk_program_code_tenant",
-                        columnNames = {"tenant_id", "code"}
-                )
-        },
-        indexes = {
+@Table(name = "IMS_PROGRAMS", uniqueConstraints = {
+                @UniqueConstraint(name = "uk_program_code_tenant", columnNames = { "tenant_id", "code" })
+}, indexes = {
                 @Index(name = "idx_program_tenant", columnList = "tenant_id"),
                 @Index(name = "idx_program_level", columnList = "level")
-        }
-)
+})
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImsPrograms {
 
-    @Id
-    @GeneratedValue
-    @UuidGenerator
-    private String id;
+        @Id
+        @GeneratedValue
+        @UuidGenerator
+        private String id;
 
-    @PrePersist
-    protected void onCreate() {
-        if (this.id == null || this.id.isEmpty()) {
-            this.id = java.util.UUID.randomUUID().toString();
+        @PrePersist
+        protected void onCreate() {
+                if (this.id == null || this.id.isEmpty()) {
+                        this.id = java.util.UUID.randomUUID().toString();
+                }
         }
-    }
 
-    @Column(name = "tenant_id", nullable = false)
-    private String tenantId;
+        @Column(name = "tenant_id", nullable = false)
+        private String tenantId;
 
-    @Column(name = "code", length = 64, nullable = false)
-    private String code;
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "department_id")
+        private Department department;
 
-    @Column(name = "title", length = 255, nullable = false)
-    private String title;
+        @Column(name = "code", length = 64, nullable = false)
+        private String code;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "level", length = 50, nullable = false)
-    private ProgramLevel level;
+        @Column(name = "title", length = 255, nullable = false)
+        private String title;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "board", length = 100)
-    private AcademicBoard board;
+        @Enumerated(EnumType.STRING)
+        @Column(name = "level", length = 50, nullable = false)
+        private ProgramLevel level;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
+        @Enumerated(EnumType.STRING)
+        @Column(name = "board", length = 100)
+        private AcademicBoard board;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private Instant createdAt;
+        @Column(name = "description", columnDefinition = "TEXT")
+        private String description;
 
-    // Program → Offerings (Class / Batch / Degree Instance)
-     @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
-     private List<ImsOfferings> offerings;
+        @CreationTimestamp
+        @Column(name = "created_at", updatable = false)
+        private Instant createdAt;
 
-    // Program → Subjects
-     @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
-     private List<ImsSubjects> subjects;
+        // Program → Academic Sessions (e.g., 2025-26, 2026-27)
+        @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+        private List<AcademicSession> sessions;
 
-    // Program → Academic Years
-     @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
-     private List<ImsAcademicYears> academicYears;
+        // Derived: Program -> Sessions -> Offerings. No direct list needed usually.
+
+        // Program → Subjects (Curriculum definition)
+        @OneToMany(mappedBy = "program", fetch = FetchType.LAZY)
+        private List<ImsSubjects> subjects;
 }
-

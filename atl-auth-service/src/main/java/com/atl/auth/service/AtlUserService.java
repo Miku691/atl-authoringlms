@@ -37,6 +37,7 @@ public class AtlUserService {
     private final AtlRoleService roleService;
     private final AtlRedisService atlRedisService;
     private final AtlOtpService otpService;
+    private final com.atl.auth.repo.ImsTenantsRepo tenantsRepo;
 
     public ApiResponse<AtlSingupResponseDto> userSingUpService(AtlSinginRequestDto requestDto) {
 
@@ -49,8 +50,24 @@ public class AtlUserService {
         AtlUser altUserObj = new AtlUser();
         altUserObj.setUsername(requestDto.getUsername());
         altUserObj.setEmail(requestDto.getEmail());
-        altUserObj.setRoles(roleService.setDefaultRole(ApplicationConstant.DEFAULT_ROLE));
-        altUserObj.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+
+        String roleToSet = (requestDto.getRoleCode() != null && !requestDto.getRoleCode().isEmpty())
+                ? requestDto.getRoleCode()
+                : ApplicationConstant.DEFAULT_ROLE;
+
+        altUserObj.setRoles(roleService.setDefaultRole(roleToSet));
+
+        if (requestDto.getPassword() != null && !requestDto.getPassword().isEmpty()) {
+            altUserObj.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        } else {
+            String defaultPwd = roleToSet.equalsIgnoreCase("STUDENT") ? "student@123" : "instructor@123";
+            altUserObj.setPassword(passwordEncoder.encode(defaultPwd));
+        }
+
+        if (requestDto.getTenantId() != null) {
+            altUserObj.setTenant(tenantsRepo.findById(requestDto.getTenantId()).orElse(null));
+        }
+
         AtlUser savedObj = userRepo.save(altUserObj);
         // return modelMapper.map(savedObj, AtlSingupResponseDto.class);
 

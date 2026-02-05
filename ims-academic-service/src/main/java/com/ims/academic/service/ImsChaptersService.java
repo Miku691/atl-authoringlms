@@ -12,7 +12,7 @@ public interface ImsChaptersService {
 
     ImsChaptersDto getById(String id);
 
-    List<ImsChaptersDto> getBySyllabusPackId(String syllabusPackId);
+    List<ImsChaptersDto> getByOfferingSubjectId(String offeringSubjectId);
 
     void delete(String id);
 }

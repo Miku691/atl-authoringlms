@@ -10,7 +10,7 @@ interface ConfirmationModalProps {
     confirmText?: string;
     cancelText?: string;
     isLoading?: boolean;
-    variant?: 'danger' | 'warning' | 'info';
+    variant?: 'danger' | 'warning' | 'info' | 'success';
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -47,6 +47,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             buttonBg: 'bg-blue-600',
             buttonHover: 'hover:bg-blue-700',
             focusRing: 'focus:ring-blue-500'
+        },
+        success: {
+            iconBg: 'bg-green-100',
+            iconColor: 'text-green-600',
+            buttonBg: 'bg-green-600',
+            buttonHover: 'hover:bg-green-700',
+            focusRing: 'focus:ring-green-500'
         }
     };
 

@@ -18,7 +18,7 @@ const LoginPage: React.FC = () => {
         setError('');
 
         try {
-            const response = await api.post('/atl-auth/auth/signin', { username, password });
+            const response = await api.post('/atl-auth-service/auth/signin', { username, password });
             if (response.data.status === 'SUCCESS') {
                 navigate('/otp', { state: { username } });
             } else {

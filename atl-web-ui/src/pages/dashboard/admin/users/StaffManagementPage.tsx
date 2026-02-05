@@ -33,10 +33,31 @@ interface Staff {
     department: string;
     tenantId?: string;
     profileImageUrl?: string;
+    monthlySalary?: number;
+    qualification?: string;
+    experience?: string;
 }
 
 interface ValidationErrors {
     [key: string]: string;
+}
+
+interface StaffFormData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    employeeId: string;
+    joinDate: Date;
+    gender: string;
+    status: string;
+    dob: Date | null;
+    address: string;
+    role: string;
+    department: string;
+    monthlySalary: string | number;
+    qualification: string;
+    experience: string;
 }
 
 const StaffManagementPage: React.FC = () => {
@@ -71,10 +92,13 @@ const StaffManagementPage: React.FC = () => {
         dob: null as Date | null,
         address: '',
         role: '',
-        department: ''
+        department: '',
+        monthlySalary: '',
+        qualification: '',
+        experience: ''
     };
 
-    const [formData, setFormData] = useState<Partial<Omit<Staff, 'joinDate' | 'dob'> & { joinDate: Date; dob: Date | null }>>(initialFormState);
+    const [formData, setFormData] = useState<StaffFormData>(initialFormState);
 
     useEffect(() => {
         if (tenantId) {
@@ -85,7 +109,7 @@ const StaffManagementPage: React.FC = () => {
     const fetchStaff = async () => {
         setIsLoading(true);
         try {
-            const response = await api.get(`/ims-staff/staff/tenant/${tenantId}`);
+            const response = await api.get(`/ims-staff-service/staff/tenant/${tenantId}`);
             if (response.data.status === 'SUCCESS') {
                 setStaffList(response.data.apiData);
             }
@@ -173,14 +197,17 @@ const StaffManagementPage: React.FC = () => {
                 tenantId: tenantId,
                 status: formData.status?.toUpperCase() || 'ACTIVE',
                 joinDate: formData.joinDate ? formData.joinDate.toISOString().split('T')[0] : null,
-                dob: formData.dob ? formData.dob.toISOString().split('T')[0] : null
+                dob: formData.dob ? formData.dob.toISOString().split('T')[0] : null,
+                monthlySalary: formData.monthlySalary ? parseFloat(formData.monthlySalary as any) : null,
+                qualification: formData.qualification,
+                experience: formData.experience
             };
 
             let response;
             if (selectedStaffId) {
-                response = await api.put(`/ims-staff/staff/${selectedStaffId}`, payload);
+                response = await api.put(`/ims-staff-service/staff/${selectedStaffId}`, payload);
             } else {
-                response = await api.post('/ims-staff/staff', payload);
+                response = await api.post('/ims-staff-service/staff', payload);
             }
 
             if (response.data.status === 'SUCCESS') {
@@ -212,7 +239,10 @@ const StaffManagementPage: React.FC = () => {
             gender: staff.gender,
             address: staff.address,
             role: staff.role,
-            department: staff.department
+            department: staff.department,
+            monthlySalary: staff.monthlySalary ?? '',
+            qualification: staff.qualification ?? '',
+            experience: staff.experience ?? ''
         });
         setIsModalOpen(true);
     };
@@ -227,7 +257,7 @@ const StaffManagementPage: React.FC = () => {
 
         setIsDeleting(true);
         try {
-            const response = await api.delete(`/ims-staff/staff/${staffToDelete}`);
+            const response = await api.delete(`/ims-staff-service/staff/${staffToDelete}`);
             if (response.data.status === 'SUCCESS') {
                 toast.success('Staff deleted successfully');
                 setStaffList(staffList.filter(s => s.id !== staffToDelete));
@@ -531,6 +561,50 @@ const StaffManagementPage: React.FC = () => {
                                                     { value: 'On Leave', label: 'On Leave' }
                                                 ]}
                                             />
+                                        </div>
+
+                                        {/* Professional Background */}
+                                        <div className="col-span-full mt-4">
+                                            <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Professional Background</h4>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Qualification</label>
+                                            <input
+                                                type="text"
+                                                name="qualification"
+                                                value={formData.qualification}
+                                                onChange={handleInputChange}
+                                                placeholder="e.g. MBA, PhD"
+                                                className="mt-1 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Experience</label>
+                                            <input
+                                                type="text"
+                                                name="experience"
+                                                value={formData.experience}
+                                                onChange={handleInputChange}
+                                                placeholder="e.g. 5 Years"
+                                                className="mt-1 block w-full shadow-sm sm:text-sm border border-gray-300 rounded-md p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Monthly Salary</label>
+                                            <div className="mt-1 relative rounded-md shadow-sm">
+                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <span className="text-gray-500 sm:text-sm">$</span>
+                                                </div>
+                                                <input
+                                                    type="number"
+                                                    name="monthlySalary"
+                                                    value={formData.monthlySalary}
+                                                    onChange={handleInputChange}
+                                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                                    placeholder="0.00"
+                                                />
+                                            </div>
                                         </div>
 
                                         {/* Contact Details */}

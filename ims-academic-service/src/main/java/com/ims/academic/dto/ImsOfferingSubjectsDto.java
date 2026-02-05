@@ -12,6 +12,6 @@ public class ImsOfferingSubjectsDto {
     private String id;
     private String offeringId;
     private String subjectId;
-    private Integer orderIndex;
-    private BigDecimal weight;
+    private boolean isOptional;
+    private Double credits;
 }

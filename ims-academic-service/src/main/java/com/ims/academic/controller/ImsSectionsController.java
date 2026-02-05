@@ -25,8 +25,19 @@ public class ImsSectionsController {
                         .statusCode(HttpStatus.CREATED.value())
                         .message("Section created successfully")
                         .apiData(service.create(dto))
-                        .build()
-        );
+                        .build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ImsSectionsDto>> update(@PathVariable String id,
+            @RequestBody ImsSectionsDto dto) {
+        return ResponseEntity.ok(
+                ApiResponse.<ImsSectionsDto>builder()
+                        .status("SUCCESS")
+                        .statusCode(HttpStatus.OK.value())
+                        .message("Section updated successfully")
+                        .apiData(service.update(id, dto))
+                        .build());
     }
 
     @GetMapping("/{id}")
@@ -37,8 +48,7 @@ public class ImsSectionsController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Section fetched successfully")
                         .apiData(service.getById(id))
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/class/{classId}")
@@ -49,8 +59,7 @@ public class ImsSectionsController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Sections fetched successfully")
                         .apiData(service.getByClass(classId))
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/tenant/{tenantId}")
@@ -61,8 +70,7 @@ public class ImsSectionsController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Sections fetched successfully")
                         .apiData(service.getByTenant(tenantId))
-                        .build()
-        );
+                        .build());
     }
 
     @DeleteMapping("/{id}")
@@ -76,7 +84,6 @@ public class ImsSectionsController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Section deleted successfully")
                         .apiData(null)
-                        .build()
-        );
+                        .build());
     }
 }

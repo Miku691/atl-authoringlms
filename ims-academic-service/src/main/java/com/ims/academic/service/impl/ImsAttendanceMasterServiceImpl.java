@@ -35,7 +35,10 @@ public class ImsAttendanceMasterServiceImpl implements ImsAttendanceMasterServic
         ImsAttendanceMaster entity = toEntity(dto);
 
         if (entity.getRecords() != null) {
-            entity.getRecords().forEach(record -> record.setAttendanceMaster(entity));
+            entity.getRecords().forEach(record -> {
+                record.setAttendanceMaster(entity);
+                record.setTenantId(entity.getTenantId());
+            });
         }
 
         return toDto(repo.save(entity));
@@ -48,6 +51,7 @@ public class ImsAttendanceMasterServiceImpl implements ImsAttendanceMasterServic
                 .orElseThrow(() -> new ResourceNotFoundException("Attendance Master ID", id));
 
         existing.setOfferingId(dto.getOfferingId());
+        existing.setSubjectId(dto.getSubjectId());
         existing.setDate(dto.getDate());
         existing.setStatus(dto.getStatus());
         existing.setTakenBy(dto.getTakenBy());

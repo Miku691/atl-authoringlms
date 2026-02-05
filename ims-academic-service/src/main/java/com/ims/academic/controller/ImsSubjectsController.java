@@ -1,84 +1,38 @@
 package com.ims.academic.controller;
 
-import com.ims.academic.dto.ImsSubjectsDto;
+import com.ims.academic.dto.MessageDto;
+import com.ims.academic.dto.SubjectRequestDto;
+import com.ims.academic.dto.SubjectResponseDto;
 import com.ims.academic.service.ImsSubjectsService;
-import com.ims.academic.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("subjects")
+@RequestMapping("/subjects")
 @RequiredArgsConstructor
 public class ImsSubjectsController {
 
-    private final ImsSubjectsService service;
+    private final ImsSubjectsService subjectsService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ImsSubjectsDto>> create(@RequestBody ImsSubjectsDto dto) {
-        ImsSubjectsDto saved = service.create(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.<ImsSubjectsDto>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.CREATED.value())
-                        .message("Subject created successfully")
-                        .apiData(saved)
-                        .build()
-        );
+    @PostMapping("/tenant/{tenantId}")
+    public ResponseEntity<MessageDto> createSubject(
+            @PathVariable String tenantId,
+            @RequestBody SubjectRequestDto dto) {
+        return ResponseEntity.ok(subjectsService.createSubject(tenantId, dto));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ImsSubjectsDto>> getById(@PathVariable String id) {
-        return ResponseEntity.ok(
-                ApiResponse.<ImsSubjectsDto>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Subject fetched successfully")
-                        .apiData(service.getById(id))
-                        .build()
-        );
+    @GetMapping("/tenant/{tenantId}")
+    public ResponseEntity<List<SubjectResponseDto>> getAllSubjects(@PathVariable String tenantId) {
+        return ResponseEntity.ok(subjectsService.getAllSubjects(tenantId));
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<ImsSubjectsDto>>> getAll() {
-        return ResponseEntity.ok(
-                ApiResponse.<List<ImsSubjectsDto>>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Subjects fetched successfully")
-                        .apiData(service.getAll())
-                        .build()
-        );
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ImsSubjectsDto>> update(
-            @PathVariable String id,
-            @RequestBody ImsSubjectsDto dto) {
-
-        return ResponseEntity.ok(
-                ApiResponse.<ImsSubjectsDto>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Subject updated successfully")
-                        .apiData(service.update(id, dto))
-                        .build()
-        );
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
-        service.delete(id);
-        return ResponseEntity.ok(
-                ApiResponse.<Void>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Subject deleted successfully")
-                        .apiData(null)
-                        .build()
-        );
+    @DeleteMapping("/tenant/{tenantId}/subject/{subjectId}")
+    public ResponseEntity<MessageDto> deleteSubject(
+            @PathVariable String tenantId,
+            @PathVariable String subjectId) {
+        return ResponseEntity.ok(subjectsService.deleteSubject(tenantId, subjectId));
     }
 }

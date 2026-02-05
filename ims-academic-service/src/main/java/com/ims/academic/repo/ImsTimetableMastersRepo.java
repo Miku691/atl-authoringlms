@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ImsTimetableMastersRepo extends JpaRepository<ImsTimetableMasters, String> {
     List<ImsTimetableMasters> findByOfferingId(String offeringId);
+
+    List<ImsTimetableMasters> findByOfferingIdAndTenantId(String offeringId, String tenantId);
 }

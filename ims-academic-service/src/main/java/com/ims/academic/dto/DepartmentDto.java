@@ -1,0 +1,15 @@
+package com.ims.academic.dto;
+
+import lombok.*;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class DepartmentDto {
+    private String id;
+    private String tenantId;
+    private String name;
+    private String code;
+    private String headOfDepartmentId;
+}

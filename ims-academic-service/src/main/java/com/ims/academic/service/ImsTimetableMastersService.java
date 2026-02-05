@@ -13,5 +13,7 @@ public interface ImsTimetableMastersService {
 
     List<ImsTimetableMastersDto> getByOfferingId(String offeringId);
 
+    List<ImsTimetableMastersDto> getByOfferingIdAndTenantId(String offeringId, String tenantId);
+
     void delete(String id);
 }

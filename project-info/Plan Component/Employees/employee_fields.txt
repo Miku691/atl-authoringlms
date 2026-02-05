@@ -1,0 +1,15 @@
+### Employee Information (Basic)
+- Employee Name [Required]
+- Mobile No for SMS/WhatsApp [Required]
+- Employee Role [Required] (Dropdown)
+- Picture [Optional]
+- Date of Joining [Required]
+- Monthly Salary [Required]
+
+### Other Information
+- Father / Husband Name
+- Gender (Dropdown)
+- Experience
+- National ID
+- Religion (Dropdown)
+- Email Address

@@ -16,6 +16,8 @@ interface CustomDatePickerProps {
     showMonthDropdown?: boolean;
     showYearDropdown?: boolean;
     dropdownMode?: 'scroll' | 'select';
+    scrollableYearDropdown?: boolean;
+    yearDropdownItemNumber?: number;
 }
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
@@ -30,7 +32,9 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
     minDate,
     showMonthDropdown = true,
     showYearDropdown = true,
-    dropdownMode = "select"
+    dropdownMode = "select",
+    scrollableYearDropdown = false,
+    yearDropdownItemNumber
 }) => {
     return (
         <div className={`flex flex-col ${className}`}>
@@ -53,6 +57,8 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
                     showMonthDropdown={showMonthDropdown}
                     showYearDropdown={showYearDropdown}
                     dropdownMode={dropdownMode}
+                    scrollableYearDropdown={scrollableYearDropdown}
+                    yearDropdownItemNumber={yearDropdownItemNumber}
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none text-gray-400">
                     <Calendar className="w-4 h-4" />

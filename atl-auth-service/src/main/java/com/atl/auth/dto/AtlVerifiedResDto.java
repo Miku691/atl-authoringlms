@@ -11,10 +11,12 @@ import java.util.Set;
 @Setter
 @Builder
 public class AtlVerifiedResDto {
+    private String id;
     private String username;
     private String jwt;
     private Set<String> roles;
     private String tenantId;
+    private String email;
     private Boolean tenantSetupCompleted;
     private TenantType tenantType;
 }

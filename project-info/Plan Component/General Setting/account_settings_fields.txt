@@ -1,0 +1,12 @@
+Account Settings Fields:
+
+- Username (Email)
+- Password (Secure text)
+- TimeZone (Dropdown)
+- Currency (Dropdown)
+- Symbol (Text)
+
+Account Status Details:
+- Subscription Type
+- Expiry Date
+- Action: Delete Account

@@ -37,8 +37,7 @@ public class ImsSectionsServiceImpl implements ImsSectionsService {
 
         if (repo.existsByImsClassIdAndName(dto.getClassId(), dto.getName())) {
             throw new ResourceAlreadyExistException(
-                    dto.getName(), "SECTION", "Name"
-            );
+                    dto.getName(), "SECTION", "Name");
         }
 
         ImsSections section = ImsSections.builder()
@@ -56,7 +55,8 @@ public class ImsSectionsServiceImpl implements ImsSectionsService {
         ImsSections existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Section ID", id));
 
-        existing.setName(dto.getName());
+        if (dto.getName() != null)
+            existing.setName(dto.getName());
 
         return toDto(repo.save(existing));
     }

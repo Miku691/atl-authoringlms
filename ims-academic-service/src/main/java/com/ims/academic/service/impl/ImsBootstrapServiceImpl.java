@@ -28,6 +28,7 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
     private final ImsClassesService classesService;
     private final ImsProgramsRepo programsRepo;
     private final ImsOfferingsRepo offeringsRepo;
+    private final com.ims.academic.service.AcademicSessionService sessionService;
 
     @Override
     @Transactional
@@ -65,111 +66,173 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
     }
 
     private void setupSchool(BootstrapReqDto req) {
-        // 1. Create Main Program (e.g. "Main School Curriculum")
+        BootstrapReqDto.SchoolConfig config = req.getSchoolConfig();
+        if (config == null) {
+            throw new IllegalArgumentException("School config is missing");
+        }
+
+        // 1. Create Main Program
         ImsProgramsDto program = ImsProgramsDto.builder()
                 .tenantId(req.getTenantId())
                 .code("SCHOOL-MAIN-" + req.getAcademicYear())
                 .title("School Curriculum " + req.getAcademicYear())
                 .level(ProgramLevel.SCHOOL)
-                .board(AcademicBoard.CBSE) // Default or parse from req.getBoard()
-                .description("Default school program created by bootstrap")
+                .board(AcademicBoard.CBSE) // Default or parse
+                .description("Main School Program")
                 .build();
 
-        if (req.getBoard() != null) {
+        if (config.getBoard() != null) {
             try {
-                program.setBoard(AcademicBoard.valueOf(req.getBoard().toUpperCase()));
+                program.setBoard(AcademicBoard.valueOf(config.getBoard().toUpperCase()));
             } catch (Exception ignored) {
-                program.setBoard(AcademicBoard.OTHER); // Fallback
+                program.setBoard(AcademicBoard.OTHER);
             }
         }
 
         ImsProgramsDto savedProgram = programsService.create(program);
 
-        // 2. Create Classes (Offerings) & ImsClasses
-        // e.g. Class 1 to Class 12
-        int levels = req.getNumberOfLevels() > 0 ? req.getNumberOfLevels() : 12;
+        // 1.1 Create Default Session
+        com.ims.academic.dto.AcademicSessionDto session = com.ims.academic.dto.AcademicSessionDto.builder()
+                .tenantId(req.getTenantId())
+                .programId(savedProgram.getId())
+                .name(req.getAcademicYear())
+                .startDate(LocalDate.now())
+                .endDate(LocalDate.now().plusYears(1))
+                .isCurrent(true)
+                .build();
 
-        for (int i = 1; i <= levels; i++) {
-            // Create Offering (The logical "Class 10")
-            ImsOfferingsDto offering = ImsOfferingsDto.builder()
-                    .tenantId(req.getTenantId())
-                    .programId(savedProgram.getId())
-                    .type(OfferingType.SCHOOL_CLASS)
-                    .name("Class " + i)
-                    .startDate(LocalDate.now()) // Should ideally come from academic year start
-                    .endDate(LocalDate.now().plusYears(1))
-                    .capacity(40) // Default
-                    .build();
-            ImsOfferingsDto savedOffering = offeringsService.create(offering);
+        com.ims.academic.dto.AcademicSessionDto savedSession = sessionService.create(session);
 
-            // Create ImsClass (The entity for mapping)
-            // Name: "Class X", Code: "CLASS-X", Linked to Offering
-            ImsClassesDto classDto = ImsClassesDto.builder()
-                    .tenantId(req.getTenantId())
-                    .name("Class " + i)
-                    .code("CLASS-" + i)
-                    .offeringId(savedOffering.getId())
-                    .build();
-            classesService.create(classDto);
+        // 2. Create Classes and Sections
+        int start = config.getStartClass() > 0 ? config.getStartClass() : 1;
+        int end = config.getEndClass() > 0 ? config.getEndClass() : 12;
+        int sections = config.getSectionsPerClass() > 0 ? config.getSectionsPerClass() : 1;
+
+        for (int i = start; i <= end; i++) {
+            for (int s = 0; s < sections; s++) {
+                String sectionName = String.valueOf((char) ('A' + s));
+                String className = "Class " + i + "-" + sectionName;
+
+                // Create Offering (The schedulable unit)
+                ImsOfferingsDto offering = ImsOfferingsDto.builder()
+                        .tenantId(req.getTenantId())
+                        .programId(savedProgram.getId())
+                        .sessionId(savedSession.getId())
+                        .type(OfferingType.SCHOOL_CLASS)
+                        .name(className)
+                        .startDate(LocalDate.now())
+                        .endDate(LocalDate.now().plusYears(1))
+                        .capacity(40)
+                        .build();
+                ImsOfferingsDto savedOffering = offeringsService.create(offering);
+
+                // Create ImsClass
+                ImsClassesDto classDto = ImsClassesDto.builder()
+                        .tenantId(req.getTenantId())
+                        .name(className)
+                        .code("CLS-" + i + "-" + sectionName)
+                        .offeringId(savedOffering.getId())
+                        .build();
+                classesService.create(classDto);
+            }
         }
     }
 
     private void setupCollege(BootstrapReqDto req) {
-        // For college, "Program" usually means "B.Tech", "B.Sc" etc.
-        // We'll create a default one "General Science" or similar if not specified
-        ImsProgramsDto program = ImsProgramsDto.builder()
-                .tenantId(req.getTenantId())
-                .code("COLLEGE-GEN-" + req.getAcademicYear())
-                .title("General Degree " + req.getAcademicYear())
-                .level(ProgramLevel.UNDERGRAD)
-                .description("Default college program created by bootstrap")
-                .build();
+        BootstrapReqDto.CollegeConfig config = req.getCollegeConfig();
+        if (config == null || config.getPrograms() == null) {
+            throw new IllegalArgumentException("College config/programs missing");
+        }
 
-        ImsProgramsDto savedProgram = programsService.create(program);
+        for (BootstrapReqDto.ProgramReq progReq : config.getPrograms()) {
+            // Create Program
+            ImsProgramsDto program = ImsProgramsDto.builder()
+                    .tenantId(req.getTenantId())
+                    .code(progReq.getCode() != null ? progReq.getCode() : "PROG-" + System.currentTimeMillis())
+                    .title(progReq.getName())
+                    .level(ProgramLevel.UNDERGRAD) // Default
+                    .description("College Degree Program")
+                    .build();
 
-        // Create Semesters (Offerings)
-        int semesters = req.getNumberOfLevels() > 0 ? req.getNumberOfLevels() : 8; // Default 4 years
+            ImsProgramsDto savedProgram = programsService.create(program);
 
-        for (int i = 1; i <= semesters; i++) {
-            ImsOfferingsDto offering = ImsOfferingsDto.builder()
+            // Create Session for this Program
+            com.ims.academic.dto.AcademicSessionDto session = com.ims.academic.dto.AcademicSessionDto.builder()
                     .tenantId(req.getTenantId())
                     .programId(savedProgram.getId())
-                    .type(OfferingType.COLLEGE_PROGRAM)
-                    .name("Semester " + i)
+                    .name(req.getAcademicYear())
                     .startDate(LocalDate.now())
-                    .endDate(LocalDate.now().plusMonths(6))
-                    .capacity(60)
+                    .endDate(LocalDate.now().plusYears(1))
+                    .isCurrent(true)
                     .build();
-            offeringsService.create(offering);
+            com.ims.academic.dto.AcademicSessionDto savedSession = sessionService.create(session);
+
+            // Create Terms (Semesters)
+            int terms = progReq.getNumberOfTerms() > 0 ? progReq.getNumberOfTerms() : 8;
+            String label = progReq.getTermLabel() != null ? progReq.getTermLabel() : "Semester";
+
+            for (int i = 1; i <= terms; i++) {
+                ImsOfferingsDto offering = ImsOfferingsDto.builder()
+                        .tenantId(req.getTenantId())
+                        .programId(savedProgram.getId())
+                        .sessionId(savedSession.getId())
+                        .type(OfferingType.COLLEGE_PROGRAM)
+                        .name(label + " " + i)
+                        .startDate(LocalDate.now())
+                        .endDate(LocalDate.now().plusMonths(6))
+                        .capacity(60)
+                        .build();
+                offeringsService.create(offering);
+            }
         }
     }
 
     private void setupCoaching(BootstrapReqDto req) {
-        // Coaching: Program = "IIT-JEE 2025" etc.
-        ImsProgramsDto program = ImsProgramsDto.builder()
-                .tenantId(req.getTenantId())
-                .code("COACHING-" + req.getAcademicYear())
-                .title("Coaching Program " + req.getAcademicYear())
-                .level(ProgramLevel.COACHING)
-                .description("Default coaching program created by bootstrap")
-                .build();
+        BootstrapReqDto.CoachingConfig config = req.getCoachingConfig();
+        if (config == null || config.getPrograms() == null) {
+            throw new IllegalArgumentException("Coaching config/programs missing");
+        }
 
-        ImsProgramsDto savedProgram = programsService.create(program);
+        for (BootstrapReqDto.ProgramReq progReq : config.getPrograms()) {
+            // Create Program
+            ImsProgramsDto program = ImsProgramsDto.builder()
+                    .tenantId(req.getTenantId())
+                    .code(progReq.getCode() != null ? progReq.getCode() : "COACH-" + System.currentTimeMillis())
+                    .title(progReq.getName())
+                    .level(ProgramLevel.COACHING)
+                    .description("Coaching Program")
+                    .build();
 
-        // Create Batches (Offerings)
-        int batches = req.getNumberOfLevels() > 0 ? req.getNumberOfLevels() : 2; // Morning, Evening
+            ImsProgramsDto savedProgram = programsService.create(program);
 
-        for (int i = 1; i <= batches; i++) {
-            ImsOfferingsDto offering = ImsOfferingsDto.builder()
+            // Create Session for this Program
+            com.ims.academic.dto.AcademicSessionDto session = com.ims.academic.dto.AcademicSessionDto.builder()
                     .tenantId(req.getTenantId())
                     .programId(savedProgram.getId())
-                    .type(OfferingType.COACHING_BATCH)
-                    .name("Batch " + ((char) ('A' + i - 1))) // Batch A, Batch B...
+                    .name(req.getAcademicYear())
                     .startDate(LocalDate.now())
                     .endDate(LocalDate.now().plusYears(1))
-                    .capacity(30)
+                    .isCurrent(true)
                     .build();
-            offeringsService.create(offering);
+            com.ims.academic.dto.AcademicSessionDto savedSession = sessionService.create(session);
+
+            // Create Batches
+            int batches = progReq.getNumberOfTerms() > 0 ? progReq.getNumberOfTerms() : 2;
+            String label = progReq.getTermLabel() != null ? progReq.getTermLabel() : "Batch";
+
+            for (int i = 1; i <= batches; i++) {
+                ImsOfferingsDto offering = ImsOfferingsDto.builder()
+                        .tenantId(req.getTenantId())
+                        .programId(savedProgram.getId())
+                        .sessionId(savedSession.getId())
+                        .type(OfferingType.COACHING_BATCH)
+                        .name(label + " " + ((char) ('A' + i - 1))) // Batch A, Batch B...
+                        .startDate(LocalDate.now())
+                        .endDate(LocalDate.now().plusYears(1))
+                        .capacity(40)
+                        .build();
+                offeringsService.create(offering);
+            }
         }
     }
 }

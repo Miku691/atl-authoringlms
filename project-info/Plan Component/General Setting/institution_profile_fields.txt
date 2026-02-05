@@ -1,0 +1,13 @@
+Institute Profile Fields:
+
+- Institute Logo (Image)
+- Phone Number (Text/Numeric)
+- Website (URL)
+- Name of Institute (Text)
+- Address (Textarea)
+- Target Line / Motto (Text)
+- Country (Dropdown)
+
+Summary/Display Fields:
+- Email (Likely from account settings)
+- Full Profile Preview

@@ -26,6 +26,9 @@ public class ImsTimetableMasters {
         }
     }
 
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
+
     @Column(name = "offering_id", nullable = false)
     private String offeringId;
 

@@ -33,8 +33,7 @@ public class ImsProgramsServiceImpl implements ImsProgramsService {
 
         if (repo.existsByTenantIdAndCode(dto.getTenantId(), dto.getCode())) {
             throw new ResourceAlreadyExistException(
-                    dto.getCode(), "PROGRAM", "Code"
-            );
+                    dto.getCode(), "PROGRAM", "Code");
         }
 
         return toDto(repo.save(toEntity(dto)));
@@ -46,10 +45,14 @@ public class ImsProgramsServiceImpl implements ImsProgramsService {
         ImsPrograms existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Program ID", id));
 
-        existing.setTitle(dto.getTitle());
-        existing.setLevel(dto.getLevel());
-        existing.setBoard(dto.getBoard());
-        existing.setDescription(dto.getDescription());
+        if (dto.getTitle() != null)
+            existing.setTitle(dto.getTitle());
+        if (dto.getLevel() != null)
+            existing.setLevel(dto.getLevel());
+        if (dto.getBoard() != null)
+            existing.setBoard(dto.getBoard());
+        if (dto.getDescription() != null)
+            existing.setDescription(dto.getDescription());
 
         return toDto(repo.save(existing));
     }
@@ -83,5 +86,10 @@ public class ImsProgramsServiceImpl implements ImsProgramsService {
             throw new ResourceNotFoundException("Program ID", id);
         }
         repo.deleteById(id);
+    }
+
+    @Override
+    public long countByTenant(String tenantId) {
+        return repo.countByTenantId(tenantId);
     }
 }

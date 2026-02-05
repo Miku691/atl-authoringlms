@@ -7,9 +7,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ImsChaptersDto {
-
     private String id;
-    private String syllabusPackId;
+    private String offeringSubjectId;
     private String title;
     private Integer orderIndex;
 }

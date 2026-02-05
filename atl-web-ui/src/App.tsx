@@ -14,13 +14,42 @@ import RoleManagementPage from './pages/dashboard/admin/RoleManagementPage';
 import TenantSettingsPage from './pages/dashboard/admin/TenantSettingsPage';
 import StudentManagementPage from './pages/dashboard/admin/users/StudentManagementPage';
 import AddStudentPage from './pages/dashboard/admin/people/students/AddStudentPage';
+import BulkAdmissionPage from './pages/dashboard/admin/people/students/BulkAdmissionPage';
+import StudentProfilePage from './pages/dashboard/admin/people/students/StudentProfilePage';
+import AttendanceMarkingPage from './pages/dashboard/admin/operations/AttendanceMarkingPage';
+import GuardianManagementPage from './pages/dashboard/admin/people/guardians/GuardianManagementPage';
+import FeeConfigPage from './pages/dashboard/admin/finance/FeeConfigPage';
+import FeeStructurePage from './pages/dashboard/admin/finance/FeeStructurePage';
+import StudentLedgerPage from './pages/dashboard/admin/finance/StudentLedgerPage';
+import CollectionDeskPage from './pages/dashboard/admin/finance/CollectionDeskPage';
 
 // ... (existing imports)
 
 import StaffManagementPage from './pages/dashboard/admin/users/StaffManagementPage';
-import InstructorManagementPage from './pages/dashboard/admin/users/InstructorManagementPage';
+import InstructorManagementPage from './pages/dashboard/admin/people/instructors/InstructorManagementPage';
+import InstructorAvailabilityPage from './pages/dashboard/admin/people/instructors/InstructorAvailabilityPage';
+import InstructorSubjectsPage from './pages/dashboard/admin/people/instructors/InstructorSubjectsPage';
+import InstructorProfilePage from './pages/dashboard/admin/people/instructors/InstructorProfilePage';
 import AcademicStructurePage from './pages/dashboard/admin/academics/AcademicStructurePage';
+import DepartmentManagementPage from './pages/dashboard/admin/academics/DepartmentManagementPage';
+import SyllabusTrackingPage from './pages/dashboard/admin/academics/SyllabusTrackingPage';
+import SubjectManagementPage from './pages/dashboard/admin/academics/SubjectManagementPage';
+import TimetableManagementPage from './pages/dashboard/admin/academics/TimetableManagementPage';
+import GradingConfigPage from './pages/dashboard/admin/academics/GradingConfigPage';
 import ComingSoonPage from './pages/common/ComingSoonPage';
+import StudentDashboardHome from './pages/dashboard/student/StudentDashboardHome';
+import MyProfilePage from './pages/dashboard/student/MyProfilePage';
+import MyAcademicsPage from './pages/dashboard/student/MyAcademicsPage';
+import MyTimetablePage from './pages/dashboard/student/MyTimetablePage';
+import MySyllabusPage from './pages/dashboard/student/MySyllabusPage';
+import MyAttendancePage from './pages/dashboard/student/MyAttendancePage';
+import MyAssignmentsPage from './pages/dashboard/student/MyAssignmentsPage';
+import MyFinancePage from './pages/dashboard/student/MyFinancePage';
+import WardFinancePage from './pages/dashboard/guardian/WardFinancePage';
+import AssignmentManagementPage from './pages/dashboard/admin/operations/AssignmentManagementPage';
+import AnnouncementManagementPage from './pages/dashboard/admin/communication/AnnouncementManagementPage';
+import TeacherDashboard from './pages/dashboard/teacher/TeacherDashboard';
+import InstructorClassHubPage from './pages/dashboard/teacher/InstructorClassHubPage';
 
 // Protected Route Wrapper
 import { useSelector } from 'react-redux';
@@ -44,7 +73,6 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
       }
     } else {
       if (isCreatePage) {
-        // If tenant exists, shouldn't be on create page
         return <Navigate to={user.tenantSetupCompleted ? "/dashboard" : "/onboarding/setup-tenant"} replace />;
       }
 
@@ -58,13 +86,27 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
   }
 
   if (allowedRoles && user) {
-    const hasRole = user.roles.some(role => allowedRoles.includes(role));
+    const hasRole = user.roles.some((role: string) => allowedRoles.includes(role));
     if (!hasRole) {
       return <Navigate to="/unauthorized" replace />;
     }
   }
 
   return children;
+};
+
+const DashboardWrapper = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  if (user?.roles.includes('STUDENT')) {
+    return <StudentDashboardHome />;
+  }
+  if (user?.roles.includes('GUARDIAN') || user?.roles.includes('PARENT')) {
+    return <WardFinancePage />; // Temp: show finance page as dashboard for guardians
+  }
+  if (user?.roles.includes('INSTRUCTOR')) {
+    return <TeacherDashboard />;
+  }
+  return <AdminDashboardHome />;
 };
 
 const App: React.FC = () => {
@@ -80,44 +122,72 @@ const App: React.FC = () => {
 
           {/* Protected Main App Layout */}
           <Route element={
-            <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT']}>
+            <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT', 'GUARDIAN', 'PARENT']}>
               <AdminLayout />
             </ProtectedRoute>
           }>
-            <Route path="/dashboard" element={<AdminDashboardHome />} />
+            <Route path="/dashboard" element={<DashboardWrapper />} />
+
+            {/* Student Routes */}
+            <Route path="/student/profile" element={<MyProfilePage />} />
+            <Route path="/student/academics" element={<MyAcademicsPage />} />
+            <Route path="/student/timetable" element={<MyTimetablePage />} />
+            <Route path="/student/syllabus" element={<MySyllabusPage />} />
+            <Route path="/student/attendance" element={<MyAttendancePage />} />
+            <Route path="/student/assignments" element={<MyAssignmentsPage />} />
+            <Route path="/student/finance" element={<MyFinancePage />} />
+
+            {/* Guardian Routes */}
+            <Route path="/guardian/finance" element={<WardFinancePage />} />
 
             {/* Setup */}
             <Route path="/setup" element={<TenantSettingsPage />} />
 
             {/* Academics */}
             <Route path="/academics/offerings" element={<AcademicStructurePage />} />
-            <Route path="/academics/subjects" element={<ComingSoonPage />} />
-            <Route path="/academics/syllabus" element={<ComingSoonPage />} />
+            <Route path="/academics/departments" element={<DepartmentManagementPage />} />
+            <Route path="/academics/subjects" element={<SubjectManagementPage />} />
+            <Route path="/academics/syllabus" element={<SyllabusTrackingPage />} />
+            <Route path="/academics/timetable" element={<TimetableManagementPage />} />
+            <Route path="/academics/grading" element={<GradingConfigPage />} />
 
             {/* People */}
             <Route path="/people/students" element={<StudentManagementPage />} />
             <Route path="/people/students/all" element={<StudentManagementPage />} />
             <Route path="/people/students/add" element={<AddStudentPage />} />
+            <Route path="/people/students/bulk" element={<BulkAdmissionPage />} />
+            <Route path="/people/students/:id" element={<StudentProfilePage />} />
             <Route path="/people/students/enrollments" element={<ComingSoonPage />} />
-            <Route path="/people/students/guardians" element={<ComingSoonPage />} />
+            <Route path="/people/students/guardians" element={<GuardianManagementPage />} />
             <Route path="/people/students/documents" element={<ComingSoonPage />} />
             <Route path="/people/instructors" element={<InstructorManagementPage />} />
+            <Route path="/people/instructors/:id/availability" element={<InstructorAvailabilityPage />} />
+            <Route path="/people/instructors/:id/subjects" element={<InstructorSubjectsPage />} />
+            <Route path="/people/instructors/:id" element={<InstructorProfilePage />} />
+            <Route path="/instructor/class/:offeringId" element={<InstructorClassHubPage />} />
             <Route path="/people/staff" element={<StaffManagementPage />} />
 
             {/* Operations */}
+            <Route path="/operations/attendance" element={<AttendanceMarkingPage />} />
             <Route path="/operations/*" element={<ComingSoonPage />} />
 
             {/* Finance */}
+            <Route path="/finance/config" element={<FeeConfigPage />} />
+            <Route path="/finance/structure" element={<FeeStructurePage />} />
+            <Route path="/finance/ledger" element={<StudentLedgerPage />} />
+            <Route path="/finance/collections" element={<CollectionDeskPage />} />
             <Route path="/finance/*" element={<ComingSoonPage />} />
 
-            {/* LMS */}
-            <Route path="/lms/*" element={<ComingSoonPage />} />
-
             {/* Communication */}
+            <Route path="/communication/announcements" element={<AnnouncementManagementPage />} />
             <Route path="/communication/*" element={<ComingSoonPage />} />
 
             {/* Reports */}
             <Route path="/reports/*" element={<ComingSoonPage />} />
+
+            {/* LMS */}
+            <Route path="/lms/assignments" element={<AssignmentManagementPage />} />
+            <Route path="/lms/*" element={<ComingSoonPage />} />
 
             {/* System */}
             <Route path="/system/users" element={<StudentManagementPage />} />

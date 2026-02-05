@@ -10,6 +10,7 @@ import java.util.List;
 public class ImsTimetableMastersDto {
 
     private String id;
+    private String tenantId;
     private String offeringId;
     private String academicYearId;
     private String name;

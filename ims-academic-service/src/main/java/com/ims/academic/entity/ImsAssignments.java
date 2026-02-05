@@ -27,7 +27,10 @@ public class ImsAssignments {
         }
     }
 
-    @Column(name = "offering_id")
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
+
+    @Column(name = "offering_id", nullable = false)
     private String offeringId;
 
     @Column(name = "subject_id")

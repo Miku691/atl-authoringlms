@@ -8,14 +8,10 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.LocalDate;
 
 @Entity
-@Table(
-        name = "IMS_OFFERINGS",
-        indexes = {
-                @Index(name = "idx_offering_tenant", columnList = "tenant_id"),
-                @Index(name = "idx_offering_program", columnList = "program_id"),
-                @Index(name = "idx_offering_type", columnList = "type")
-        }
-)
+@Table(name = "IMS_OFFERINGS", indexes = {
+        @Index(name = "idx_offering_tenant", columnList = "tenant_id"),
+        @Index(name = "idx_offering_type", columnList = "type")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -38,10 +34,14 @@ public class ImsOfferings {
     @Column(name = "tenant_id", nullable = false)
     private String tenantId;
 
-    // Program reference (same microservice → allowed)
+    // Session reference (Session belongs to Program)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "program_id", nullable = false)
-    private ImsPrograms program;
+    @JoinColumn(name = "session_id", nullable = false)
+    private AcademicSession session;
+
+    // Optional: Keep program for faster querying if needed, but strict hierarchy
+    // suggests via session.
+    // For now, valid Offering must belong to a session.
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 50)
@@ -63,4 +63,3 @@ public class ImsOfferings {
     @Column(name = "metadata", columnDefinition = "TEXT")
     private String metadata;
 }
-

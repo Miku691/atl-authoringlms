@@ -1,10 +1,10 @@
 package com.ims.academic.service.impl;
 
 import com.ims.academic.dto.ImsOfferingSubjectsDto;
-import com.ims.academic.entity.ImsOfferingSubjects;
+import com.ims.academic.entity.ImsOfferingSubject;
 import com.ims.academic.exception.ResourceAlreadyExistException;
 import com.ims.academic.exception.ResourceNotFoundException;
-import com.ims.academic.repo.ImsOfferingSubjectsRepo;
+import com.ims.academic.repo.ImsOfferingSubjectRepo;
 import com.ims.academic.service.ImsOfferingSubjectsService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -17,15 +17,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ImsOfferingSubjectsServiceImpl implements ImsOfferingSubjectsService {
 
-    private final ImsOfferingSubjectsRepo repo;
+    private final ImsOfferingSubjectRepo repo;
     private final ModelMapper modelMapper;
 
-    private ImsOfferingSubjectsDto toDto(ImsOfferingSubjects entity) {
+    private ImsOfferingSubjectsDto toDto(ImsOfferingSubject entity) {
         return modelMapper.map(entity, ImsOfferingSubjectsDto.class);
     }
 
-    private ImsOfferingSubjects toEntity(ImsOfferingSubjectsDto dto) {
-        return modelMapper.map(dto, ImsOfferingSubjects.class);
+    private ImsOfferingSubject toEntity(ImsOfferingSubjectsDto dto) {
+        return modelMapper.map(dto, ImsOfferingSubject.class);
     }
 
     @Override
@@ -42,11 +42,13 @@ public class ImsOfferingSubjectsServiceImpl implements ImsOfferingSubjectsServic
     @Override
     public ImsOfferingSubjectsDto update(String id, ImsOfferingSubjectsDto dto) {
 
-        ImsOfferingSubjects existing = repo.findById(id)
+        ImsOfferingSubject existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("OfferingSubject ID", id));
 
-        existing.setOrderIndex(dto.getOrderIndex());
-        existing.setWeight(dto.getWeight());
+        existing.setOptional(dto.isOptional());
+        if (dto.getCredits() != null) {
+            existing.setCredits(dto.getCredits().doubleValue());
+        }
         // Typically we don't update offeringId or subjectId in an update call unless
         // specifically requested,
         // as that changes the identity of the relationship. focusing on mutable fields.

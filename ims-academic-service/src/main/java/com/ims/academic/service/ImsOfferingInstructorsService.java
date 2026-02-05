@@ -14,5 +14,7 @@ public interface ImsOfferingInstructorsService {
 
     List<ImsOfferingInstructorsDto> getByOfferingId(String offeringId);
 
+    List<ImsOfferingInstructorsDto> getByInstructorId(String instructorId);
+
     void delete(String id);
 }

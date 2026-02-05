@@ -12,4 +12,13 @@ public class ApiResponse<T> {
     private int statusCode;
     private String message;
     private T apiData;
+
+    public static <T> ApiResponse<T> success(int statusCode, String message, T apiData) {
+        return ApiResponse.<T>builder()
+                .status("SUCCESS")
+                .statusCode(statusCode)
+                .message(message)
+                .apiData(apiData)
+                .build();
+    }
 }

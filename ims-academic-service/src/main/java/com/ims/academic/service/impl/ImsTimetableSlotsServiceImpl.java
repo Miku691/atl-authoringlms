@@ -3,6 +3,7 @@ package com.ims.academic.service.impl;
 import com.ims.academic.dto.ImsTimetableSlotsDto;
 import com.ims.academic.entity.ImsTimetableMasters;
 import com.ims.academic.entity.ImsTimetableSlots;
+import com.ims.academic.exception.ResourceAlreadyExistException;
 import com.ims.academic.exception.ResourceNotFoundException;
 import com.ims.academic.repo.ImsTimetableMastersRepo;
 import com.ims.academic.repo.ImsTimetableSlotsRepo;
@@ -44,6 +45,13 @@ public class ImsTimetableSlotsServiceImpl implements ImsTimetableSlotsService {
                 .orElseThrow(() -> new ResourceNotFoundException("Timetable Master ID", dto.getTimetableMasterId()));
         entity.setTimetableMaster(master);
 
+        if (repo.existsByTimetableMasterIdAndDayOfWeekAndSlotLabelAndTenantId(master.getId(), dto.getDayOfWeek(),
+                dto.getSlotLabel(), dto.getTenantId())) {
+            throw new ResourceAlreadyExistException(dto.getSlotLabel(), "Timetable Slot", "label");
+        }
+
+        entity.setPeriodNumber(dto.getPeriodNumber());
+
         // Also handle children linking if passed?
         // For simple CRUD, usually children are added separately or mapped correctly.
         // If children are present in DTO, ensure they link back.
@@ -60,10 +68,19 @@ public class ImsTimetableSlotsServiceImpl implements ImsTimetableSlotsService {
         ImsTimetableSlots existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Timetable Slot ID", id));
 
+        if (!existing.getSlotLabel().equals(dto.getSlotLabel())
+                || !existing.getDayOfWeek().equals(dto.getDayOfWeek())) {
+            if (repo.existsByTimetableMasterIdAndDayOfWeekAndSlotLabelAndTenantId(existing.getTimetableMaster().getId(),
+                    dto.getDayOfWeek(), dto.getSlotLabel(), existing.getTenantId())) {
+                throw new ResourceAlreadyExistException(dto.getSlotLabel(), "Timetable Slot", "label");
+            }
+        }
+
         existing.setDayOfWeek(dto.getDayOfWeek());
         existing.setStartTime(dto.getStartTime());
         existing.setEndTime(dto.getEndTime());
         existing.setSlotLabel(dto.getSlotLabel());
+        existing.setPeriodNumber(dto.getPeriodNumber());
 
         // If updating master parent
         if (!existing.getTimetableMaster().getId().equals(dto.getTimetableMasterId())) {
@@ -86,6 +103,14 @@ public class ImsTimetableSlotsServiceImpl implements ImsTimetableSlotsService {
     @Override
     public List<ImsTimetableSlotsDto> getByTimetableMasterId(String timetableMasterId) {
         return repo.findByTimetableMasterId(timetableMasterId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImsTimetableSlotsDto> getByTenantId(String tenantId) {
+        return repo.findByTenantId(tenantId)
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());

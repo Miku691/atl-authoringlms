@@ -1,0 +1,8 @@
+### Student Attendance
+- Date [Required]
+- Search Class [Required]
+- Modes: Manual Attendance, Card Scanning
+
+### Employee Attendance
+- Date [Required]
+- Search Employee

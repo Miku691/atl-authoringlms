@@ -11,7 +11,9 @@ import java.util.List;
 public class ImsAttendanceMasterDto {
 
     private String id;
+    private String tenantId;
     private String offeringId;
+    private String subjectId;
     private LocalDate date;
     private String status;
     private String takenBy;

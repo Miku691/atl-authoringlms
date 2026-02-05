@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -17,68 +18,73 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ImsAttendanceMasterController {
 
-    private final ImsAttendanceMasterService service;
+        private final ImsAttendanceMasterService service;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ImsAttendanceMasterDto>> create(@RequestBody ImsAttendanceMasterDto dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.<ImsAttendanceMasterDto>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.CREATED.value())
-                        .message("Attendance Master created successfully")
-                        .apiData(service.create(dto))
-                        .build());
-    }
+        @PostMapping
+        @PreAuthorize("@securityService.canMarkAttendance(#dto.instructorId)")
+        public ResponseEntity<ApiResponse<ImsAttendanceMasterDto>> create(@RequestBody ImsAttendanceMasterDto dto) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(
+                                ApiResponse.<ImsAttendanceMasterDto>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.CREATED.value())
+                                                .message("Attendance Master created successfully")
+                                                .apiData(service.create(dto))
+                                                .build());
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ImsAttendanceMasterDto>> getById(@PathVariable String id) {
-        return ResponseEntity.ok(
-                ApiResponse.<ImsAttendanceMasterDto>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Attendance Master fetched successfully")
-                        .apiData(service.getById(id))
-                        .build());
-    }
+        @GetMapping("/{id}")
+        @PreAuthorize("isAuthenticated()")
+        public ResponseEntity<ApiResponse<ImsAttendanceMasterDto>> getById(@PathVariable String id) {
+                return ResponseEntity.ok(
+                                ApiResponse.<ImsAttendanceMasterDto>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Attendance Master fetched successfully")
+                                                .apiData(service.getById(id))
+                                                .build());
+        }
 
-    @GetMapping("/offering/{offeringId}")
-    public ResponseEntity<ApiResponse<List<ImsAttendanceMasterDto>>> getByOfferingId(
-            @PathVariable String offeringId) {
+        @GetMapping("/offering/{offeringId}")
+        @PreAuthorize("isAuthenticated()")
+        public ResponseEntity<ApiResponse<List<ImsAttendanceMasterDto>>> getByOfferingId(
+                        @PathVariable String offeringId) {
 
-        return ResponseEntity.ok(
-                ApiResponse.<List<ImsAttendanceMasterDto>>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Attendance Masters fetched successfully")
-                        .apiData(service.getByOfferingId(offeringId))
-                        .build());
-    }
+                return ResponseEntity.ok(
+                                ApiResponse.<List<ImsAttendanceMasterDto>>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Attendance Masters fetched successfully")
+                                                .apiData(service.getByOfferingId(offeringId))
+                                                .build());
+        }
 
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponse<List<ImsAttendanceMasterDto>>> getByOfferingIdAndDate(
-            @RequestParam String offeringId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        @GetMapping("/search")
+        @PreAuthorize("isAuthenticated()")
+        public ResponseEntity<ApiResponse<List<ImsAttendanceMasterDto>>> getByOfferingIdAndDate(
+                        @RequestParam String offeringId,
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        return ResponseEntity.ok(
-                ApiResponse.<List<ImsAttendanceMasterDto>>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Attendance Masters fetched successfully")
-                        .apiData(service.getByOfferingIdAndDate(offeringId, date))
-                        .build());
-    }
+                return ResponseEntity.ok(
+                                ApiResponse.<List<ImsAttendanceMasterDto>>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Attendance Masters fetched successfully")
+                                                .apiData(service.getByOfferingIdAndDate(offeringId, date))
+                                                .build());
+        }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
+        @DeleteMapping("/{id}")
+        @PreAuthorize("@securityService.canManageAcademics()")
+        public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
 
-        service.delete(id);
+                service.delete(id);
 
-        return ResponseEntity.ok(
-                ApiResponse.<Void>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Attendance Master deleted successfully")
-                        .apiData(null)
-                        .build());
-    }
+                return ResponseEntity.ok(
+                                ApiResponse.<Void>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Attendance Master deleted successfully")
+                                                .apiData(null)
+                                                .build());
+        }
 }

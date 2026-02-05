@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface ImsStudentDocumentsService {
 
-    ImsStudentDocumentsDto upload(String studentId, String documentType, MultipartFile file);
+    ImsStudentDocumentsDto upload(String studentId, String documentType, String tenantId, MultipartFile file);
 
-    List<ImsStudentDocumentsDto> getByStudentId(String studentId);
+    List<ImsStudentDocumentsDto> getByStudentId(String studentId, String tenantId);
 
-    ImsStudentDocumentsDto getById(String id);
+    ImsStudentDocumentsDto getById(String id, String tenantId);
 
     void delete(String id);
 

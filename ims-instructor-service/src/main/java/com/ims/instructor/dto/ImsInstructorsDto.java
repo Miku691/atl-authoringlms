@@ -18,6 +18,12 @@ public class ImsInstructorsDto {
     private Integer experienceYears;
     private String specialization;
     private LocalDate joinDate;
+    private String email;
+    private String phone;
+    private String employeeId;
+    private LocalDate dob;
+    private String gender;
+    private String address;
     private String status;
     private Instant createdAt;
     private Instant updatedAt;

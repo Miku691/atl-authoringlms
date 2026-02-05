@@ -8,16 +8,15 @@ import CustomDatePicker from '../../../../components/common/CustomDatePicker';
 import CustomSelect from '../../../../components/common/CustomSelect';
 import {
     GraduationCap,
-    Plus,
     Search,
     Edit,
     Trash2,
     Loader2,
     X,
     Save,
-    FileText
-} from 'lucide-react';
-import StudentDocumentsModal from './StudentDocumentsModal';
+    FileText,
+    Key
+} from 'lucide-react'; import StudentDocumentsModal from './StudentDocumentsModal';
 import AuthenticatedAvatar from '../../../../components/common/AuthenticatedAvatar';
 import { useNavigate } from 'react-router-dom';
 
@@ -51,6 +50,23 @@ interface ValidationErrors {
     [key: string]: string;
 }
 
+interface StudentFormData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    admissionNo: string;
+    admissionDate: Date;
+    gender: string;
+    status: string;
+    dob: Date | null;
+    address: string;
+    bloodGroup: string;
+    category: string;
+    religion: string;
+    currentOfferingId: string;
+}
+
 const StudentManagementPage: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.auth);
     const tenantId = user?.tenantId;
@@ -77,6 +93,11 @@ const StudentManagementPage: React.FC = () => {
 
     const [isDeleting, setIsDeleting] = useState(false);
 
+    // Grant Access Modal State
+    const [isGrantAccessModalOpen, setIsGrantAccessModalOpen] = useState(false);
+    const [studentToGrantAccess, setStudentToGrantAccess] = useState<Student | null>(null);
+    const [isGrantingAccess, setIsGrantingAccess] = useState(false);
+
     const [offerings, setOfferings] = useState<Offering[]>([]);
 
     const initialFormState = {
@@ -97,7 +118,7 @@ const StudentManagementPage: React.FC = () => {
         currentOfferingId: ''
     };
 
-    const [formData, setFormData] = useState<Partial<Omit<Student, 'admissionDate' | 'dob'> & { admissionDate: Date; dob: Date | null }>>(initialFormState);
+    const [formData, setFormData] = useState<StudentFormData>(initialFormState);
 
     useEffect(() => {
         if (tenantId) {
@@ -108,7 +129,7 @@ const StudentManagementPage: React.FC = () => {
 
     const fetchOfferings = async () => {
         try {
-            const response = await api.get(`/ims-academic/offerings/tenant/${tenantId}`);
+            const response = await api.get(`/ims-academic-service/offerings/tenant/${tenantId}`);
             if (response.data.status === 'SUCCESS') {
                 setOfferings(response.data.apiData);
             }
@@ -120,7 +141,7 @@ const StudentManagementPage: React.FC = () => {
     const fetchStudents = async () => {
         setIsLoading(true);
         try {
-            const response = await api.get(`/ims-student/students/tenant/${tenantId}`);
+            const response = await api.get(`/ims-student-service/students/tenant/${tenantId}`);
             if (response.data.status === 'SUCCESS') {
                 setStudents(response.data.apiData);
             }
@@ -243,9 +264,9 @@ const StudentManagementPage: React.FC = () => {
 
             let response;
             if (selectedStudentId) {
-                response = await api.put(`/ims-student/students/${selectedStudentId}`, payload);
+                response = await api.put(`/ims-student-service/students/${selectedStudentId}`, payload);
             } else {
-                response = await api.post('/ims-student/students', payload);
+                response = await api.post('/ims-student-service/students', payload);
             }
 
             if (response.data.status === 'SUCCESS') {
@@ -283,7 +304,7 @@ const StudentManagementPage: React.FC = () => {
             category: student.category,
 
             religion: student.religion,
-            currentOfferingId: student.currentOfferingId
+            currentOfferingId: student.currentOfferingId || ''
         });
         setIsModalOpen(true);
     };
@@ -301,12 +322,46 @@ const StudentManagementPage: React.FC = () => {
         setIsDocsModalOpen(true);
     };
 
+    const handleGrantAccessClick = (student: Student) => {
+        setStudentToGrantAccess(student);
+        setIsGrantAccessModalOpen(true);
+    };
+
+    const handleConfirmGrantAccess = async () => {
+        if (!studentToGrantAccess) return;
+
+        setIsGrantingAccess(true);
+        try {
+            const payload = {
+                username: studentToGrantAccess.email,
+                email: studentToGrantAccess.email,
+                tenantId: tenantId
+            };
+
+            await api.post('/atl-auth-service/auth/signup', payload);
+            toast.success("Access Granted! Default password: student@123");
+            setIsGrantAccessModalOpen(false);
+            setStudentToGrantAccess(null);
+        } catch (error: any) {
+            console.error(error);
+            const msg = error.response?.data?.message || "Failed to grant access";
+            if (msg.includes("Already Exist")) {
+                toast.error("User already has access");
+            } else {
+                toast.error(msg);
+            }
+        } finally {
+            setIsGrantingAccess(false);
+        }
+    };
+
+
     const handleConfirmDelete = async () => {
         if (!studentToDelete) return;
 
         setIsDeleting(true);
         try {
-            const response = await api.delete(`/ims-student/students/${studentToDelete}`);
+            const response = await api.delete(`/ims-student-service/students/${studentToDelete}`);
             if (response.data.status === 'SUCCESS') {
                 toast.success('Student deleted successfully');
                 setStudents(students.filter(student => student.id !== studentToDelete));
@@ -353,7 +408,7 @@ const StudentManagementPage: React.FC = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button
+                    {/* <button
                         className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors whitespace-nowrap"
                         onClick={() => {
                             setSelectedStudentId(null);
@@ -363,7 +418,7 @@ const StudentManagementPage: React.FC = () => {
                     >
                         <Plus className="w-4 h-4 mr-2" />
                         Add Student
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
@@ -439,6 +494,13 @@ const StudentManagementPage: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div className="flex items-center justify-end gap-2">
+                                                <button
+                                                    onClick={() => handleGrantAccessClick(student)}
+                                                    className="text-yellow-600 hover:text-yellow-900 p-1 rounded hover:bg-yellow-50 transition-colors"
+                                                    title="Grant Login Access"
+                                                >
+                                                    <Key className="w-4 h-4" />
+                                                </button>
                                                 <button
                                                     onClick={() => handleDocsClick(student)}
                                                     className="text-gray-600 hover:text-gray-900 p-1 rounded hover:bg-gray-100 transition-colors"
@@ -736,6 +798,18 @@ const StudentManagementPage: React.FC = () => {
                 confirmText="Delete"
                 isLoading={isDeleting}
                 variant="danger"
+            />
+
+            {/* Grant Access Modal */}
+            <ConfirmationModal
+                isOpen={isGrantAccessModalOpen}
+                onClose={() => setIsGrantAccessModalOpen(false)}
+                onConfirm={handleConfirmGrantAccess}
+                title="Grant Login Access"
+                message={`Are you sure you want to provide login access to ${studentToGrantAccess?.firstName}? They will be able to login with their email and default password.`}
+                confirmText="Grant Access"
+                isLoading={isGrantingAccess}
+                variant="success"
             />
 
             {/* Documents Modal */}

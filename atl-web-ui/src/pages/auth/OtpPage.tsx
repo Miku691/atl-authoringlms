@@ -27,7 +27,7 @@ const OtpPage: React.FC = () => {
         // Auto-trigger send OTP on component mount
         const sendOtp = async () => {
             try {
-                const response = await api.post('/atl-auth/auth/otp/sendOtp', { username });
+                const response = await api.post('/atl-auth-service/auth/otp/sendOtp', { username });
                 if (response.data.message) {
                     setInfoMessage(`We've sent a 6-digit code to your email associated with ${username}`);
                 }
@@ -45,14 +45,16 @@ const OtpPage: React.FC = () => {
         setError('');
 
         try {
-            const response = await api.post('/atl-auth/auth/otp/verifyOtp', { username, otp });
+            const response = await api.post('/atl-auth-service/auth/otp/verifyOtp', { username, otp });
 
             if (response.data.status === 'SUCCESS') {
-                const { jwt, roles, tenantId, tenantSetupCompleted, tenantType } = response.data.apiData;
+                const { jwt, roles, tenantId, tenantSetupCompleted, tenantType, id, email } = response.data.apiData;
 
                 dispatch(loginSuccess({
                     user: {
+                        id,
                         username,
+                        email,
                         roles: Array.from(roles),
                         tenantId,
                         tenantSetupCompleted,
@@ -68,12 +70,12 @@ const OtpPage: React.FC = () => {
                     } else if (roles.includes('TENANT_ADMIN') && !tenantSetupCompleted) {
                         navigate('/onboarding/setup-tenant'); // Go to setup if valid tenant but not setup
                     } else {
-                        navigate('/admin/dashboard');
+                        navigate('/dashboard');
                     }
                 } else if (roles.includes('STUDENT')) {
-                    navigate('/student/dashboard');
+                    navigate('/dashboard');
                 } else if (roles.includes('TEACHER')) {
-                    navigate('/teacher/dashboard');
+                    navigate('/dashboard');
                 } else {
                     navigate('/dashboard'); // Fallback
                 }

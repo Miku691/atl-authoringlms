@@ -9,13 +9,11 @@ import com.ims.academic.dto.InstructorAssignmentDto;
 import com.ims.academic.dto.external.ImsInstructorSubjectsDto;
 import com.ims.academic.entity.ImsOfferingInstructors;
 import com.ims.academic.entity.ImsOfferings;
-import com.ims.academic.entity.ImsPrograms;
 import com.ims.academic.enums.OfferingStatus;
 import com.ims.academic.exception.ResourceNotFoundException;
 import com.ims.academic.repo.ImsOfferingInstructorsRepo;
-import com.ims.academic.repo.ImsOfferingSubjectsRepo;
+import com.ims.academic.repo.ImsOfferingSubjectRepo;
 import com.ims.academic.repo.ImsOfferingsRepo;
-import com.ims.academic.repo.ImsProgramsRepo;
 import com.ims.academic.service.ImsOfferingsService;
 import com.ims.academic.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +31,8 @@ import java.util.stream.Collectors;
 public class ImsOfferingsServiceImpl implements ImsOfferingsService {
 
     private final ImsOfferingsRepo repo;
-    private final ImsProgramsRepo programsRepo;
-    private final ImsOfferingSubjectsRepo offeringSubjectsRepo;
+    private final com.ims.academic.repo.AcademicSessionRepo academicSessionRepo;
+    private final ImsOfferingSubjectRepo offeringSubjectsRepo;
     private final ImsOfferingInstructorsRepo offeringInstructorsRepo;
     private final InstructorClient instructorClient;
     private final ModelMapper modelMapper;
@@ -42,7 +40,12 @@ public class ImsOfferingsServiceImpl implements ImsOfferingsService {
 
     private ImsOfferingsDto toDto(ImsOfferings entity) {
         ImsOfferingsDto dto = modelMapper.map(entity, ImsOfferingsDto.class);
-        dto.setProgramId(entity.getProgram().getId());
+        if (entity.getSession() != null) {
+            dto.setSessionId(entity.getSession().getId());
+            if (entity.getSession().getProgram() != null) {
+                dto.setProgramId(entity.getSession().getProgram().getId());
+            }
+        }
         dto.setStatus(computeStatus(entity));
         return dto;
     }
@@ -74,12 +77,15 @@ public class ImsOfferingsServiceImpl implements ImsOfferingsService {
 
     @Override
     public ImsOfferingsDto create(ImsOfferingsDto dto) {
+        if (dto.getSessionId() == null) {
+            throw new IllegalArgumentException("Session ID is required");
+        }
 
-        ImsPrograms program = programsRepo.findById(dto.getProgramId())
-                .orElseThrow(() -> new ResourceNotFoundException("Program ID", dto.getProgramId()));
+        com.ims.academic.entity.AcademicSession session = academicSessionRepo.findById(dto.getSessionId())
+                .orElseThrow(() -> new ResourceNotFoundException("Session ID", dto.getSessionId()));
 
         ImsOfferings offering = modelMapper.map(dto, ImsOfferings.class);
-        offering.setProgram(program);
+        offering.setSession(session);
 
         return toDto(repo.save(offering));
     }
@@ -90,12 +96,18 @@ public class ImsOfferingsServiceImpl implements ImsOfferingsService {
         ImsOfferings existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Offering ID", id));
 
-        existing.setName(dto.getName());
-        existing.setType(dto.getType());
-        existing.setStartDate(dto.getStartDate());
-        existing.setEndDate(dto.getEndDate());
-        existing.setCapacity(dto.getCapacity());
-        existing.setMetadata(dto.getMetadata());
+        if (dto.getName() != null)
+            existing.setName(dto.getName());
+        if (dto.getType() != null)
+            existing.setType(dto.getType());
+        if (dto.getStartDate() != null)
+            existing.setStartDate(dto.getStartDate());
+        if (dto.getEndDate() != null)
+            existing.setEndDate(dto.getEndDate());
+        if (dto.getCapacity() != null)
+            existing.setCapacity(dto.getCapacity());
+        if (dto.getMetadata() != null)
+            existing.setMetadata(dto.getMetadata());
 
         return toDto(repo.save(existing));
     }
@@ -117,7 +129,15 @@ public class ImsOfferingsServiceImpl implements ImsOfferingsService {
 
     @Override
     public List<ImsOfferingsDto> getByProgram(String programId) {
-        return repo.findByProgramId(programId)
+        return repo.findBySession_ProgramId(programId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImsOfferingsDto> getByInstructor(String instructorId) {
+        return repo.findByInstructorId(instructorId)
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
@@ -180,7 +200,7 @@ public class ImsOfferingsServiceImpl implements ImsOfferingsService {
         }
 
         // 1. Get Required Subjects
-        List<com.ims.academic.entity.ImsOfferingSubjects> required = offeringSubjectsRepo.findByOfferingId(offeringId);
+        List<com.ims.academic.entity.ImsOfferingSubject> required = offeringSubjectsRepo.findByOfferingId(offeringId);
         if (required.isEmpty()) {
             return com.ims.academic.dto.CoverageStatusDto.builder()
                     .isCovered(true)
@@ -201,7 +221,7 @@ public class ImsOfferingsServiceImpl implements ImsOfferingsService {
 
         // 3. Diff
         List<String> missing = required.stream()
-                .map(com.ims.academic.entity.ImsOfferingSubjects::getSubjectId)
+                .map(s -> s.getSubject().getId())
                 .filter(sId -> !coveredSubjectIds.contains(sId))
                 .collect(Collectors.toList());
 
@@ -283,5 +303,10 @@ public class ImsOfferingsServiceImpl implements ImsOfferingsService {
         return repo.findByTenantId(tenantId).stream()
                 .map(this::computeStatus)
                 .anyMatch(status -> status == OfferingStatus.ACTIVE);
+    }
+
+    @Override
+    public long countByTenant(String tenantId) {
+        return repo.countByTenantId(tenantId);
     }
 }

@@ -19,6 +19,8 @@ public class AtlSinginRequestDto {
     @Email(message = "Email must be valid")
     private String email;
 
-    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
+
+    private String tenantId;
+    private String roleCode;
 }

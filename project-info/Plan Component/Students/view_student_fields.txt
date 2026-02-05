@@ -1,0 +1,36 @@
+Student Report Fields:
+
+1. Profile Sidebar:
+- Profile Picture
+- Student Name
+- Registration No
+- Date of Admission
+- Class
+- Family (Reference to family group)
+- Discount in Fee
+- Date Of Birth
+- Gender
+- Identification Mark
+- Blood Group
+
+2. Attendance Report:
+- Overall Attendance Percentage
+- Monthly Attendance Percentage
+- Today/Yesterday Status (Marked/Not Marked)
+- Present Count (Monthly)
+- Leave Count (Monthly)
+- Absent Count (Monthly)
+
+3. Class Tests Report:
+- Subject Name
+- Performance Percentage per Subject
+- Total Class Tests
+- Total Marks
+- Obtained Marks
+- Overall Score Percentage
+
+4. Examination Report:
+- Exam Results/History
+
+5. Fee Report:
+- Payment History/Status

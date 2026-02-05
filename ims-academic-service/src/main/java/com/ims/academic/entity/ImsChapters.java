@@ -24,8 +24,9 @@ public class ImsChapters {
         }
     }
 
-    @Column(name = "syllabus_pack_id", nullable = false)
-    private String syllabusPackId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "offering_subject_id", nullable = true)
+    private ImsOfferingSubject offeringSubject;
 
     @Column(name = "title", nullable = false)
     private String title;

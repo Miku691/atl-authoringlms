@@ -48,6 +48,66 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             roles: ['SUPER_ADMIN', 'TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT']
         },
         {
+            path: '/student/profile',
+            label: 'My Profile',
+            icon: UserCircle,
+            roles: ['STUDENT']
+        },
+        {
+            path: '/student/academics',
+            label: 'My Academics',
+            icon: GraduationCap,
+            roles: ['STUDENT'],
+            setupRequired: true,
+            condition: () => hasActiveOfferings
+        },
+        {
+            path: '/student/syllabus',
+            label: 'My Syllabus',
+            icon: FileText,
+            roles: ['STUDENT'],
+            setupRequired: true,
+            condition: () => hasActiveOfferings
+        },
+        {
+            path: '/student/timetable',
+            label: 'My Timetable',
+            icon: Clock,
+            roles: ['STUDENT'],
+            setupRequired: true,
+            condition: () => hasActiveOfferings
+        },
+        {
+            path: '/student/attendance',
+            label: 'My Attendance',
+            icon: ListChecks,
+            roles: ['STUDENT'],
+            setupRequired: true,
+            condition: () => hasActiveOfferings
+        },
+        {
+            path: '/student/assignments',
+            label: 'My Assignments',
+            icon: FileText,
+            roles: ['STUDENT'],
+            setupRequired: true,
+            condition: () => hasActiveOfferings
+        },
+        {
+            path: '/student/finance',
+            label: 'My Finance',
+            icon: DollarSign,
+            roles: ['STUDENT'],
+            setupRequired: true
+        },
+        {
+            path: '/guardian/finance',
+            label: 'Ward Finance',
+            icon: DollarSign,
+            roles: ['GUARDIAN', 'PARENT'],
+            setupRequired: true
+        },
+        {
             path: '/setup',
             label: 'Setup & Config',
             icon: Settings,
@@ -63,6 +123,8 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             subItems: [
                 { path: '/academics/offerings', label: offeringLabel, icon: Layers, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
                 { path: '/academics/subjects', label: 'Subjects', icon: BookOpen, roles: ['TENANT_ADMIN'] },
+                { path: '/academics/timetable', label: 'Timetable', icon: Clock, roles: ['TENANT_ADMIN', 'INSTRUCTOR'], condition: () => hasActiveOfferings },
+                { path: '/academics/grading', label: 'Grading Scales', icon: FileText, roles: ['TENANT_ADMIN'] },
                 { path: '/academics/syllabus', label: 'Syllabus', icon: FileText, roles: ['TENANT_ADMIN', 'INSTRUCTOR'], condition: () => hasActiveOfferings },
             ]
         },
@@ -99,6 +161,7 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             condition: () => hasActiveOfferings, // Entire section hidden if no active offerings
             subItems: [
                 { path: '/operations/attendance', label: 'Attendance', icon: ListChecks, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
+                { path: '/lms/assignments', label: 'Assignments', icon: FileText, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
                 { path: '/operations/timetable', label: 'Timetable', icon: Clock, roles: ['TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT'] },
                 { path: '/operations/calendar', label: 'Calendar', icon: Calendar, roles: ['TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT'] },
             ]
@@ -107,11 +170,13 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             path: '/finance',
             label: 'Finance',
             icon: DollarSign,
-            roles: ['TENANT_ADMIN'],
+            roles: ['TENANT_ADMIN', 'ACCOUNTANT'],
             setupRequired: true,
             subItems: [
-                { path: '/finance/fees', label: 'Fee Structure', icon: FileText },
-                { path: '/finance/collections', label: 'Collections', icon: CreditCard },
+                { path: '/finance/config', label: 'Financial Masters', icon: Settings, roles: ['TENANT_ADMIN'] },
+                { path: '/finance/structure', label: 'Fee Structure', icon: FileText, roles: ['TENANT_ADMIN'] },
+                { path: '/finance/collections', label: 'Collections', icon: CreditCard, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+                { path: '/finance/ledger', label: 'Student Ledger', icon: Layers, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
             ]
         },
         {
@@ -123,7 +188,7 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             condition: () => hasActiveOfferings,
             subItems: [
                 { path: '/lms/courses', label: 'My Courses', icon: BookOpen },
-                { path: '/lms/assignments', label: 'Assignments', icon: FileText },
+                { path: '/lms/assignments', label: 'Assignments', icon: FileText, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
                 { path: '/lms/exams', label: 'Online Exams', icon: FileText } // Placeholder icon
             ]
         },
@@ -133,7 +198,7 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             icon: MessageSquare,
             roles: ['TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT'],
             subItems: [
-                { path: '/communication/announcements', label: 'Announcements', icon: Megaphone },
+                { path: '/communication/announcements', label: 'Announcements', icon: Megaphone, roles: ['TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT'] },
                 { path: '/communication/messages', label: 'Messages', icon: Bell }
             ]
         },

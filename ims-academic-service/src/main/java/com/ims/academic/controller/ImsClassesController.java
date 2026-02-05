@@ -15,67 +15,79 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ImsClassesController {
 
-    private final ImsClassesService service;
+        private final ImsClassesService service;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ImsClassesDto>> create(@RequestBody ImsClassesDto dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.<ImsClassesDto>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.CREATED.value())
-                        .message("Class created successfully")
-                        .apiData(service.create(dto))
-                        .build());
-    }
+        @PostMapping
+        public ResponseEntity<ApiResponse<ImsClassesDto>> create(@RequestBody ImsClassesDto dto) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(
+                                ApiResponse.<ImsClassesDto>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.CREATED.value())
+                                                .message("Class created successfully")
+                                                .apiData(service.create(dto))
+                                                .build());
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ImsClassesDto>> getById(@PathVariable String id) {
-        return ResponseEntity.ok(
-                ApiResponse.<ImsClassesDto>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Class fetched successfully")
-                        .apiData(service.getById(id))
-                        .build());
-    }
+        @PutMapping("/{id}")
+        public ResponseEntity<ApiResponse<ImsClassesDto>> update(@PathVariable String id,
+                        @RequestBody ImsClassesDto dto) {
+                return ResponseEntity.ok(
+                                ApiResponse.<ImsClassesDto>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Class updated successfully")
+                                                .apiData(service.update(id, dto))
+                                                .build());
+        }
 
-    @GetMapping("/tenant/{tenantId}")
-    public ResponseEntity<ApiResponse<List<ImsClassesDto>>> getByTenant(
-            @PathVariable String tenantId) {
+        @GetMapping("/{id}")
+        public ResponseEntity<ApiResponse<ImsClassesDto>> getById(@PathVariable String id) {
+                return ResponseEntity.ok(
+                                ApiResponse.<ImsClassesDto>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Class fetched successfully")
+                                                .apiData(service.getById(id))
+                                                .build());
+        }
 
-        return ResponseEntity.ok(
-                ApiResponse.<List<ImsClassesDto>>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Classes fetched successfully")
-                        .apiData(service.getByTenant(tenantId))
-                        .build());
-    }
+        @GetMapping("/tenant/{tenantId}")
+        public ResponseEntity<ApiResponse<List<ImsClassesDto>>> getByTenant(
+                        @PathVariable String tenantId) {
 
-    @GetMapping("/offering/{offeringId}")
-    public ResponseEntity<ApiResponse<List<ImsClassesDto>>> getByOffering(
-            @PathVariable String offeringId) {
+                return ResponseEntity.ok(
+                                ApiResponse.<List<ImsClassesDto>>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Classes fetched successfully")
+                                                .apiData(service.getByTenant(tenantId))
+                                                .build());
+        }
 
-        return ResponseEntity.ok(
-                ApiResponse.<List<ImsClassesDto>>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Classes fetched successfully")
-                        .apiData(service.getByOffering(offeringId))
-                        .build());
-    }
+        @GetMapping("/offering/{offeringId}")
+        public ResponseEntity<ApiResponse<List<ImsClassesDto>>> getByOffering(
+                        @PathVariable String offeringId) {
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
+                return ResponseEntity.ok(
+                                ApiResponse.<List<ImsClassesDto>>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Classes fetched successfully")
+                                                .apiData(service.getByOffering(offeringId))
+                                                .build());
+        }
 
-        service.delete(id);
+        @DeleteMapping("/{id}")
+        public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
 
-        return ResponseEntity.ok(
-                ApiResponse.<Void>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Class deleted successfully")
-                        .apiData(null)
-                        .build());
-    }
+                service.delete(id);
+
+                return ResponseEntity.ok(
+                                ApiResponse.<Void>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Class deleted successfully")
+                                                .apiData(null)
+                                                .build());
+        }
 }

@@ -62,8 +62,10 @@ public class ImsClassesServiceImpl implements ImsClassesService {
         ImsClasses existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Class ID", id));
 
-        existing.setName(dto.getName());
-        existing.setCode(dto.getCode());
+        if (dto.getName() != null)
+            existing.setName(dto.getName());
+        if (dto.getCode() != null)
+            existing.setCode(dto.getCode());
 
         if (dto.getOfferingId() != null) {
             ImsOfferings offering = offeringsRepo.findById(dto.getOfferingId())

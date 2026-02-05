@@ -45,7 +45,7 @@ const StudentDocumentsModal: React.FC<StudentDocumentsModalProps> = ({
         if (!studentId) return;
         setIsLoading(true);
         try {
-            const response = await api.get(`/ims-student/student-documents/student/${studentId}`);
+            const response = await api.get(`/ims-student-service/student-documents/student/${studentId}`);
             if (response.data.status === 'SUCCESS') {
                 setDocuments(response.data.apiData);
             }
@@ -74,7 +74,7 @@ const StudentDocumentsModal: React.FC<StudentDocumentsModalProps> = ({
         formData.append('documentType', documentType);
 
         try {
-            const response = await api.post('/ims-student/student-documents/upload', formData, {
+            const response = await api.post('/ims-student-service/student-documents/upload', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -96,7 +96,7 @@ const StudentDocumentsModal: React.FC<StudentDocumentsModalProps> = ({
 
     const handleDelete = async (id: string) => {
         try {
-            const response = await api.delete(`/ims-student/student-documents/${id}`);
+            const response = await api.delete(`/ims-student-service/student-documents/${id}`);
             if (response.data.status === 'SUCCESS') {
                 toast.success('Document deleted');
                 setDocuments(documents.filter(d => d.id !== id));

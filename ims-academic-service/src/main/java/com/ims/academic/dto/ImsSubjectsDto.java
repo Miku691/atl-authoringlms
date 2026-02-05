@@ -14,4 +14,5 @@ public class ImsSubjectsDto {
     private String code;
     private String title;
     private SubjectType subjectType;
+    private Integer totalExamMarks;
 }

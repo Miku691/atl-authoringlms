@@ -37,11 +37,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // .requestMatchers("/auth/signin", "/auth/signup").permitAll()
-                        .requestMatchers("/auth/signin", "/auth/otp/**", "/auth/onboard-admin", "/auth/forgot-password/**").permitAll()
-                        .requestMatchers("/auth/signup").hasRole("TENANT_ADMIN")
+                        .requestMatchers("/auth/signin", "/atl-auth-service/auth/signin",
+                                "/auth/otp/**", "/atl-auth-service/auth/otp/**",
+                                "/auth/onboard-admin", "/atl-auth-service/auth/onboard-admin",
+                                "/auth/forgot-password/**", "/atl-auth-service/auth/forgot-password/**")
+                        .permitAll()
+                        .requestMatchers("/auth/signup", "/atl-auth-service/auth/signup").hasRole("TENANT_ADMIN")
 
-                        .requestMatchers("/tenants/**").hasRole("TENANT_ADMIN")
-                        .requestMatchers("/roles/**").hasRole("TENANT_ADMIN")
+                        .requestMatchers("/tenants/**", "/atl-auth-service/tenants/**").hasRole("TENANT_ADMIN")
+                        .requestMatchers("/roles/**", "/atl-auth-service/roles/**").hasRole("TENANT_ADMIN")
                         .anyRequest().authenticated());
         return httpSecurity.build();
     }

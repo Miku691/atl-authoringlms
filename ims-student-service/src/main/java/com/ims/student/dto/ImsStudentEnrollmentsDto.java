@@ -13,8 +13,10 @@ import java.time.Instant;
 @AllArgsConstructor
 public class ImsStudentEnrollmentsDto {
     private String id;
+    private String tenantId;
     private String studentId;
     private String offeringId;
+    private String sectionId;
     private String status;
     private boolean isDeleted;
     private Integer rollNo;

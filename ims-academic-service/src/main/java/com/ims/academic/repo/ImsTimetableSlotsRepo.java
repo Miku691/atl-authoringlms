@@ -7,4 +7,9 @@ import java.util.List;
 
 public interface ImsTimetableSlotsRepo extends JpaRepository<ImsTimetableSlots, String> {
     List<ImsTimetableSlots> findByTimetableMasterId(String timetableMasterId);
+
+    List<ImsTimetableSlots> findByTenantId(String tenantId);
+
+    boolean existsByTimetableMasterIdAndDayOfWeekAndSlotLabelAndTenantId(String timetableMasterId, Integer dayOfWeek,
+            String slotLabel, String tenantId);
 }

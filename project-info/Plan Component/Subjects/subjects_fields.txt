@@ -1,0 +1,19 @@
+Subjects Management Fields:
+
+1. Create/Assign Subjects:
+- Select Class (Dropdown)
+- Subject List (Dynamic rows):
+    - Subject Name (Text)
+    - Total Exam Marks (Numeric)
+- Add More / Remove support for rows
+
+2. Class-Subject Overview:
+- Class Name
+- Count of Total Subjects Assigned
+- Cumulative Total Exam Marks
+- Individual Subject Rings/Gauges:
+    - Subject Name
+    - Individual Subject Marks
+- Actions:
+    - Edit Class-Subject mappings
+    - Assign More Subjects

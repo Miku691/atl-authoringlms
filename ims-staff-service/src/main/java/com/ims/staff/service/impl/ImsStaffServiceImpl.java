@@ -31,12 +31,8 @@ public class ImsStaffServiceImpl implements ImsStaffService {
     @Override
     public ImsStaffDto create(ImsStaffDto dto) {
 
-        if (repo.existsByUserId(dto.getUserId())) {
-            throw new ResourceAlreadyExistException(dto.getUserId(), "STAFF", "User ID");
-        }
-
-        if (repo.existsByContactNumber(dto.getContactNumber())) {
-            throw new ResourceAlreadyExistException(dto.getContactNumber(), "STAFF", "Contact Number");
+        if (repo.existsByPhone(dto.getPhone())) {
+            throw new ResourceAlreadyExistException(dto.getPhone(), "STAFF", "Phone Number");
         }
 
         if (dto.getEmail() != null && repo.existsByEmail(dto.getEmail())) {
@@ -53,25 +49,50 @@ public class ImsStaffServiceImpl implements ImsStaffService {
         ImsStaff existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Staff ID", id));
 
-        existing.setFirstName(dto.getFirstName());
-        existing.setLastName(dto.getLastName());
-        existing.setRelationType(dto.getRelationType());
-        existing.setStatus(dto.getStatus());
+        if (dto.getFirstName() != null)
+            existing.setFirstName(dto.getFirstName());
+        if (dto.getLastName() != null)
+            existing.setLastName(dto.getLastName());
+        if (dto.getStatus() != null)
+            existing.setStatus(dto.getStatus());
 
-        if (dto.getContactNumber() != null &&
-                !dto.getContactNumber().equals(existing.getContactNumber()) &&
-                repo.existsByContactNumber(dto.getContactNumber())) {
-            throw new ResourceAlreadyExistException(dto.getContactNumber(), "STAFF", "Contact Number");
+        if (dto.getPhone() != null &&
+                !dto.getPhone().equals(existing.getPhone())) {
+            if (repo.existsByPhone(dto.getPhone())) {
+                throw new ResourceAlreadyExistException(dto.getPhone(), "STAFF", "Phone Number");
+            }
+            existing.setPhone(dto.getPhone());
         }
 
         if (dto.getEmail() != null &&
-                !dto.getEmail().equals(existing.getEmail()) &&
-                repo.existsByEmail(dto.getEmail())) {
-            throw new ResourceAlreadyExistException(dto.getEmail(), "STAFF", "Email");
+                !dto.getEmail().equals(existing.getEmail())) {
+            if (repo.existsByEmail(dto.getEmail())) {
+                throw new ResourceAlreadyExistException(dto.getEmail(), "STAFF", "Email");
+            }
+            existing.setEmail(dto.getEmail());
         }
 
-        existing.setContactNumber(dto.getContactNumber());
-        existing.setEmail(dto.getEmail());
+        // Broad profile fields
+        if (dto.getEmployeeId() != null)
+            existing.setEmployeeId(dto.getEmployeeId());
+        if (dto.getJoinDate() != null)
+            existing.setJoinDate(dto.getJoinDate());
+        if (dto.getDob() != null)
+            existing.setDob(dto.getDob());
+        if (dto.getGender() != null)
+            existing.setGender(dto.getGender());
+        if (dto.getAddress() != null)
+            existing.setAddress(dto.getAddress());
+        if (dto.getRole() != null)
+            existing.setRole(dto.getRole());
+        if (dto.getDepartment() != null)
+            existing.setDepartment(dto.getDepartment());
+        if (dto.getMonthlySalary() != null)
+            existing.setMonthlySalary(dto.getMonthlySalary());
+        if (dto.getQualification() != null)
+            existing.setQualification(dto.getQualification());
+        if (dto.getExperience() != null)
+            existing.setExperience(dto.getExperience());
 
         return toDto(repo.save(existing));
     }

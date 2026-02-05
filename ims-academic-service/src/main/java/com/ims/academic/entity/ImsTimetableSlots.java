@@ -27,6 +27,9 @@ public class ImsTimetableSlots {
         }
     }
 
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "timetable_master_id", nullable = false)
     @ToString.Exclude
@@ -43,6 +46,9 @@ public class ImsTimetableSlots {
 
     @Column(name = "slot_label", length = 100)
     private String slotLabel;
+
+    @Column(name = "period_number")
+    private Integer periodNumber;
 
     @OneToMany(mappedBy = "timetableSlot", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImsTimetableEntries> entries;

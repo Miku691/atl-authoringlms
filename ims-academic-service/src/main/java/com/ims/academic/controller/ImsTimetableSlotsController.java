@@ -15,54 +15,67 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ImsTimetableSlotsController {
 
-    private final ImsTimetableSlotsService service;
+        private final ImsTimetableSlotsService service;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<ImsTimetableSlotsDto>> create(@RequestBody ImsTimetableSlotsDto dto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponse.<ImsTimetableSlotsDto>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.CREATED.value())
-                        .message("Timetable Slot created successfully")
-                        .apiData(service.create(dto))
-                        .build());
-    }
+        @PostMapping
+        public ResponseEntity<ApiResponse<ImsTimetableSlotsDto>> create(@RequestBody ImsTimetableSlotsDto dto) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(
+                                ApiResponse.<ImsTimetableSlotsDto>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.CREATED.value())
+                                                .message("Timetable Slot created successfully")
+                                                .apiData(service.create(dto))
+                                                .build());
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ImsTimetableSlotsDto>> getById(@PathVariable String id) {
-        return ResponseEntity.ok(
-                ApiResponse.<ImsTimetableSlotsDto>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Timetable Slot fetched successfully")
-                        .apiData(service.getById(id))
-                        .build());
-    }
+        @GetMapping("/{id}")
+        public ResponseEntity<ApiResponse<ImsTimetableSlotsDto>> getById(@PathVariable String id) {
+                return ResponseEntity.ok(
+                                ApiResponse.<ImsTimetableSlotsDto>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Timetable Slot fetched successfully")
+                                                .apiData(service.getById(id))
+                                                .build());
+        }
 
-    @GetMapping("/master/{timetableMasterId}")
-    public ResponseEntity<ApiResponse<List<ImsTimetableSlotsDto>>> getByTimetableMasterId(
-            @PathVariable String timetableMasterId) {
+        @GetMapping("/master/{timetableMasterId}")
+        public ResponseEntity<ApiResponse<List<ImsTimetableSlotsDto>>> getByTimetableMasterId(
+                        @PathVariable String timetableMasterId) {
 
-        return ResponseEntity.ok(
-                ApiResponse.<List<ImsTimetableSlotsDto>>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Timetable Slots fetched successfully")
-                        .apiData(service.getByTimetableMasterId(timetableMasterId))
-                        .build());
-    }
+                return ResponseEntity.ok(
+                                ApiResponse.<List<ImsTimetableSlotsDto>>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Timetable Slots fetched successfully")
+                                                .apiData(service.getByTimetableMasterId(timetableMasterId))
+                                                .build());
+        }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
+        @GetMapping("/tenant/{tenantId}")
+        public ResponseEntity<ApiResponse<List<ImsTimetableSlotsDto>>> getByTenantId(
+                        @PathVariable String tenantId) {
 
-        service.delete(id);
+                return ResponseEntity.ok(
+                                ApiResponse.<List<ImsTimetableSlotsDto>>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Tenant Timetable Slots fetched successfully")
+                                                .apiData(service.getByTenantId(tenantId))
+                                                .build());
+        }
 
-        return ResponseEntity.ok(
-                ApiResponse.<Void>builder()
-                        .status("SUCCESS")
-                        .statusCode(HttpStatus.OK.value())
-                        .message("Timetable Slot deleted successfully")
-                        .apiData(null)
-                        .build());
-    }
+        @DeleteMapping("/{id}")
+        public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
+
+                service.delete(id);
+
+                return ResponseEntity.ok(
+                                ApiResponse.<Void>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Timetable Slot deleted successfully")
+                                                .apiData(null)
+                                                .build());
+        }
 }

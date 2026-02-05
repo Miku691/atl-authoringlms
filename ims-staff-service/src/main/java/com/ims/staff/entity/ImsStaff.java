@@ -14,14 +14,11 @@ import org.hibernate.annotations.UuidGenerator;
 import java.time.Instant;
 
 @Entity
-@Table(
-        name = "IMS_STAFF",
-        indexes = {
-                @Index(name = "idx_staff_tenant", columnList = "tenant_id"),
-                @Index(name = "idx_staff_user", columnList = "user_id"),
-                @Index(name = "idx_staff_contact", columnList = "contact_number")
-        }
-)
+@Table(name = "IMS_STAFF", indexes = {
+        @Index(name = "idx_staff_tenant", columnList = "tenant_id"),
+        @Index(name = "idx_staff_user", columnList = "user_id"),
+        @Index(name = "idx_staff_contact", columnList = "phone")
+})
 @Data
 @Builder
 @NoArgsConstructor
@@ -43,7 +40,7 @@ public class ImsStaff {
     @Column(name = "tenant_id", nullable = false)
     private String tenantId;
 
-    @Column(name = "user_id", nullable = false, unique = true)
+    @Column(name = "user_id")
     private String userId;
 
     @Column(name = "first_name", length = 100, nullable = false)
@@ -52,18 +49,36 @@ public class ImsStaff {
     @Column(name = "last_name", length = 100)
     private String lastName;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "relation_type", nullable = false, length = 30)
-    private RelationType relationType;
+    @Column(name = "phone", length = 20, nullable = false, unique = true)
+    private String phone;
 
-    @Column(name = "contact_number", length = 15, nullable = false, unique = true)
-    private String contactNumber;
+    @Column(name = "employee_id", length = 50)
+    private String employeeId;
+
+    @Column(name = "join_date")
+    private java.time.LocalDate joinDate;
+
+    @Column(name = "dob")
+    private java.time.LocalDate dob;
+
+    @Column(name = "gender", length = 20)
+    private String gender;
+
+    @Column(name = "address", columnDefinition = "TEXT")
+    private String address;
+
+    @Column(name = "role", length = 100)
+    private String role;
+
+    @Column(name = "department", length = 100)
+    private String department;
 
     @Column(name = "email", length = 100, unique = true)
     private String email;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20)
+    @Builder.Default
     private StaffStatus status = StaffStatus.ACTIVE;
 
     @CreationTimestamp
@@ -73,4 +88,13 @@ public class ImsStaff {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Column(name = "monthly_salary")
+    private Double monthlySalary;
+
+    @Column(name = "qualification", length = 255)
+    private String qualification;
+
+    @Column(name = "experience", length = 255)
+    private String experience;
 }

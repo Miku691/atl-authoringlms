@@ -1,0 +1,10 @@
+### Collect Fees
+- Search Student [Required] (Student Wise, Family Wise, Scanning Paid Invoices)
+
+### Generate Fees Invoice
+- Fee Month [Required]
+- Due Date [Required]
+- Fine After Due Date [Required]
+- Select Bank [Required]
+- Search Student [Required]
+- Document Options: Bank Copy, Student Copy, Institute Copy

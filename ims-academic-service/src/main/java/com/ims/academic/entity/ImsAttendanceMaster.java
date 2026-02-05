@@ -27,8 +27,14 @@ public class ImsAttendanceMaster {
         }
     }
 
-    @Column(name = "offering_id", nullable = false)
+    @Column(name = "tenant_id", nullable = false)
+    private String tenantId;
+
+    @Column(name = "offering_id", nullable = true)
     private String offeringId;
+
+    @Column(name = "subject_id", nullable = true)
+    private String subjectId;
 
     @Column(name = "date")
     private LocalDate date;

@@ -23,7 +23,7 @@ const ForgotPasswordPage: React.FC = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const response = await api.post('/atl-auth/auth/forgot-password/initiate', { email });
+            const response = await api.post('/atl-auth-service/auth/forgot-password/initiate', { email });
             if (response.data.status === 'SUCCESS' || response.status === 200) {
                 toast.success('OTP sent to your email');
                 setStep(2);
@@ -42,7 +42,7 @@ const ForgotPasswordPage: React.FC = () => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            const response = await api.post('/atl-auth/auth/forgot-password/verify-otp', { email, otp });
+            const response = await api.post('/atl-auth-service/auth/forgot-password/verify-otp', { email, otp });
             if (response.data.status === 'SUCCESS' || response.status === 200) {
                 toast.success('OTP Verified');
                 setStep(3);
@@ -67,7 +67,7 @@ const ForgotPasswordPage: React.FC = () => {
 
         setIsLoading(true);
         try {
-            const response = await api.post('/atl-auth/auth/forgot-password/reset', {
+            const response = await api.post('/atl-auth-service/auth/forgot-password/reset', {
                 email,
                 otp,
                 newPassword

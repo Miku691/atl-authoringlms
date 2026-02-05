@@ -21,10 +21,10 @@ import java.util.Optional;
 public class AcademicReadinessServiceImpl implements AcademicReadinessService {
 
     private final ImsProgramsRepo programsRepo;
-    private final ImsAcademicYearsRepo academicYearsRepo;
+    private final com.ims.academic.repo.AcademicSessionRepo academicSessionRepo;
     private final ImsTenantSettingsRepo tenantSettingsRepo;
     private final ImsClassesRepo classesRepo;
-    private final ImsOfferingSubjectsRepo offeringSubjectsRepo;
+    private final ImsOfferingSubjectRepo offeringSubjectsRepo;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -39,10 +39,10 @@ public class AcademicReadinessServiceImpl implements AcademicReadinessService {
             isReady = false;
         }
 
-        // 2. Check Academic Year
-        long yearCount = academicYearsRepo.countByTenantId(tenantId);
-        if (yearCount == 0) {
-            missingComponents.add("ACADEMIC_YEAR");
+        // 2. Check Academic Session (formerly Year)
+        long sessionCount = academicSessionRepo.findByTenantId(tenantId).size();
+        if (sessionCount == 0) {
+            missingComponents.add("ACADEMIC_SESSION");
             isReady = false;
         }
 
@@ -68,17 +68,14 @@ public class AcademicReadinessServiceImpl implements AcademicReadinessService {
                 } else {
                     // Class exists, implies Offering exists (FK).
                     // Verify Subject Mapping
+                    // Verify Subject Mapping
                     ImsClasses imsClass = classEntity.get();
                     if (imsClass.getOffering() == null) {
                         // Should not happen with nullable=false, but good to check
                         missingComponents.add("OFFERING_MISSING_FOR_" + className);
                         isReady = false;
                     } else {
-                        boolean hasSubjects = offeringSubjectsRepo
-                                .existsByOfferingIdAndSubjectId(imsClass.getOffering().getId(), null);
-                        // Wait, existsByOfferingIdAndSubjectId checks specific subject.
-                        // We need "exists ANY subject".
-                        // Use findByOfferingId and check size > 0
+                        // Check if any subject is mapped
                         boolean hasAnySubjects = !offeringSubjectsRepo.findByOfferingId(imsClass.getOffering().getId())
                                 .isEmpty();
 

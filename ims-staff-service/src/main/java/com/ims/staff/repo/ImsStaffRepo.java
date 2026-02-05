@@ -7,9 +7,7 @@ import java.util.List;
 
 public interface ImsStaffRepo extends JpaRepository<ImsStaff, String> {
 
-    boolean existsByUserId(String userId);
-
-    boolean existsByContactNumber(String contactNumber);
+    boolean existsByPhone(String phone);
 
     boolean existsByEmail(String email);
 

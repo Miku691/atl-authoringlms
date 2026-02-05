@@ -46,14 +46,16 @@ public class ImsStudentEnrollmentsServiceImpl implements ImsStudentEnrollmentsSe
     @Override
     @Transactional
     public ImsStudentEnrollmentsDto create(ImsStudentEnrollmentsDto dto) {
-        // 1. Validate Student Exists
-        if (!studentsRepo.existsById(dto.getStudentId())) {
-            throw new ResourceNotFoundException("Student ID", dto.getStudentId());
-        }
+        // 1. Validate Student Exists and Get TenantId
+        ImsStudents student = studentsRepo.findById(dto.getStudentId())
+                .orElseThrow(() -> new ResourceNotFoundException("Student ID", dto.getStudentId()));
+
+        String tenantId = student.getTenantId();
+        dto.setTenantId(tenantId);
 
         // 2. Validate Offering via Client
         try {
-            com.ims.student.util.ApiResponse<com.ims.student.dto.external.ImsOfferingsDto> offeringResponse = academicClient
+            ApiResponse<ImsOfferingsDto> offeringResponse = academicClient
                     .getOfferingById(dto.getOfferingId());
             if (offeringResponse == null || !"SUCCESS".equals(offeringResponse.getStatus())
                     || offeringResponse.getApiData() == null) {
@@ -73,8 +75,23 @@ public class ImsStudentEnrollmentsServiceImpl implements ImsStudentEnrollmentsSe
                             + e.getMessage());
         }
 
+        // 2.1 Validate Section if provided
+        if (dto.getSectionId() != null && !dto.getSectionId().isEmpty()) {
+            try {
+                com.ims.student.util.ApiResponse<com.ims.student.dto.external.ImsSectionsDto> sectionResponse = academicClient
+                        .getSectionById(dto.getSectionId());
+                if (sectionResponse == null || !"SUCCESS".equals(sectionResponse.getStatus())
+                        || sectionResponse.getApiData() == null) {
+                    throw new ResourceNotFoundException("Section ID", dto.getSectionId());
+                }
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Invalid Section ID: " + dto.getSectionId());
+            }
+        }
+
         // 3. Check for Duplicate Active Enrollment
-        if (repo.existsByStudentIdAndOfferingIdAndStatus(dto.getStudentId(), dto.getOfferingId(), "ACTIVE")) {
+        if (repo.existsByStudentIdAndOfferingIdAndStatusAndTenantId(dto.getStudentId(), dto.getOfferingId(), "ACTIVE",
+                tenantId)) {
             throw new ResourceAlreadyExistException(dto.getStudentId() + " in " + dto.getOfferingId(), "ENROLLMENT",
                     "Active Enrollment");
         }
@@ -99,6 +116,28 @@ public class ImsStudentEnrollmentsServiceImpl implements ImsStudentEnrollmentsSe
             existing.setStatus(dto.getStatus());
         if (dto.getRollNo() != null)
             existing.setRollNo(dto.getRollNo());
+
+        // Allow updating Section
+        if (dto.getSectionId() != null) {
+            if (dto.getSectionId().isEmpty()) {
+                // Clear section if empty string passed
+                existing.setSectionId(null);
+            } else {
+                // Validate new section
+                try {
+                    com.ims.student.util.ApiResponse<com.ims.student.dto.external.ImsSectionsDto> sectionResponse = academicClient
+                            .getSectionById(dto.getSectionId());
+                    if (sectionResponse != null && "SUCCESS".equals(sectionResponse.getStatus())
+                            && sectionResponse.getApiData() != null) {
+                        existing.setSectionId(dto.getSectionId());
+                    } else {
+                        throw new ResourceNotFoundException("Section ID", dto.getSectionId());
+                    }
+                } catch (Exception e) {
+                    throw new IllegalArgumentException("Invalid Section ID: " + dto.getSectionId());
+                }
+            }
+        }
 
         // Offering cannot be changed. Promotion = New Enrollment.
 
@@ -142,9 +181,11 @@ public class ImsStudentEnrollmentsServiceImpl implements ImsStudentEnrollmentsSe
     }
 
     @Override
-    public Page<StudentSummaryDto> getStudentsByOffering(String offeringId, String status, Pageable pageable) {
+    public Page<StudentSummaryDto> getStudentsByOffering(String offeringId, String status, String tenantId,
+            Pageable pageable) {
         // 1. Fetch Enrollments Page
-        Page<ImsStudentEnrollments> enrollmentsPage = repo.findByOfferingIdAndStatus(offeringId, status, pageable);
+        Page<ImsStudentEnrollments> enrollmentsPage = repo.findByOfferingIdAndStatusAndTenantId(offeringId, status,
+                tenantId, pageable);
 
         if (enrollmentsPage.isEmpty()) {
             return Page.empty(pageable);

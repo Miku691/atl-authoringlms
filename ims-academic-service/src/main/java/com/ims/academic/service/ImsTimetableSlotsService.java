@@ -13,5 +13,7 @@ public interface ImsTimetableSlotsService {
 
     List<ImsTimetableSlotsDto> getByTimetableMasterId(String timetableMasterId);
 
+    List<ImsTimetableSlotsDto> getByTenantId(String tenantId);
+
     void delete(String id);
 }

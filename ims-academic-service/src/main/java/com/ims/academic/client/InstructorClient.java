@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
-@FeignClient(name = "ims-instructor-service", path = "/ims-instructor")
+@FeignClient(name = "ims-instructor-service")
 public interface InstructorClient {
 
     @GetMapping("/instructor-subjects/instructor/{instructorId}")

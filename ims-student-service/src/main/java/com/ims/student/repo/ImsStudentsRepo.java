@@ -16,4 +16,10 @@ public interface ImsStudentsRepo extends JpaRepository<ImsStudents, String> {
     Optional<ImsStudents> findByEmail(String email);
 
     List<ImsStudents> findByTenantId(String tenantId);
+
+    Optional<ImsStudents> findByUserId(String userId);
+
+    Optional<ImsStudents> findByEmailAndTenantId(String email, String tenantId);
+
+    long countByTenantId(String tenantId);
 }

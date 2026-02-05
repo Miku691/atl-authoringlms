@@ -5,6 +5,8 @@ import com.ims.academic.entity.ImsOfferingInstructors;
 import com.ims.academic.exception.ResourceAlreadyExistException;
 import com.ims.academic.exception.ResourceNotFoundException;
 import com.ims.academic.repo.ImsOfferingInstructorsRepo;
+import com.ims.academic.repo.ImsOfferingsRepo;
+import com.ims.academic.repo.ImsSubjectsRepo;
 import com.ims.academic.service.ImsOfferingInstructorsService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,9 +21,21 @@ public class ImsOfferingInstructorsServiceImpl implements ImsOfferingInstructors
 
     private final ImsOfferingInstructorsRepo repo;
     private final ModelMapper modelMapper;
+    private final ImsOfferingsRepo offeringsRepo;
+    private final ImsSubjectsRepo subjectsRepo;
 
     private ImsOfferingInstructorsDto toDto(ImsOfferingInstructors entity) {
-        return modelMapper.map(entity, ImsOfferingInstructorsDto.class);
+        ImsOfferingInstructorsDto dto = modelMapper.map(entity, ImsOfferingInstructorsDto.class);
+
+        offeringsRepo.findById(entity.getOfferingId()).ifPresent(o -> dto.setOfferingName(o.getName()));
+
+        if (entity.getSubjectId() != null) {
+            subjectsRepo.findById(entity.getSubjectId()).ifPresent(s -> dto.setSubjectName(s.getTitle()));
+        } else {
+            dto.setSubjectName("All Subjects");
+        }
+
+        return dto;
     }
 
     private ImsOfferingInstructors toEntity(ImsOfferingInstructorsDto dto) {
@@ -65,6 +79,14 @@ public class ImsOfferingInstructorsServiceImpl implements ImsOfferingInstructors
     @Override
     public List<ImsOfferingInstructorsDto> getByOfferingId(String offeringId) {
         return repo.findByOfferingId(offeringId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImsOfferingInstructorsDto> getByInstructorId(String instructorId) {
+        return repo.findByInstructorId(instructorId)
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());

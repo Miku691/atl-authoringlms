@@ -84,9 +84,9 @@ const StudentDetailsPage: React.FC = () => {
         setIsLoading(true);
         try {
             const [studentRes, enrollRes, guardianRes] = await Promise.all([
-                api.get(`/ims-student/students/${id}`),
-                api.get(`/ims-student/student-enrollments/student/${id}`),
-                api.get(`/ims-student/student-guardians/student/${id}`)
+                api.get(`/ims-student-service/students/${id}`),
+                api.get(`/ims-student-service/student-enrollments/student/${id}`),
+                api.get(`/ims-student-service/student-guardians/student/${id}`)
             ]);
 
             if (studentRes.data.status === 'SUCCESS') {
@@ -103,7 +103,7 @@ const StudentDetailsPage: React.FC = () => {
                 // Let's fetch the offering name for each enrollment to be user friendly
                 const enriched = await Promise.all(fetchedEnrollments.map(async (enr: any) => {
                     try {
-                        const offRes = await api.get(`/ims-academic/offerings/${enr.offeringId}`);
+                        const offRes = await api.get(`/ims-academic-service/offerings/${enr.offeringId}`);
                         return { ...enr, offeringName: offRes.data.apiData.name };
                     } catch (e) {
                         return { ...enr, offeringName: 'Unknown Offering' };

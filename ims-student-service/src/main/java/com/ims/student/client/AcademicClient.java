@@ -2,6 +2,7 @@ package com.ims.student.client;
 
 import com.ims.student.dto.external.ImsClassesDto;
 import com.ims.student.dto.external.ImsOfferingsDto;
+import com.ims.student.dto.external.ImsSectionsDto;
 import com.ims.student.util.ApiResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient(name = "ims-academic-service", path = "/ims-academic")
+@FeignClient(name = "ims-academic-service")  //, path = "/ims-academic"
 public interface AcademicClient {
 
     @GetMapping("/classes/offering/{offeringId}")
@@ -28,5 +29,8 @@ public interface AcademicClient {
     ApiResponse<ImsOfferingsDto> getOfferingById(@PathVariable("id") String id);
 
     @PostMapping("/offerings/bulk-fetch")
-    ApiResponse<java.util.List<ImsOfferingsDto>> getOfferingsByIds(@RequestBody java.util.List<String> ids);
+    ApiResponse<List<ImsOfferingsDto>> getOfferingsByIds(@RequestBody List<String> ids);
+
+    @GetMapping("/sections/{id}")
+    ApiResponse<ImsSectionsDto> getSectionById(@PathVariable("id") String id);
 }

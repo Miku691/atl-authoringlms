@@ -16,6 +16,8 @@ public interface ImsOfferingsService {
 
     List<ImsOfferingsDto> getByProgram(String programId);
 
+    List<ImsOfferingsDto> getByInstructor(String instructorId);
+
     void delete(String id);
 
     ImsOfferingsDto activate(String id);
@@ -29,4 +31,6 @@ public interface ImsOfferingsService {
     java.util.List<ImsOfferingsDto> getByIds(java.util.List<String> ids);
 
     boolean hasActiveOfferings(String tenantId);
+
+    long countByTenant(String tenantId);
 }

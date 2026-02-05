@@ -17,4 +17,6 @@ public interface ImsProgramsService {
     List<ImsProgramsDto> getAll();
 
     void delete(String id);
+
+    long countByTenant(String tenantId);
 }

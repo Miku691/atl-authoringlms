@@ -47,6 +47,12 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
 
         existing.setFirstName(dto.getFirstName());
         existing.setLastName(dto.getLastName());
+        existing.setEmail(dto.getEmail());
+        existing.setPhone(dto.getPhone());
+        existing.setEmployeeId(dto.getEmployeeId());
+        existing.setDob(dto.getDob());
+        existing.setGender(dto.getGender());
+        existing.setAddress(dto.getAddress());
         existing.setQualification(dto.getQualification());
         existing.setSpecialization(dto.getSpecialization());
         existing.setExperienceYears(dto.getExperienceYears());
@@ -62,6 +68,13 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
         return repo.findById(id)
                 .map(this::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Instructor ID", id));
+    }
+
+    @Override
+    public ImsInstructorsDto getByUserId(String userId) {
+        return repo.findByUserId(userId)
+                .map(this::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor User ID", userId));
     }
 
     @Override
@@ -86,5 +99,17 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
             throw new ResourceNotFoundException("Instructor ID", id);
         }
         repo.deleteById(id);
+    }
+
+    @Override
+    public ImsInstructorsDto getByEmailAndTenantId(String email, String tenantId) {
+        return repo.findByEmailAndTenantId(email, tenantId)
+                .map(this::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor Email", email));
+    }
+
+    @Override
+    public long countByTenant(String tenantId) {
+        return repo.countByTenantId(tenantId);
     }
 }
