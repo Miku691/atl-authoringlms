@@ -4,10 +4,10 @@ import com.ims.academic.dto.ImsClassesDto;
 import com.ims.academic.entity.ImsClasses;
 import com.ims.academic.exception.ResourceAlreadyExistException;
 import com.ims.academic.exception.ResourceNotFoundException;
+import com.ims.academic.dto.ImsSectionsDto;
 import com.ims.academic.repo.ImsClassesRepo;
-import com.ims.academic.repo.ImsOfferingsRepo;
 import com.ims.academic.service.ImsClassesService;
-import com.ims.academic.entity.ImsOfferings;
+import com.ims.academic.service.ImsSectionsService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -20,16 +20,11 @@ import java.util.stream.Collectors;
 public class ImsClassesServiceImpl implements ImsClassesService {
 
     private final ImsClassesRepo repo;
-    private final ImsOfferingsRepo offeringsRepo;
+    private final ImsSectionsService sectionsService;
     private final ModelMapper modelMapper;
 
     private ImsClassesDto toDto(ImsClasses entity) {
-        ImsClassesDto dto = modelMapper.map(entity, ImsClassesDto.class);
-        if (entity.getOffering() != null) {
-            dto.setOfferingId(entity.getOffering().getId());
-            dto.setOfferingName(entity.getOffering().getName());
-        }
-        return dto;
+        return modelMapper.map(entity, ImsClassesDto.class);
     }
 
     private ImsClasses toEntity(ImsClassesDto dto) {
@@ -44,16 +39,21 @@ public class ImsClassesServiceImpl implements ImsClassesService {
                     dto.getName(), "CLASS", "Name");
         }
 
-        ImsClasses entity = toEntity(dto);
+        ImsClasses savedEntity = repo.save(toEntity(dto));
 
-        // Link Offering
-        if (dto.getOfferingId() != null) {
-            ImsOfferings offering = offeringsRepo.findById(dto.getOfferingId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Offering", dto.getOfferingId()));
-            entity.setOffering(offering);
+        // Create Default Section if programId is provided (manual dashboard creation)
+        if (dto.getProgramId() != null) {
+            ImsSectionsDto sectionDto = ImsSectionsDto.builder()
+                    .tenantId(dto.getTenantId())
+                    .classId(savedEntity.getId())
+                    .name("A")
+                    .capacity(dto.getCapacity())
+                    .programId(dto.getProgramId())
+                    .build();
+            sectionsService.create(sectionDto);
         }
 
-        return toDto(repo.save(entity));
+        return toDto(savedEntity);
     }
 
     @Override
@@ -66,12 +66,6 @@ public class ImsClassesServiceImpl implements ImsClassesService {
             existing.setName(dto.getName());
         if (dto.getCode() != null)
             existing.setCode(dto.getCode());
-
-        if (dto.getOfferingId() != null) {
-            ImsOfferings offering = offeringsRepo.findById(dto.getOfferingId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Offering", dto.getOfferingId()));
-            existing.setOffering(offering);
-        }
 
         return toDto(repo.save(existing));
     }
@@ -93,10 +87,11 @@ public class ImsClassesServiceImpl implements ImsClassesService {
 
     @Override
     public List<ImsClassesDto> getByOffering(String offeringId) {
-        return repo.findByOfferingId(offeringId)
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+        // This is now handled at the Section level, but keeping the method signature
+        // for compatibility if needed
+        // or we could throw exception. For now, empty list since no Class directly has
+        // offeringId anymore.
+        return List.of();
     }
 
     @Override

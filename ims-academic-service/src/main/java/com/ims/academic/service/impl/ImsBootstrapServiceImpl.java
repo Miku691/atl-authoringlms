@@ -3,6 +3,7 @@ package com.ims.academic.service.impl;
 import com.ims.academic.dto.ImsClassesDto;
 import com.ims.academic.dto.ImsOfferingsDto;
 import com.ims.academic.dto.ImsProgramsDto;
+import com.ims.academic.dto.ImsSectionsDto;
 import com.ims.academic.dto.bootstrap.BootstrapReqDto;
 import com.ims.academic.enums.AcademicBoard;
 import com.ims.academic.enums.OfferingType;
@@ -13,6 +14,7 @@ import com.ims.academic.service.ImsBootstrapService;
 import com.ims.academic.service.ImsOfferingsService;
 import com.ims.academic.service.ImsProgramsService;
 import com.ims.academic.service.ImsClassesService;
+import com.ims.academic.service.ImsSectionsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
     private final ImsProgramsService programsService;
     private final ImsOfferingsService offeringsService;
     private final ImsClassesService classesService;
+    private final ImsSectionsService sectionsService;
     private final ImsProgramsRepo programsRepo;
     private final ImsOfferingsRepo offeringsRepo;
     private final com.ims.academic.service.AcademicSessionService sessionService;
@@ -100,8 +103,7 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
                 .endDate(LocalDate.now().plusYears(1))
                 .isCurrent(true)
                 .build();
-
-        com.ims.academic.dto.AcademicSessionDto savedSession = sessionService.create(session);
+        sessionService.create(session);
 
         // 2. Create Classes and Sections
         int start = config.getStartClass() > 0 ? config.getStartClass() : 1;
@@ -109,31 +111,28 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
         int sections = config.getSectionsPerClass() > 0 ? config.getSectionsPerClass() : 1;
 
         for (int i = start; i <= end; i++) {
+            // 2.1 Create Class (e.g., "Class 1")
+            String baseClassName = "Class " + i;
+            ImsClassesDto classDto = ImsClassesDto.builder()
+                    .tenantId(req.getTenantId())
+                    .name(baseClassName)
+                    .code("CLS-" + i)
+                    .capacity(40) // Default for sections created by this class
+                    .build();
+            ImsClassesDto savedClass = classesService.create(classDto);
+
             for (int s = 0; s < sections; s++) {
-                String sectionName = String.valueOf((char) ('A' + s));
-                String className = "Class " + i + "-" + sectionName;
+                String sectionLabel = String.valueOf((char) ('A' + s));
 
-                // Create Offering (The schedulable unit)
-                ImsOfferingsDto offering = ImsOfferingsDto.builder()
+                // 2.2 Create Section Entity (Orchestration happens inside sectionsService)
+                ImsSectionsDto sectionDto = ImsSectionsDto.builder()
                         .tenantId(req.getTenantId())
-                        .programId(savedProgram.getId())
-                        .sessionId(savedSession.getId())
-                        .type(OfferingType.SCHOOL_CLASS)
-                        .name(className)
-                        .startDate(LocalDate.now())
-                        .endDate(LocalDate.now().plusYears(1))
+                        .classId(savedClass.getId())
+                        .name(sectionLabel)
                         .capacity(40)
+                        .programId(savedProgram.getId())
                         .build();
-                ImsOfferingsDto savedOffering = offeringsService.create(offering);
-
-                // Create ImsClass
-                ImsClassesDto classDto = ImsClassesDto.builder()
-                        .tenantId(req.getTenantId())
-                        .name(className)
-                        .code("CLS-" + i + "-" + sectionName)
-                        .offeringId(savedOffering.getId())
-                        .build();
-                classesService.create(classDto);
+                sectionsService.create(sectionDto);
             }
         }
     }

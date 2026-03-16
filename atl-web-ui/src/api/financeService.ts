@@ -8,6 +8,20 @@ import type {
     RefundRequest
 } from '../types/finance';
 
+export interface Transaction {
+    balance: number;
+    status: 'PAID' | 'PARTIAL' | 'UNPAID';
+}
+
+export interface CollectionSummary {
+    todayCollection: number;
+    monthCollection: number;
+    yearCollection: number;
+    collectionByOffering: Record<string, number>;
+    offeringNames: Record<string, string>;
+    recentTransactions: Transaction[];
+}
+
 const BASE_URL = '/ims-finance-service/api/v1/finance';
 
 export const financeService = {
@@ -118,6 +132,12 @@ export const financeService = {
         return response.data;
     },
 
+    bulkAllocateFees: async (offeringId: string, academicYear: string) => {
+        const response = await api.post(`/ims-finance-service/ledger/bulk-allocate?offeringId=${offeringId}&academicYear=${academicYear}`);
+        return response.data;
+    },
+
+
     getMyLedger: async () => {
         const response = await api.get(`${BASE_URL}/ledger/me`);
         return response.data.apiData;
@@ -186,5 +206,11 @@ export const financeService = {
     deleteDemandNote: async (id: string) => {
         const response = await api.delete(`${BASE_URL.replace('/ledger', '')}/demand-notes/${id}`);
         return response.data.apiData;
-    }
+    },
+
+    // Collection Summary for Dashboard
+    getCollectionSummary: async () => {
+        const response = await api.get(`${BASE_URL}/stats/collection-summary`);
+        return response.data.apiData;
+    },
 };

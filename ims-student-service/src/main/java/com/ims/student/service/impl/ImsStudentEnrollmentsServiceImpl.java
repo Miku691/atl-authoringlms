@@ -280,4 +280,9 @@ public class ImsStudentEnrollmentsServiceImpl implements ImsStudentEnrollmentsSe
                 })
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public java.util.List<java.util.Map<String, Object>> getOfferingStats(String tenantId) {
+        return repo.countByOffering(tenantId);
+    }
 }

@@ -18,7 +18,8 @@ import {
     ListChecks,
     Clock,
     Megaphone,
-    Bell
+    Bell,
+    Calculator
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -143,13 +144,32 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
                     subItems: [
                         { path: '/people/students/all', label: 'All Students', icon: Users, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
                         { path: '/people/students/add', label: 'Add Student', icon: UserCircle, roles: ['TENANT_ADMIN'] },
-                        { path: '/people/students/enrollments', label: 'Enrollments', icon: Layers, roles: ['TENANT_ADMIN'], condition: () => hasActiveOfferings },
                         { path: '/people/students/guardians', label: 'Guardians', icon: Users, roles: ['TENANT_ADMIN'] },
-                        { path: '/people/students/documents', label: 'Documents', icon: FileText, roles: ['TENANT_ADMIN'] },
+                        { path: '/people/students/reports', label: 'Reports', icon: BarChart3, roles: ['TENANT_ADMIN'] },
                     ]
                 },
-                { path: '/people/instructors', label: 'Instructors', icon: UserCircle, roles: ['TENANT_ADMIN'] },
-                { path: '/people/staff', label: 'Staff', icon: Briefcase, roles: ['TENANT_ADMIN'] },
+                {
+                    path: '/people/instructors',
+                    label: 'Instructors',
+                    icon: UserCircle,
+                    roles: ['TENANT_ADMIN'],
+                    subItems: [
+                        { path: '/people/instructors/all', label: 'All Instructors', icon: Users, roles: ['TENANT_ADMIN'] },
+                        { path: '/people/instructors/add', label: 'Add Instructor', icon: UserCircle, roles: ['TENANT_ADMIN'] },
+                        { path: '/people/instructors/reports', label: 'Reports', icon: BarChart3, roles: ['TENANT_ADMIN'] },
+                    ]
+                },
+                {
+                    path: '/people/staff',
+                    label: 'Staff',
+                    icon: Briefcase,
+                    roles: ['TENANT_ADMIN'],
+                    subItems: [
+                        { path: '/people/staff/all', label: 'All Staff', icon: Users, roles: ['TENANT_ADMIN'] },
+                        { path: '/people/staff/add', label: 'Add Staff', icon: UserCircle, roles: ['TENANT_ADMIN'] },
+                        { path: '/people/staff/reports', label: 'Reports', icon: BarChart3, roles: ['TENANT_ADMIN'] },
+                    ]
+                },
             ]
         },
         {
@@ -222,6 +242,7 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             subItems: [
                 { path: '/system/users', label: 'User Management', icon: Users },
                 { path: '/system/roles', label: 'Role Management', icon: ShieldCheck },
+                { path: '/system/fee-allocation', label: 'Bulk Fee Allocation', icon: Calculator },
                 { path: '/system/audit', label: 'Audit Logs', icon: FileText },
             ]
         }

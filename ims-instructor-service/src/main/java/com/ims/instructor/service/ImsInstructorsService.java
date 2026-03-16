@@ -22,4 +22,6 @@ public interface ImsInstructorsService {
     void delete(String id);
 
     long countByTenant(String tenantId);
+
+    void grantAccess(String id);
 }

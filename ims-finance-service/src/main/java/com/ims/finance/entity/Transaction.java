@@ -34,6 +34,12 @@ public class Transaction {
     @Column(nullable = false)
     private String studentId;
 
+    @Column
+    private String offeringId; // The class/offering this payment is primarily for
+
+    @Column
+    private String academicYear; // The academic year context
+
     @Column(nullable = false)
     private BigDecimal amount;
 

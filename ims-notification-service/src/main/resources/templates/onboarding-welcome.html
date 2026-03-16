@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+    th:replace="~{base-layout :: main-layout(~{::.welcome-body}, 'Welcome to IMS')}">
+
+<body>
+    <div class="welcome-body">
+        <h2>Welcome to the Platform!</h2>
+        <p>Hello,</p>
+        <p>Your institutional access as <b><span th:text="${role}">USER</span></b> has been granted successfully.</p>
+        <p>You can now log in using your email address and the following temporary password:</p>
+        <div class="otp-code" th:text="${tempPassword}">PASSWORD</div>
+        <p><b>Important:</b> For security reasons, you will be required to reset this password immediately upon your
+            first login.</p>
+        <div style="text-align: center;">
+            <a href="#" class="button">Log in to Dashboard</a>
+        </div>
+        <p>If you have any trouble logging in, please reach out to your administrator.</p>
+        <p>Best regards,<br />The IMS Admin Team</p>
+    </div>
+</body>
+
+</html>

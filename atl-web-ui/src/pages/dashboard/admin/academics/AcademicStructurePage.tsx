@@ -32,7 +32,6 @@ interface ImsClass {
     tenantId: string;
     name: string;
     code: string;
-    offeringId: string;
 }
 
 interface ImsSection {
@@ -40,6 +39,8 @@ interface ImsSection {
     tenantId: string;
     classId: string;
     name: string;
+    offeringId?: string;
+    offeringName?: string;
 }
 
 // --- Component ---
@@ -78,6 +79,13 @@ const AcademicStructurePage: React.FC = () => {
         name: string;
         capacity: number;
         type: string;
+    } | null>(null);
+
+    const [editedSection, setEditedSection] = useState<{
+        id: string;
+        name: string;
+        capacity: number;
+        offeringId: string;
     } | null>(null);
 
     // Subject Mapping State
@@ -137,62 +145,45 @@ const AcademicStructurePage: React.FC = () => {
         if (!newClassName || !selectedProgramId) return;
         setIsSubmitting(true);
         try {
-            const siblings = offerings.filter(o => o.programId === selectedProgramId);
-            if (siblings.length === 0) {
-                toast.error("No active academic session found for this program.");
-                setIsSubmitting(false);
-                return;
-            }
-            const sessionId = siblings[0].sessionId;
-
-            const offeringRes = await api.post('/ims-academic-service/offerings', {
-                tenantId,
-                programId: selectedProgramId,
-                sessionId: sessionId,
-                name: newClassName,
-                type: 'SCHOOL_CLASS',
-                startDate: new Date().toISOString().split('T')[0],
-                endDate: new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0],
-                capacity: defaultCapacity
-            });
-
-            const newOffering = offeringRes.data.apiData;
-
             await api.post('/ims-academic-service/classes', {
                 tenantId,
                 name: newClassName,
                 code: newClassName.toUpperCase().replace(/\s+/g, '-'),
-                offeringId: newOffering.id
+                programId: selectedProgramId,
+                capacity: defaultCapacity
             });
 
             toast.success("Class Added");
             setIsAddClassOpen(false);
             setNewClassName('');
             fetchData();
-        } catch (e) {
+        } catch (e: any) {
             console.error(e);
-            toast.error("Failed to add class");
+            toast.error(e.response?.data?.message || "Failed to add class");
         } finally {
             setIsSubmitting(false);
         }
     };
 
     const handleAddSection = async () => {
-        if (!newSectionName || !selectedClassId) return;
+        if (!newSectionName || !selectedClassId || !selectedProgramId) return;
         setIsSubmitting(true);
         try {
             await api.post('/ims-academic-service/sections', {
                 tenantId,
                 classId: selectedClassId,
-                name: newSectionName
+                name: newSectionName,
+                programId: selectedProgramId,
+                capacity: defaultCapacity
             });
 
             toast.success("Section Added");
             setIsSectionModalOpen(false);
             setNewSectionName('');
             fetchData();
-        } catch (e) {
-            toast.error("Failed to add section");
+        } catch (e: any) {
+            console.error(e);
+            toast.error(e.response?.data?.message || "Failed to add section");
         } finally {
             setIsSubmitting(false);
         }
@@ -202,23 +193,33 @@ const AcademicStructurePage: React.FC = () => {
         if (!editedClass) return;
         setIsSubmitting(true);
         try {
-            await api.put(`/ims-academic-service/offerings/${editedClass.offeringId}`, {
-                name: editedClass.name,
-                capacity: editedClass.capacity,
-                type: editedClass.type
+            await api.patch(`/ims-academic-service/classes/${editedClass.id}`, {
+                name: editedClass.name
             });
-
-            await api.put(`/ims-academic-service/classes/${editedClass.id}`, {
-                name: editedClass.name,
-                code: editedClass.name.toUpperCase().replace(/\s+/g, '-')
-            });
-
             toast.success("Class Updated");
             setEditedClass(null);
             fetchData();
-        } catch (error) {
-            console.error(error);
-            toast.error("Failed to update class");
+        } catch (e: any) {
+            toast.error(e.response?.data?.message || "Failed to update class");
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleUpdateSection = async () => {
+        if (!editedSection) return;
+        setIsSubmitting(true);
+        try {
+            await api.patch(`/ims-academic-service/sections/${editedSection.id}`, {
+                name: editedSection.name,
+                capacity: editedSection.capacity,
+                offeringId: editedSection.offeringId
+            });
+            toast.success("Section Updated");
+            setEditedSection(null);
+            fetchData();
+        } catch (e: any) {
+            toast.error(e.response?.data?.message || "Failed to update section");
         } finally {
             setIsSubmitting(false);
         }
@@ -262,8 +263,8 @@ const AcademicStructurePage: React.FC = () => {
                 toast.success("Section Deleted");
             }
             fetchData();
-        } catch (e) {
-            toast.error("Failed to delete " + deleteModal.type.toLowerCase());
+        } catch (e: any) {
+            toast.error(e.response?.data?.message || "Failed to delete " + deleteModal.type.toLowerCase());
         } finally {
             setIsSubmitting(false);
             setDeleteModal({ ...deleteModal, isOpen: false });
@@ -284,17 +285,22 @@ const AcademicStructurePage: React.FC = () => {
 
     const getClassesForProgram = (progId: string) => {
         const progOfferingIds = offerings.filter(o => o.programId === progId).map(o => o.id);
-        const progClasses = classes.filter(c => progOfferingIds.includes(c.offeringId));
-        return progClasses.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+        const progSectionClassIds = sections
+            .filter(s => s.offeringId && progOfferingIds.includes(s.offeringId))
+            .map(s => s.classId);
+
+        return classes
+            .filter(c => progSectionClassIds.includes(c.id))
+            .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
     };
 
     const getSectionsForClass = (classId: string) => {
-        return sections.filter(s => s.classId === classId).sort((a, b) => a.name.localeCompare(b.name));
+        return sections.filter(s => s.classId === classId);
     };
 
-    const getOfferingForClass = (classId: string) => {
-        const cls = classes.find(c => c.id === classId);
-        return cls ? offerings.find(o => o.id === cls.offeringId) : null;
+    const getOfferingForSection = (sectionId: string) => {
+        const section = sections.find(s => s.id === sectionId);
+        return offerings.find(o => o.id === section?.offeringId);
     };
 
     if (isLoading) {
@@ -350,47 +356,34 @@ const AcademicStructurePage: React.FC = () => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {programClasses.map(cls => {
                                             const clsSections = getSectionsForClass(cls.id);
-                                            const clsOffering = getOfferingForClass(cls.id);
 
                                             return (
                                                 <div key={cls.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative group">
-                                                    <div className="flex justify-between items-start mb-2">
+                                                    <div className="flex justify-between items-start mb-4">
                                                         <div>
                                                             <h4 className="font-bold text-gray-800 text-lg">{cls.name}</h4>
-                                                            <p className="text-xs text-gray-500">Cap: {clsOffering?.capacity || '-'}</p>
+                                                            <p className="text-xs text-gray-400 capitalize">{program.level.toLowerCase()}</p>
                                                         </div>
                                                         <div className="flex gap-1">
-                                                            <button
-                                                                onClick={() => openSubjectMapping(cls.name, cls.offeringId)}
-                                                                className="text-gray-300 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                                                                title="Manage Subjects"
-                                                            >
-                                                                <BookOpen className="w-4 h-4" />
-                                                            </button>
                                                             {isAdmin && (
                                                                 <>
                                                                     <button
-                                                                        onClick={() => openInstructorAssignment(cls.name, cls.offeringId)}
-                                                                        className="text-gray-300 hover:text-amber-600 opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                                                                        title="Assign Faculty"
-                                                                    >
-                                                                        <UserCheck className="w-4 h-4" />
-                                                                    </button>
-                                                                    <button
                                                                         onClick={() => setEditedClass({
                                                                             id: cls.id,
-                                                                            offeringId: cls.offeringId,
+                                                                            offeringId: '', // Class no longer has offering
                                                                             name: cls.name,
-                                                                            capacity: clsOffering?.capacity || 0,
-                                                                            type: clsOffering?.type || 'SCHOOL_CLASS'
+                                                                            capacity: 0,
+                                                                            type: 'SCHOOL_CLASS'
                                                                         })}
                                                                         className="text-gray-300 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                                                                        title="Edit Class"
                                                                     >
                                                                         <Edit2 className="w-4 h-4" />
                                                                     </button>
                                                                     <button
-                                                                        onClick={() => handleDeleteClass(cls.id, cls.offeringId)}
+                                                                        onClick={() => handleDeleteClass(cls.id, '')}
                                                                         className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                                                                        title="Delete Class"
                                                                     >
                                                                         <Trash2 className="w-4 h-4" />
                                                                     </button>
@@ -399,34 +392,84 @@ const AcademicStructurePage: React.FC = () => {
                                                         </div>
                                                     </div>
 
-                                                    <div className="mt-4">
-                                                        <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Sections</p>
-                                                        <div className="flex flex-wrap gap-2">
-                                                            {clsSections.map(sec => (
-                                                                <span key={sec.id} className="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-blue-50 text-blue-700 border border-blue-100 group/sec">
-                                                                    {sec.name}
-                                                                    {isAdmin && (
-                                                                        <button
-                                                                            onClick={() => handleDeleteSection(sec.id)}
-                                                                            className="ml-1.5 text-blue-400 hover:text-red-500 opacity-0 group-hover/sec:opacity-100"
-                                                                        >
-                                                                            <X className="w-3 h-3" />
-                                                                        </button>
-                                                                    )}
-                                                                </span>
-                                                            ))}
+                                                    <div className="space-y-3">
+                                                        <div className="flex justify-between items-center">
+                                                            <p className="text-xs font-semibold text-gray-500 uppercase">Sections & Offerings</p>
                                                             {isAdmin && (
                                                                 <button
                                                                     onClick={() => {
                                                                         setSelectedClassId(cls.id);
                                                                         setSelectedClassName(cls.name);
+                                                                        setSelectedProgramId(program.id);
                                                                         setIsSectionModalOpen(true);
                                                                     }}
-                                                                    className="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-medium bg-gray-50 text-gray-600 border border-gray-200 border-dashed hover:bg-gray-100"
+                                                                    className="text-indigo-600 hover:text-indigo-700 text-xs flex items-center gap-1 font-medium"
                                                                 >
-                                                                    <Plus className="w-3 h-3" />
+                                                                    <Plus className="w-3 h-3" /> Add Section
                                                                 </button>
                                                             )}
+                                                        </div>
+
+                                                        <div className="grid grid-cols-1 gap-2">
+                                                            {clsSections.map(sec => {
+                                                                const secOffering = getOfferingForSection(sec.id);
+                                                                return (
+                                                                    <div key={sec.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-100 group/sec">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <span className="w-8 h-8 flex items-center justify-center bg-white rounded border border-gray-200 text-sm font-bold text-gray-700">
+                                                                                {sec.name}
+                                                                            </span>
+                                                                            <div>
+                                                                                <p className="text-xs text-gray-400">Cap: {secOffering?.capacity || '-'}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="flex items-center gap-1">
+                                                                            <button
+                                                                                onClick={() => openSubjectMapping(`${cls.name} - ${sec.name}`, sec.offeringId || '')}
+                                                                                className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-white rounded transition-colors"
+                                                                                title="Manage Subjects"
+                                                                                disabled={!sec.offeringId}
+                                                                            >
+                                                                                <BookOpen className="w-3.5 h-3.5" />
+                                                                            </button>
+                                                                            {isAdmin && (
+                                                                                <>
+                                                                                    <button
+                                                                                        onClick={() => openInstructorAssignment(`${cls.name} - ${sec.name}`, sec.offeringId || '')}
+                                                                                        className="p-1 text-gray-400 hover:text-amber-600 hover:bg-white rounded transition-colors"
+                                                                                        title="Assign Faculty"
+                                                                                        disabled={!sec.offeringId}
+                                                                                    >
+                                                                                        <UserCheck className="w-3.5 h-3.5" />
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={() => {
+                                                                                            setEditedSection({
+                                                                                                id: sec.id,
+                                                                                                name: sec.name,
+                                                                                                capacity: secOffering?.capacity || 40,
+                                                                                                offeringId: sec.offeringId || ''
+                                                                                            });
+                                                                                            setSelectedClassName(cls.name);
+                                                                                        }}
+                                                                                        className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-white rounded transition-colors"
+                                                                                        title="Edit Section"
+                                                                                    >
+                                                                                        <Edit2 className="w-3.5 h-3.5" />
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={() => handleDeleteSection(sec.id)}
+                                                                                        className="p-1 text-gray-400 hover:text-red-500 hover:bg-white rounded transition-colors"
+                                                                                        title="Delete Section"
+                                                                                    >
+                                                                                        <X className="w-3.5 h-3.5" />
+                                                                                    </button>
+                                                                                </>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -491,15 +534,6 @@ const AcademicStructurePage: React.FC = () => {
                                     className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Total Capacity</label>
-                                <input
-                                    type="number"
-                                    value={editedClass.capacity}
-                                    onChange={(e) => setEditedClass({ ...editedClass, capacity: Number(e.target.value) })}
-                                    className="w-full mt-1 p-2 border rounded-lg"
-                                />
-                            </div>
                             <div className="flex justify-end gap-3 mt-6">
                                 <button onClick={() => setEditedClass(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg" disabled={isSubmitting}>Cancel</button>
                                 <button onClick={handleUpdateClass} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
@@ -559,6 +593,42 @@ const AcademicStructurePage: React.FC = () => {
                     className={selectedClassNameForInstructor}
                     tenantId={tenantId}
                 />
+            )}
+
+            {/* Edit Section Modal */}
+            {editedSection && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-scaleIn">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">Edit Section in {selectedClassName}</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Section Name</label>
+                                <input
+                                    value={editedSection.name}
+                                    onChange={(e) => setEditedSection({ ...editedSection, name: e.target.value })}
+                                    placeholder="e.g. A, B"
+                                    className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Capacity</label>
+                                <input
+                                    type="number"
+                                    value={editedSection.capacity}
+                                    onChange={(e) => setEditedSection({ ...editedSection, capacity: Number(e.target.value) })}
+                                    className="w-full mt-1 p-2 border rounded-lg"
+                                />
+                            </div>
+                            <div className="flex justify-end gap-3 mt-6">
+                                <button onClick={() => setEditedSection(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg" disabled={isSubmitting}>Cancel</button>
+                                <button onClick={handleUpdateSection} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                                    Update
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
 
             <ConfirmationModal

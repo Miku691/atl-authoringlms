@@ -17,6 +17,8 @@ import {
     UserPlus
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import FloatingLabelInput from '../../../../../components/common/FloatingLabelInput';
+import { User, Briefcase } from 'lucide-react';
 
 const GuardianManagementPage: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.auth);
@@ -265,9 +267,9 @@ const GuardianManagementPage: React.FC = () => {
 
             {/* Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setIsModalOpen(false)} />
-                    <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden animate-slide-up">
+                <div className="fixed inset-0 z-[40] flex items-center justify-center p-4">
+                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setIsModalOpen(false)} />
+                    <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden animate-slide-up">
                         <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
                             <div>
                                 <h3 className="text-xl font-black text-gray-900 tracking-tight">{selectedGuardian ? 'Update Profile' : 'New Family Contact'}</h3>
@@ -276,68 +278,58 @@ const GuardianManagementPage: React.FC = () => {
                             <button onClick={() => setIsModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 bg-white shadow-sm rounded-xl border border-gray-100"><X className="w-5 h-5" /></button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="col-span-full">
-                                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Full Name</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all font-medium"
-                                        placeholder="e.g. John Doe"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Phone Number</label>
-                                    <input
+                        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 pt-6 custom-scrollbar">
+                            <div className="space-y-5">
+                                <FloatingLabelInput
+                                    label="Full Name"
+                                    icon={<User className="w-4 h-4" />}
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    required
+                                />
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                    <FloatingLabelInput
+                                        label="Phone Number"
                                         type="tel"
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all font-medium"
-                                        placeholder="e.g. 9876543210"
+                                        icon={<Phone className="w-4 h-4" />}
                                         value={formData.phone}
                                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                         required
                                     />
-                                </div>
-                                <div>
-                                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Email Address</label>
-                                    <input
+                                    <FloatingLabelInput
+                                        label="Email Address"
                                         type="email"
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all font-medium"
-                                        placeholder="e.g. john@example.com"
+                                        icon={<Mail className="w-4 h-4" />}
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                     />
                                 </div>
+
+                                <FloatingLabelInput
+                                    label="Occupation"
+                                    icon={<Briefcase className="w-4 h-4" />}
+                                    value={formData.occupation}
+                                    onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
+                                />
+
                                 <div>
-                                    <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Occupation</label>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all font-medium"
-                                        placeholder="e.g. Software Engineer"
-                                        value={formData.occupation}
-                                        onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
+                                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Residential Address</label>
+                                    <textarea
+                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 focus:bg-white transition-all font-medium resize-none"
+                                        rows={3}
+                                        placeholder="Full home or office address..."
+                                        value={formData.address}
+                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                     />
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-[11px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Residential Address</label>
-                                <textarea
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all font-medium resize-none"
-                                    rows={3}
-                                    placeholder="Full home or office address..."
-                                    value={formData.address}
-                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                />
-                            </div>
-
-                            <div className="pt-4 flex gap-3">
+                            <div className="pt-8 flex gap-3 sticky bottom-0 bg-white">
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 px-6 py-3.5 bg-gray-50 text-gray-500 rounded-2xl text-sm font-bold hover:bg-gray-100 transition-all border border-gray-100"
+                                    className="flex-1 px-6 py-3.5 bg-slate-50 text-slate-500 rounded-2xl text-sm font-bold hover:bg-slate-100 transition-all border border-slate-100"
                                 >
                                     Cancel
                                 </button>

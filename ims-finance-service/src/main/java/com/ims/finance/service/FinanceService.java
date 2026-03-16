@@ -1,11 +1,18 @@
 package com.ims.finance.service;
 
 import com.ims.finance.dto.CollectPaymentDTO;
+import com.ims.finance.dto.CollectionSummaryDTO;
 import com.ims.finance.dto.RefundDTO;
 import com.ims.finance.dto.TransactionDTO;
 import java.util.List;
 
 public interface FinanceService {
+    /**
+     * Retrieves a summary of collections for the dashboard.
+     *
+     * @return collection summary
+     */
+    CollectionSummaryDTO getCollectionSummary();
     /**
      * Collects a payment from a student and updates their ledger.
      *

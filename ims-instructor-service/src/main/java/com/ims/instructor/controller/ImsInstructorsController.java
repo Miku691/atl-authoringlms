@@ -129,4 +129,16 @@ public class ImsInstructorsController {
                                                 .apiData(dto)
                                                 .build());
         }
+
+        @PostMapping("/{id}/grant-access")
+        public ResponseEntity<ApiResponse<Void>> grantAccess(@PathVariable String id) {
+                service.grantAccess(id);
+                return ResponseEntity.ok(
+                                ApiResponse.<Void>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Access granted successfully")
+                                                .apiData(null)
+                                                .build());
+        }
 }

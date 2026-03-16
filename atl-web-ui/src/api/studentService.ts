@@ -69,5 +69,22 @@ export const studentService = {
     getStudentsByOffering: async (offeringId: string, page = 0, size = 100) => {
         const response = await api.get(`/ims-student-service/enrollments/offering/${offeringId}?page=${page}&size=${size}`);
         return response.data;
+    },
+
+    searchStudents: async (params: {
+        tenantId: string;
+        gender?: string;
+        offeringId?: string;
+        searchTerm?: string;
+        page?: number;
+        size?: number;
+    }) => {
+        const { tenantId, gender, offeringId, searchTerm, page = 0, size = 10 } = params;
+        let url = `/ims-student-service/students/search?tenantId=${tenantId}&page=${page}&size=${size}`;
+        if (gender) url += `&gender=${encodeURIComponent(gender)}`;
+        if (offeringId) url += `&offeringId=${encodeURIComponent(offeringId)}`;
+        if (searchTerm) url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
+        const response = await api.get(url);
+        return response.data;
     }
 };

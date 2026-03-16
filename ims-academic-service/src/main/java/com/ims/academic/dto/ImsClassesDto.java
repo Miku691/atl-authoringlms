@@ -12,6 +12,6 @@ public class ImsClassesDto {
     private String tenantId;
     private String name;
     private String code;
-    private String offeringId;
-    private String offeringName;
+    private Integer capacity;
+    private String programId;
 }

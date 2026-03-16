@@ -15,10 +15,14 @@ import {
     X,
     Save,
     FileText,
-    Key
+    Key,
+    ChevronLeft,
+    ChevronRight,
+    Filter
 } from 'lucide-react'; import StudentDocumentsModal from './StudentDocumentsModal';
 import AuthenticatedAvatar from '../../../../components/common/AuthenticatedAvatar';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { studentService } from '../../../../api/studentService';
 
 interface Student {
     id: string;
@@ -70,9 +74,20 @@ interface StudentFormData {
 const StudentManagementPage: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.auth);
     const tenantId = user?.tenantId;
+    const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+
     const [students, setStudents] = useState<Student[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    // Filter & Pagination State
     const [searchTerm, setSearchTerm] = useState('');
+    const [genderFilter, setGenderFilter] = useState(searchParams.get('gender') || '');
+    const [offeringFilter, setOfferingFilter] = useState(searchParams.get('offeringId') || '');
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const pageSize = 10;
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,8 +103,6 @@ const StudentManagementPage: React.FC = () => {
     // Delete Confirmation State
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [studentToDelete, setStudentToDelete] = useState<string | null>(null);
-
-    const navigate = useNavigate();
 
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -125,7 +138,7 @@ const StudentManagementPage: React.FC = () => {
             fetchStudents();
             fetchOfferings();
         }
-    }, [tenantId]);
+    }, [tenantId, genderFilter, offeringFilter, currentPage]);
 
     const fetchOfferings = async () => {
         try {
@@ -139,11 +152,21 @@ const StudentManagementPage: React.FC = () => {
     };
 
     const fetchStudents = async () => {
+        if (!tenantId) return;
         setIsLoading(true);
         try {
-            const response = await api.get(`/ims-student-service/students/tenant/${tenantId}`);
-            if (response.data.status === 'SUCCESS') {
-                setStudents(response.data.apiData);
+            const data = await studentService.searchStudents({
+                tenantId,
+                gender: genderFilter || undefined,
+                offeringId: offeringFilter || undefined,
+                searchTerm: searchTerm || undefined,
+                page: currentPage,
+                size: pageSize
+            });
+            if (data.status === 'SUCCESS') {
+                setStudents(data.apiData.content);
+                setTotalPages(data.apiData.totalPages);
+                setTotalElements(data.apiData.totalElements);
             }
         } catch (error: any) {
             toast.error('Failed to fetch students');
@@ -332,16 +355,11 @@ const StudentManagementPage: React.FC = () => {
 
         setIsGrantingAccess(true);
         try {
-            const payload = {
-                username: studentToGrantAccess.email,
-                email: studentToGrantAccess.email,
-                tenantId: tenantId
-            };
-
-            await api.post('/atl-auth-service/auth/signup', payload);
-            toast.success("Access Granted! Default password: student@123");
+            await api.post(`/ims-student-service/students/${studentToGrantAccess.id}/grant-access`);
+            toast.success("Access Granted! User can now login with their email.");
             setIsGrantAccessModalOpen(false);
             setStudentToGrantAccess(null);
+            fetchStudents(); // Refresh to show any UI changes (if applicable)
         } catch (error: any) {
             console.error(error);
             const msg = error.response?.data?.message || "Failed to grant access";
@@ -375,11 +393,6 @@ const StudentManagementPage: React.FC = () => {
         }
     };
 
-    const filteredStudents = students.filter(student =>
-        student.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.admissionNo?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     return (
         <div className="flex flex-col gap-4">
@@ -395,30 +408,58 @@ const StudentManagementPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <div className="relative flex-1 sm:min-w-[300px]">
+                <div className="flex flex-col lg:flex-row gap-3 w-full lg:w-auto items-center">
+                    <div className="relative flex-1 sm:min-w-[250px]">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <Search className="h-4 w-4 text-gray-400" />
                         </div>
                         <input
                             type="text"
                             className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
-                            placeholder="Search by name or admission no..."
+                            placeholder="Name or Admission No..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(0);
+                            }}
                         />
                     </div>
-                    {/* <button
-                        className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors whitespace-nowrap"
-                        onClick={() => {
-                            setSelectedStudentId(null);
-                            setFormData(initialFormState);
-                            setIsModalOpen(true);
-                        }}
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Add Student
-                    </button> */}
+
+                    <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                        <div className="relative flex-1 sm:flex-none">
+                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <select
+                                className="pl-9 pr-8 py-2 block w-full border border-gray-300 rounded-lg bg-gray-50 text-sm focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                                value={genderFilter}
+                                onChange={(e) => {
+                                    setGenderFilter(e.target.value);
+                                    setCurrentPage(0);
+                                }}
+                            >
+                                <option value="">Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div className="relative flex-1 sm:flex-none">
+                            <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <select
+                                className="pl-9 pr-8 py-2 block w-full border border-gray-300 rounded-lg bg-gray-50 text-sm focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
+                                value={offeringFilter}
+                                onChange={(e) => {
+                                    setOfferingFilter(e.target.value);
+                                    setCurrentPage(0);
+                                }}
+                            >
+                                <option value="">All Classes</option>
+                                {offerings.map(o => (
+                                    <option key={o.id} value={o.id}>{o.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -450,18 +491,18 @@ const StudentManagementPage: React.FC = () => {
                                         <p className="mt-2 text-sm text-gray-500">Loading students...</p>
                                     </td>
                                 </tr>
-                            ) : filteredStudents.length === 0 ? (
+                            ) : students.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-12 text-center">
                                         <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
                                             <GraduationCap className="h-6 w-6 text-gray-400" />
                                         </div>
                                         <p className="mt-2 text-sm font-medium text-gray-900">No students found</p>
-                                        <p className="mt-1 text-sm text-gray-500">Get started by creating a new student record.</p>
+                                        <p className="mt-1 text-sm text-gray-500">Try adjusting your filters or search term.</p>
                                     </td>
                                 </tr>
                             ) : (
-                                filteredStudents.map((student) => (
+                                students.map((student) => (
                                     <tr key={student.id} className="hover:bg-gray-50 transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/people/students/${student.id}`)}>
                                             <div className="flex items-center">
@@ -527,6 +568,57 @@ const StudentManagementPage: React.FC = () => {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Pagination Controls */}
+                <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                    <div className="flex-1 flex justify-between sm:hidden">
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                            disabled={currentPage === 0}
+                            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                        >
+                            Previous
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                            disabled={currentPage === totalPages - 1}
+                            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                        >
+                            Next
+                        </button>
+                    </div>
+                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p className="text-xs text-gray-700">
+                                Showing <span className="font-medium">{totalElements === 0 ? 0 : currentPage * pageSize + 1}</span> to <span className="font-medium">{Math.min((currentPage + 1) * pageSize, totalElements)}</span> of{' '}
+                                <span className="font-medium">{totalElements}</span> results
+                            </p>
+                        </div>
+                        <div>
+                            <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                                    disabled={currentPage === 0}
+                                    className="relative inline-flex items-center px-2 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                                >
+                                    <span className="sr-only">Previous</span>
+                                    <ChevronLeft className="h-4 w-4" />
+                                </button>
+                                <span className="relative inline-flex items-center px-3 py-1 border border-gray-300 bg-white text-xs font-medium text-gray-700">
+                                    Page {currentPage + 1} of {totalPages}
+                                </span>
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                                    disabled={currentPage === totalPages - 1}
+                                    className="relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                                >
+                                    <span className="sr-only">Next</span>
+                                    <ChevronRight className="h-4 w-4" />
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
                 </div>
             </div>
 

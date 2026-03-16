@@ -35,6 +35,8 @@ const FeeStructurePage: React.FC = () => {
         }
     }, [user?.tenantId]);
 
+    const [selectedOfferingId, setSelectedOfferingId] = useState<string>('ALL');
+
     const fetchInitialData = async () => {
         setLoading(true);
         try {
@@ -84,10 +86,13 @@ const FeeStructurePage: React.FC = () => {
     const getHeadName = (id: string) => feeHeads.find(h => h.id === id)?.name || id;
     const getOfferingName = (id: string) => offerings.find(o => o.id === id)?.name || id;
 
-    const filteredStructures = structures.filter(s =>
-        getHeadName(s.feeHeadId).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        getOfferingName(s.offeringId).toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredStructures = structures.filter(s => {
+        const matchesOffering = selectedOfferingId === 'ALL' || s.offeringId === selectedOfferingId;
+        const matchesSearch = searchTerm === '' || 
+            getHeadName(s.feeHeadId).toLowerCase().includes(searchTerm.toLowerCase()) ||
+            getOfferingName(s.offeringId).toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesOffering && matchesSearch;
+    });
 
     return (
         <div className="space-y-6">
@@ -106,13 +111,46 @@ const FeeStructurePage: React.FC = () => {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div className="p-4 border-b border-gray-200">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <div className="p-6 border-b border-gray-100 bg-gray-50/30">
+                    <div className="flex items-center gap-4 flex-wrap">
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Filter by Class:</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <button
+                                onClick={() => setSelectedOfferingId('ALL')}
+                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${selectedOfferingId === 'ALL'
+                                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100 ring-2 ring-indigo-100'
+                                    : 'bg-white text-gray-500 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+                                    }`}
+                            >
+                                All Classes
+                            </button>
+                            {offerings.map(offering => (
+                                <button
+                                    key={offering.id}
+                                    onClick={() => setSelectedOfferingId(offering.id)}
+                                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${selectedOfferingId === offering.id
+                                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100 ring-2 ring-indigo-100'
+                                        : 'bg-white text-gray-500 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+                                        }`}
+                                >
+                                    {offering.name}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                        Mapped Fee Heads 
+                        <span className="ml-2 px-2 py-0.5 bg-gray-100 rounded-full text-gray-500">{filteredStructures.length}</span>
+                    </div>
+                    <div className="relative w-64">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300 w-4 h-4" />
                         <input
                             type="text"
-                            placeholder="Search by fee head or offering..."
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                            placeholder="Search heads..."
+                            className="w-full pl-9 pr-4 py-1.5 text-xs border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />

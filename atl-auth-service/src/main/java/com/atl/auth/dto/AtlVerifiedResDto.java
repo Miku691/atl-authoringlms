@@ -19,4 +19,5 @@ public class AtlVerifiedResDto {
     private String email;
     private Boolean tenantSetupCompleted;
     private TenantType tenantType;
+    private boolean passwordResetRequired;
 }

@@ -3,7 +3,8 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { type RootState } from '../../../store/store';
 import { announcementService, type Announcement } from '../../../api/announcementService';
-import { dashboardService, type DashboardStats } from '../../../api/dashboardService';
+import { dashboardService, type DashboardStats, type GenderStat, type OfferingStat } from '../../../api/dashboardService';
+import DashboardChart from './components/DashboardChart';
 import {
     Users, BookOpen, GraduationCap, TrendingUp, Bell,
     PlusCircle, Calendar, ShieldCheck, ArrowUpRight, Clock, MapPin,
@@ -16,6 +17,8 @@ const AdminDashboardHome: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.auth);
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [stats, setStats] = useState<DashboardStats | null>(null);
+    const [genderStats, setGenderStats] = useState<GenderStat[]>([]);
+    const [offeringStats, setOfferingStats] = useState<OfferingStat[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -28,12 +31,16 @@ const AdminDashboardHome: React.FC = () => {
         if (!user?.tenantId) return;
         setLoading(true);
         try {
-            const [announcRes, statsData] = await Promise.all([
+            const [announcRes, statsData, gStats, oStats] = await Promise.all([
                 announcementService.getAnnouncementsByTenant(user.tenantId),
-                dashboardService.getStats(user.tenantId)
+                dashboardService.getStats(user.tenantId),
+                dashboardService.getGenderStats(user.tenantId),
+                dashboardService.getOfferingStats(user.tenantId)
             ]);
             setAnnouncements(announcRes.apiData || []);
             setStats(statsData);
+            setGenderStats(gStats);
+            setOfferingStats(oStats);
         } catch (error) {
             console.error("Dashboard data fetch failed", error);
             toast.error("Failed to load some dashboard metrics");
@@ -155,6 +162,22 @@ const AdminDashboardHome: React.FC = () => {
                             }`}></div>
                     </div>
                 ))}
+            </div>
+
+            {/* Analytics Charts Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <DashboardChart
+                    title="Student Growth By Class"
+                    data={offeringStats.map(s => ({ name: s.offeringName, value: s.count, id: s.offeringId }))}
+                    colors={['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981']}
+                    onSegmentClick={(item) => navigate(`/people/students?offeringId=${item.id}`)}
+                />
+                <DashboardChart
+                    title="Gender Distribution"
+                    data={genderStats.map(s => ({ name: s.gender, value: s.count, id: s.gender }))}
+                    colors={['#0ea5e9', '#d946ef', '#f59e0b', '#10b981']}
+                    onSegmentClick={(item) => navigate(`/people/students?gender=${item.id}`)}
+                />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

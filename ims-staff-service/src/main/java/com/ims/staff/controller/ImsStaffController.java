@@ -26,8 +26,7 @@ public class ImsStaffController {
                         .statusCode(HttpStatus.CREATED.value())
                         .message("Staff created successfully")
                         .apiData(saved)
-                        .build()
-        );
+                        .build());
     }
 
     @PutMapping("/{id}")
@@ -42,8 +41,7 @@ public class ImsStaffController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Staff updated successfully")
                         .apiData(updated)
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/{id}")
@@ -54,8 +52,7 @@ public class ImsStaffController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Staff fetched successfully")
                         .apiData(service.getById(id))
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping("/tenant/{tenantId}")
@@ -66,8 +63,7 @@ public class ImsStaffController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Staff fetched successfully")
                         .apiData(service.getByTenant(tenantId))
-                        .build()
-        );
+                        .build());
     }
 
     @GetMapping
@@ -78,8 +74,7 @@ public class ImsStaffController {
                         .statusCode(HttpStatus.OK.value())
                         .message("All staff fetched")
                         .apiData(service.getAll())
-                        .build()
-        );
+                        .build());
     }
 
     @DeleteMapping("/{id}")
@@ -91,7 +86,18 @@ public class ImsStaffController {
                         .statusCode(HttpStatus.OK.value())
                         .message("Staff deleted successfully")
                         .apiData(null)
-                        .build()
-        );
+                        .build());
+    }
+
+    @PostMapping("/{id}/grant-access")
+    public ResponseEntity<ApiResponse<Void>> grantAccess(@PathVariable String id) {
+        service.grantAccess(id);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .status("SUCCESS")
+                        .statusCode(HttpStatus.OK.value())
+                        .message("Access granted successfully")
+                        .apiData(null)
+                        .build());
     }
 }

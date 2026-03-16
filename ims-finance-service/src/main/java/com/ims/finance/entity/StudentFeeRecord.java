@@ -59,6 +59,10 @@ public class StudentFeeRecord {
     @Column(nullable = false)
     private String tenantId;
 
+    @Column
+    private String installmentScheduleId; // Added for Phase 10: link to specific installment
+
+
     public enum FeeStatus {
         PAID, PARTIAL, UNPAID
     }

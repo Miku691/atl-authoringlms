@@ -6,6 +6,8 @@ import com.atl.auth.entity.AtlRole;
 import com.atl.auth.enums.TenantType;
 import com.atl.auth.exception.ApiResponse;
 import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 import com.atl.auth.exception.CustomUnauthorizedException;
 import com.atl.auth.exception.OtpVerificationException;
 import com.atl.auth.exception.UserNotFoundException;
@@ -22,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AtlOtpService {
     private final AtlUserRepo userRepo;
     private final AuthUtil authUtil;
-    private final AtlEmailService atlEmailService;
+    private final ExternalNotificationClient notificationClient;
     private final AtlRedisService atlRedisService;
     private final com.atl.auth.client.AcademicClient academicClient;
     private final com.atl.auth.repo.ImsTenantsRepo tenantsRepo;
@@ -45,9 +47,8 @@ public class AtlOtpService {
 
         atlRedisService.saveValueToRedisWithTTL(otpKey, otp, 5);
 
-        // comment for dev.
-        // atlEmailService.sendTextEmail(email, "Your OTP Code", "Your OTP is: " + otp +
-        // "\nIt will expire in 5 minutes.");
+        // Send OTP via Notification Service
+        sendOtpEmail(email, otp);
 
         return AtlSendOtpResponseDto.builder()
                 .username(userObj.getUsername())
@@ -72,12 +73,12 @@ public class AtlOtpService {
         String storedOtp = atlRedisService.getRedisValue(key);
 
         try {
-            // isOtpValid = checkAndValidateOtp(storedOtp, verifyOtpDto.getOtp());
+            isOtpValid = checkAndValidateOtp(storedOtp, verifyOtpDto.getOtp());
         } catch (OtpVerificationException e) {
-            throw new RuntimeException(e);
+            throw new CustomUnauthorizedException(e.getMessage());
         }
 
-        if (true) {
+        if (isOtpValid) {
             String token = authUtil.generateAccessToken(userObj);
 
             boolean tenantSetupCompleted = false;
@@ -121,6 +122,7 @@ public class AtlOtpService {
                             .tenantId(userObj.getTenant() != null ? userObj.getTenant().getId() : null)
                             .tenantSetupCompleted(tenantSetupCompleted)
                             .tenantType(tenantType)
+                            .passwordResetRequired(userObj.isPasswordResetRequired())
                             .build())
                     .build();
         }
@@ -141,9 +143,25 @@ public class AtlOtpService {
         String otpKey = ApplicationConstant.OTP_PREFIX + userObj.getEmail();
         atlRedisService.saveValueToRedisWithTTL(otpKey, otp, 5);
 
-        // In production, send email here
-        // atlEmailService.sendTextEmail(userObj.getEmail(), ...);
+        // Send Email via Notification Service
+        sendOtpEmail(userObj.getEmail(), otp);
+
         System.out.println("Forgot Password OTP for " + username + ": " + otp);
+    }
+
+    private void sendOtpEmail(String email, String otp) {
+        Map<String, Object> templateData = new HashMap<>();
+        templateData.put("otp", otp);
+
+        ExternalEmailRequestDto emailRequest = ExternalEmailRequestDto.builder()
+                .to(email)
+                .subject("Your Security Verification Code")
+                .templateName("otp-verification")
+                .templateData(templateData)
+                .isHtml(true)
+                .build();
+
+        notificationClient.sendEmail(emailRequest);
     }
 
     public boolean verifyOtpForPasswordReset(String username, String otp) {

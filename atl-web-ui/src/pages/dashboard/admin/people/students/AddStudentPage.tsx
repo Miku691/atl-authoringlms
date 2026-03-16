@@ -11,12 +11,12 @@ interface Section {
     id: string;
     name: string;
     classId: string;
+    offeringId: string;
 }
 
 interface ImsClass {
     id: string;
     name: string;
-    offeringId: string;
 }
 
 const AddStudentPage: React.FC = () => {
@@ -147,9 +147,26 @@ const AddStudentPage: React.FC = () => {
                     throw new Error("Invalid Class Selection");
                 }
 
+                // Find offeringId from selected section, or find default section 'A'
+                let targetOfferingId = '';
+                if (formData.selectedSectionId) {
+                    const sec = sections.find(s => s.id === formData.selectedSectionId);
+                    if (sec) targetOfferingId = sec.offeringId;
+                } else {
+                    // Fallback to section 'A' for this class
+                    const defaultSec = sections.find(s => s.classId === formData.selectedClassId && s.name === 'A');
+                    if (defaultSec) targetOfferingId = defaultSec.offeringId;
+                }
+
+                if (!targetOfferingId) {
+                    toast.error("Could not determine Offering. Please check academic setup.");
+                    setIsSubmitting(false);
+                    return;
+                }
+
                 await api.post('/ims-student-service/enrollments', {
                     studentId,
-                    offeringId: selectedClass.offeringId,
+                    offeringId: targetOfferingId,
                     sectionId: formData.selectedSectionId || null,
                     academicYear: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1),
                     rollNo: formData.rollNo ? parseInt(formData.rollNo) : null,

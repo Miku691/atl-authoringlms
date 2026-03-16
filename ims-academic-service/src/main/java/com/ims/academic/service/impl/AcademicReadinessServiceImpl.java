@@ -24,6 +24,7 @@ public class AcademicReadinessServiceImpl implements AcademicReadinessService {
     private final com.ims.academic.repo.AcademicSessionRepo academicSessionRepo;
     private final ImsTenantSettingsRepo tenantSettingsRepo;
     private final ImsClassesRepo classesRepo;
+    private final ImsSectionsRepo sectionsRepo;
     private final ImsOfferingSubjectRepo offeringSubjectsRepo;
     private final ObjectMapper objectMapper;
 
@@ -66,22 +67,29 @@ public class AcademicReadinessServiceImpl implements AcademicReadinessService {
                     missingComponents.add("CLASS_MISSING_" + className);
                     isReady = false;
                 } else {
-                    // Class exists, implies Offering exists (FK).
-                    // Verify Subject Mapping
-                    // Verify Subject Mapping
-                    ImsClasses imsClass = classEntity.get();
-                    if (imsClass.getOffering() == null) {
-                        // Should not happen with nullable=false, but good to check
-                        missingComponents.add("OFFERING_MISSING_FOR_" + className);
+                    // Class exists, find its sections
+                    List<com.ims.academic.entity.ImsSections> sections = sectionsRepo
+                            .findByImsClassId(classEntity.get().getId());
+                    if (sections.isEmpty()) {
+                        missingComponents.add("SECTION_MISSING_FOR_" + className);
                         isReady = false;
                     } else {
-                        // Check if any subject is mapped
-                        boolean hasAnySubjects = !offeringSubjectsRepo.findByOfferingId(imsClass.getOffering().getId())
-                                .isEmpty();
+                        for (com.ims.academic.entity.ImsSections section : sections) {
+                            if (section.getOffering() == null) {
+                                missingComponents.add("OFFERING_MISSING_FOR_" + className + "_" + section.getName());
+                                isReady = false;
+                            } else {
+                                // Check if any subject is mapped for this section's offering
+                                boolean hasAnySubjects = !offeringSubjectsRepo
+                                        .findByOfferingId(section.getOffering().getId())
+                                        .isEmpty();
 
-                        if (!hasAnySubjects) {
-                            missingComponents.add("SUBJECT_MAPPING_MISSING_" + className);
-                            isReady = false;
+                                if (!hasAnySubjects) {
+                                    missingComponents
+                                            .add("SUBJECT_MAPPING_MISSING_" + className + "_" + section.getName());
+                                    isReady = false;
+                                }
+                            }
                         }
                     }
                 }

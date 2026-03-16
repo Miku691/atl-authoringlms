@@ -8,6 +8,7 @@ import RegisterInstitutePage from './pages/auth/RegisterInstitutePage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import SetupTenantPage from './pages/onboarding/SetupTenantPage';
 import CreateTenantPage from './pages/onboarding/CreateTenantPage';
+import ForcePasswordResetPage from './pages/auth/ForcePasswordResetPage';
 import AdminLayout from './layouts/AdminLayout';
 import AdminDashboardHome from './pages/dashboard/admin/AdminDashboardHome';
 import RoleManagementPage from './pages/dashboard/admin/RoleManagementPage';
@@ -18,10 +19,13 @@ import BulkAdmissionPage from './pages/dashboard/admin/people/students/BulkAdmis
 import StudentProfilePage from './pages/dashboard/admin/people/students/StudentProfilePage';
 import AttendanceMarkingPage from './pages/dashboard/admin/operations/AttendanceMarkingPage';
 import GuardianManagementPage from './pages/dashboard/admin/people/guardians/GuardianManagementPage';
+import AddInstructorPage from './pages/dashboard/admin/people/instructors/AddInstructorPage';
+import AddStaffPage from './pages/dashboard/admin/users/AddStaffPage';
 import FeeConfigPage from './pages/dashboard/admin/finance/FeeConfigPage';
 import FeeStructurePage from './pages/dashboard/admin/finance/FeeStructurePage';
 import StudentLedgerPage from './pages/dashboard/admin/finance/StudentLedgerPage';
 import CollectionDeskPage from './pages/dashboard/admin/finance/CollectionDeskPage';
+import FeeAllocationPage from './pages/dashboard/admin/system/FeeAllocationPage';
 
 // ... (existing imports)
 
@@ -119,6 +123,7 @@ const App: React.FC = () => {
           <Route path="/otp" element={<OtpPage />} />
           <Route path="/register-institute" element={<RegisterInstitutePage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ForcePasswordResetPage />} />
 
           {/* Protected Main App Layout */}
           <Route element={
@@ -157,15 +162,20 @@ const App: React.FC = () => {
             <Route path="/people/students/add" element={<AddStudentPage />} />
             <Route path="/people/students/bulk" element={<BulkAdmissionPage />} />
             <Route path="/people/students/:id" element={<StudentProfilePage />} />
-            <Route path="/people/students/enrollments" element={<ComingSoonPage />} />
             <Route path="/people/students/guardians" element={<GuardianManagementPage />} />
-            <Route path="/people/students/documents" element={<ComingSoonPage />} />
+            <Route path="/people/students/reports" element={<ComingSoonPage />} />
             <Route path="/people/instructors" element={<InstructorManagementPage />} />
+            <Route path="/people/instructors/all" element={<InstructorManagementPage />} />
+            <Route path="/people/instructors/add" element={<AddInstructorPage />} />
+            <Route path="/people/instructors/reports" element={<ComingSoonPage />} />
             <Route path="/people/instructors/:id/availability" element={<InstructorAvailabilityPage />} />
             <Route path="/people/instructors/:id/subjects" element={<InstructorSubjectsPage />} />
             <Route path="/people/instructors/:id" element={<InstructorProfilePage />} />
             <Route path="/instructor/class/:offeringId" element={<InstructorClassHubPage />} />
             <Route path="/people/staff" element={<StaffManagementPage />} />
+            <Route path="/people/staff/all" element={<StaffManagementPage />} />
+            <Route path="/people/staff/add" element={<AddStaffPage />} />
+            <Route path="/people/staff/reports" element={<ComingSoonPage />} />
 
             {/* Operations */}
             <Route path="/operations/attendance" element={<AttendanceMarkingPage />} />
@@ -192,6 +202,7 @@ const App: React.FC = () => {
             {/* System */}
             <Route path="/system/users" element={<StudentManagementPage />} />
             <Route path="/system/roles" element={<RoleManagementPage />} />
+            <Route path="/system/fee-allocation" element={<FeeAllocationPage />} />
             <Route path="/system/audit" element={<ComingSoonPage />} />
 
             {/* Legacy Admin Redirects */}

@@ -31,6 +31,18 @@ public class FinanceController {
     }
 
     /**
+     * Retrieves a collection summary for the dashboard.
+     *
+     * @return collection summary
+     */
+    @GetMapping("/stats/collection-summary")
+    @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'ACCOUNTANT')")
+    public ResponseEntity<ApiResponse<com.ims.finance.dto.CollectionSummaryDTO>> getCollectionSummary() {
+        return ResponseEntity.ok(ApiResponse.success("Collection summary fetched successfully",
+                financeService.getCollectionSummary()));
+    }
+
+    /**
      * Collects a payment from a student.
      *
      * @param collectPaymentDTO payment details

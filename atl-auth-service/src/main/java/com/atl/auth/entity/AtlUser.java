@@ -1,6 +1,5 @@
 package com.atl.auth.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,12 +28,11 @@ public class AtlUser {
 
     private String status;
 
+    @Column(name = "password_reset_required")
+    private boolean passwordResetRequired = false;
+
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "atl_user_role",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
+    @JoinTable(name = "atl_user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<AtlRole> roles = new HashSet<>();
 
     // TENANT RELATION

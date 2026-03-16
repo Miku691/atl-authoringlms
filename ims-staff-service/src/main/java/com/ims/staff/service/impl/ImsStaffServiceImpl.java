@@ -19,6 +19,7 @@ public class ImsStaffServiceImpl implements ImsStaffService {
 
     private final ImsStaffRepo repo;
     private final ModelMapper modelMapper;
+    private final com.ims.staff.client.AuthClient authClient;
 
     private ImsStaffDto toDto(ImsStaff staff) {
         return modelMapper.map(staff, ImsStaffDto.class);
@@ -124,5 +125,39 @@ public class ImsStaffServiceImpl implements ImsStaffService {
             throw new ResourceNotFoundException("Staff ID", id);
         }
         repo.deleteById(id);
+    }
+
+    @Override
+    public void grantAccess(String id) {
+        ImsStaff staff = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Staff ID", id));
+
+        if (staff.getUserId() != null) {
+            throw new ResourceAlreadyExistException("Staff already has access", "STAFF", "user_id");
+        }
+
+        if (staff.getEmail() == null || staff.getEmail().isEmpty()) {
+            throw new RuntimeException("Email is required to grant access");
+        }
+
+        com.ims.staff.dto.AuthSignupRequestDto signupRequest = com.ims.staff.dto.AuthSignupRequestDto.builder()
+                .username(staff.getEmail())
+                .email(staff.getEmail())
+                .tenantId(staff.getTenantId())
+                .roleCode("STAFF")
+                .build();
+
+        com.ims.staff.util.ApiResponse<java.util.Map<String, Object>> authResponse = authClient.signup(signupRequest);
+
+        if (authResponse != null && "SUCCESS".equalsIgnoreCase(authResponse.getStatus())) {
+            java.util.Map<String, Object> userData = authResponse.getApiData();
+            if (userData != null && userData.get("id") != null) {
+                staff.setUserId(userData.get("id").toString());
+                repo.save(staff);
+            }
+        } else {
+            String errorMsg = authResponse != null ? authResponse.getMessage() : "Unknown error from Auth Service";
+            throw new RuntimeException("Failed to grant access: " + errorMsg);
+        }
     }
 }

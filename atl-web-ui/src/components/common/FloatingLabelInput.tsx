@@ -28,8 +28,8 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
                 className={`
                     relative rounded-lg border transition-all duration-200
                     ${error
-                        ? 'border-red-300 focus-within:ring-2 focus-within:ring-red-100 focus-within:border-red-500'
-                        : 'border-gray-200 focus-within:ring-2 focus-within:ring-indigo-100 focus-within:border-indigo-500'
+                        ? 'border-red-500 ring-4 ring-red-50 focus-within:ring-red-100 focus-within:border-red-600 shadow-sm shadow-red-200/20'
+                        : 'border-gray-200 focus-within:ring-4 focus-within:ring-indigo-50 focus-within:border-indigo-500'
                     }
                     bg-white
                 `}
@@ -37,7 +37,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
                 {/* Icon */}
                 {icon && (
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <div className={`transition-colors duration-200 ${isFocused || hasValue ? 'text-indigo-500' : 'text-gray-400'}`}>
+                        <div className={`transition-colors duration-200 ${isFocused || hasValue ? (error ? 'text-red-500' : 'text-indigo-500') : 'text-gray-400'}`}>
                             {icon}
                         </div>
                     </div>

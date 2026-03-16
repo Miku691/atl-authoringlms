@@ -1,16 +1,20 @@
 package com.ims.instructor.service.impl;
 
+import com.ims.instructor.client.AuthClient;
+import com.ims.instructor.dto.AuthSignupRequestDto;
 import com.ims.instructor.dto.ImsInstructorsDto;
 import com.ims.instructor.entity.ImsInstructors;
 import com.ims.instructor.exception.ResourceAlreadyExistException;
 import com.ims.instructor.exception.ResourceNotFoundException;
 import com.ims.instructor.repo.ImsInstructorsRepo;
 import com.ims.instructor.service.ImsInstructorsService;
+import com.ims.instructor.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +23,7 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
 
     private final ImsInstructorsRepo repo;
     private final ModelMapper modelMapper;
+    private final AuthClient authClient;
 
     private ImsInstructorsDto toDto(ImsInstructors ins) {
         return modelMapper.map(ins, ImsInstructorsDto.class);
@@ -111,5 +116,40 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
     @Override
     public long countByTenant(String tenantId) {
         return repo.countByTenantId(tenantId);
+    }
+
+    @Override
+    public void grantAccess(String id) {
+        ImsInstructors instructor = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Instructor ID", id));
+
+        if (instructor.getUserId() != null) {
+            throw new ResourceAlreadyExistException(instructor.getUserId(), "INSTRUCTOR", "user_id");
+        }
+
+        if (instructor.getEmail() == null || instructor.getEmail().isEmpty()) {
+            throw new RuntimeException("Email is required to grant access");
+        }
+
+        AuthSignupRequestDto signupRequest = AuthSignupRequestDto
+                .builder()
+                .username(instructor.getEmail())
+                .email(instructor.getEmail())
+                .tenantId(instructor.getTenantId())
+                .roleCode("INSTRUCTOR")
+                .build();
+
+        ApiResponse<Map<String, Object>> authResponse = authClient.signup(signupRequest);
+
+        if (authResponse != null && "SUCCESS".equalsIgnoreCase(authResponse.getStatus())) {
+            java.util.Map<String, Object> userData = authResponse.getApiData();
+            if (userData != null && userData.get("id") != null) {
+                instructor.setUserId(userData.get("id").toString());
+                repo.save(instructor);
+            }
+        } else {
+            String errorMsg = authResponse != null ? authResponse.getMessage() : "Unknown error from Auth Service";
+            throw new RuntimeException("Failed to grant access: " + errorMsg);
+        }
     }
 }

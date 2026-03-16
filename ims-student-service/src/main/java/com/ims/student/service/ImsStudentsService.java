@@ -1,8 +1,11 @@
 package com.ims.student.service;
 
 import com.ims.student.dto.ImsStudentsDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ImsStudentsService {
     ImsStudentsDto create(ImsStudentsDto dto);
@@ -22,4 +25,13 @@ public interface ImsStudentsService {
     ImsStudentsDto getStudentByEmailAndTenantId(String email, String tenantId);
 
     long countByTenant(String tenantId);
+
+    void grantAccess(String id);
+
+    List<Map<String, Object>> getGenderStats(String tenantId);
+
+    Page<ImsStudentsDto> searchStudents(String tenantId, String gender,
+                                        String offeringId, String searchTerm, Pageable pageable);
+
+    List<ImsStudentsDto> getByOffering(String tenantId, String offeringId);
 }

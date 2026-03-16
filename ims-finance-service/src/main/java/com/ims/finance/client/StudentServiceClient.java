@@ -20,6 +20,11 @@ public interface StudentServiceClient {
     @GetMapping("/enrollments/guardian/{userId}")
     com.ims.finance.util.ApiResponse<List<String>> getWardIdsByGuardianUserId(@PathVariable("userId") String userId);
 
+    @GetMapping("/students/offering/{offeringId}")
+    com.ims.finance.util.ApiResponse<List<StudentResponse>> getStudentsByOffering(
+            @PathVariable("offeringId") String offeringId,
+            @org.springframework.web.bind.annotation.RequestParam("tenantId") String tenantId);
+
     @Data
     class StudentResponse {
         private String id;

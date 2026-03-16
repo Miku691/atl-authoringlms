@@ -195,7 +195,7 @@ const SyllabusTrackingPage: React.FC = () => {
             }
 
             await academicService.createChapter({
-                subjectId: selectedOS.subjectId,
+                offeringSubjectId: selectedOfferingSubjectId,
                 title: newChapterTitle,
                 orderIndex: chapters.length + 1
             });

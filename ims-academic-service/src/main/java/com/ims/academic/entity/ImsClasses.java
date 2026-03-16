@@ -39,9 +39,4 @@ public class ImsClasses {
         // Optional internal code
         @Column(name = "code", length = 32)
         private String code;
-
-        // Link to Offering (e.g. Class 10, Semester 1)
-        @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "offering_id", nullable = false)
-        private ImsOfferings offering;
 }

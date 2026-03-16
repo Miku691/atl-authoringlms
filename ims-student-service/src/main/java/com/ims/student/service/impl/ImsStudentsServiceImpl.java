@@ -1,17 +1,23 @@
 package com.ims.student.service.impl;
 
+import com.ims.student.client.AuthClient;
+import com.ims.student.dto.AuthSignupRequestDto;
 import com.ims.student.entity.ImsStudents;
 import com.ims.student.dto.ImsStudentsDto;
 import com.ims.student.exception.ResourceAlreadyExistException;
 import com.ims.student.exception.ResourceNotFoundException;
 import com.ims.student.repo.ImsStudentsRepo;
 import com.ims.student.service.ImsStudentsService;
+import com.ims.student.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +25,7 @@ import java.util.stream.Collectors;
 public class ImsStudentsServiceImpl implements ImsStudentsService {
     private final ImsStudentsRepo repo;
     private final ModelMapper modelMapper;
+    private final AuthClient authClient;
 
     private ImsStudentsDto toDto(ImsStudents e) {
         return modelMapper.map(e, ImsStudentsDto.class);
@@ -153,5 +160,59 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
     @Override
     public long countByTenant(String tenantId) {
         return repo.countByTenantId(tenantId);
+    }
+
+    @Override
+    public void grantAccess(String id) {
+        ImsStudents student = repo.findById(id)
+                .filter(s -> !s.isDeleted())
+                .orElseThrow(() -> new ResourceNotFoundException("Student id", id));
+
+        if (student.getUserId() != null) {
+            throw new ResourceAlreadyExistException("Student already has access", "STUDENT", "user_id");
+        }
+
+        if (student.getEmail() == null || student.getEmail().isEmpty()) {
+            throw new RuntimeException("Email is required to grant access");
+        }
+
+        AuthSignupRequestDto signupRequest = AuthSignupRequestDto.builder()
+                .username(student.getEmail())
+                .email(student.getEmail())
+                .tenantId(student.getTenantId())
+                .roleCode("STUDENT")
+                .build();
+
+        ApiResponse<Map<String, Object>> authResponse = authClient.signup(signupRequest);
+
+        if (authResponse != null && "SUCCESS".equalsIgnoreCase(authResponse.getStatus())) {
+            Map<String, Object> userData = authResponse.getApiData();
+            if (userData != null && userData.get("id") != null) {
+                student.setUserId(userData.get("id").toString());
+                repo.save(student);
+            }
+        } else {
+            String errorMsg = authResponse != null ? authResponse.getMessage() : "Unknown error from Auth Service";
+            throw new RuntimeException("Failed to grant access: " + errorMsg);
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getGenderStats(String tenantId) {
+        return repo.countByGender(tenantId);
+    }
+
+    @Override
+    public Page<ImsStudentsDto> searchStudents(String tenantId, String gender,
+                                               String offeringId, String searchTerm, Pageable pageable) {
+        return repo.searchStudents(tenantId, gender, offeringId, searchTerm, pageable)
+                .map(this::toDto);
+    }
+
+    @Override
+    public List<ImsStudentsDto> getByOffering(String tenantId, String offeringId) {
+        return repo.findByOffering(tenantId, offeringId).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 }

@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="ImsNotificationServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <envs>
+      <env name="AUTH_EMAIL" value="mikui17112018@gmail.com" />
+      <env name="AUTH_JWT_SECRET" value="strongjwt_secret-this-is-my-super-secret" />
+      <env name="AUTH_MAIL_PASS" value="kwst lqjx zesd jsdv" />
+      <env name="REDIS_PASSWORD" value="alt@redis123" />
+      <env name="REDIS_URL" value="localhost" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.ims.notification.ImsNotificationServiceApplication" />
+    <module name="ims-notification-service" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.ims.notification.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

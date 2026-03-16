@@ -39,8 +39,8 @@ public class ImsInstructors {
     @Column(name = "tenant_id", nullable = false)
     private String tenantId; // Comes from auth-service
 
-    @Column(name = "user_id", nullable = false, unique = true)
-    private String userId; // Reference to auth.users(id)
+    @Column(name = "user_id")
+    private String userId = null; // Reference to auth.users(id)
 
     @Column(name = "first_name", length = 100, nullable = false)
     private String firstName;

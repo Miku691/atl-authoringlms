@@ -18,4 +18,6 @@ public interface ImsGuardiansService {
     ImsGuardiansDto getByPhoneAndTenant(String phone, String tenantId);
 
     void delete(String id);
+
+    void grantAccess(String id);
 }

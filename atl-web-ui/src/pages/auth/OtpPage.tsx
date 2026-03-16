@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import api from '../../utils/api';
@@ -14,6 +14,7 @@ const OtpPage: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
+    const hasSentOtp = useRef(false);
 
     // Get username from navigation state, fallback to empty string if not present
     const username = location.state?.username;
@@ -24,8 +25,11 @@ const OtpPage: React.FC = () => {
             return;
         }
 
-        // Auto-trigger send OTP on component mount
+        // Auto-trigger send OTP on component mount (with guard for StrictMode)
         const sendOtp = async () => {
+            if (hasSentOtp.current) return;
+            hasSentOtp.current = true;
+
             try {
                 const response = await api.post('/atl-auth-service/auth/otp/sendOtp', { username });
                 if (response.data.message) {
@@ -48,7 +52,7 @@ const OtpPage: React.FC = () => {
             const response = await api.post('/atl-auth-service/auth/otp/verifyOtp', { username, otp });
 
             if (response.data.status === 'SUCCESS') {
-                const { jwt, roles, tenantId, tenantSetupCompleted, tenantType, id, email } = response.data.apiData;
+                const { jwt, roles, tenantId, tenantSetupCompleted, tenantType, id, email, passwordResetRequired } = response.data.apiData;
 
                 dispatch(loginSuccess({
                     user: {
@@ -62,6 +66,12 @@ const OtpPage: React.FC = () => {
                     },
                     token: jwt
                 }));
+
+                // Check if password reset is required
+                if (passwordResetRequired) {
+                    navigate('/reset-password', { state: { email, otp } });
+                    return;
+                }
 
                 // Role Based Redirect
                 if (roles.includes('ADMIN') || roles.includes('TENANT_ADMIN')) {

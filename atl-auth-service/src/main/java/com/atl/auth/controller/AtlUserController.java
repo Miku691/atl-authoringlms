@@ -43,7 +43,7 @@ public class AtlUserController {
 
     @PostMapping("/onboard-admin")
     public ResponseEntity<ApiResponse<AtlSinginResponseDto>> onBoardBootstrapAdmin(
-            @RequestBody BootstrapAdminRequestDto adminDto) {
+            @Valid @RequestBody BootstrapAdminRequestDto adminDto) {
         return new ResponseEntity<ApiResponse<AtlSinginResponseDto>>(
                 bootstrapAdminService.createBootstrapAdmin(adminDto), HttpStatus.CREATED);
     }

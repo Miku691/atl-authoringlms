@@ -8,6 +8,8 @@ export interface ImsOffering {
     status: 'ACTIVE' | 'INACTIVE' | 'UPCOMING';
     startDate?: string;
     endDate?: string;
+    type?: 'SCHOOL' | 'COLLEGE' | 'COACHING';
+    programName?: string;
 }
 
 export interface Subject {

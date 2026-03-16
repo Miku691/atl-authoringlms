@@ -24,4 +24,6 @@ public interface ImsStudentEnrollmentsService {
     Page<StudentSummaryDto> getStudentsByOffering(String offeringId, String status, String tenantId, Pageable pageable);
 
     List<StudentAcademicHistoryDto> getAcademicHistory(String studentId);
+
+    java.util.List<java.util.Map<String, Object>> getOfferingStats(String tenantId);
 }

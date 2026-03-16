@@ -11,6 +11,7 @@ import com.atl.auth.exception.CustomUnauthorizedException;
 import com.atl.auth.exception.UserNotFoundException;
 import com.atl.auth.repo.AtlUserRepo;
 import com.atl.auth.utility.ApplicationConstant;
+import com.atl.auth.utility.PasswordGeneratorUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import com.atl.auth.service.AtlOtpService;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +40,8 @@ public class AtlUserService {
     private final AtlRedisService atlRedisService;
     private final AtlOtpService otpService;
     private final com.atl.auth.repo.ImsTenantsRepo tenantsRepo;
+    private final PasswordGeneratorUtil passwordGeneratorUtil;
+    private final ExternalNotificationClient notificationClient;
 
     public ApiResponse<AtlSingupResponseDto> userSingUpService(AtlSinginRequestDto requestDto) {
 
@@ -57,11 +61,22 @@ public class AtlUserService {
 
         altUserObj.setRoles(roleService.setDefaultRole(roleToSet));
 
-        if (requestDto.getPassword() != null && !requestDto.getPassword().isEmpty()) {
+        // Random Password Generation for specific roles
+        if (roleToSet.equalsIgnoreCase("STUDENT") ||
+                roleToSet.equalsIgnoreCase("INSTRUCTOR") ||
+                roleToSet.equalsIgnoreCase("STAFF") ||
+                roleToSet.equalsIgnoreCase("GUARDIAN")) {
+
+            String tempPassword = passwordGeneratorUtil.generateRandomPassword(10);
+            altUserObj.setPassword(passwordEncoder.encode(tempPassword));
+            altUserObj.setPasswordResetRequired(true);
+
+            // Send Email with Temp Password
+            sendTempPasswordEmail(altUserObj.getEmail(), tempPassword, roleToSet);
+        } else if (requestDto.getPassword() != null && !requestDto.getPassword().isEmpty()) {
             altUserObj.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         } else {
-            String defaultPwd = roleToSet.equalsIgnoreCase("STUDENT") ? "student@123" : "instructor@123";
-            altUserObj.setPassword(passwordEncoder.encode(defaultPwd));
+            altUserObj.setPassword(passwordEncoder.encode(ApplicationConstant.DEFAULT_PASSWORD));
         }
 
         if (requestDto.getTenantId() != null) {
@@ -107,7 +122,7 @@ public class AtlUserService {
 
             return ApiResponse.success(HttpStatus.OK.value(),
                     ApplicationConstant.API_LOGIN_SUCCESS_MSG,
-                    new AtlSinginResponseDto(user.getUsername(), maskedEmail));
+                    new AtlSinginResponseDto(user.getUsername(), maskedEmail, user.isPasswordResetRequired()));
 
         } catch (BadCredentialsException e) {
             throw new CustomUnauthorizedException("Invalid username or password");
@@ -124,7 +139,7 @@ public class AtlUserService {
         altUserObj.setStatus(userDetails.getStatus());
         altUserObj.setTenant(userDetails.getTenant());
 
-        AtlUser updateUser = userRepo.save(altUserObj);
+        userRepo.save(altUserObj);
 
         return "Details Updated Successfully";
     }
@@ -180,8 +195,9 @@ public class AtlUserService {
             throw new CustomAuthException("Invalid or Expired OTP");
         }
 
-        // Update Password
+        // Update Password and clear reset flag
         user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+        user.setPasswordResetRequired(false);
         userRepo.save(user);
 
         // Optionally clear OTP from Redis? It expires cleanly anyway.
@@ -189,5 +205,21 @@ public class AtlUserService {
         return ApiResponse.success(HttpStatus.OK.value(),
                 "Password updated successfully",
                 "Password reset successfully");
+    }
+
+    private void sendTempPasswordEmail(String email, String tempPassword, String role) {
+        Map<String, Object> templateData = new HashMap<>();
+        templateData.put("tempPassword", tempPassword);
+        templateData.put("role", role);
+
+        ExternalEmailRequestDto emailRequest = ExternalEmailRequestDto.builder()
+                .to(email)
+                .subject("Welcome to IMS - Your Account is Ready")
+                .templateName("onboarding-welcome")
+                .templateData(templateData)
+                .isHtml(true)
+                .build();
+
+        notificationClient.sendEmail(emailRequest);
     }
 }

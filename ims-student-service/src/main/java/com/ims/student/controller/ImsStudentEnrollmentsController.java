@@ -1,6 +1,7 @@
 package com.ims.student.controller;
 
 import com.ims.student.dto.ImsStudentEnrollmentsDto;
+import com.ims.student.dto.StudentAcademicHistoryDto;
 import com.ims.student.service.ImsStudentEnrollmentsService;
 import com.ims.student.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/enrollments")
@@ -125,7 +127,7 @@ public class ImsStudentEnrollmentsController {
 
         @GetMapping("/history/{studentId}")
         @PreAuthorize("@securityService.canViewStudent(#studentId)")
-        public ResponseEntity<ApiResponse<java.util.List<com.ims.student.dto.StudentAcademicHistoryDto>>> getAcademicHistory(
+        public ResponseEntity<ApiResponse<List<StudentAcademicHistoryDto>>> getAcademicHistory(
                         @PathVariable String studentId) {
 
                 return ResponseEntity.ok(
@@ -134,6 +136,19 @@ public class ImsStudentEnrollmentsController {
                                                 .statusCode(HttpStatus.OK.value())
                                                 .message("Academic history fetched successfully")
                                                 .apiData(service.getAcademicHistory(studentId))
+                                                .build());
+        }
+
+        @GetMapping("/stats/offering/tenant/{tenantId}")
+        @PreAuthorize("isAuthenticated()")
+        public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getOfferingStats(
+                        @PathVariable String tenantId) {
+                return ResponseEntity.ok(
+                                ApiResponse.<java.util.List<java.util.Map<String, Object>>>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Offering stats fetched successfully")
+                                                .apiData(service.getOfferingStats(tenantId))
                                                 .build());
         }
 }

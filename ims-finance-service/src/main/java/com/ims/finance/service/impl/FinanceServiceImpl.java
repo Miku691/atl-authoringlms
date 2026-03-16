@@ -2,6 +2,7 @@ package com.ims.finance.service.impl;
 
 import com.ims.finance.client.StudentServiceClient;
 import com.ims.finance.dto.CollectPaymentDTO;
+import com.ims.finance.dto.CollectionSummaryDTO;
 import com.ims.finance.dto.RefundDTO;
 import com.ims.finance.dto.TransactionDTO;
 import com.ims.finance.entity.DemandNote;
@@ -19,7 +20,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,6 +51,52 @@ public class FinanceServiceImpl implements FinanceService {
         this.demandNoteRepository = demandNoteRepository;
         this.studentServiceClient = studentServiceClient;
         this.modelMapper = modelMapper;
+    }
+
+    @Override
+    public CollectionSummaryDTO getCollectionSummary() {
+        String tenantId = SecurityUtils.getCurrentTenantId();
+
+        LocalDateTime todayStart = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        LocalDateTime monthStart = LocalDateTime.of(LocalDate.now().withDayOfMonth(1), LocalTime.MIN);
+        LocalDateTime yearStart = LocalDateTime.of(LocalDate.now().withDayOfYear(1), LocalTime.MIN);
+
+        BigDecimal today = transactionRepository.sumAmountByTenantIdAndDateAfter(tenantId, todayStart);
+        BigDecimal month = transactionRepository.sumAmountByTenantIdAndDateAfter(tenantId, monthStart);
+        BigDecimal year = transactionRepository.sumAmountByTenantIdAndDateAfter(tenantId, yearStart);
+
+        List<Object[]> offeringStats = transactionRepository.sumAmountByOffering(tenantId);
+        Map<String, BigDecimal> collectionByOffering = new HashMap<>();
+        for (Object[] row : offeringStats) {
+            collectionByOffering.put((String) row[0], (BigDecimal) row[1]);
+        }
+
+        List<TransactionDTO> recent = transactionRepository.findAllByTenantIdOrderByTransactionDateDesc(tenantId)
+                .stream()
+                .limit(10)
+                .map(t -> modelMapper.map(t, TransactionDTO.class))
+                .collect(Collectors.toList());
+
+        // Fetch offering names for the dashboard
+        Map<String, String> offeringNames = new HashMap<>();
+        if (!collectionByOffering.isEmpty()) {
+            try {
+                // We can fetch names from academic service in bulk if needed, 
+                // but for now let's just use the IDs or fetch as needed
+                // Ideally, Finance Service should have a cache or names are passed/fetched
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+
+        return CollectionSummaryDTO.builder()
+                .todayCollection(today != null ? today : BigDecimal.ZERO)
+                .monthCollection(month != null ? month : BigDecimal.ZERO)
+                .yearCollection(year != null ? year : BigDecimal.ZERO)
+                .collectionByOffering(collectionByOffering)
+                .offeringNames(offeringNames)
+                .recentTransactions(recent)
+                .build();
     }
 
     @Override
@@ -138,6 +187,13 @@ public class FinanceServiceImpl implements FinanceService {
                 remainingAmount = remainingAmount.subtract(amountToPay);
                 record.setAmountPaid(record.getAmountPaid().add(amountToPay));
                 record.setBalance(record.getBalance().subtract(amountToPay));
+                
+                // Set offering context in transaction if not already set
+                if (transaction.getOfferingId() == null) {
+                    transaction.setOfferingId(record.getOfferingId());
+                    transaction.setAcademicYear(record.getAcademicYear());
+                    transactionRepository.save(transaction);
+                }
 
                 if (record.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
                     record.setStatus(StudentFeeRecord.FeeStatus.PAID);

@@ -10,6 +10,4 @@ public interface ImsClassesRepo extends JpaRepository<ImsClasses, String> {
     boolean existsByTenantIdAndName(String tenantId, String name);
 
     List<ImsClasses> findByTenantId(String tenantId);
-
-    List<ImsClasses> findByOfferingId(String offeringId);
 }

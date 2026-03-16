@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base-layout :: main-layout(~{::.otp-body}, 'IMS Security')}">
+
+<body>
+    <div class="otp-body">
+        <h2>Security Verification</h2>
+        <p>Hello,</p>
+        <p>You requested a security code to access your account. Please use the following One-Time Password (OTP) to
+            complete your verification:</p>
+        <div class="otp-code" th:text="${otp}">000000</div>
+        <p>This code will expire in <b>5 minutes</b>. For security reasons, do not share this code with anyone.</p>
+        <p>If you did not request this, please ignore this email or contact support if you have concerns.</p>
+        <p>Best regards,<br />The IMS Security Team</p>
+    </div>
+</body>
+
+</html>

@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Search, CreditCard, IndianRupee, History, Download, ArrowRight, User, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, CreditCard, IndianRupee, History, Download, ArrowRight, User, CheckCircle2, TrendingUp, BarChart3, Calendar, Filter } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { financeService } from '../../../../api/financeService';
+import { financeService, type CollectionSummary } from '../../../../api/financeService';
 import { studentService } from '../../../../api/studentService';
 import type { StudentFeeRecord, PaymentMode, Transaction } from '../../../../types/finance';
 import type { Student } from '../../../../api/studentService';
 import FloatingLabelInput from '../../../../components/common/FloatingLabelInput';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const CollectionDeskPage: React.FC = () => {
 
@@ -15,8 +16,9 @@ const CollectionDeskPage: React.FC = () => {
     const [ledger, setLedger] = useState<StudentFeeRecord[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [summary, setSummary] = useState<CollectionSummary | null>(null);
 
-    // Payment Form state
+    // ... (keep paymentData state)
     const [paymentData, setPaymentData] = useState({
         amount: 0,
         paymentMode: 'CASH' as PaymentMode,
@@ -24,6 +26,24 @@ const CollectionDeskPage: React.FC = () => {
         feeRecordIds: [] as string[]
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (!selectedStudent) {
+            fetchCollectionSummary();
+        }
+    }, [selectedStudent]);
+
+    const fetchCollectionSummary = async () => {
+        setIsLoading(true);
+        try {
+            const data = await financeService.getCollectionSummary();
+            setSummary(data);
+        } catch (error) {
+            console.error('Failed to fetch collection summary', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleSearch = async (term: string) => {
         setSearchTerm(term);
@@ -90,16 +110,6 @@ const CollectionDeskPage: React.FC = () => {
         }
     };
 
-    const toggleFeeSelection = (id: string) => {
-        setPaymentData(prev => {
-            const isSelected = prev.feeRecordIds.includes(id);
-            const newList = isSelected ? prev.feeRecordIds.filter(f => f !== id) : [...prev.feeRecordIds, id];
-
-            // User wants to enter amount manually, so we don't recalculate amount here
-            return { ...prev, feeRecordIds: newList };
-        });
-    };
-
     const handleDownloadReceipt = async (txId: string) => {
         try {
             const blob = await financeService.downloadReceipt(txId);
@@ -159,7 +169,7 @@ const CollectionDeskPage: React.FC = () => {
             </div>
 
             {selectedStudent ? (
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {/* Left Panel: Payment Form & Ledger Details */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Student Badge */}
@@ -219,15 +229,34 @@ const CollectionDeskPage: React.FC = () => {
                                 )}
 
                                 <div>
-                                    <p className="text-xs font-semibold text-gray-500 uppercase px-1 mb-2">Select Dues (Optional - FIFO default)</p>
+                                    <div className="flex items-center justify-between px-1 mb-2">
+                                        <p className="text-xs font-semibold text-gray-500 uppercase">Select Fee Head (One at a time)</p>
+                                        {paymentData.feeRecordIds.length > 0 && paymentData.amount > 0 && (
+                                            <div className="flex items-center gap-2 animate-in slide-in-from-right-2 duration-300">
+                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Live Balance:</span>
+                                                <div className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black border border-orange-100 flex items-center gap-1">
+                                                    ₹{(ledger.find(r => r.id === paymentData.feeRecordIds[0])?.balance || 0) - paymentData.amount > 0
+                                                        ? ((ledger.find(r => r.id === paymentData.feeRecordIds[0])?.balance || 0) - paymentData.amount).toLocaleString()
+                                                        : '0 (FULLY PAID)'}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className="grid grid-cols-1 gap-2">
                                         {ledger.filter(r => r.status !== 'PAID').map(record => (
                                             <div
                                                 key={record.id}
-                                                onClick={() => toggleFeeSelection(record.id)}
+                                                onClick={() => {
+                                                    // Enforce single selection (Phase 9.3 requirement)
+                                                    setPaymentData(prev => ({
+                                                        ...prev,
+                                                        feeRecordIds: prev.feeRecordIds.includes(record.id) ? [] : [record.id]
+                                                        // Removed automatic amount setting to allow user to enter custom amount (e.g. partial)
+                                                    }));
+                                                }}
                                                 className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${paymentData.feeRecordIds.includes(record.id)
-                                                    ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200'
-                                                    : 'bg-white border-gray-100 hover:border-gray-300'
+                                                    ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200 shadow-sm'
+                                                    : 'bg-white border-gray-100 hover:border-gray-200'
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-3">
@@ -237,12 +266,12 @@ const CollectionDeskPage: React.FC = () => {
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-gray-800">{record.feeHeadName}</p>
-                                                        <p className="text-[10px] text-gray-500">Due: {record.dueDate}</p>
+                                                        <p className="text-[10px] text-gray-500 font-medium">Due: {new Date(record.dueDate).toLocaleDateString()}</p>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-sm font-bold text-gray-900">₹{record.balance.toLocaleString()}</p>
-                                                    <p className="text-[10px] text-gray-400">Total: ₹{record.amountDue}</p>
+                                                    <p className="text-sm font-black text-gray-900">₹{record.balance.toLocaleString()}</p>
+                                                    <p className="text-[10px] text-gray-400 font-bold">Total: ₹{record.amountDue.toLocaleString()}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -251,7 +280,7 @@ const CollectionDeskPage: React.FC = () => {
 
                                 <button
                                     type="submit"
-                                    disabled={isSubmitting || paymentData.amount <= 0}
+                                    disabled={isSubmitting || paymentData.amount <= 0 || (paymentData.amount > 0 && paymentData.feeRecordIds.length === 0)}
                                     className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold text-lg hover:bg-indigo-700 disabled:opacity-50 shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-3"
                                 >
                                     {isSubmitting ? 'Processing Payment...' : (
@@ -265,7 +294,7 @@ const CollectionDeskPage: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Right Panel: Recent Transactions */}
+                    {/* Right Panel: Recent Transactions for Selected Student */}
                     <div className="space-y-6">
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
@@ -306,25 +335,148 @@ const CollectionDeskPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            ) : summary ? (
+                <div className="space-y-6 animate-in fade-in duration-500">
+                    {/* Summary Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group">
+                            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-green-50 rounded-full group-hover:scale-110 transition-transform" />
+                            <div className="relative z-10 flex flex-col justify-between h-full">
+                                <div className="flex items-center gap-3 text-green-600 mb-4">
+                                    <div className="p-2 bg-green-100 rounded-lg">
+                                        <TrendingUp className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-xs font-black uppercase tracking-widest">Today's Collection</span>
+                                </div>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-3xl font-black text-gray-900">₹{summary.todayCollection.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group">
+                            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-50 rounded-full group-hover:scale-110 transition-transform" />
+                            <div className="relative z-10 flex flex-col justify-between h-full">
+                                <div className="flex items-center gap-3 text-blue-600 mb-4">
+                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                        <Calendar className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-xs font-black uppercase tracking-widest">Monthly Collection</span>
+                                </div>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-3xl font-black text-gray-900">₹{summary.monthCollection.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group">
+                            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-50 rounded-full group-hover:scale-110 transition-transform" />
+                            <div className="relative z-10 flex flex-col justify-between h-full">
+                                <div className="flex items-center gap-3 text-indigo-600 mb-4">
+                                    <div className="p-2 bg-indigo-100 rounded-lg">
+                                        <BarChart3 className="w-5 h-5" />
+                                    </div>
+                                    <span className="text-xs font-black uppercase tracking-widest">Yearly Collection</span>
+                                </div>
+                                <div className="flex items-baseline gap-1">
+                                    <span className="text-3xl font-black text-gray-900">₹{summary.yearCollection.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Class-wise collection chart */}
+                        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                            <div className="flex items-center justify-between mb-8">
+                                <h3 className="font-black text-gray-900 uppercase tracking-widest text-sm flex items-center gap-2">
+                                    <Filter className="w-4 h-4 text-indigo-600" />
+                                    Class-wise Collection
+                                </h3>
+                                <div className="px-3 py-1 bg-gray-50 rounded-full text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Current Academic Year</div>
+                            </div>
+                            
+                            <div className="h-[300px] w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart
+                                        data={Object.entries(summary.collectionByOffering).map(([id, amount]) => ({
+                                            name: summary.offeringNames[id] || id,
+                                            amount: amount
+                                        }))}
+                                        margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+                                        <XAxis 
+                                            dataKey="name" 
+                                            axisLine={false} 
+                                            tickLine={false} 
+                                            tick={{ fill: '#9CA3AF', fontSize: 10, fontWeight: 700 }}
+                                            dy={10}
+                                        />
+                                        <YAxis 
+                                            axisLine={false} 
+                                            tickLine={false}
+                                            tick={{ fill: '#9CA3AF', fontSize: 10, fontWeight: 700 }}
+                                            tickFormatter={(value) => `₹${value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value}`}
+                                        />
+                                        <Tooltip 
+                                            cursor={{ fill: '#F3F4F6' }}
+                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                            formatter={(value: any) => [`₹${value.toLocaleString()}`, 'Collected']}
+                                        />
+                                        <Bar dataKey="amount" fill="#4F46E5" radius={[6, 6, 0, 0]} barSize={40}>
+                                            {Object.entries(summary.collectionByOffering).map((_, index) => (
+                                                <Cell key={`cell-${index}`} fill={['#6366F1', '#818CF8', '#A5B4FC', '#C7D2FE'][index % 4]} opacity={0.8} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+
+                        {/* Recent Activity List */}
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+                            <div className="p-6 border-b border-gray-100">
+                                <h3 className="font-black text-gray-900 uppercase tracking-widest text-sm flex items-center gap-2">
+                                    <History className="w-4 h-4 text-indigo-600" />
+                                    Recent Activity
+                                </h3>
+                            </div>
+                            <div className="flex-1 divide-y divide-gray-50 overflow-y-auto max-h-[400px]">
+                                {summary.recentTransactions.length === 0 ? (
+                                    <div className="p-12 text-center">
+                                        <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <History className="w-6 h-6 text-gray-300" />
+                                        </div>
+                                        <p className="text-xs text-gray-400 font-medium">No recent transactions</p>
+                                    </div>
+                                ) : (
+                                    summary.recentTransactions.map((tx: any) => (
+                                        <div key={tx.id} className="p-4 hover:bg-gray-50/50 transition-colors flex items-center justify-between group">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-[10px] font-black uppercase">
+                                                    {tx.paymentMode?.[0]}
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-bold text-gray-900">₹{tx.amount.toLocaleString()}</p>
+                                                    <p className="text-[10px] text-gray-500 font-medium uppercase tracking-tight">{tx.paymentMode} • {new Date(tx.transactionDate).toLocaleDateString()}</p>
+                                                </div>
+                                            </div>
+                                            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-indigo-400 transition-colors" />
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                            <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-center">
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Last Updated: {new Date().toLocaleTimeString()}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             ) : (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-16 text-center">
-                    <div className="w-24 h-24 bg-indigo-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-indigo-500 rotate-12 group-hover:rotate-0 transition-transform">
-                        <CreditCard className="w-12 h-12" />
-                    </div>
-                    <h3 className="text-2xl font-black text-gray-900">Collection Desk Ready</h3>
-                    <p className="text-gray-500 max-w-sm mx-auto mt-4 leading-relaxed">
-                        Start collecting fees by searching for a student. You can select specific fee heads or let the system apply payment to the oldest balances automatically.
-                    </p>
-                    <div className="mt-8 flex justify-center gap-4">
-                        <div className="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100 flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
-                            <span className="text-xs font-bold text-gray-600 uppercase">Automatic Receipt</span>
-                        </div>
-                        <div className="px-4 py-2 bg-gray-50 rounded-lg border border-gray-100 flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-green-500" />
-                            <span className="text-xs font-bold text-gray-600 uppercase">FIFO allocation</span>
-                        </div>
-                    </div>
+                <div className="h-96 flex flex-col items-center justify-center space-y-4">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
+                    <p className="text-sm text-gray-400 font-medium animate-pulse">Loading Collection Statistics...</p>
                 </div>
             )}
         </div>

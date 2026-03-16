@@ -95,4 +95,15 @@ public class StudentFeeLedgerController {
         studentFeeAllocationService.allocateFeesToStudent(studentId, offeringId, academicYear);
         return ResponseEntity.ok(ApiResponse.success("Fees allocated successfully", null));
     }
+
+    /**
+     * Manually triggers bulk fee allocation for all students in an offering.
+     */
+    @PostMapping("/bulk-allocate")
+    @PreAuthorize("hasRole('TENANT_ADMIN')")
+    public ResponseEntity<ApiResponse<Void>> bulkAllocateFees(@RequestParam String offeringId,
+            @RequestParam String academicYear) {
+        studentFeeAllocationService.bulkAllocateFees(offeringId, academicYear);
+        return ResponseEntity.ok(ApiResponse.success("Bulk fees allocation triggered successfully", null));
+    }
 }

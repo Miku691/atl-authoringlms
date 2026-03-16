@@ -11,4 +11,6 @@ public interface AcademicSessionRepo extends JpaRepository<AcademicSession, Stri
     List<AcademicSession> findByTenantId(String tenantId);
 
     List<AcademicSession> findByProgramId(String programId);
+
+    java.util.Optional<AcademicSession> findFirstByTenantIdAndIsCurrentTrue(String tenantId);
 }

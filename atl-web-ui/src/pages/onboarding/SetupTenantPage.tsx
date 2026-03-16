@@ -4,8 +4,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../../store/store';
 import { updateSetupStatus } from '../../store/authSlice';
 import api from '../../utils/api';
-import { School, GraduationCap, Users, CheckCircle, ArrowRight, Plus, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
+import { School, GraduationCap, Users, CheckCircle, Plus, Trash2, ArrowLeft, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+
+import FloatingLabelInput from '../../components/common/FloatingLabelInput';
 
 // --- Types ---
 
@@ -53,11 +55,11 @@ const InitialSetupPage: React.FC = () => {
     const [type, setType] = useState<InstitutionType | null>(null);
     const [academicYear, setAcademicYear] = useState<string>(`${new Date().getFullYear()}-${new Date().getFullYear() + 1}`);
 
-    // School State
+    // School State - Defaults 1-2, Section A (1)
     const [schoolDetails, setSchoolDetails] = useState({
         board: 'CBSE',
         startClass: 1,
-        endClass: 12,
+        endClass: 2,
         sectionsPerClass: 1
     });
 
@@ -145,11 +147,11 @@ const InitialSetupPage: React.FC = () => {
                             setStep(2);
                         }}
                         className={`cursor-pointer p-6 border-2 rounded-xl transition-all hover:shadow-lg flex flex-col items-center
-                            ${type === item.id ? `border-${item.color}-500 bg-${item.color}-50` : 'border-gray-200 hover:border-gray-300'}
+                            ${type === item.id ? `border-indigo-500 bg-indigo-50` : 'border-gray-200 hover:border-gray-300'}
                         `}
                     >
-                        <div className={`p-4 rounded-full mb-4 bg-${item.color}-100`}>
-                            <item.icon className={`w-8 h-8 text-${item.color}-600`} />
+                        <div className={`p-4 rounded-full mb-4 ${type === item.id ? 'bg-indigo-100' : 'bg-gray-100'}`}>
+                            <item.icon className="w-8 h-8 text-indigo-600" />
                         </div>
                         <h3 className="font-semibold text-lg text-gray-800">{item.label}</h3>
                         <p className="text-sm text-gray-500 text-center mt-2">{item.desc}</p>
@@ -165,28 +167,29 @@ const InitialSetupPage: React.FC = () => {
 
             {/* Global Settings */}
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <label className="block text-sm font-medium text-gray-700 mb-2">Academic Year Label</label>
-                <input
+                <FloatingLabelInput
+                    label="Academic Year Label"
                     value={academicYear}
                     onChange={(e) => setAcademicYear(e.target.value)}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                     placeholder="e.g. 2024-2025"
                 />
             </div>
 
             {/* School Specific */}
             {type === 'SCHOOL' && (
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
                     <h3 className="font-semibold text-gray-900 flex items-center gap-2">
                         <School className="w-5 h-5 text-indigo-600" /> School Structure
                     </h3>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Education Board</label>
+                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+                            Education Board
+                        </label>
                         <select
                             value={schoolDetails.board}
                             onChange={(e) => setSchoolDetails({ ...schoolDetails, board: e.target.value })}
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 sm:text-sm transition-all bg-white"
                         >
                             <option value="CBSE">CBSE</option>
                             <option value="ICSE">ICSE</option>
@@ -196,35 +199,40 @@ const InitialSetupPage: React.FC = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Start Class</label>
-                            <input
-                                type="number" min="1" max="12"
-                                value={schoolDetails.startClass}
-                                onChange={(e) => setSchoolDetails({ ...schoolDetails, startClass: parseInt(e.target.value) })}
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">End Class</label>
-                            <input
-                                type="number" min="1" max="12"
-                                value={schoolDetails.endClass}
-                                onChange={(e) => setSchoolDetails({ ...schoolDetails, endClass: parseInt(e.target.value) })}
-                                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                            />
-                        </div>
+                        <FloatingLabelInput
+                            label="Start Class"
+                            type="number"
+                            min="1"
+                            max="12"
+                            disabled
+                            value={schoolDetails.startClass}
+                            onChange={() => { }}
+                        />
+                        <FloatingLabelInput
+                            label="End Class"
+                            type="number"
+                            min="1"
+                            max="12"
+                            disabled
+                            value={schoolDetails.endClass}
+                            onChange={() => { }}
+                        />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Default Sections per Class</label>
-                        <p className="text-xs text-gray-500 mb-2">We will create sections A, B, C... automatically.</p>
-                        <input
-                            type="number" min="1" max="10"
+                    <div className="pt-2 border-t border-gray-100">
+                        <FloatingLabelInput
+                            label="Default Sections per Class"
+                            type="number"
+                            min="1"
+                            max="10"
+                            disabled
                             value={schoolDetails.sectionsPerClass}
-                            onChange={(e) => setSchoolDetails({ ...schoolDetails, sectionsPerClass: parseInt(e.target.value) })}
-                            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            onChange={() => { }}
+                            className="mb-0"
                         />
+                        <p className="text-[10px] text-gray-400 mt-1 px-1 italic">
+                            * We will create sections A, B, C... automatically. Default configuration is non-editable during initial setup.
+                        </p>
                     </div>
                 </div>
             )}
