@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { type RootState } from '../../../../store/store';
-import { academicService } from '../../../../api/academicService';
+import { academicService, type GradingScale } from '../../../../api/academicService';
 import {
     Plus,
     Trash2,
@@ -16,15 +16,6 @@ import {
 import { toast } from 'react-hot-toast';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 
-interface GradingScale {
-    id: string;
-    gradeLabel: string;
-    minPercentage: number;
-    maxPercentage: number;
-    gradePoint: number;
-    description: string;
-    tenantId: string;
-}
 
 const GradingConfigPage: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.auth);
@@ -79,10 +70,10 @@ const GradingConfigPage: React.FC = () => {
         setIsSaving(true);
         try {
             if (editingScale.id) {
-                await academicService.updateGradingScale(editingScale.id, editingScale);
+                await academicService.updateGradingScale(user.tenantId, editingScale.id, editingScale as GradingScale);
                 toast.success("Grading scale updated");
             } else {
-                await academicService.createGradingScale({ ...editingScale, tenantId: user.tenantId });
+                await academicService.createGradingScale(user.tenantId, { ...editingScale, tenantId: user.tenantId } as GradingScale);
                 toast.success("Grading scale created");
             }
             setIsModalOpen(false);
@@ -104,10 +95,12 @@ const GradingConfigPage: React.FC = () => {
         if (!scaleToDelete) return;
         setIsDeleting(true);
         try {
-            await academicService.deleteGradingScale(scaleToDelete.id);
-            toast.success("Grading scale removed");
-            setDeleteModalOpen(false);
-            fetchScales();
+            if (user?.tenantId) {
+                await academicService.deleteGradingScale(user.tenantId, scaleToDelete.id!);
+                toast.success("Grading scale removed");
+                setDeleteModalOpen(false);
+                fetchScales();
+            }
         } catch (error: any) {
             console.error(error);
             toast.error(error.response?.data?.message || "Failed to delete");

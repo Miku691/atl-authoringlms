@@ -29,4 +29,8 @@ public class FeeDiscountDTO {
     private BigDecimal value;
 
     private String tenantId;
+
+    private String scope;
+
+    private java.util.List<String> applicableFeeHeadIds;
 }

@@ -58,4 +58,29 @@ public interface FinanceService {
      * @return map of ward IDs to their transactions
      */
     java.util.Map<String, List<TransactionDTO>> getWardsTransactions();
+    
+    /**
+     * Retrieves a list of defaulters (students with overdue fees).
+     * @param offeringId optional filter by offering
+     * @return list of defaulters
+     */
+    List<com.ims.finance.dto.DefaulterDTO> getDefaulters(String offeringId);
+
+    /**
+     * Retrieves all transactions for a specific day.
+     */
+    List<TransactionDTO> getDayBook(java.time.LocalDate date);
+
+    /**
+     * Retrieves students with outstanding (pending) fees.
+     */
+    List<com.ims.finance.dto.OutstandingFeeDTO> getOutstandingFees();
+
+    /**
+     * Retrieves an income vs expense report for an academic year.
+     */
+    com.ims.finance.dto.IncomeExpenseReportDTO getIncomeExpenseReport(String academicYear);
+    void bootstrapFeeHeads();
+    void bootstrapExpenseCategories();
+    java.util.Map<String, Boolean> getBulkSetupStatus();
 }

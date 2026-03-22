@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface DepartmentRepo extends JpaRepository<Department, String> {
     List<Department> findByTenantId(String tenantId);
+    boolean existsByTenantIdAndName(String tenantId, String name);
 }

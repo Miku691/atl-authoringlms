@@ -52,6 +52,16 @@ export interface Department {
     programIds: string[];
 }
 
+export interface GradingScale {
+    id?: string;
+    gradeLabel: string;
+    minPercentage: number;
+    maxPercentage: number;
+    gradePoint: number;
+    description: string;
+    tenantId: string;
+}
+
 export const academicService = {
     // Departments
     getDepartments: async () => {
@@ -224,18 +234,36 @@ export const academicService = {
         return response.data;
     },
 
-    createGradingScale: async (data: any) => {
-        const response = await api.post('/ims-academic-service/grading-scales', data);
+    createGradingScale: async (tenantId: string, data: GradingScale) => {
+        const response = await api.post(`/ims-academic-service/grading-scales/tenant/${tenantId}`, data);
         return response.data;
     },
 
-    updateGradingScale: async (id: string, data: any) => {
-        const response = await api.put(`/ims-academic-service/grading-scales/${id}`, data);
+    updateGradingScale: async (tenantId: string, id: string, data: Partial<GradingScale>) => {
+        const response = await api.put(`/ims-academic-service/grading-scales/tenant/${tenantId}/${id}`, data);
         return response.data;
     },
 
-    deleteGradingScale: async (id: string) => {
-        const response = await api.delete(`/ims-academic-service/grading-scales/${id}`);
+    deleteGradingScale: async (tenantId: string, id: string) => {
+        const response = await api.delete(`/ims-academic-service/grading-scales/tenant/${tenantId}/${id}`);
+        return response.data;
+    },
+
+    // Bulk Setup
+    setupSubjects: async (tenantId: string) => {
+        const response = await api.post(`/ims-academic-service/api/v1/academic/bulk-setup/subjects?tenantId=${tenantId}`);
+        return response.data;
+    },
+    setupGrading: async (tenantId: string) => {
+        const response = await api.post(`/ims-academic-service/api/v1/academic/bulk-setup/grading?tenantId=${tenantId}`);
+        return response.data;
+    },
+    setupDepartments: async (tenantId: string) => {
+        const response = await api.post(`/ims-academic-service/api/v1/academic/bulk-setup/departments?tenantId=${tenantId}`);
+        return response.data;
+    },
+    getBulkSetupStatus: async (tenantId: string) => {
+        const response = await api.get(`/ims-academic-service/api/v1/academic/bulk-setup/status?tenantId=${tenantId}`);
         return response.data;
     }
 };

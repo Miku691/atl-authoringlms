@@ -13,4 +13,7 @@ public class AtlSinginResponseDto {
     private String username;
     private String email;
     private boolean passwordResetRequired;
+    private String tenantId;
+    private String tenantName;
+    private String currency;
 }

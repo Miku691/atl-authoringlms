@@ -4,6 +4,8 @@ import com.ims.finance.dto.FeeHeadDTO;
 import com.ims.finance.entity.FeeHead;
 import com.ims.finance.exception.ResourceNotFoundException;
 import com.ims.finance.repository.FeeHeadRepository;
+import com.ims.finance.repository.FeeStructureRepository;
+import com.ims.finance.repository.StudentFeeRecordRepository;
 import com.ims.finance.service.FeeHeadService;
 import com.ims.finance.util.SecurityUtils;
 import org.modelmapper.ModelMapper;
@@ -19,10 +21,17 @@ import java.util.stream.Collectors;
 public class FeeHeadServiceImpl implements FeeHeadService {
 
     private final FeeHeadRepository feeHeadRepository;
+    private final FeeStructureRepository feeStructureRepository;
+    private final StudentFeeRecordRepository studentFeeRecordRepository;
     private final ModelMapper modelMapper;
 
-    public FeeHeadServiceImpl(FeeHeadRepository feeHeadRepository, ModelMapper modelMapper) {
+    public FeeHeadServiceImpl(FeeHeadRepository feeHeadRepository, 
+                             FeeStructureRepository feeStructureRepository,
+                             StudentFeeRecordRepository studentFeeRecordRepository,
+                             ModelMapper modelMapper) {
         this.feeHeadRepository = feeHeadRepository;
+        this.feeStructureRepository = feeStructureRepository;
+        this.studentFeeRecordRepository = studentFeeRecordRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -65,6 +74,12 @@ public class FeeHeadServiceImpl implements FeeHeadService {
     public void deleteFeeHead(String id) {
         FeeHead feeHead = feeHeadRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("id", id));
+
+        // Validation: Check if fee head is assigned to any structure or record
+        if (feeStructureRepository.existsByFeeHeadId(id) || studentFeeRecordRepository.existsByFeeHeadId(id)) {
+            throw new IllegalStateException("Cannot delete Fee Head as it is currently assigned to students or fee structures.");
+        }
+
         feeHeadRepository.delete(feeHead);
     }
 }

@@ -43,7 +43,20 @@ public class FeeDiscount {
     @Column(nullable = false)
     private String tenantId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DiscountScope scope = DiscountScope.GLOBAL;
+
+    @jakarta.persistence.ElementCollection(fetch = jakarta.persistence.FetchType.EAGER)
+    @jakarta.persistence.CollectionTable(name = "fee_discount_applicable_heads", joinColumns = @jakarta.persistence.JoinColumn(name = "discount_id"))
+    @Column(name = "fee_head_id")
+    private java.util.List<String> applicableFeeHeadIds;
+
     public enum DiscountType {
         PERCENTAGE, FIXED
+    }
+
+    public enum DiscountScope {
+        GLOBAL, SIBLING, MERIT, CUSTOM
     }
 }

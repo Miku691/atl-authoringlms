@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, CreditCard, IndianRupee, History, Download, ArrowRight, User, CheckCircle2, TrendingUp, BarChart3, Calendar, Filter } from 'lucide-react';
+import { Search, CreditCard, History, Download, ArrowRight, User, CheckCircle2, TrendingUp, BarChart3, Calendar, Filter } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { financeService, type CollectionSummary } from '../../../../api/financeService';
 import { studentService } from '../../../../api/studentService';
@@ -7,8 +7,11 @@ import type { StudentFeeRecord, PaymentMode, Transaction } from '../../../../typ
 import type { Student } from '../../../../api/studentService';
 import FloatingLabelInput from '../../../../components/common/FloatingLabelInput';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { useCurrency } from '../../../../context/CurrencyContext';
+import { getCurrencySymbol } from '../../../../utils/currency';
 
 const CollectionDeskPage: React.FC = () => {
+    const { format, currencyCode } = useCurrency();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [students, setStudents] = useState<Student[]>([]);
@@ -179,7 +182,7 @@ const CollectionDeskPage: React.FC = () => {
                             </div>
                             <div className="flex-1">
                                 <h2 className="text-lg font-bold text-gray-900">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
-                                <p className="text-xs text-gray-500">#{selectedStudent.admissionNo} • {selectedStudent.phone}</p>
+                                <p className="text-xs text-gray-500">#{selectedStudent.admissionNo} â€¢ {selectedStudent.phone}</p>
                             </div>
                             <button onClick={() => setSelectedStudent(null)} className="text-xs text-indigo-600 hover:underline font-medium">Change Student</button>
                         </div>
@@ -198,7 +201,7 @@ const CollectionDeskPage: React.FC = () => {
                                         required
                                         value={paymentData.amount}
                                         onChange={e => setPaymentData({ ...paymentData, amount: parseFloat(e.target.value) })}
-                                        icon={<IndianRupee className="w-4 h-4" />}
+                                        icon={<span>{getCurrencySymbol(currencyCode)}</span>}
                                     />
                                     <div className="space-y-1">
                                         <label className="text-xs font-semibold text-gray-500 uppercase px-1">Payment Mode</label>
@@ -235,9 +238,9 @@ const CollectionDeskPage: React.FC = () => {
                                             <div className="flex items-center gap-2 animate-in slide-in-from-right-2 duration-300">
                                                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Live Balance:</span>
                                                 <div className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black border border-orange-100 flex items-center gap-1">
-                                                    ₹{(ledger.find(r => r.id === paymentData.feeRecordIds[0])?.balance || 0) - paymentData.amount > 0
-                                                        ? ((ledger.find(r => r.id === paymentData.feeRecordIds[0])?.balance || 0) - paymentData.amount).toLocaleString()
-                                                        : '0 (FULLY PAID)'}
+                                                    {format((ledger.find(r => r.id === paymentData.feeRecordIds[0])?.balance || 0) - paymentData.amount > 0
+                                                        ? ((ledger.find(r => r.id === paymentData.feeRecordIds[0])?.balance || 0) - paymentData.amount)
+                                                        : 0)} {(ledger.find(r => r.id === paymentData.feeRecordIds[0])?.balance || 0) - paymentData.amount <= 0 && '(FULLY PAID)'}
                                                 </div>
                                             </div>
                                         )}
@@ -270,8 +273,8 @@ const CollectionDeskPage: React.FC = () => {
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-sm font-black text-gray-900">₹{record.balance.toLocaleString()}</p>
-                                                    <p className="text-[10px] text-gray-400 font-bold">Total: ₹{record.amountDue.toLocaleString()}</p>
+                                                    <p className="text-sm font-black text-gray-900">{format(record.balance)}</p>
+                                                    <p className="text-[10px] text-gray-400 font-bold">Total: {format(record.amountDue)}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -285,8 +288,8 @@ const CollectionDeskPage: React.FC = () => {
                                 >
                                     {isSubmitting ? 'Processing Payment...' : (
                                         <>
-                                            <IndianRupee className="w-6 h-6" />
-                                            Confirm Collection (₹{paymentData.amount.toLocaleString()})
+                                            <CreditCard className="w-6 h-6" />
+                                            Confirm Collection ({format(paymentData.amount)})
                                         </>
                                     )}
                                 </button>
@@ -313,7 +316,7 @@ const CollectionDeskPage: React.FC = () => {
                                         <div key={tx.id} className="p-4 hover:bg-gray-50 transition-colors group">
                                             <div className="flex justify-between items-start mb-1">
                                                 <div>
-                                                    <p className="text-sm font-bold text-gray-900">₹{tx.amount.toLocaleString()}</p>
+                                                    <p className="text-sm font-bold text-gray-900">{format(tx.amount)}</p>
                                                     <p className="text-[10px] text-gray-500 font-medium">{new Date(tx.transactionDate).toLocaleString()}</p>
                                                 </div>
                                                 <button
@@ -349,7 +352,7 @@ const CollectionDeskPage: React.FC = () => {
                                     <span className="text-xs font-black uppercase tracking-widest">Today's Collection</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl font-black text-gray-900">₹{summary.todayCollection.toLocaleString()}</span>
+                                    <span className="text-3xl font-black text-gray-900">{format(summary.todayCollection)}</span>
                                 </div>
                             </div>
                         </div>
@@ -364,7 +367,7 @@ const CollectionDeskPage: React.FC = () => {
                                     <span className="text-xs font-black uppercase tracking-widest">Monthly Collection</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl font-black text-gray-900">₹{summary.monthCollection.toLocaleString()}</span>
+                                    <span className="text-3xl font-black text-gray-900">{format(summary.monthCollection)}</span>
                                 </div>
                             </div>
                         </div>
@@ -379,7 +382,7 @@ const CollectionDeskPage: React.FC = () => {
                                     <span className="text-xs font-black uppercase tracking-widest">Yearly Collection</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl font-black text-gray-900">₹{summary.yearCollection.toLocaleString()}</span>
+                                    <span className="text-3xl font-black text-gray-900">{format(summary.yearCollection)}</span>
                                 </div>
                             </div>
                         </div>
@@ -417,12 +420,12 @@ const CollectionDeskPage: React.FC = () => {
                                             axisLine={false} 
                                             tickLine={false}
                                             tick={{ fill: '#9CA3AF', fontSize: 10, fontWeight: 700 }}
-                                            tickFormatter={(value) => `₹${value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value}`}
+                                            tickFormatter={(value) => `${getCurrencySymbol(currencyCode)}${value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value}`}
                                         />
                                         <Tooltip 
                                             cursor={{ fill: '#F3F4F6' }}
                                             contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                            formatter={(value: any) => [`₹${value.toLocaleString()}`, 'Collected']}
+                                            formatter={(value: any) => [format(value), 'Collected']}
                                         />
                                         <Bar dataKey="amount" fill="#4F46E5" radius={[6, 6, 0, 0]} barSize={40}>
                                             {Object.entries(summary.collectionByOffering).map((_, index) => (
@@ -458,7 +461,7 @@ const CollectionDeskPage: React.FC = () => {
                                                     {tx.paymentMode?.[0]}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-bold text-gray-900">₹{tx.amount.toLocaleString()}</p>
+                                                    <p className="text-sm font-bold text-gray-900">{format(tx.amount)}</p>
                                                     <p className="text-[10px] text-gray-500 font-medium uppercase tracking-tight">{tx.paymentMode} • {new Date(tx.transactionDate).toLocaleDateString()}</p>
                                                 </div>
                                             </div>
@@ -484,3 +487,9 @@ const CollectionDeskPage: React.FC = () => {
 };
 
 export default CollectionDeskPage;
+
+
+
+
+
+

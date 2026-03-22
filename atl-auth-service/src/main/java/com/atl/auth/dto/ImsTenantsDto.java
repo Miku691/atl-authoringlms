@@ -17,4 +17,5 @@ public class ImsTenantsDto {
     private String contactEmail;
     private String contactPhone;
     private Boolean isActive;
+    private String currency;
 }

@@ -13,4 +13,6 @@ public interface DemandNoteRepository extends JpaRepository<DemandNote, String> 
             DemandNote.DemandStatus status);
 
     List<DemandNote> findAllByTenantId(String tenantId);
+
+    java.util.Optional<DemandNote> findByStudentIdAndFeeHeadIdAndAcademicYearAndTenantId(String studentId, String feeHeadId, String academicYear, String tenantId);
 }

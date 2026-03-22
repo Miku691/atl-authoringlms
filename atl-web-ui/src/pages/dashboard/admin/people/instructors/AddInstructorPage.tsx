@@ -348,7 +348,7 @@ const AddInstructorPage: React.FC = () => {
                             ) : (
                                 <>
                                     <Save className="w-5 h-5" />
-                                    Confirm & Onboard Instructor
+                                    Confirm
                                 </>
                             )}
                         </button>

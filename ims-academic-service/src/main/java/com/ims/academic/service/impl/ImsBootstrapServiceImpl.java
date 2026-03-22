@@ -15,6 +15,13 @@ import com.ims.academic.service.ImsOfferingsService;
 import com.ims.academic.service.ImsProgramsService;
 import com.ims.academic.service.ImsClassesService;
 import com.ims.academic.service.ImsSectionsService;
+import com.ims.academic.repo.ImsSubjectsRepo;
+import com.ims.academic.repo.GradingScaleRepo;
+import com.ims.academic.repo.DepartmentRepo;
+import com.ims.academic.entity.ImsSubjects;
+import com.ims.academic.entity.GradingScale;
+import com.ims.academic.entity.Department;
+import com.ims.academic.enums.SubjectType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +38,9 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
     private final ImsSectionsService sectionsService;
     private final ImsProgramsRepo programsRepo;
     private final ImsOfferingsRepo offeringsRepo;
+    private final ImsSubjectsRepo subjectsRepo;
+    private final GradingScaleRepo gradingScaleRepo;
+    private final DepartmentRepo departmentRepo;
     private final com.ims.academic.service.AcademicSessionService sessionService;
 
     @Override
@@ -66,6 +76,86 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
         long programCount = programsRepo.countByTenantId(tenantId);
         long offeringCount = offeringsRepo.countByTenantId(tenantId);
         return programCount > 0 && offeringCount > 0;
+    }
+
+    @Override
+    @Transactional
+    public void bootstrapSubjects(String tenantId) {
+        String[][] defaultSubjects = {
+            {"MATH", "Mathematics"}, {"SCI", "Science"}, {"ENG", "English"},
+            {"PHY", "Physics"}, {"CHE", "Chemistry"}, {"BIO", "Biology"},
+            {"HIS", "History"}, {"GEO", "Geography"}, {"CS", "Computer Science"},
+            {"PE", "Physical Education"}
+        };
+
+        for (String[] sub : defaultSubjects) {
+            if (!subjectsRepo.existsByTenantIdAndCode(tenantId, sub[0])) {
+                ImsSubjects subject = ImsSubjects.builder()
+                        .tenantId(tenantId)
+                        .code(sub[0])
+                        .title(sub[1])
+                        .subjectType(SubjectType.THEORY)
+                        .build();
+                subjectsRepo.save(subject);
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void bootstrapGradingScales(String tenantId) {
+        Object[][] defaultScales = {
+            {"A+", 90.0, 100.0, 4.0, "Excellent"},
+            {"A", 80.0, 89.9, 3.7, "Very Good"},
+            {"B+", 70.0, 79.9, 3.3, "Good"},
+            {"B", 60.0, 69.9, 3.0, "Above Average"},
+            {"C", 50.0, 59.9, 2.0, "Average"},
+            {"D", 40.0, 49.9, 1.0, "Pass"},
+            {"F", 0.0, 39.9, 0.0, "Fail"}
+        };
+
+        for (Object[] scale : defaultScales) {
+            if (!gradingScaleRepo.existsByTenantIdAndGradeLabel(tenantId, (String) scale[0])) {
+                GradingScale gs = GradingScale.builder()
+                        .tenantId(tenantId)
+                        .gradeLabel((String) scale[0])
+                        .minPercentage((Double) scale[1])
+                        .maxPercentage((Double) scale[2])
+                        .gradePoint((Double) scale[3])
+                        .description((String) scale[4])
+                        .build();
+                gradingScaleRepo.save(gs);
+            }
+        }
+    }
+
+    @Override
+    @Transactional
+    public void bootstrapDepartments(String tenantId) {
+        String[][] defaultDepts = {
+            {"ACAD", "Academics"}, {"ADMIN", "Administration"},
+            {"SPORTS", "Sports"}, {"SCI", "Science"}, {"HUM", "Humanities"}
+        };
+
+        for (String[] dept : defaultDepts) {
+            if (!departmentRepo.existsByTenantIdAndName(tenantId, dept[1])) {
+                Department d = Department.builder()
+                        .tenantId(tenantId)
+                        .code(dept[0])
+                        .name(dept[1])
+                        .build();
+                departmentRepo.save(d);
+            }
+        }
+    }
+
+    @Override
+    public java.util.Map<String, Boolean> getBulkSetupStatus(String tenantId) {
+        java.util.Map<String, Boolean> status = new java.util.HashMap<>();
+        status.put("subjects", !subjectsRepo.findByTenantId(tenantId).isEmpty());
+        status.put("grading", !gradingScaleRepo.findByTenantId(tenantId).isEmpty());
+        status.put("departments", !departmentRepo.findByTenantId(tenantId).isEmpty());
+        return status;
     }
 
     private void setupSchool(BootstrapReqDto req) {

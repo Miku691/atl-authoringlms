@@ -25,6 +25,8 @@ public class StudentFeeRecordDTO {
     private BigDecimal amountPaid;
     private BigDecimal balance;
     private LocalDate dueDate;
+    private BigDecimal lateFeeAmount;
+    private Boolean lateFeeApplied;
     private FeeStatus status;
     private String tenantId;
 }

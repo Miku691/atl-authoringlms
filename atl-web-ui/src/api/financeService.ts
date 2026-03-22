@@ -5,7 +5,12 @@ import type {
     FeeDiscount,
     LateFeeRule,
     CollectPaymentRequest,
-    RefundRequest
+    RefundRequest,
+    FeeInstallmentPlan,
+    FeeInstallmentSchedule,
+    ExpenseCategory,
+    Expense,
+    Budget
 } from '../types/finance';
 
 export interface Transaction {
@@ -20,6 +25,9 @@ export interface CollectionSummary {
     collectionByOffering: Record<string, number>;
     offeringNames: Record<string, string>;
     recentTransactions: Transaction[];
+    pendingReceivables: number;
+    monthlyTrend: { month: string; income: number; expense: number }[];
+    feeDistribution: { name: string; value: number }[];
 }
 
 const BASE_URL = '/ims-finance-service/api/v1/finance';
@@ -93,25 +101,20 @@ export const financeService = {
         return response.data.apiData;
     },
 
-    // Late Fee Rules
-    getLateFeeRules: async () => {
-        const response = await api.get(`${BASE_URL}/late-fee-rules`);
+    // Student Fee Concessions
+    grantConcession: async (data: any) => {
+        const response = await api.post(`${BASE_URL}/concessions`, data);
         return response.data.apiData;
     },
 
-    createLateFeeRule: async (data: LateFeeRule) => {
-        const response = await api.post(`${BASE_URL}/late-fee-rules`, data);
+    getConcessionsByStudent: async (studentId: string) => {
+        const response = await api.get(`${BASE_URL}/concessions/student/${studentId}`);
         return response.data.apiData;
     },
 
-    updateLateFeeRule: async (id: string, data: Partial<LateFeeRule>) => {
-        const response = await api.put(`${BASE_URL}/late-fee-rules/${id}`, data);
-        return response.data.apiData;
-    },
-
-    deleteLateFeeRule: async (id: string) => {
-        const response = await api.delete(`${BASE_URL}/late-fee-rules/${id}`);
-        return response.data.apiData;
+    revokeConcession: async (id: string) => {
+        const response = await api.delete(`${BASE_URL}/concessions/${id}/revoke`);
+        return response.data;
     },
 
     // Student Ledger
@@ -133,7 +136,7 @@ export const financeService = {
     },
 
     bulkAllocateFees: async (offeringId: string, academicYear: string) => {
-        const response = await api.post(`/ims-finance-service/ledger/bulk-allocate?offeringId=${offeringId}&academicYear=${academicYear}`);
+        const response = await api.post(`${BASE_URL}/ledger/bulk-allocate?offeringId=${offeringId}&academicYear=${academicYear}`);
         return response.data;
     },
 
@@ -208,9 +211,144 @@ export const financeService = {
         return response.data.apiData;
     },
 
-    // Collection Summary for Dashboard
     getCollectionSummary: async () => {
         const response = await api.get(`${BASE_URL}/stats/collection-summary`);
         return response.data.apiData;
     },
+
+    // Installment Plans
+    createInstallmentPlan: async (data: Partial<FeeInstallmentPlan>) => {
+        const response = await api.post(`${BASE_URL}/installment-plans`, data);
+        return response.data.apiData;
+    },
+
+    getInstallmentPlansByOffering: async (offeringId: string) => {
+        const response = await api.get(`${BASE_URL}/installment-plans/offering/${offeringId}`);
+        return response.data.apiData;
+    },
+
+    getInstallmentPlanById: async (planId: string) => {
+        const response = await api.get(`${BASE_URL}/installment-plans/${planId}`);
+        return response.data.apiData;
+    },
+
+    addSchedulesToPlan: async (planId: string, schedules: Partial<FeeInstallmentSchedule>[]) => {
+        const response = await api.post(`${BASE_URL}/installment-plans/${planId}/schedules`, schedules);
+        return response.data.apiData;
+    },
+
+    deleteInstallmentPlan: async (planId: string) => {
+        const response = await api.delete(`${BASE_URL}/installment-plans/${planId}`);
+        return response.data.apiData;
+    },
+
+    // Late Fee Rules
+    getLateFeeRules: async () => {
+        const response = await api.get(`${BASE_URL}/late-fee-rules`);
+        return response.data.apiData;
+    },
+
+    createLateFeeRule: async (data: LateFeeRule) => {
+        const response = await api.post(`${BASE_URL}/late-fee-rules`, data);
+        return response.data.apiData;
+    },
+
+    updateLateFeeRule: async (id: string, data: Partial<LateFeeRule>) => {
+        const response = await api.put(`${BASE_URL}/late-fee-rules/${id}`, data);
+        return response.data.apiData;
+    },
+
+    deleteLateFeeRule: async (id: string) => {
+        const response = await api.delete(`${BASE_URL}/late-fee-rules/${id}`);
+        return response.data.apiData;
+    },
+
+    // Reports
+    getDefaulters: async (offeringId?: string) => {
+        const url = offeringId ? `${BASE_URL}/stats/defaulters?offeringId=${offeringId}` : `${BASE_URL}/stats/defaulters`;
+        const response = await api.get(url);
+        return response.data.apiData;
+    },
+
+    // Expenses
+    getExpenseCategories: async () => {
+        const response = await api.get(`${BASE_URL}/expenses/categories`);
+        return response.data.apiData;
+    },
+
+    createExpenseCategory: async (data: ExpenseCategory) => {
+        const response = await api.post(`${BASE_URL}/expenses/categories`, data);
+        return response.data.apiData;
+    },
+
+    deleteExpenseCategory: async (id: string) => {
+        const response = await api.delete(`${BASE_URL}/expenses/categories/${id}`);
+        return response.data;
+    },
+
+    getExpenses: async () => {
+        const response = await api.get(`${BASE_URL}/expenses`);
+        return response.data.apiData;
+    },
+
+    recordExpense: async (data: Expense) => {
+        const response = await api.post(`${BASE_URL}/expenses`, data);
+        return response.data.apiData;
+    },
+
+    deleteExpense: async (id: string) => {
+        const response = await api.delete(`${BASE_URL}/expenses/${id}`);
+        return response.data;
+    },
+
+    // Budgets
+    getBudgets: async (academicYear: string) => {
+        const response = await api.get(`${BASE_URL}/budgets?academicYear=${academicYear}`);
+        return response.data.apiData;
+    },
+
+    saveBudget: async (data: Budget) => {
+        const response = await api.post(`${BASE_URL}/budgets`, data);
+        return response.data.apiData;
+    },
+
+    getBudgetReport: async (academicYear: string) => {
+        const response = await api.get(`${BASE_URL}/budgets/report?academicYear=${academicYear}`);
+        return response.data.apiData;
+    },
+
+    deleteBudget: async (id: string) => {
+        const response = await api.delete(`${BASE_URL}/budgets/${id}`);
+        return response.data;
+    },
+
+    // Advanced Reports
+    getDayBook: async (date: string) => {
+        const response = await api.get(`${BASE_URL}/reports/day-book?date=${date}`);
+        return response.data.apiData;
+    },
+
+    getOutstandingFees: async () => {
+        const response = await api.get(`${BASE_URL}/reports/outstanding`);
+        return response.data.apiData;
+    },
+
+    getIncomeExpenseReport: async (academicYear: string) => {
+        const response = await api.get(`${BASE_URL}/reports/income-expense?academicYear=${academicYear}`);
+        return response.data.apiData;
+    },
+
+    // Bulk Setup
+    getBulkSetupStatus: async () => {
+        const response = await api.get(`/ims-finance-service/api/v1/finance/bulk-setup/status`);
+        return response.data;
+    },
+    setupFeeHeads: async () => {
+        const response = await api.post(`/ims-finance-service/api/v1/finance/bulk-setup/fee-heads`);
+        return response.data;
+    },
+    setupExpenseCategories: async () => {
+        const response = await api.post(`/ims-finance-service/api/v1/finance/bulk-setup/expense-categories`);
+        return response.data;
+    }
 };

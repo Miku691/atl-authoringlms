@@ -1,50 +1,42 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Trash2, Edit, Percent, DollarSign as DollarIcon, Clock } from 'lucide-react';
+import { Plus, Trash2, Edit, Percent, DollarSign as DollarIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { financeService } from '../../../../api/financeService';
-import type { FeeHead, FeeDiscount, LateFeeRule } from '../../../../types/finance';
+import type { FeeHead, FeeDiscount } from '../../../../types/finance';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 import FloatingLabelInput from '../../../../components/common/FloatingLabelInput';
 
 const FeeConfigPage: React.FC = () => {
-    const [activeTab, setActiveTab] = useState<'HEADS' | 'DISCOUNTS' | 'RULES'>('HEADS');
     const [loading, setLoading] = useState(false);
 
     // Data lists
     const [feeHeads, setFeeHeads] = useState<FeeHead[]>([]);
     const [discounts, setDiscounts] = useState<FeeDiscount[]>([]);
-    const [rules, setRules] = useState<LateFeeRule[]>([]);
 
     // Modals
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState<{ type: string; id: string; name: string } | null>(null);
+    const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string } | null>(null);
 
     // Form states
-    const [newFeeHead, setNewFeeHead] = useState<Partial<FeeHead>>({ name: '', description: '' });
-    const [newDiscount, setNewDiscount] = useState<Partial<FeeDiscount>>({ name: '', type: 'PERCENTAGE', value: 0 });
-    const [newRule, setNewRule] = useState<Partial<LateFeeRule>>({ name: '', type: 'FIXED', value: 0, gracePeriodDays: 0 });
+    const [newDiscount, setNewDiscount] = useState<Partial<FeeDiscount>>({ name: '', type: 'PERCENTAGE', value: 0, scope: 'GLOBAL', applicableFeeHeadIds: [] });
 
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingId, setEditingId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchData();
-    }, [activeTab]);
+    }, []);
 
     const fetchData = async () => {
         setLoading(true);
         try {
-            if (activeTab === 'HEADS') {
-                const data = await financeService.getFeeHeads();
-                setFeeHeads(data);
-            } else if (activeTab === 'DISCOUNTS') {
-                const data = await financeService.getFeeDiscounts();
-                setDiscounts(data);
-            } else if (activeTab === 'RULES') {
-                const data = await financeService.getLateFeeRules();
-                setRules(data);
-            }
+            const [data, headsData] = await Promise.all([
+                financeService.getFeeDiscounts(),
+                financeService.getFeeHeads()
+            ]);
+            setDiscounts(data);
+            setFeeHeads(headsData);
         } catch (error) {
             toast.error("Failed to fetch configuration");
         } finally {
@@ -52,50 +44,30 @@ const FeeConfigPage: React.FC = () => {
         }
     };
 
-    const handleEdit = (type: 'HEAD' | 'DISCOUNT' | 'RULE', item: any) => {
+    const handleEdit = (item: FeeDiscount) => {
         setIsEditMode(true);
-        setEditingId(item.id);
-        if (type === 'HEAD') {
-            setNewFeeHead({ name: item.name, description: item.description });
-        } else if (type === 'DISCOUNT') {
-            setNewDiscount({ name: item.name, type: item.type, value: item.value });
-        } else if (type === 'RULE') {
-            setNewRule({ name: item.name, type: item.type, value: item.value, gracePeriodDays: item.gracePeriodDays });
-        }
+        setEditingId(item.id!);
+        setNewDiscount({ 
+            name: item.name, 
+            type: item.type, 
+            value: item.value, 
+            scope: item.scope || 'GLOBAL', 
+            applicableFeeHeadIds: item.applicableFeeHeadIds || [] 
+        });
         setIsCreateModalOpen(true);
     };
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            if (activeTab === 'HEADS') {
-                if (isEditMode && editingId) {
-                    await financeService.updateFeeHead(editingId, newFeeHead as FeeHead);
-                    toast.success("Fee Head updated");
-                } else {
-                    await financeService.createFeeHead(newFeeHead as FeeHead);
-                    toast.success("Fee Head created");
-                }
-                setNewFeeHead({ name: '', description: '' });
-            } else if (activeTab === 'DISCOUNTS') {
-                if (isEditMode && editingId) {
-                    await financeService.updateFeeDiscount(editingId, newDiscount as FeeDiscount);
-                    toast.success("Discount updated");
-                } else {
-                    await financeService.createFeeDiscount(newDiscount as FeeDiscount);
-                    toast.success("Discount created");
-                }
-                setNewDiscount({ name: '', type: 'PERCENTAGE', value: 0 });
-            } else if (activeTab === 'RULES') {
-                if (isEditMode && editingId) {
-                    await financeService.updateLateFeeRule(editingId, newRule as LateFeeRule);
-                    toast.success("Rule updated");
-                } else {
-                    await financeService.createLateFeeRule(newRule as LateFeeRule);
-                    toast.success("Rule created");
-                }
-                setNewRule({ name: '', type: 'FIXED', value: 0, gracePeriodDays: 0 });
+            if (isEditMode && editingId) {
+                await financeService.updateFeeDiscount(editingId, newDiscount as FeeDiscount);
+                toast.success("Discount updated");
+            } else {
+                await financeService.createFeeDiscount(newDiscount as FeeDiscount);
+                toast.success("Discount created");
             }
+            setNewDiscount({ name: '', type: 'PERCENTAGE', value: 0, scope: 'GLOBAL', applicableFeeHeadIds: [] });
             setIsCreateModalOpen(false);
             setIsEditMode(false);
             setEditingId(null);
@@ -105,19 +77,16 @@ const FeeConfigPage: React.FC = () => {
         }
     };
 
-    const confirmDelete = (type: string, id: string, name: string) => {
-        setItemToDelete({ type, id, name });
+    const confirmDelete = (id: string, name: string) => {
+        setItemToDelete({ id, name });
         setIsDeleteModalOpen(true);
     };
 
     const handleDelete = async () => {
         if (!itemToDelete) return;
         try {
-            if (itemToDelete.type === 'HEAD') await financeService.deleteFeeHead(itemToDelete.id);
-            else if (itemToDelete.type === 'DISCOUNT') await financeService.deleteFeeDiscount(itemToDelete.id);
-            else if (itemToDelete.type === 'RULE') await financeService.deleteLateFeeRule(itemToDelete.id);
-
-            toast.success("Item deleted");
+            await financeService.deleteFeeDiscount(itemToDelete.id);
+            toast.success("Discount deleted");
             setIsDeleteModalOpen(false);
             fetchData();
         } catch (error) {
@@ -129,38 +98,21 @@ const FeeConfigPage: React.FC = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Finance Configuration</h1>
-                    <p className="text-sm text-gray-500">Manage fee heads, discounts, and late fee policies.</p>
+                    <h1 className="text-2xl font-bold text-gray-900">Fee Discounts</h1>
+                    <p className="text-sm text-gray-500">Manage scholarship, sibling, and merit-based discounts.</p>
                 </div>
                 <button
                     onClick={() => {
                         setIsEditMode(false);
                         setEditingId(null);
-                        setNewFeeHead({ name: '', description: '' });
-                        setNewDiscount({ name: '', type: 'PERCENTAGE', value: 0 });
-                        setNewRule({ name: '', type: 'FIXED', value: 0, gracePeriodDays: 0 });
+                        setNewDiscount({ name: '', type: 'PERCENTAGE', value: 0, scope: 'GLOBAL', applicableFeeHeadIds: [] });
                         setIsCreateModalOpen(true);
                     }}
                     className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
                 >
                     <Plus className="w-4 h-4" />
-                    Add {activeTab === 'HEADS' ? 'Fee Head' : activeTab === 'DISCOUNTS' ? 'Discount' : 'Rule'}
+                    Add Discount
                 </button>
-            </div>
-
-            {/* Tabs */}
-            <div className="flex gap-4 border-b border-gray-200">
-                {(['HEADS', 'DISCOUNTS', 'RULES'] as const).map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`pb-3 px-2 text-sm font-medium transition-colors relative ${activeTab === tab ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-700'
-                            }`}
-                    >
-                        {tab.charAt(0) + tab.slice(1).toLowerCase()}
-                        {activeTab === tab && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-indigo-600" />}
-                    </button>
-                ))}
             </div>
 
             {/* Content Table */}
@@ -169,10 +121,9 @@ const FeeConfigPage: React.FC = () => {
                     <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
                         <tr>
                             <th className="px-6 py-3 font-medium">Name</th>
-                            {activeTab !== 'HEADS' && <th className="px-6 py-3 font-medium">Type</th>}
-                            {activeTab !== 'HEADS' && <th className="px-6 py-3 font-medium">Value</th>}
-                            {activeTab === 'RULES' && <th className="px-6 py-3 font-medium">Grace Period</th>}
-                            {activeTab === 'HEADS' && <th className="px-6 py-3 font-medium">Description</th>}
+                            <th className="px-6 py-3 font-medium">Type</th>
+                            <th className="px-6 py-3 font-medium">Value</th>
+                            <th className="px-6 py-3 font-medium">Scope</th>
                             <th className="px-6 py-3 font-medium text-right">Actions</th>
                         </tr>
                     </thead>
@@ -181,53 +132,26 @@ const FeeConfigPage: React.FC = () => {
                             <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Loading...</td></tr>
                         ) : (
                             <>
-                                {activeTab === 'HEADS' && feeHeads.map(head => (
-                                    <tr key={head.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{head.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-500">{head.description || '-'}</td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <button onClick={() => handleEdit('HEAD', head)} className="text-indigo-600 hover:bg-indigo-50 p-1 rounded"><Edit className="w-4 h-4" /></button>
-                                                <button onClick={() => confirmDelete('HEAD', head.id!, head.name)} className="text-red-600 hover:bg-red-50 p-1 rounded"><Trash2 className="w-4 h-4" /></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {activeTab === 'DISCOUNTS' && discounts.map(d => (
+                                {discounts.map(d => (
                                     <tr key={d.id} className="hover:bg-gray-50">
                                         <td className="px-6 py-4 text-sm font-medium text-gray-900">{d.name}</td>
                                         <td className="px-6 py-4 text-sm text-gray-500">{d.type}</td>
                                         <td className="px-6 py-4 text-sm text-gray-900 font-mono">
                                             {d.type === 'PERCENTAGE' ? `${d.value}%` : `₹${d.value}`}
                                         </td>
+                                        <td className="px-6 py-4 text-sm text-gray-500 uppercase tracking-tight font-bold">{d.scope || 'GLOBAL'}</td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2">
-                                                <button onClick={() => handleEdit('DISCOUNT', d)} className="text-indigo-600 hover:bg-indigo-50 p-1 rounded"><Edit className="w-4 h-4" /></button>
-                                                <button onClick={() => confirmDelete('DISCOUNT', d.id!, d.name)} className="text-red-600 hover:bg-red-50 p-1 rounded"><Trash2 className="w-4 h-4" /></button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {activeTab === 'RULES' && rules.map(r => (
-                                    <tr key={r.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{r.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-500">{r.type}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900 font-mono">
-                                            {r.type === 'PERCENTAGE' ? `${r.value}%` : `₹${r.value}`}
-                                        </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500">{r.gracePeriodDays} Days</td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <button onClick={() => handleEdit('RULE', r)} className="text-indigo-600 hover:bg-indigo-50 p-1 rounded"><Edit className="w-4 h-4" /></button>
-                                                <button onClick={() => confirmDelete('RULE', r.id!, r.name)} className="text-red-600 hover:bg-red-50 p-1 rounded"><Trash2 className="w-4 h-4" /></button>
+                                                <button onClick={() => handleEdit(d)} className="text-indigo-600 hover:bg-indigo-50 p-1 rounded"><Edit className="w-4 h-4" /></button>
+                                                <button onClick={() => confirmDelete(d.id!, d.name)} className="text-red-600 hover:bg-red-50 p-1 rounded"><Trash2 className="w-4 h-4" /></button>
                                             </div>
                                         </td>
                                     </tr>
                                 ))}
                             </>
                         )}
-                        {!loading && ((activeTab === 'HEADS' && feeHeads.length === 0) || (activeTab === 'DISCOUNTS' && discounts.length === 0) || (activeTab === 'RULES' && rules.length === 0)) && (
-                            <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">No items found.</td></tr>
+                        {!loading && discounts.length === 0 && (
+                            <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">No discounts found.</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -238,49 +162,55 @@ const FeeConfigPage: React.FC = () => {
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Edit' : 'New'} {activeTab === 'HEADS' ? 'Fee Head' : activeTab === 'DISCOUNTS' ? 'Discount' : 'Late Fee Rule'}</h2>
+                            <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Edit' : 'New'} Discount</h2>
                         </div>
                         <form onSubmit={handleCreate} className="p-6 space-y-4">
-                            {activeTab === 'HEADS' && (
-                                <>
-                                    <FloatingLabelInput label="Fee Head Name" required value={newFeeHead.name} onChange={e => setNewFeeHead({ ...newFeeHead, name: e.target.value })} icon={<Plus className="w-4 h-4" />} />
-                                    <FloatingLabelInput label="Description" value={newFeeHead.description} onChange={e => setNewFeeHead({ ...newFeeHead, description: e.target.value })} />
-                                </>
-                            )}
-                            {activeTab === 'DISCOUNTS' && (
-                                <>
-                                    <FloatingLabelInput label="Discount Name" required value={newDiscount.name} onChange={e => setNewDiscount({ ...newDiscount, name: e.target.value })} />
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-xs font-semibold text-gray-500 uppercase px-1">Type</label>
-                                            <select className="w-full p-3 border rounded-lg" value={newDiscount.type} onChange={e => setNewDiscount({ ...newDiscount, type: e.target.value as any })}>
-                                                <option value="PERCENTAGE">Percentage</option>
-                                                <option value="FIXED">Fixed Amount</option>
-                                            </select>
-                                        </div>
-                                        <FloatingLabelInput label="Value" type="number" required value={newDiscount.value} onChange={e => setNewDiscount({ ...newDiscount, value: parseFloat(e.target.value) })} icon={newDiscount.type === 'PERCENTAGE' ? <Percent className="w-4 h-4" /> : <DollarIcon className="w-4 h-4" />} />
-                                    </div>
-                                </>
-                            )}
-                            {activeTab === 'RULES' && (
-                                <>
-                                    <FloatingLabelInput label="Rule Name" required value={newRule.name} onChange={e => setNewRule({ ...newRule, name: e.target.value })} />
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-xs font-semibold text-gray-500 uppercase px-1">Penalty Type</label>
-                                            <select className="w-full p-3 border rounded-lg" value={newRule.type} onChange={e => setNewRule({ ...newRule, type: e.target.value as any })}>
-                                                <option value="FIXED">Fixed Amount</option>
-                                                <option value="PERCENTAGE">Percentage</option>
-                                            </select>
-                                        </div>
-                                        <FloatingLabelInput label="Value" type="number" required value={newRule.value} onChange={e => setNewRule({ ...newRule, value: parseFloat(e.target.value) })} icon={newRule.type === 'PERCENTAGE' ? <Percent className="w-4 h-4" /> : <DollarIcon className="w-4 h-4" />} />
-                                    </div>
-                                    <FloatingLabelInput label="Grace Period (Days)" type="number" required value={newRule.gracePeriodDays} onChange={e => setNewRule({ ...newRule, gracePeriodDays: parseInt(e.target.value) })} icon={<Clock className="w-4 h-4" />} />
-                                </>
-                            )}
+                            <FloatingLabelInput label="Discount Name" required value={newDiscount.name} onChange={e => setNewDiscount({ ...newDiscount, name: e.target.value })} />
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-gray-500 uppercase px-1">Type</label>
+                                    <select className="w-full p-3 border rounded-lg text-sm" value={newDiscount.type} onChange={e => setNewDiscount({ ...newDiscount, type: e.target.value as any })}>
+                                        <option value="PERCENTAGE">Percentage</option>
+                                        <option value="FIXED">Fixed Amount</option>
+                                    </select>
+                                </div>
+                                <FloatingLabelInput label="Value" type="number" required value={newDiscount.value} onChange={e => setNewDiscount({ ...newDiscount, value: parseFloat(e.target.value) || 0 })} icon={newDiscount.type === 'PERCENTAGE' ? <Percent className="w-4 h-4" /> : <DollarIcon className="w-4 h-4" />} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="text-xs font-semibold text-gray-500 uppercase px-1">Scope</label>
+                                    <select className="w-full p-3 bg-white border border-gray-200 rounded-lg outline-none text-sm" value={newDiscount.scope || 'GLOBAL'} onChange={e => setNewDiscount({ ...newDiscount, scope: e.target.value as any })}>
+                                        <option value="GLOBAL">Global (All)</option>
+                                        <option value="SIBLING">Sibling Discount</option>
+                                        <option value="MERIT">Merit / Scholarship</option>
+                                        <option value="CUSTOM">Custom</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="border border-gray-200 rounded-lg p-4 space-y-2">
+                                <label className="text-xs font-semibold text-gray-500 uppercase">Applicable Fee Heads <span className="text-[10px] lowercase font-normal">(Leave empty for all)</span></label>
+                                <div className="max-h-32 overflow-y-auto space-y-2">
+                                    {feeHeads.map(head => (
+                                        <label key={head.id} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50 p-1 rounded transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+                                                checked={newDiscount.applicableFeeHeadIds?.includes(head.id!) || false}
+                                                onChange={(e) => {
+                                                    const newHeads = e.target.checked
+                                                        ? [...(newDiscount.applicableFeeHeadIds || []), head.id!]
+                                                        : (newDiscount.applicableFeeHeadIds || []).filter(id => id !== head.id);
+                                                    setNewDiscount({ ...newDiscount, applicableFeeHeadIds: newHeads });
+                                                }}
+                                            />
+                                            {head.name}
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
                             <div className="flex justify-end gap-3 pt-4 border-t mt-4">
-                                <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Save Config</button>
+                                <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium">Cancel</button>
+                                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-bold shadow-lg shadow-indigo-100">Save Discount</button>
                             </div>
                         </form>
                     </div>

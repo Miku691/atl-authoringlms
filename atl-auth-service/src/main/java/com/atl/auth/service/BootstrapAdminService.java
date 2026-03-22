@@ -52,7 +52,7 @@ public class BootstrapAdminService {
                                 .message(ApplicationConstant.API_SIGNUP_SUCCESS_MSG)
                                 .status(ApplicationConstant.API_SUCCESS)
                                 .statusCode(HttpStatus.OK.value())
-                                .apiData(new AtlSinginResponseDto(saved.getUsername(), maskedEmail, false))
+                                .apiData(new AtlSinginResponseDto(saved.getUsername(), maskedEmail, false, null, null, null))
                                 .build();
 
                 /*

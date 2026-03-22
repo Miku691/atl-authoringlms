@@ -48,6 +48,9 @@ public class ImsTenants {
     @Column(name = "type")
     private com.atl.auth.enums.TenantType type;
 
+    @Column(name = "currency")
+    private String currency;
+
     @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<AtlUser> users = new ArrayList<>();
 

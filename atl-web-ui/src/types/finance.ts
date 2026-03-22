@@ -24,6 +24,18 @@ export interface FeeDiscount {
     type: DiscountType;
     value: number;
     tenantId?: string;
+    scope?: 'GLOBAL' | 'SIBLING' | 'MERIT' | 'CUSTOM';
+    applicableFeeHeadIds?: string[];
+}
+
+export interface StudentFeeConcession {
+    id?: string;
+    studentId: string;
+    feeDiscountId: string;
+    academicYear: string;
+    status?: string;
+    remarks?: string;
+    tenantId?: string;
 }
 
 export interface LateFeeRule {
@@ -45,9 +57,12 @@ export interface StudentFeeRecord {
     amountDue: number;
     amountPaid: number;
     balance: number;
+    lateFeeAmount?: number;
+    lateFeeApplied?: boolean;
     dueDate: string;
     status: FeeStatus;
     tenantId: string;
+    installmentScheduleId?: string;
 }
 
 export interface Transaction {
@@ -67,6 +82,7 @@ export interface CollectPaymentRequest {
     paymentMode: PaymentMode;
     referenceNumber?: string;
     feeRecordIds?: string[];
+    waiveLateFee?: boolean;
 }
 
 export interface RefundRequest {
@@ -111,3 +127,83 @@ export interface DemandNote {
     status: 'PENDING' | 'PAID' | 'PARTIAL';
     tenantId?: string;
 }
+
+export interface FeeInstallmentSchedule {
+    id?: string;
+    feeHeadId: string;
+    feeHeadName?: string;
+    installmentNumber: number;
+    amount: number;
+    dueDate: string;
+}
+
+export interface FeeInstallmentPlan {
+    id?: string;
+    name: string;
+    description?: string;
+    offeringId: string;
+    academicYear: string;
+    schedules?: FeeInstallmentSchedule[];
+}
+
+export interface DefaulterDTO {
+    studentId: string;
+    studentName: string;
+    offeringId: string;
+    offeringName?: string;
+    totalOverdue: number;
+    totalLateFee: number;
+    overdueInstallmentsCount: number;
+    earliestDueDate: string;
+}
+
+export interface ExpenseCategory {
+    id?: string;
+    name: string;
+    description?: string;
+    tenantId?: string;
+}
+
+export interface Expense {
+    id?: string;
+    categoryId: string;
+    categoryName?: string;
+    amount: number;
+    description: string;
+    expenseDate: string;
+    paymentMethod: string;
+    referenceNo?: string;
+    tenantId?: string;
+}
+
+export interface Budget {
+    id?: string;
+    categoryId: string;
+    categoryName?: string;
+    allocatedAmount: number;
+    actualSpend?: number;
+    academicYear: string;
+    tenantId?: string;
+}
+
+export interface OutstandingFee {
+    studentId: string;
+    studentName: string;
+    enrollmentId: string;
+    offeringId: string;
+    offeringName?: string;
+    totalAllocated: number;
+    totalPaid: number;
+    totalOverdue: number;
+    balance: number;
+}
+
+export interface IncomeExpenseReport {
+    academicYear: string;
+    totalIncome: number;
+    totalExpense: number;
+    netProfit: number;
+    incomeByCategory: Record<string, number>;
+    expenseByCategory: Record<string, number>;
+}
+

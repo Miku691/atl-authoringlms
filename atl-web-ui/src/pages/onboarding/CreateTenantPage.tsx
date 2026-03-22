@@ -25,7 +25,10 @@ interface TenantDto {
     contactPhone: string;
     isActive: boolean;
     bootstrapUsername: string;
+    currency: string;
 }
+
+import { CURRENCIES } from '../../utils/currency';
 
 const CreateTenantPage: React.FC = () => {
     const navigate = useNavigate();
@@ -40,6 +43,7 @@ const CreateTenantPage: React.FC = () => {
         contactEmail: user?.username || '',
         countryCode: '+91',
         contactPhone: '',
+        currency: 'INR',
     });
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -90,6 +94,7 @@ const CreateTenantPage: React.FC = () => {
                 contactPhone: `${formData.countryCode}${formData.contactPhone}`,
                 isActive: true,
                 bootstrapUsername: user?.username || '',
+                currency: formData.currency,
             };
 
             const response = await api.post('/atl-auth-service/tenants', payload);
@@ -210,6 +215,22 @@ const CreateTenantPage: React.FC = () => {
                                 icon={<Mail className="h-5 w-5" />}
                                 error={errors.contactEmail}
                             />
+
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-1">
+                                    Functional Currency
+                                </label>
+                                <select
+                                    name="currency"
+                                    value={formData.currency}
+                                    onChange={handleChange}
+                                    className="block w-full px-3 py-[15px] border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 sm:text-sm transition-all bg-white h-[54px]"
+                                >
+                                    {CURRENCIES.map(c => (
+                                        <option key={c.code} value={c.code}>{c.label}</option>
+                                    ))}
+                                </select>
+                            </div>
 
                             <div>
                                 <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-1">

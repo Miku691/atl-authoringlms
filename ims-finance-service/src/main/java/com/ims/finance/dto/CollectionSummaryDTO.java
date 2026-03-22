@@ -19,4 +19,7 @@ public class CollectionSummaryDTO {
     private Map<String, BigDecimal> collectionByOffering; // OfferingId -> Amount
     private Map<String, String> offeringNames; // OfferingId -> Name
     private List<TransactionDTO> recentTransactions;
+    private BigDecimal pendingReceivables;
+    private List<Map<String, Object>> monthlyTrend;
+    private List<Map<String, Object>> feeDistribution;
 }

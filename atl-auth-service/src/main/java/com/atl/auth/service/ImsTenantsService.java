@@ -63,12 +63,13 @@ public class ImsTenantsService {
         ImsTenants existing = repo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tenant not found"));
 
-        existing.setTenantName(dto.getTenantName());
-        existing.setTenantCode(dto.getTenantCode());
-        existing.setAddress(dto.getAddress());
-        existing.setContactEmail(dto.getContactEmail());
-        existing.setContactPhone(dto.getContactPhone());
-        existing.setIsActive(dto.getIsActive());
+        if (dto.getTenantName() != null) existing.setTenantName(dto.getTenantName());
+        if (dto.getTenantCode() != null) existing.setTenantCode(dto.getTenantCode());
+        if (dto.getAddress() != null) existing.setAddress(dto.getAddress());
+        if (dto.getContactEmail() != null) existing.setContactEmail(dto.getContactEmail());
+        if (dto.getContactPhone() != null) existing.setContactPhone(dto.getContactPhone());
+        if (dto.getIsActive() != null) existing.setIsActive(dto.getIsActive());
+        if (dto.getCurrency() != null) existing.setCurrency(dto.getCurrency());
 
         ImsTenants updated = repo.save(existing);
         return convertToDto(updated);

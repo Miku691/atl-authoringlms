@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, Trash2, Search, Layers, IndianRupee, Calendar } from 'lucide-react';
+import { Plus, Trash2, Search, Layers, Calendar } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../../store/store';
@@ -8,8 +8,11 @@ import { academicService, type ImsOffering } from '../../../../api/academicServi
 import type { FeeHead, FeeStructure } from '../../../../types/finance';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 import FloatingLabelInput from '../../../../components/common/FloatingLabelInput';
+import { useCurrency } from '../../../../context/CurrencyContext';
+import { getCurrencySymbol } from '../../../../utils/currency';
 
 const FeeStructurePage: React.FC = () => {
+    const { format, currencyCode } = useCurrency();
     const { user } = useSelector((state: RootState) => state.auth);
     const [structures, setStructures] = useState<FeeStructure[]>([]);
     const [feeHeads, setFeeHeads] = useState<FeeHead[]>([]);
@@ -184,7 +187,7 @@ const FeeStructurePage: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-700">{getHeadName(s.feeHeadId)}</td>
                                         <td className="px-6 py-4 text-sm text-gray-500 font-mono">{s.academicYear}</td>
-                                        <td className="px-6 py-4 text-sm text-right font-bold text-gray-900">₹{s.amount.toLocaleString()}</td>
+                                        <td className="px-6 py-4 text-sm text-right font-bold text-gray-900">{format(s.amount)}</td>
                                         <td className="px-6 py-4 text-right">
                                             <button onClick={() => { setItemToDelete(s); setIsDeleteModalOpen(true); }} className="text-red-600 hover:bg-red-50 p-1 rounded">
                                                 <Trash2 className="w-4 h-4" />
@@ -227,7 +230,7 @@ const FeeStructurePage: React.FC = () => {
                                     })}
                                 </select>
                             </div>
-                            <FloatingLabelInput label="Amount" type="number" required value={newStructure.amount} onChange={e => setNewStructure({ ...newStructure, amount: parseFloat(e.target.value) })} icon={<IndianRupee className="w-4 h-4" />} />
+                            <FloatingLabelInput label="Amount" type="number" required value={newStructure.amount} onChange={e => setNewStructure({ ...newStructure, amount: parseFloat(e.target.value) })} icon={<span>{getCurrencySymbol(currencyCode)}</span>} />
                             <FloatingLabelInput label="Academic Year" placeholder="e.g. 2024-25" required value={newStructure.academicYear} onChange={e => setNewStructure({ ...newStructure, academicYear: e.target.value })} icon={<Calendar className="w-4 h-4" />} />
 
                             <div className="flex justify-end gap-3 pt-4 border-t">

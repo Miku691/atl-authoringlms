@@ -11,7 +11,6 @@ import {
     ShieldCheck,
     Calendar,
     FileText,
-    CreditCard,
     Briefcase,
     UserCircle,
     Layers,
@@ -19,7 +18,15 @@ import {
     Clock,
     Megaphone,
     Bell,
-    Calculator
+    Calculator,
+    AlertTriangle,
+    ShoppingBag,
+    Tag,
+    PieChart,
+    Target,
+    Package,
+    Truck,
+    Banknote
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -109,13 +116,6 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             setupRequired: true
         },
         {
-            path: '/setup',
-            label: 'Setup & Config',
-            icon: Settings,
-            roles: ['SUPER_ADMIN', 'TENANT_ADMIN'],
-            condition: (user) => !user.tenantSetupCompleted || !isReady, // Visible if setup incomplete OR not ready
-        },
-        {
             path: '/academics',
             label: 'Academics',
             icon: BookOpen,
@@ -193,10 +193,33 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             roles: ['TENANT_ADMIN', 'ACCOUNTANT'],
             setupRequired: true,
             subItems: [
+                { path: '/finance/dashboard', label: 'Finance Dashboard', icon: LayoutDashboard, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+                { path: '/finance/fee-heads', label: 'Fee Heads', icon: Tag, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+                { path: '/finance/late-fee-rules', label: 'Late Fee Policies', icon: Clock, roles: ['TENANT_ADMIN'] },
                 { path: '/finance/config', label: 'Financial Masters', icon: Settings, roles: ['TENANT_ADMIN'] },
                 { path: '/finance/structure', label: 'Fee Structure', icon: FileText, roles: ['TENANT_ADMIN'] },
-                { path: '/finance/collections', label: 'Collections', icon: CreditCard, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
-                { path: '/finance/ledger', label: 'Student Ledger', icon: Layers, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+                { path: '/finance/installment-plans', label: 'Installment Plans', icon: Calendar, roles: ['TENANT_ADMIN'] },
+                { path: '/finance/collection-desk', label: 'Collection Desk', icon: Banknote, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+                { path: '/finance/ledger', label: 'Student Ledgers', icon: Users, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+                { path: '/finance/defaulters', label: 'Defaulters', icon: AlertTriangle, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+                { path: '/finance/expenses', label: 'Expenses', icon: ShoppingBag, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+                { path: '/finance/expense-categories', label: 'Expense Categories', icon: Tag, roles: ['TENANT_ADMIN'] },
+                { path: '/finance/budgets', label: 'Budgets', icon: Target, roles: ['TENANT_ADMIN'] },
+                { path: '/finance/budget-analysis', label: 'Budget Analysis', icon: PieChart, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+                { path: '/finance/reports', label: 'Advanced Reports', icon: BarChart3, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+            ]
+        },
+        {
+            path: '/inventory',
+            label: 'Inventory & Assets',
+            icon: Package,
+            roles: ['TENANT_ADMIN', 'INVENTORY_MANAGER'],
+            setupRequired: true,
+            subItems: [
+                { path: '/inventory/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+                { path: '/inventory/stock', label: 'Stock Management', icon: ShoppingBag },
+                { path: '/inventory/assets', label: 'Asset Register', icon: Briefcase },
+                { path: '/inventory/suppliers', label: 'Suppliers', icon: Truck },
             ]
         },
         {
@@ -240,9 +263,11 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             icon: ShieldCheck,
             roles: ['SUPER_ADMIN', 'TENANT_ADMIN'],
             subItems: [
+                { path: '/system/setup-master', label: 'Setup Master', icon: Settings, roles: ['TENANT_ADMIN'] },
                 { path: '/system/users', label: 'User Management', icon: Users },
                 { path: '/system/roles', label: 'Role Management', icon: ShieldCheck },
                 { path: '/system/fee-allocation', label: 'Bulk Fee Allocation', icon: Calculator },
+                { path: '/setup', label: 'Setup & Config', icon: Settings, roles: ['SUPER_ADMIN', 'TENANT_ADMIN'], condition: (user: any) => !user.tenantSetupCompleted || !isReady },
                 { path: '/system/audit', label: 'Audit Logs', icon: FileText },
             ]
         }

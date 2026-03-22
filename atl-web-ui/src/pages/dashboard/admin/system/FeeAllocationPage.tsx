@@ -180,7 +180,7 @@ const FeeAllocationPage: React.FC = () => {
                             </li>
                             <li className="flex gap-3">
                                 <div className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0">3</div>
-                                <p className="text-xs text-gray-600 leading-relaxed">System fetches all students and creates ledger entries for each fee head in the structure.</p>
+                                <p className="text-xs text-gray-600 leading-relaxed">System creates ledger entries for each fee head in the structure, splitting them proportionally if an Installment Plan is defined.</p>
                             </li>
                         </ul>
                     </div>

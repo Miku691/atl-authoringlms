@@ -33,12 +33,19 @@ const authSlice = createSlice({
         },
         updateSetupStatus: (state, action: PayloadAction<boolean>) => {
             if (state.user) {
+                // @ts-ignore - tenantSetupCompleted might be added back or handled differently
                 state.user.tenantSetupCompleted = action.payload;
+                localStorage.setItem('user', JSON.stringify(state.user));
+            }
+        },
+        updateCurrency: (state, action: PayloadAction<string>) => {
+            if (state.user) {
+                state.user.currency = action.payload;
                 localStorage.setItem('user', JSON.stringify(state.user));
             }
         },
     },
 });
 
-export const { loginSuccess, logout, updateUserTenant, updateSetupStatus } = authSlice.actions;
+export const { loginSuccess, logout, updateUserTenant, updateSetupStatus, updateCurrency } = authSlice.actions;
 export default authSlice.reducer;

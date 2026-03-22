@@ -43,6 +43,20 @@ public class FinanceController {
     }
 
     /**
+     * Retrieves a list of defaulters (students with overdue fees).
+     *
+     * @param offeringId optional filter by offering ID
+     * @return list of defaulter summaries
+     */
+    @GetMapping("/stats/defaulters")
+    @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'ACCOUNTANT')")
+    public ResponseEntity<ApiResponse<List<com.ims.finance.dto.DefaulterDTO>>> getDefaulters(
+            @RequestParam(required = false) String offeringId) {
+        return ResponseEntity.ok(ApiResponse.success("Defaulters fetched successfully",
+                financeService.getDefaulters(offeringId)));
+    }
+
+    /**
      * Collects a payment from a student.
      *
      * @param collectPaymentDTO payment details
@@ -128,5 +142,37 @@ public class FinanceController {
         return new ResponseEntity<>(
                 ApiResponse.success(HttpStatus.OK.value(), "Refund processed successfully", processed),
                 HttpStatus.OK);
+    }
+
+    /**
+     * Retrieves all transactions for a specific day.
+     */
+    @GetMapping("/reports/day-book")
+    @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'ACCOUNTANT')")
+    public ResponseEntity<ApiResponse<List<TransactionDTO>>> getDayBook(
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate date) {
+        return ResponseEntity.ok(ApiResponse.success("Day book fetched successfully",
+                financeService.getDayBook(date)));
+    }
+
+    /**
+     * Retrieves students with outstanding fees.
+     */
+    @GetMapping("/reports/outstanding")
+    @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'ACCOUNTANT')")
+    public ResponseEntity<ApiResponse<List<com.ims.finance.dto.OutstandingFeeDTO>>> getOutstandingFees() {
+        return ResponseEntity.ok(ApiResponse.success("Outstanding fees report fetched successfully",
+                financeService.getOutstandingFees()));
+    }
+
+    /**
+     * Retrieves an income vs expense report.
+     */
+    @GetMapping("/reports/income-expense")
+    @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'ACCOUNTANT')")
+    public ResponseEntity<ApiResponse<com.ims.finance.dto.IncomeExpenseReportDTO>> getIncomeExpenseReport(
+            @RequestParam String academicYear) {
+        return ResponseEntity.ok(ApiResponse.success("Income-Expense report fetched successfully",
+                financeService.getIncomeExpenseReport(academicYear)));
     }
 }

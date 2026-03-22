@@ -36,8 +36,10 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
     @Override
     public ImsInstructorsDto create(ImsInstructorsDto dto) {
 
-        if (repo.existsByUserId(dto.getUserId())) {
-            throw new ResourceAlreadyExistException(dto.getUserId(), "INSTRUCTOR", "User ID");
+        if(dto.getUserId() != null){
+            if (repo.existsByUserId(dto.getUserId())) {
+                throw new ResourceAlreadyExistException(dto.getUserId(), "INSTRUCTOR", "User ID");
+            }
         }
 
         ImsInstructors saved = repo.save(toEntity(dto));

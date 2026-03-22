@@ -120,9 +120,13 @@ public class AtlUserService {
             // .apiData(new AtlSinginResponseDto(user.getUsername(), maskedEmail))
             // .build();
 
+            String tenantId = user.getTenant() != null ? user.getTenant().getId() : null;
+            String tenantName = user.getTenant() != null ? user.getTenant().getTenantName() : null;
+            String currency = user.getTenant() != null ? user.getTenant().getCurrency() : null;
+
             return ApiResponse.success(HttpStatus.OK.value(),
                     ApplicationConstant.API_LOGIN_SUCCESS_MSG,
-                    new AtlSinginResponseDto(user.getUsername(), maskedEmail, user.isPasswordResetRequired()));
+                    new AtlSinginResponseDto(user.getUsername(), maskedEmail, user.isPasswordResetRequired(), tenantId, tenantName, currency));
 
         } catch (BadCredentialsException e) {
             throw new CustomUnauthorizedException("Invalid username or password");

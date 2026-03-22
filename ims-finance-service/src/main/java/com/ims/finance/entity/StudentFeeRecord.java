@@ -52,6 +52,12 @@ public class StudentFeeRecord {
     @Column(nullable = false)
     private BigDecimal balance;
 
+    @Column(nullable = false)
+    private BigDecimal lateFeeAmount = BigDecimal.ZERO; // Phase 12
+
+    @Column(nullable = false)
+    private Boolean lateFeeApplied = false; // Phase 12
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private FeeStatus status; // PAID, PARTIAL, UNPAID

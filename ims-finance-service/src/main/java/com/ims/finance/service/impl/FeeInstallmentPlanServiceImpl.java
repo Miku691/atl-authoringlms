@@ -79,6 +79,7 @@ public class FeeInstallmentPlanServiceImpl implements FeeInstallmentPlanService 
             schedule.setInstallmentNumber(req.getInstallmentNumber());
             schedule.setAmount(req.getAmount());
             schedule.setDueDate(req.getDueDate());
+            schedule.setLateFeeRuleId(req.getLateFeeRuleId()); // Phase 12
             schedule.setTenantId(tenantId);
             return schedule;
         }).collect(Collectors.toList());
@@ -115,6 +116,7 @@ public class FeeInstallmentPlanServiceImpl implements FeeInstallmentPlanService 
                     .installmentNumber(schedule.getInstallmentNumber())
                     .amount(schedule.getAmount())
                     .dueDate(schedule.getDueDate())
+                    .lateFeeRuleId(schedule.getLateFeeRuleId()) // Phase 12
                     .build();
         }).collect(Collectors.toList());
 

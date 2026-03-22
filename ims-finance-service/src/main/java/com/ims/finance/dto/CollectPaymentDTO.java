@@ -35,4 +35,9 @@ public class CollectPaymentDTO {
      * If null or empty, payment will be applied to the oldest records first (FIFO).
      */
     private List<String> feeRecordIds;
+
+    /**
+     * Whether to waive the applied late fee for the targeted fee records.
+     */
+    private Boolean waiveLateFee;
 }

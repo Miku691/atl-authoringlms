@@ -44,6 +44,9 @@ public class FeeInstallmentSchedule {
     @Column(nullable = false)
     private LocalDate dueDate;
 
+    @Column(nullable = true)
+    private String lateFeeRuleId; // Reference to a LateFeeRule (Phase 12)
+
     @Column(nullable = false)
     private String tenantId;
 }

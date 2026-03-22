@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Calculator, Calendar, IdCard, Smartphone, HelpCircle, FileText, Clock, Users, ArrowRight, IndianRupee } from 'lucide-react';
+import { useCurrency } from '../../../../context/CurrencyContext';
+import { getCurrencySymbol } from '../../../../utils/currency';
+import { Search, Calculator, Calendar, IdCard, Smartphone, HelpCircle, FileText, Clock, Users, ArrowRight, Tag, Shield } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../../store/store';
 import { financeService } from '../../../../api/financeService';
 import { studentService } from '../../../../api/studentService';
-import type { StudentFeeRecord, DemandNote } from '../../../../types/finance';
+import type { StudentFeeRecord, DemandNote, FeeDiscount, StudentFeeConcession } from '../../../../types/finance';
 import { academicService, type ImsOffering } from '../../../../api/academicService';
 import FloatingLabelInput from '../../../../components/common/FloatingLabelInput';
+
 
 interface Student {
     id: string;
@@ -27,6 +30,7 @@ interface Guardian {
 }
 
 const StudentLedgerPage: React.FC = () => {
+    const { format, currencyCode } = useCurrency();
     const { user } = useSelector((state: RootState) => state.auth);
     const isAdmin = user?.roles?.includes('TENANT_ADMIN');
 
@@ -38,6 +42,17 @@ const StudentLedgerPage: React.FC = () => {
     const [guardians, setGuardians] = useState<Guardian[]>([]);
     const [activeOffering, setActiveOffering] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
+
+    // Concession States
+    const [concessions, setConcessions] = useState<StudentFeeConcession[]>([]);
+    const [feeDiscounts, setFeeDiscounts] = useState<FeeDiscount[]>([]);
+    const [isConcessionModalOpen, setIsConcessionModalOpen] = useState(false);
+    const [concessionData, setConcessionData] = useState({
+        feeDiscountId: '',
+        academicYear: new Date().getFullYear().toString() + '-' + (new Date().getFullYear() + 1).toString().slice(-2),
+        remarks: ''
+    });
+    const [isAssigningConcession, setIsAssigningConcession] = useState(false);
 
     // Allocation States
     const [isAllocateModalOpen, setIsAllocateModalOpen] = useState(false);
@@ -108,15 +123,19 @@ const StudentLedgerPage: React.FC = () => {
     const fetchLedger = async (studentId: string) => {
         setIsLoading(true);
         try {
-            const [ledgerData, enrollmentData, guardianData, demandData] = await Promise.all([
+            const [ledgerData, enrollmentData, guardianData, demandData, concessionDataRes, discountData] = await Promise.all([
                 financeService.getStudentLedger(studentId),
                 studentService.getStudentEnrollments(studentId),
                 studentService.getStudentGuardians(studentId),
-                financeService.getStudentDemandNotes(studentId)
+                financeService.getStudentDemandNotes(studentId),
+                financeService.getConcessionsByStudent(studentId),
+                financeService.getFeeDiscounts()
             ]);
             setLedger(ledgerData);
             setGuardians(guardianData.apiData || []);
             setDemandNotes(demandData || []);
+            setConcessions(concessionDataRes || []);
+            setFeeDiscounts(discountData || []);
 
             // Auto-detect active offering
             const activeEnrollment = enrollmentData.apiData?.find((e: any) => e.status === 'ACTIVE') || enrollmentData.apiData?.[0];
@@ -145,6 +164,37 @@ const StudentLedgerPage: React.FC = () => {
         setStudents([]);
         setSearchTerm('');
         fetchLedger(student.id);
+    };
+
+    const handleAssignConcession = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!selectedStudent) return;
+        setIsAssigningConcession(true);
+        try {
+            await financeService.grantConcession({
+                studentId: selectedStudent.id,
+                ...concessionData
+            });
+            toast.success('Concession assigned successfully');
+            setIsConcessionModalOpen(false);
+            setConcessionData({ feeDiscountId: '', academicYear: allocationData.academicYear, remarks: '' });
+            fetchLedger(selectedStudent.id);
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || 'Failed to assign concession');
+        } finally {
+            setIsAssigningConcession(false);
+        }
+    };
+
+    const handleRevokeConcession = async (id: string) => {
+        if (!window.confirm("Are you sure you want to revoke this concession? This won't affect past fee records automatically.")) return;
+        try {
+            await financeService.revokeConcession(id);
+            toast.success("Concession revoked");
+            fetchLedger(selectedStudent!.id);
+        } catch (error: any) {
+            toast.error("Failed to revoke concession");
+        }
     };
 
     const handleAllocate = async (e: React.FormEvent) => {
@@ -256,7 +306,7 @@ const StudentLedgerPage: React.FC = () => {
                     {/* Search Results Dropdown */}
                     {students.length > 0 && (
                         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                            {students.map(s => (
+                            {students.map((s: any) => (
                                 <button
                                     key={s.id}
                                     className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 border-b last:border-0"
@@ -318,6 +368,13 @@ const StudentLedgerPage: React.FC = () => {
                             {isAdmin && (
                                 <>
                                     <button
+                                        onClick={() => setIsConcessionModalOpen(true)}
+                                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors shadow-sm"
+                                    >
+                                        <Tag className="w-4 h-4" />
+                                        Assign Concession
+                                    </button>
+                                    <button
                                         onClick={() => setIsDemandModalOpen(true)}
                                         className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-sm"
                                     >
@@ -355,6 +412,7 @@ const StudentLedgerPage: React.FC = () => {
                                         <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
                                             <tr>
                                                 <th className="px-6 py-3 text-left font-semibold tracking-wider">Fee Head</th>
+                                                <th className="px-6 py-3 text-left font-semibold tracking-wider">Due Date</th>
                                                 <th className="px-6 py-3 text-left font-semibold tracking-wider">Amount</th>
                                                 <th className="px-6 py-3 text-left font-semibold tracking-wider">Paid</th>
                                                 <th className="px-6 py-3 text-left font-semibold tracking-wider">Balance</th>
@@ -364,30 +422,33 @@ const StudentLedgerPage: React.FC = () => {
                                         <tbody className="bg-white divide-y divide-gray-200">
                                             {isLoading ? (
                                                 <tr>
-                                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500">Loading records...</td>
+                                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500">Loading records...</td>
                                                 </tr>
                                             ) : ledger.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={5} className="px-6 py-8 text-center text-gray-500 flex flex-col items-center gap-2">
+                                                    <td colSpan={6} className="px-6 py-8 text-center text-gray-500 flex flex-col items-center gap-2">
                                                         <HelpCircle className="w-8 h-8 text-gray-300" />
                                                         No fee records found for this student.
                                                     </td>
                                                 </tr>
                                             ) : (
-                                                ledger.map((record) => (
+                                                ledger.map((record: any) => (
                                                     <tr key={record.id} className="hover:bg-gray-50 transition-colors">
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <div className="text-sm font-medium text-gray-900">{record.feeHeadName}</div>
                                                             <div className="text-xs text-gray-500">{record.academicYear}</div>
                                                         </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                            {new Date(record.dueDate).toLocaleDateString()}
+                                                        </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">
-                                                            ₹{record.amountDue.toLocaleString()}
+                                                            {format(record.amountDue)}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">
-                                                            ₹{record.amountPaid.toLocaleString()}
+                                                            {format(record.amountPaid)}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-bold">
-                                                            ₹{record.balance.toLocaleString()}
+                                                            {format(record.balance)}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusStyle(record.status)}`}>
@@ -419,7 +480,7 @@ const StudentLedgerPage: React.FC = () => {
                                             No billing notes generated yet.
                                         </div>
                                     ) : (
-                                        demandNotes.map((note) => (
+                                        demandNotes.map((note: any) => (
                                             <div key={note.id} className="p-4 border border-gray-100 rounded-xl hover:border-indigo-200 transition-colors bg-white shadow-sm ring-1 ring-gray-900/5">
                                                 <div className="flex justify-between items-start mb-2">
                                                     <div>
@@ -439,7 +500,7 @@ const StudentLedgerPage: React.FC = () => {
                                                         </div>
                                                     </div>
                                                     <div className="flex flex-col items-end gap-2">
-                                                        <p className="text-lg font-black text-indigo-600">₹{note.amount.toLocaleString()}</p>
+                                                        <p className="text-lg font-black text-indigo-600">{format(note.amount)}</p>
                                                         {note.status !== 'PAID' && (
                                                             <button
                                                                 onClick={() => openPayModal(note)}
@@ -452,6 +513,51 @@ const StudentLedgerPage: React.FC = () => {
                                                 </div>
                                             </div>
                                         ))
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Applied Concessions */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                <div className="px-6 py-4 border-b border-gray-200 bg-amber-50/50 flex justify-between items-center">
+                                    <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                                        <Tag className="w-4 h-4 text-amber-600" />
+                                        Active Concessions
+                                    </h3>
+                                </div>
+                                <div className="p-4 space-y-4 max-h-[300px] overflow-y-auto">
+                                    {concessions.filter(c => c.status === 'ACTIVE').length === 0 ? (
+                                        <div className="text-center py-8 text-gray-500 italic text-sm">
+                                            No active concessions.
+                                        </div>
+                                    ) : (
+                                        concessions.filter(c => c.status === 'ACTIVE').map((con: any) => {
+                                            const discount = feeDiscounts.find(d => d.id === con.feeDiscountId);
+                                            return (
+                                                <div key={con.id} className="p-4 border border-amber-100 rounded-xl bg-gradient-to-br from-amber-50/30 to-white shadow-sm ring-1 ring-amber-900/5">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <p className="text-sm font-bold text-gray-900">{discount?.name || 'Unknown Discount'}</p>
+                                                            <p className="text-[10px] text-gray-500 uppercase font-semibold">{con.academicYear}</p>
+                                                        </div>
+                                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-amber-100 text-amber-800">
+                                                            {discount?.type === 'PERCENTAGE' ? `${discount.value}% OFF` : `${format(discount?.value || 0)} OFF`}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between items-end mt-2">
+                                                        <p className="text-xs text-gray-600 italic max-w-[70%] line-clamp-2">{con.remarks || 'No remarks provided'}</p>
+                                                        {isAdmin && (
+                                                            <button
+                                                                onClick={() => handleRevokeConcession(con.id!)}
+                                                                className="text-xs text-red-600 hover:text-red-800 font-semibold"
+                                                            >
+                                                                Revoke
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })
                                     )}
                                 </div>
                             </div>
@@ -486,7 +592,7 @@ const StudentLedgerPage: React.FC = () => {
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-gray-500 uppercase px-1">Academic Offering</label>
                                 <div className="w-full p-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 font-medium flex justify-between items-center">
-                                    <span>{offerings.find(o => o.id === allocationData.offeringId)?.name || 'Not Enrolled'}</span>
+                                    <span>{offerings.find((o: any) => o.id === allocationData.offeringId)?.name || 'Not Enrolled'}</span>
                                     <span className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded uppercase">Auto-detected</span>
                                 </div>
                                 <p className="text-[10px] text-gray-400 px-1 mt-1">Fee allocation is based on the student's current enrollment.</p>
@@ -556,13 +662,13 @@ const StudentLedgerPage: React.FC = () => {
                                     }}
                                 >
                                     <option value="">Select Fee Head</option>
-                                    {ledger.map(record => (
+                                    {ledger.map((record: any) => (
                                         <option
                                             key={record.feeHeadId}
                                             value={record.feeHeadId}
                                             disabled={record.balance <= 0}
                                         >
-                                            {record.feeHeadName} (Bal: ₹{record.balance}){record.balance <= 0 ? ' - FULLY PAID' : ''}
+                                            {record.feeHeadName} (Bal: {format(record.balance)}){record.balance <= 0 ? ' - FULLY PAID' : ''}
                                         </option>
                                     ))}
                                 </select>
@@ -584,7 +690,7 @@ const StudentLedgerPage: React.FC = () => {
                                 required
                                 value={demandData.amount}
                                 onChange={e => setDemandData({ ...demandData, amount: parseFloat(e.target.value) })}
-                                icon={<span>₹</span>}
+                                icon={<span>{getCurrencySymbol(currencyCode)}</span>}
                             />
 
                             <FloatingLabelInput
@@ -630,7 +736,7 @@ const StudentLedgerPage: React.FC = () => {
                     <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all scale-100">
                         <div className="p-6 border-b border-gray-200 bg-indigo-50">
                             <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                <IndianRupee className="w-5 h-5 text-indigo-600" />
+                                <span>{getCurrencySymbol(currencyCode)}</span>
                                 Pay Monthly Bill
                             </h3>
                             <p className="text-xs text-gray-500 mt-1">Collect payment for {selectedNote.billingMonth}</p>
@@ -642,7 +748,7 @@ const StudentLedgerPage: React.FC = () => {
                                     <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Bill Balance</span>
                                     <span className="text-xs font-bold text-indigo-600 uppercase">{selectedNote.feeHeadName}</span>
                                 </div>
-                                <div className="text-2xl font-black text-gray-900">₹{selectedNote.balance.toLocaleString()}</div>
+                                <div className="text-2xl font-black text-gray-900">{format(selectedNote.balance)}</div>
                             </div>
 
                             <FloatingLabelInput
@@ -651,7 +757,7 @@ const StudentLedgerPage: React.FC = () => {
                                 required
                                 value={payData.amount}
                                 onChange={e => setPayData({ ...payData, amount: parseFloat(e.target.value) })}
-                                icon={<span>₹</span>}
+                                icon={<span>{getCurrencySymbol(currencyCode)}</span>}
                             />
 
                             <div className="space-y-1">
@@ -702,8 +808,80 @@ const StudentLedgerPage: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            {/* Assign Concession Modal */}
+            {isConcessionModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+                        <div className="p-6 border-b border-gray-200 bg-amber-50">
+                            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                <Shield className="w-5 h-5 text-amber-600" />
+                                Assign Fee Concession
+                            </h3>
+                            <p className="text-xs text-gray-500 mt-1">Apply a discount rule to this student. The discount will be applied during the next fee allocation.</p>
+                        </div>
+
+                        <form onSubmit={handleAssignConcession} className="p-6 space-y-4">
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-gray-500 uppercase px-1">Discount Rule</label>
+                                <select
+                                    className="block w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-amber-500 focus:border-amber-500 sm:text-sm"
+                                    required
+                                    value={concessionData.feeDiscountId}
+                                    onChange={e => setConcessionData({ ...concessionData, feeDiscountId: e.target.value })}
+                                >
+                                    <option value="">Select Discount</option>
+                                    {feeDiscounts.map((discount: any) => (
+                                        <option key={discount.id} value={discount.id}>
+                                            {discount.name} ({discount.type === 'PERCENTAGE' ? `${discount.value}%` : `₹${discount.value}`}) - {discount.scope}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <FloatingLabelInput
+                                label="Academic Year"
+                                required
+                                value={concessionData.academicYear}
+                                onChange={e => setConcessionData({ ...concessionData, academicYear: e.target.value })}
+                                icon={<Calendar className="w-4 h-4" />}
+                            />
+
+                            <FloatingLabelInput
+                                label="Remarks / Reason"
+                                placeholder="Why is this concession applied?"
+                                value={concessionData.remarks}
+                                onChange={e => setConcessionData({ ...concessionData, remarks: e.target.value })}
+                            />
+
+                            <div className="bg-blue-50 border border-blue-200 p-3 rounded-lg text-xs text-blue-800 flex gap-2">
+                                <HelpCircle className="w-5 h-5 shrink-0" />
+                                <p>Concessions automatically adjust the due amount for applicable fee heads when "Allocate Fees" or "Bulk Fee Allocation" is run.</p>
+                            </div>
+
+                            <div className="flex justify-end gap-3 pt-4 border-t">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsConcessionModalOpen(false)}
+                                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg font-medium"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={isAssigningConcession || !concessionData.feeDiscountId}
+                                    className="px-6 py-2 bg-amber-600 text-white rounded-lg font-bold hover:bg-amber-700 disabled:opacity-50 flex items-center gap-2 shadow-lg transition-all"
+                                >
+                                    {isAssigningConcession ? 'Assigning...' : 'Assign Concession'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
 export default StudentLedgerPage;
+

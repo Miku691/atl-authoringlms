@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface FeeHeadRepository extends JpaRepository<FeeHead, String> {
     List<FeeHead> findAllByTenantId(String tenantId);
+    boolean existsByTenantIdAndName(String tenantId, String name);
 }

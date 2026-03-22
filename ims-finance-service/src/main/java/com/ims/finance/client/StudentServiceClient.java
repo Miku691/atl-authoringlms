@@ -12,6 +12,9 @@ public interface StudentServiceClient {
     @GetMapping("/students/user/{userId}")
     com.ims.finance.util.ApiResponse<StudentResponse> getStudentByUserId(@PathVariable("userId") String userId);
 
+    @GetMapping("/students/{id}")
+    com.ims.finance.util.ApiResponse<StudentResponse> getStudentById(@PathVariable("id") String id);
+
     @GetMapping("/students/profile/resolve")
     com.ims.finance.util.ApiResponse<StudentResponse> getStudentByEmail(
             @org.springframework.web.bind.annotation.RequestParam("email") String email,
@@ -31,6 +34,7 @@ public interface StudentServiceClient {
         private String userId;
         private String firstName;
         private String lastName;
+        private String enrollmentId;
         private String tenantId;
     }
 }

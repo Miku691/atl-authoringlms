@@ -23,9 +23,26 @@ import AddInstructorPage from './pages/dashboard/admin/people/instructors/AddIns
 import AddStaffPage from './pages/dashboard/admin/users/AddStaffPage';
 import FeeConfigPage from './pages/dashboard/admin/finance/FeeConfigPage';
 import FeeStructurePage from './pages/dashboard/admin/finance/FeeStructurePage';
+import InstallmentPlansPage from './pages/dashboard/admin/finance/InstallmentPlansPage';
 import StudentLedgerPage from './pages/dashboard/admin/finance/StudentLedgerPage';
 import CollectionDeskPage from './pages/dashboard/admin/finance/CollectionDeskPage';
+import { DefaultersPage } from './pages/dashboard/admin/finance/DefaultersPage';
+import { ExpenseEntryPage } from './pages/dashboard/admin/finance/ExpenseEntryPage';
+import { ExpenseCategoryPage } from './pages/dashboard/admin/finance/ExpenseCategoryPage';
+import { BudgetPage } from './pages/dashboard/admin/finance/BudgetPage';
+import { BudgetReportPage } from './pages/dashboard/admin/finance/BudgetReportPage';
+import { FinancialReportsPage } from './pages/dashboard/admin/finance/FinancialReportsPage';
+import FinanceDashboardPage from './pages/dashboard/admin/finance/FinanceDashboardPage';
+import LateFeeRulesPage from './pages/dashboard/admin/finance/LateFeeRulesPage';
+import ConcessionWorkflowPage from './pages/dashboard/admin/finance/ConcessionWorkflowPage';
+import InventoryDashboardPage from './pages/dashboard/admin/inventory/InventoryDashboardPage';
+import StockManagementPage from './pages/dashboard/admin/inventory/StockManagementPage';
+import AssetRegisterPage from './pages/dashboard/admin/inventory/AssetRegisterPage';
+import SupplierManagementPage from './pages/dashboard/admin/inventory/SupplierManagementPage';
 import FeeAllocationPage from './pages/dashboard/admin/system/FeeAllocationPage';
+import { CurrencyProvider } from './context/CurrencyContext';
+import FeeHeadManagementPage from './pages/dashboard/admin/finance/FeeHeadManagementPage';
+import SetupMasterPage from './pages/dashboard/admin/system/SetupMasterPage';
 
 // ... (existing imports)
 
@@ -116,8 +133,9 @@ const DashboardWrapper = () => {
 const App: React.FC = () => {
   return (
     <Provider store={store}>
-      <Toaster position="top-right" reverseOrder={false} />
-      <Router>
+      <CurrencyProvider>
+        <Toaster position="top-right" reverseOrder={false} />
+        <Router>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/otp" element={<OtpPage />} />
@@ -182,11 +200,29 @@ const App: React.FC = () => {
             <Route path="/operations/*" element={<ComingSoonPage />} />
 
             {/* Finance */}
+            <Route path="/finance/dashboard" element={<FinanceDashboardPage />} />
+            <Route path="/finance/late-fee-rules" element={<LateFeeRulesPage />} />
+            <Route path="/finance/concessions" element={<ConcessionWorkflowPage />} />
+            <Route path="/finance/fee-heads" element={<FeeHeadManagementPage />} />
             <Route path="/finance/config" element={<FeeConfigPage />} />
             <Route path="/finance/structure" element={<FeeStructurePage />} />
+            <Route path="/finance/installment-plans" element={<InstallmentPlansPage />} />
             <Route path="/finance/ledger" element={<StudentLedgerPage />} />
-            <Route path="/finance/collections" element={<CollectionDeskPage />} />
+            <Route path="/finance/collection-desk" element={<CollectionDeskPage />} />
+            <Route path="/finance/defaulters" element={<DefaultersPage />} />
+            <Route path="/finance/expenses" element={<ExpenseEntryPage />} />
+            <Route path="/finance/expense-categories" element={<ExpenseCategoryPage />} />
+            <Route path="/finance/budgets" element={<BudgetPage />} />
+            <Route path="/finance/budget-analysis" element={<BudgetReportPage />} />
+            <Route path="/finance/reports" element={<FinancialReportsPage />} />
             <Route path="/finance/*" element={<ComingSoonPage />} />
+
+            {/* Inventory & Assets */}
+            <Route path="/inventory/dashboard" element={<InventoryDashboardPage />} />
+            <Route path="/inventory/stock" element={<StockManagementPage />} />
+            <Route path="/inventory/assets" element={<AssetRegisterPage />} />
+            <Route path="/inventory/suppliers" element={<SupplierManagementPage />} />
+            <Route path="/inventory/*" element={<ComingSoonPage />} />
 
             {/* Communication */}
             <Route path="/communication/announcements" element={<AnnouncementManagementPage />} />
@@ -200,6 +236,7 @@ const App: React.FC = () => {
             <Route path="/lms/*" element={<ComingSoonPage />} />
 
             {/* System */}
+            <Route path="/system/setup-master" element={<SetupMasterPage />} />
             <Route path="/system/users" element={<StudentManagementPage />} />
             <Route path="/system/roles" element={<RoleManagementPage />} />
             <Route path="/system/fee-allocation" element={<FeeAllocationPage />} />
@@ -226,6 +263,7 @@ const App: React.FC = () => {
           <Route path="*" element={<div>Page Not Found</div>} />
         </Routes>
       </Router>
+      </CurrencyProvider>
     </Provider>
   );
 };

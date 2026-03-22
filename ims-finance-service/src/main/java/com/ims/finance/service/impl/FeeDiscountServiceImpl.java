@@ -9,7 +9,6 @@ import com.ims.finance.util.SecurityUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -57,6 +56,10 @@ public class FeeDiscountServiceImpl implements FeeDiscountService {
         feeDiscount.setName(feeDiscountDTO.getName());
         feeDiscount.setType(FeeDiscount.DiscountType.valueOf(feeDiscountDTO.getType()));
         feeDiscount.setValue(feeDiscountDTO.getValue());
+        if (feeDiscountDTO.getScope() != null) {
+            feeDiscount.setScope(FeeDiscount.DiscountScope.valueOf(feeDiscountDTO.getScope()));
+        }
+        feeDiscount.setApplicableFeeHeadIds(feeDiscountDTO.getApplicableFeeHeadIds());
 
         FeeDiscount updatedFeeDiscount = feeDiscountRepository.save(feeDiscount);
         return modelMapper.map(updatedFeeDiscount, FeeDiscountDTO.class);

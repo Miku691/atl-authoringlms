@@ -18,4 +18,5 @@ public class FeeInstallmentScheduleResponse {
     private Integer installmentNumber;
     private BigDecimal amount;
     private LocalDate dueDate;
+    private String lateFeeRuleId;
 }
