@@ -44,8 +44,6 @@ import { CurrencyProvider } from './context/CurrencyContext';
 import FeeHeadManagementPage from './pages/dashboard/admin/finance/FeeHeadManagementPage';
 import SetupMasterPage from './pages/dashboard/admin/system/SetupMasterPage';
 
-// ... (existing imports)
-
 import StaffManagementPage from './pages/dashboard/admin/users/StaffManagementPage';
 import InstructorManagementPage from './pages/dashboard/admin/people/instructors/InstructorManagementPage';
 import InstructorAvailabilityPage from './pages/dashboard/admin/people/instructors/InstructorAvailabilityPage';
@@ -57,6 +55,10 @@ import SyllabusTrackingPage from './pages/dashboard/admin/academics/SyllabusTrac
 import SubjectManagementPage from './pages/dashboard/admin/academics/SubjectManagementPage';
 import TimetableManagementPage from './pages/dashboard/admin/academics/TimetableManagementPage';
 import GradingConfigPage from './pages/dashboard/admin/academics/GradingConfigPage';
+import SessionManagementPage from './pages/dashboard/admin/academics/SessionManagementPage';
+import PromotionCenterPage from './pages/dashboard/admin/academics/PromotionCenterPage';
+import { ReportsDashboardPage } from './pages/dashboard/admin/reports/ReportsDashboardPage';
+import InvoiceTemplatePage from './pages/dashboard/admin/templates/InvoiceTemplatePage';
 import ComingSoonPage from './pages/common/ComingSoonPage';
 import StudentDashboardHome from './pages/dashboard/student/StudentDashboardHome';
 import MyProfilePage from './pages/dashboard/student/MyProfilePage';
@@ -136,133 +138,136 @@ const App: React.FC = () => {
       <CurrencyProvider>
         <Toaster position="top-right" reverseOrder={false} />
         <Router>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/otp" element={<OtpPage />} />
-          <Route path="/register-institute" element={<RegisterInstitutePage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ForcePasswordResetPage />} />
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/otp" element={<OtpPage />} />
+            <Route path="/register-institute" element={<RegisterInstitutePage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ForcePasswordResetPage />} />
 
-          {/* Protected Main App Layout */}
-          <Route element={
-            <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT', 'GUARDIAN', 'PARENT']}>
-              <AdminLayout />
-            </ProtectedRoute>
-          }>
-            <Route path="/dashboard" element={<DashboardWrapper />} />
+            {/* Protected Main App Layout */}
+            <Route element={
+              <ProtectedRoute allowedRoles={['SUPER_ADMIN', 'TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT', 'GUARDIAN', 'PARENT']}>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
+              <Route path="/dashboard" element={<DashboardWrapper />} />
 
-            {/* Student Routes */}
-            <Route path="/student/profile" element={<MyProfilePage />} />
-            <Route path="/student/academics" element={<MyAcademicsPage />} />
-            <Route path="/student/timetable" element={<MyTimetablePage />} />
-            <Route path="/student/syllabus" element={<MySyllabusPage />} />
-            <Route path="/student/attendance" element={<MyAttendancePage />} />
-            <Route path="/student/assignments" element={<MyAssignmentsPage />} />
-            <Route path="/student/finance" element={<MyFinancePage />} />
+              {/* Student Routes */}
+              <Route path="/student/profile" element={<MyProfilePage />} />
+              <Route path="/student/academics" element={<MyAcademicsPage />} />
+              <Route path="/student/timetable" element={<MyTimetablePage />} />
+              <Route path="/student/syllabus" element={<MySyllabusPage />} />
+              <Route path="/student/attendance" element={<MyAttendancePage />} />
+              <Route path="/student/assignments" element={<MyAssignmentsPage />} />
+              <Route path="/student/finance" element={<MyFinancePage />} />
 
-            {/* Guardian Routes */}
-            <Route path="/guardian/finance" element={<WardFinancePage />} />
+              {/* Guardian Routes */}
+              <Route path="/guardian/finance" element={<WardFinancePage />} />
 
-            {/* Setup */}
-            <Route path="/setup" element={<TenantSettingsPage />} />
+              {/* Setup */}
+              <Route path="/setup" element={<TenantSettingsPage />} />
 
-            {/* Academics */}
-            <Route path="/academics/offerings" element={<AcademicStructurePage />} />
-            <Route path="/academics/departments" element={<DepartmentManagementPage />} />
-            <Route path="/academics/subjects" element={<SubjectManagementPage />} />
-            <Route path="/academics/syllabus" element={<SyllabusTrackingPage />} />
-            <Route path="/academics/timetable" element={<TimetableManagementPage />} />
-            <Route path="/academics/grading" element={<GradingConfigPage />} />
+              {/* Academics */}
+              <Route path="/academics/sessions" element={<SessionManagementPage />} />
+              <Route path="/academics/offerings" element={<AcademicStructurePage />} />
+              <Route path="/academics/promotion" element={<PromotionCenterPage />} />
+              <Route path="/academics/departments" element={<DepartmentManagementPage />} />
+              <Route path="/academics/subjects" element={<SubjectManagementPage />} />
+              <Route path="/academics/syllabus" element={<SyllabusTrackingPage />} />
+              <Route path="/academics/timetable" element={<TimetableManagementPage />} />
+              <Route path="/academics/grading" element={<GradingConfigPage />} />
 
-            {/* People */}
-            <Route path="/people/students" element={<StudentManagementPage />} />
-            <Route path="/people/students/all" element={<StudentManagementPage />} />
-            <Route path="/people/students/add" element={<AddStudentPage />} />
-            <Route path="/people/students/bulk" element={<BulkAdmissionPage />} />
-            <Route path="/people/students/:id" element={<StudentProfilePage />} />
-            <Route path="/people/students/guardians" element={<GuardianManagementPage />} />
-            <Route path="/people/students/reports" element={<ComingSoonPage />} />
-            <Route path="/people/instructors" element={<InstructorManagementPage />} />
-            <Route path="/people/instructors/all" element={<InstructorManagementPage />} />
-            <Route path="/people/instructors/add" element={<AddInstructorPage />} />
-            <Route path="/people/instructors/reports" element={<ComingSoonPage />} />
-            <Route path="/people/instructors/:id/availability" element={<InstructorAvailabilityPage />} />
-            <Route path="/people/instructors/:id/subjects" element={<InstructorSubjectsPage />} />
-            <Route path="/people/instructors/:id" element={<InstructorProfilePage />} />
-            <Route path="/instructor/class/:offeringId" element={<InstructorClassHubPage />} />
-            <Route path="/people/staff" element={<StaffManagementPage />} />
-            <Route path="/people/staff/all" element={<StaffManagementPage />} />
-            <Route path="/people/staff/add" element={<AddStaffPage />} />
-            <Route path="/people/staff/reports" element={<ComingSoonPage />} />
+              {/* People */}
+              <Route path="/people/students" element={<StudentManagementPage />} />
+              <Route path="/people/students/all" element={<StudentManagementPage />} />
+              <Route path="/people/students/add" element={<AddStudentPage />} />
+              <Route path="/people/students/bulk" element={<BulkAdmissionPage />} />
+              <Route path="/people/students/:id" element={<StudentProfilePage />} />
+              <Route path="/people/students/guardians" element={<GuardianManagementPage />} />
+              <Route path="/people/students/reports" element={<ComingSoonPage />} />
+              <Route path="/people/instructors" element={<InstructorManagementPage />} />
+              <Route path="/people/instructors/all" element={<InstructorManagementPage />} />
+              <Route path="/people/instructors/add" element={<AddInstructorPage />} />
+              <Route path="/people/instructors/reports" element={<ComingSoonPage />} />
+              <Route path="/people/instructors/:id/availability" element={<InstructorAvailabilityPage />} />
+              <Route path="/people/instructors/:id/subjects" element={<InstructorSubjectsPage />} />
+              <Route path="/people/instructors/:id" element={<InstructorProfilePage />} />
+              <Route path="/instructor/class/:offeringId" element={<InstructorClassHubPage />} />
+              <Route path="/people/staff" element={<StaffManagementPage />} />
+              <Route path="/people/staff/all" element={<StaffManagementPage />} />
+              <Route path="/people/staff/add" element={<AddStaffPage />} />
+              <Route path="/people/staff/reports" element={<ComingSoonPage />} />
 
-            {/* Operations */}
-            <Route path="/operations/attendance" element={<AttendanceMarkingPage />} />
-            <Route path="/operations/*" element={<ComingSoonPage />} />
+              {/* Operations */}
+              <Route path="/operations/attendance" element={<AttendanceMarkingPage />} />
+              <Route path="/operations/*" element={<ComingSoonPage />} />
 
-            {/* Finance */}
-            <Route path="/finance/dashboard" element={<FinanceDashboardPage />} />
-            <Route path="/finance/late-fee-rules" element={<LateFeeRulesPage />} />
-            <Route path="/finance/concessions" element={<ConcessionWorkflowPage />} />
-            <Route path="/finance/fee-heads" element={<FeeHeadManagementPage />} />
-            <Route path="/finance/config" element={<FeeConfigPage />} />
-            <Route path="/finance/structure" element={<FeeStructurePage />} />
-            <Route path="/finance/installment-plans" element={<InstallmentPlansPage />} />
-            <Route path="/finance/ledger" element={<StudentLedgerPage />} />
-            <Route path="/finance/collection-desk" element={<CollectionDeskPage />} />
-            <Route path="/finance/defaulters" element={<DefaultersPage />} />
-            <Route path="/finance/expenses" element={<ExpenseEntryPage />} />
-            <Route path="/finance/expense-categories" element={<ExpenseCategoryPage />} />
-            <Route path="/finance/budgets" element={<BudgetPage />} />
-            <Route path="/finance/budget-analysis" element={<BudgetReportPage />} />
-            <Route path="/finance/reports" element={<FinancialReportsPage />} />
-            <Route path="/finance/*" element={<ComingSoonPage />} />
+              {/* Finance */}
+              <Route path="/finance/dashboard" element={<FinanceDashboardPage />} />
+              <Route path="/finance/late-fee-rules" element={<LateFeeRulesPage />} />
+              <Route path="/finance/concessions" element={<ConcessionWorkflowPage />} />
+              <Route path="/finance/fee-heads" element={<FeeHeadManagementPage />} />
+              <Route path="/finance/config" element={<FeeConfigPage />} />
+              <Route path="/finance/structure" element={<FeeStructurePage />} />
+              <Route path="/finance/installment-plans" element={<InstallmentPlansPage />} />
+              <Route path="/finance/ledger" element={<StudentLedgerPage />} />
+              <Route path="/finance/collection-desk" element={<CollectionDeskPage />} />
+              <Route path="/finance/defaulters" element={<DefaultersPage />} />
+              <Route path="/finance/expenses" element={<ExpenseEntryPage />} />
+              <Route path="/finance/expense-categories" element={<ExpenseCategoryPage />} />
+              <Route path="/finance/budgets" element={<BudgetPage />} />
+              <Route path="/finance/budget-analysis" element={<BudgetReportPage />} />
+              <Route path="/finance/reports" element={<FinancialReportsPage />} />
+              <Route path="/finance/*" element={<ComingSoonPage />} />
 
-            {/* Inventory & Assets */}
-            <Route path="/inventory/dashboard" element={<InventoryDashboardPage />} />
-            <Route path="/inventory/stock" element={<StockManagementPage />} />
-            <Route path="/inventory/assets" element={<AssetRegisterPage />} />
-            <Route path="/inventory/suppliers" element={<SupplierManagementPage />} />
-            <Route path="/inventory/*" element={<ComingSoonPage />} />
+              {/* Inventory & Assets */}
+              <Route path="/inventory/dashboard" element={<InventoryDashboardPage />} />
+              <Route path="/inventory/stock" element={<StockManagementPage />} />
+              <Route path="/inventory/assets" element={<AssetRegisterPage />} />
+              <Route path="/inventory/suppliers" element={<SupplierManagementPage />} />
+              <Route path="/inventory/*" element={<ComingSoonPage />} />
 
-            {/* Communication */}
-            <Route path="/communication/announcements" element={<AnnouncementManagementPage />} />
-            <Route path="/communication/*" element={<ComingSoonPage />} />
+              {/* Communication */}
+              <Route path="/communication/announcements" element={<AnnouncementManagementPage />} />
+              <Route path="/communication/*" element={<ComingSoonPage />} />
 
-            {/* Reports */}
-            <Route path="/reports/*" element={<ComingSoonPage />} />
+              {/* Reports */}
+              <Route path="/reports/*" element={<ReportsDashboardPage />} />
 
-            {/* LMS */}
-            <Route path="/lms/assignments" element={<AssignmentManagementPage />} />
-            <Route path="/lms/*" element={<ComingSoonPage />} />
+              {/* LMS */}
+              <Route path="/lms/assignments" element={<AssignmentManagementPage />} />
+              <Route path="/lms/*" element={<ComingSoonPage />} />
 
-            {/* System */}
-            <Route path="/system/setup-master" element={<SetupMasterPage />} />
-            <Route path="/system/users" element={<StudentManagementPage />} />
-            <Route path="/system/roles" element={<RoleManagementPage />} />
-            <Route path="/system/fee-allocation" element={<FeeAllocationPage />} />
-            <Route path="/system/audit" element={<ComingSoonPage />} />
+              {/* System */}
+              <Route path="/system/templates/invoice" element={<InvoiceTemplatePage />} />
+              <Route path="/system/setup-master" element={<SetupMasterPage />} />
+              <Route path="/system/users" element={<StudentManagementPage />} />
+              <Route path="/system/roles" element={<RoleManagementPage />} />
+              <Route path="/system/fee-allocation" element={<FeeAllocationPage />} />
+              <Route path="/system/audit" element={<ComingSoonPage />} />
 
-            {/* Legacy Admin Redirects */}
-            <Route path="/admin/*" element={<Navigate to="/dashboard" replace />} />
-          </Route>
+              {/* Legacy Admin Redirects */}
+              <Route path="/admin/*" element={<Navigate to="/dashboard" replace />} />
+            </Route>
 
-          <Route path="/onboarding/create-tenant" element={
-            <ProtectedRoute allowedRoles={['TENANT_ADMIN']}>
-              <CreateTenantPage />
-            </ProtectedRoute>
-          } />
+            <Route path="/onboarding/create-tenant" element={
+              <ProtectedRoute allowedRoles={['TENANT_ADMIN']}>
+                <CreateTenantPage />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/onboarding/setup-tenant" element={
-            <ProtectedRoute allowedRoles={['TENANT_ADMIN']}>
-              <SetupTenantPage />
-            </ProtectedRoute>
-          } />
+            <Route path="/onboarding/setup-tenant" element={
+              <ProtectedRoute allowedRoles={['TENANT_ADMIN']}>
+                <SetupTenantPage />
+              </ProtectedRoute>
+            } />
 
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/unauthorized" element={<div>Unauthorized Access</div>} />
-          <Route path="*" element={<div>Page Not Found</div>} />
-        </Routes>
-      </Router>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/unauthorized" element={<div>Unauthorized Access</div>} />
+            <Route path="*" element={<div>Page Not Found</div>} />
+          </Routes>
+        </Router>
       </CurrencyProvider>
     </Provider>
   );

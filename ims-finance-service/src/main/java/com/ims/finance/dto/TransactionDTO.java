@@ -20,6 +20,8 @@ public class TransactionDTO {
     private PaymentMode paymentMode;
     private String referenceNumber;
     private LocalDateTime transactionDate;
+    private String studentName;
+    private String offeringName;
     private String tenantId;
     private String collectedBy;
 }

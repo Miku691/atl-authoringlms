@@ -39,6 +39,7 @@ public class ImsInstructors {
     @Column(name = "tenant_id", nullable = false)
     private String tenantId; // Comes from auth-service
 
+    @Builder.Default
     @Column(name = "user_id")
     private String userId = null; // Reference to auth.users(id)
 
@@ -51,8 +52,11 @@ public class ImsInstructors {
     @Column(name = "qualification", length = 255)
     private String qualification;
 
-    @Column(name = "experience_years")
-    private Integer experienceYears;
+    @Column(name = "experience", length = 255)
+    private String experience;
+
+    @Column(name = "monthly_salary")
+    private Double monthlySalary;
 
     @Column(name = "specialization", length = 255)
     private String specialization;

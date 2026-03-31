@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="StudentDirectory" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+    <property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+    <property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+    <property name="net.sf.jasperreports.export.csv.write.header" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.font.size.fix.enabled" value="false"/>
+
+    <parameter name="param_tenant_id" class="java.lang.String"/>
+    <queryString>
+        <![CDATA[SELECT student_id, admission_no, first_name, last_name, email, phone, gender, student_status, roll_no, academic_year, offering_name, offering_type FROM v_student_directory WHERE tenant_id = $P{param_tenant_id}]]>
+    </queryString>
+    <field name="admission_no" class="java.lang.String"/>
+    <field name="first_name" class="java.lang.String"/>
+    <field name="last_name" class="java.lang.String"/>
+    <field name="email" class="java.lang.String"/>
+    <field name="phone" class="java.lang.String"/>
+    <field name="gender" class="java.lang.String"/>
+    <field name="student_status" class="java.lang.String"/>
+    <field name="roll_no" class="java.lang.Integer"/>
+    <field name="academic_year" class="java.lang.String"/>
+    <field name="offering_name" class="java.lang.String"/>
+    <columnHeader>
+        <band height="26">
+            <staticText><reportElement x="0" y="0" width="80" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Admission No]]></text></staticText>
+            <staticText><reportElement x="80" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[First Name]]></text></staticText>
+            <staticText><reportElement x="180" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Last Name]]></text></staticText>
+            <staticText><reportElement x="280" y="0" width="120" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Email]]></text></staticText>
+            <staticText><reportElement x="400" y="0" width="80" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Phone]]></text></staticText>
+            <staticText><reportElement x="480" y="0" width="60" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Gender]]></text></staticText>
+            <staticText><reportElement x="540" y="0" width="60" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Status]]></text></staticText>
+            <staticText><reportElement x="600" y="0" width="50" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Roll No]]></text></staticText>
+            <staticText><reportElement x="650" y="0" width="60" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Year]]></text></staticText>
+            <staticText><reportElement x="710" y="0" width="90" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Class/Offering]]></text></staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="26">
+            <textField><reportElement x="0" y="0" width="80" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{admission_no}]]></textFieldExpression></textField>
+            <textField><reportElement x="80" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{first_name}]]></textFieldExpression></textField>
+            <textField><reportElement x="180" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{last_name}]]></textFieldExpression></textField>
+            <textField><reportElement x="280" y="0" width="120" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{email}]]></textFieldExpression></textField>
+            <textField><reportElement x="400" y="0" width="80" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{phone}]]></textFieldExpression></textField>
+            <textField><reportElement x="480" y="0" width="60" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{gender}]]></textFieldExpression></textField>
+            <textField><reportElement x="540" y="0" width="60" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{student_status}]]></textFieldExpression></textField>
+            <textField><reportElement x="600" y="0" width="50" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{roll_no}]]></textFieldExpression></textField>
+            <textField><reportElement x="650" y="0" width="60" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{academic_year}]]></textFieldExpression></textField>
+            <textField><reportElement x="710" y="0" width="90" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{offering_name}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+</jasperReport>

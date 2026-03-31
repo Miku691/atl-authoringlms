@@ -56,7 +56,10 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
     @Transactional
     public void allocateFeesToStudent(String studentId, String offeringId, String academicYear) {
         String tenantId = SecurityUtils.getCurrentTenantId();
+        allocateFeesToStudentInternal(studentId, offeringId, academicYear, tenantId);
+    }
 
+    public void allocateFeesToStudentInternal(String studentId, String offeringId, String academicYear, String tenantId) {
         // 1. Check for installment plans first
         List<FeeInstallmentPlan> plans = planRepository.findByOfferingIdAndTenantId(offeringId, tenantId);
         // We assume there's one active plan per offering/academic year.
@@ -140,7 +143,7 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
 
             // 2. Allocate fees for each student
             for (StudentServiceClient.StudentResponse student : students) {
-                allocateFeesToStudent(student.getId(), offeringId, academicYear);
+                allocateFeesToStudentInternal(student.getId(), offeringId, academicYear, tenantId);
             }
         }
     }
@@ -149,7 +152,8 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
         BigDecimal finalAmount = originalAmount;
 
         for (StudentFeeConcession concession : concessions) {
-            feeDiscountRepository.findById(concession.getFeeDiscountId()).ifPresent(discount -> {
+            FeeDiscount discount = feeDiscountRepository.findById(concession.getFeeDiscountId()).orElse(null);
+            if (discount != null) {
                 // Check if this discount applies to this fee head
                 boolean applies = discount.getApplicableFeeHeadIds() == null || 
                                   discount.getApplicableFeeHeadIds().isEmpty() || 
@@ -157,13 +161,13 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
 
                 if (applies) {
                     if (discount.getType() == FeeDiscount.DiscountType.FIXED) {
-                        finalAmount.subtract(discount.getValue());
+                        finalAmount = finalAmount.subtract(discount.getValue());
                     } else if (discount.getType() == FeeDiscount.DiscountType.PERCENTAGE) {
                         BigDecimal discountAmount = finalAmount.multiply(discount.getValue()).divide(BigDecimal.valueOf(100));
-                        finalAmount.subtract(discountAmount);
+                        finalAmount = finalAmount.subtract(discountAmount);
                     }
                 }
-            });
+            }
         }
         
         return finalAmount.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : finalAmount;

@@ -66,6 +66,11 @@ export const studentService = {
         return response.data;
     },
 
+    getStudentGuardianMappings: async (studentId: string) => {
+        const response = await api.get(`/ims-student-service/student-guardian-mappings/student/${studentId}`);
+        return response.data;
+    },
+
     getStudentsByOffering: async (offeringId: string, page = 0, size = 100) => {
         const response = await api.get(`/ims-student-service/enrollments/offering/${offeringId}?page=${page}&size=${size}`);
         return response.data;
@@ -85,6 +90,17 @@ export const studentService = {
         if (offeringId) url += `&offeringId=${encodeURIComponent(offeringId)}`;
         if (searchTerm) url += `&searchTerm=${encodeURIComponent(searchTerm)}`;
         const response = await api.get(url);
+        return response.data;
+    },
+
+    bulkPromote: async (data: {
+        studentIds: string[];
+        targetOfferingId: string;
+        targetAcademicYear: string;
+        newStatus: string;
+        tenantId: string;
+    }) => {
+        const response = await api.post('/ims-student-service/enrollments/bulk-promote', data);
         return response.data;
     }
 };

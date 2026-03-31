@@ -160,11 +160,11 @@ const FeeConfigPage: React.FC = () => {
             {/* Create Modal */}
             {isCreateModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
                         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                             <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Edit' : 'New'} Discount</h2>
                         </div>
-                        <form onSubmit={handleCreate} className="p-6 space-y-4">
+                        <form onSubmit={handleCreate} className="p-6 space-y-4 max-h-[calc(100vh-15rem)] overflow-y-auto custom-scrollbar">
                             <FloatingLabelInput label="Discount Name" required value={newDiscount.name} onChange={e => setNewDiscount({ ...newDiscount, name: e.target.value })} />
                             <div className="grid grid-cols-2 gap-4">
                                 <div>

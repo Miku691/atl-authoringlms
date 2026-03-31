@@ -43,6 +43,9 @@ public class Expense {
 
     private String referenceNo;
 
+    @Column(name = "academic_year", length = 20)
+    private String academicYear;
+
     @Column(nullable = false)
     private String tenantId;
 }

@@ -15,8 +15,9 @@ public class ImsInstructorsDto {
     private String firstName;
     private String lastName;
     private String qualification;
-    private Integer experienceYears;
+    private String experience;
     private String specialization;
+    private Double monthlySalary;
     private LocalDate joinDate;
     private String email;
     private String phone;

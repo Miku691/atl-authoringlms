@@ -31,10 +31,13 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Implementation of FinanceService.
  */
 @Service
+@Slf4j
 public class FinanceServiceImpl implements FinanceService {
 
     private final StudentFeeRecordRepository studentFeeRecordRepository;
@@ -45,6 +48,7 @@ public class FinanceServiceImpl implements FinanceService {
     private final FeeHeadRepository feeHeadRepository;
     private final ExpenseCategoryRepository expenseCategoryRepository;
     private final StudentServiceClient studentServiceClient;
+    private final com.ims.finance.client.OfferingServiceClient offeringServiceClient;
     private final ModelMapper modelMapper;
 
     public FinanceServiceImpl(StudentFeeRecordRepository studentFeeRecordRepository,
@@ -55,6 +59,7 @@ public class FinanceServiceImpl implements FinanceService {
             FeeHeadRepository feeHeadRepository,
             ExpenseCategoryRepository expenseCategoryRepository,
             StudentServiceClient studentServiceClient,
+            com.ims.finance.client.OfferingServiceClient offeringServiceClient,
             ModelMapper modelMapper) {
         this.studentFeeRecordRepository = studentFeeRecordRepository;
         this.transactionRepository = transactionRepository;
@@ -64,6 +69,7 @@ public class FinanceServiceImpl implements FinanceService {
         this.feeHeadRepository = feeHeadRepository;
         this.expenseCategoryRepository = expenseCategoryRepository;
         this.studentServiceClient = studentServiceClient;
+        this.offeringServiceClient = offeringServiceClient;
         this.modelMapper = modelMapper;
     }
 
@@ -79,6 +85,18 @@ public class FinanceServiceImpl implements FinanceService {
         BigDecimal month = transactionRepository.sumAmountByTenantIdAndDateAfter(tenantId, monthStart);
         BigDecimal year = transactionRepository.sumAmountByTenantIdAndDateAfter(tenantId, yearStart);
 
+        // Fetch offering names for the entire summary (including charts and recent tx)
+        Map<String, String> offeringNames = new HashMap<>();
+        try {
+            ApiResponse<List<com.ims.finance.client.OfferingServiceClient.OfferingResponse>> offeringRes = 
+                offeringServiceClient.getOfferingsByTenant(tenantId);
+            if (offeringRes != null && offeringRes.getApiData() != null) {
+                offeringRes.getApiData().forEach(o -> offeringNames.put(o.getId(), o.getName()));
+            }
+        } catch (Exception e) {
+            // Ignore API error for dashboard
+        }
+
         List<Object[]> offeringStats = transactionRepository.sumAmountByOffering(tenantId);
         Map<String, BigDecimal> collectionByOffering = new HashMap<>();
         for (Object[] row : offeringStats) {
@@ -88,8 +106,33 @@ public class FinanceServiceImpl implements FinanceService {
         List<TransactionDTO> recent = transactionRepository.findAllByTenantIdOrderByTransactionDateDesc(tenantId)
                 .stream()
                 .limit(10)
-                .map(t -> modelMapper.map(t, TransactionDTO.class))
+                .map(t -> {
+                    TransactionDTO dto = modelMapper.map(t, TransactionDTO.class);
+                    // Fetch Student Name (Small batch, 10 items max)
+                    try {
+                        ApiResponse<StudentServiceClient.StudentResponse> studentRes = studentServiceClient.getStudentById(t.getStudentId());
+                        if (studentRes != null && studentRes.getApiData() != null) {
+                            dto.setStudentName(studentRes.getApiData().getFirstName() + " " + studentRes.getApiData().getLastName());
+                        } else {
+                            dto.setStudentName("Student: " + t.getStudentId().substring(0, 8));
+                        }
+                    } catch (Exception e) {
+                        dto.setStudentName("Student: " + t.getStudentId().substring(0, 8));
+                    }
+                    
+                    if (t.getOfferingId() != null) {
+                        dto.setOfferingName(resolveOfferingName(t.getOfferingId(), offeringNames));
+                    }
+                    return dto;
+                })
                 .collect(Collectors.toList());
+
+        // Ensure all offering IDs in the chart have names in the map
+        for (String id : collectionByOffering.keySet()) {
+            if (!offeringNames.containsKey(id)) {
+                offeringNames.put(id, resolveOfferingName(id, offeringNames));
+            }
+        }
 
         // 1. Pending Receivables
         BigDecimal pendingReceivables = studentFeeRecordRepository.sumTotalBalance(tenantId);
@@ -146,10 +189,7 @@ public class FinanceServiceImpl implements FinanceService {
             feeDistribution.add(item);
         }
 
-        // Fetch offering names
-        Map<String, String> offeringNames = new HashMap<>();
-        // In a real scenario, we would call OfferingServiceClient here.
-        // For now, we'll leave it as IDs or handle in UI if possible.
+        // offeringNames already populated above
 
         return CollectionSummaryDTO.builder()
                 .todayCollection(today != null ? today : BigDecimal.ZERO)
@@ -302,9 +342,62 @@ public class FinanceServiceImpl implements FinanceService {
     @Override
     public List<TransactionDTO> getStudentTransactions(String studentId) {
         String tenantId = SecurityUtils.getCurrentTenantId();
+        
+        // Fetch student name once
+        String studentName = "Student: " + studentId.substring(0, 8);
+        try {
+            ApiResponse<StudentServiceClient.StudentResponse> studentRes = studentServiceClient.getStudentById(studentId);
+            if (studentRes != null && studentRes.getApiData() != null) {
+                studentName = studentRes.getApiData().getFirstName() + " " + studentRes.getApiData().getLastName();
+            }
+        } catch (Exception e) {}
+
+        final String finalStudentName = studentName;
+
+        // Fetch offering names for the tenant (caching would be better, but this is simple)
+        Map<String, String> offeringNames = new HashMap<>();
+        try {
+            ApiResponse<List<com.ims.finance.client.OfferingServiceClient.OfferingResponse>> offeringRes = 
+                offeringServiceClient.getOfferingsByTenant(tenantId);
+            if (offeringRes != null && offeringRes.getApiData() != null) {
+                offeringRes.getApiData().forEach(o -> offeringNames.put(o.getId(), o.getName()));
+            }
+        } catch (Exception e) {}
+
         return transactionRepository.findAllByStudentIdAndTenantId(studentId, tenantId).stream()
-                .map(t -> modelMapper.map(t, TransactionDTO.class))
+                .map(t -> {
+                    TransactionDTO dto = modelMapper.map(t, TransactionDTO.class);
+                    dto.setStudentName(finalStudentName);
+                    if (t.getOfferingId() != null) {
+                        dto.setOfferingName(resolveOfferingName(t.getOfferingId(), offeringNames));
+                    }
+                    return dto;
+                })
                 .collect(Collectors.toList());
+    }
+
+    private String resolveOfferingName(String offeringId, Map<String, String> cache) {
+        if (offeringId == null) return null;
+        if (cache.containsKey(offeringId)) {
+            return cache.get(offeringId);
+        }
+        
+        // Try specific fetch from academic service if missing in tenant map
+        try {
+            ApiResponse<com.ims.finance.client.OfferingServiceClient.OfferingResponse> res = offeringServiceClient.getOfferingById(offeringId);
+            if (res != null && res.getApiData() != null) {
+                String name = res.getApiData().getName();
+                log.info("Resolved offering name for ID {}: {}", offeringId, name);
+                cache.put(offeringId, name);
+                return name;
+            } else {
+                log.warn("Failed to resolve offering name for ID {}: API response empty", offeringId);
+            }
+        } catch (Exception e) {
+            log.error("Error connecting to academic service to resolve offering ID {}: {}", offeringId, e.getMessage());
+        }
+        
+        return "Class " + offeringId.substring(0, 8);
     }
 
     @Override
@@ -441,10 +534,13 @@ public class FinanceServiceImpl implements FinanceService {
                 ApiResponse<StudentServiceClient.StudentResponse> response = 
                     studentServiceClient.getStudentById(studentId);
                 if (response != null && response.getApiData() != null) {
-                    studentName = response.getApiData().getFirstName() + " " + response.getApiData().getLastName();
+                    StudentServiceClient.StudentResponse s = response.getApiData();
+                    studentName = (s.getFirstName() != null ? s.getFirstName() : "") + " " + 
+                                  (s.getLastName() != null ? s.getLastName() : "");
+                    if (studentName.trim().isEmpty()) studentName = "Unknown (" + studentId.substring(0, 8) + ")";
                 }
             } catch (Exception e) {
-                // Ignore API error
+                // Ignore API error, keep Unknown
             }
 
             // In a real app we might want to group by offering as well, but this is a simplified view
@@ -514,8 +610,22 @@ public class FinanceServiceImpl implements FinanceService {
             try {
                 ApiResponse<StudentServiceClient.StudentResponse> res = studentServiceClient.getStudentById(studentId);
                 if (res != null && res.getApiData() != null) {
-                    studentName = res.getApiData().getFirstName() + " " + res.getApiData().getLastName();
-                    enrollmentId = res.getApiData().getEnrollmentId();
+                    StudentServiceClient.StudentResponse s = res.getApiData();
+                    studentName = (s.getFirstName() != null ? s.getFirstName() : "") + " " + 
+                                  (s.getLastName() != null ? s.getLastName() : "");
+                    if (studentName.trim().isEmpty()) studentName = "Unknown (" + studentId.substring(0, 8) + ")";
+                    enrollmentId = s.getEnrollmentId();
+                }
+            } catch (Exception e) {
+                // Ignore API error
+            }
+
+            // Also try to get offering name for report
+            try {
+                ApiResponse<com.ims.finance.client.OfferingServiceClient.OfferingResponse> offRes = 
+                    offeringServiceClient.getOfferingById(studentRecords.get(0).getOfferingId());
+                if (offRes != null && offRes.getApiData() != null) {
+                    offeringName = offRes.getApiData().getName();
                 }
             } catch (Exception e) {}
 

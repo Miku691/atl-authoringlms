@@ -8,7 +8,7 @@ import type { RootState } from '../../../../store/store';
 import { financeService } from '../../../../api/financeService';
 import { studentService } from '../../../../api/studentService';
 import type { StudentFeeRecord, DemandNote, FeeDiscount, StudentFeeConcession } from '../../../../types/finance';
-import { academicService, type ImsOffering } from '../../../../api/academicService';
+import { academicService, type ImsOffering, type AcademicSession } from '../../../../api/academicService';
 import FloatingLabelInput from '../../../../components/common/FloatingLabelInput';
 
 
@@ -27,6 +27,7 @@ interface Guardian {
     guardianName: string;
     relation: string;
     phone: string;
+    isPrimary?: boolean;
 }
 
 const StudentLedgerPage: React.FC = () => {
@@ -41,6 +42,7 @@ const StudentLedgerPage: React.FC = () => {
     const [demandNotes, setDemandNotes] = useState<DemandNote[]>([]);
     const [guardians, setGuardians] = useState<Guardian[]>([]);
     const [activeOffering, setActiveOffering] = useState<string>('');
+    const [sessions, setSessions] = useState<AcademicSession[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     // Concession States
@@ -49,7 +51,7 @@ const StudentLedgerPage: React.FC = () => {
     const [isConcessionModalOpen, setIsConcessionModalOpen] = useState(false);
     const [concessionData, setConcessionData] = useState({
         feeDiscountId: '',
-        academicYear: new Date().getFullYear().toString() + '-' + (new Date().getFullYear() + 1).toString().slice(-2),
+        academicYear: '',
         remarks: ''
     });
     const [isAssigningConcession, setIsAssigningConcession] = useState(false);
@@ -71,7 +73,7 @@ const StudentLedgerPage: React.FC = () => {
     const [offerings, setOfferings] = useState<ImsOffering[]>([]);
     const [allocationData, setAllocationData] = useState({
         offeringId: '',
-        academicYear: new Date().getFullYear().toString() + '-' + (new Date().getFullYear() + 1).toString().slice(-2)
+        academicYear: ''
     });
     const [isAllocating, setIsAllocating] = useState(false);
 
@@ -93,10 +95,21 @@ const StudentLedgerPage: React.FC = () => {
 
     const fetchOfferings = async (tenantId: string) => {
         try {
-            const data = await academicService.getOfferingsByTenant(tenantId);
-            setOfferings(data);
+            const [offeringData, sessionData] = await Promise.all([
+                academicService.getOfferingsByTenant(tenantId),
+                academicService.getSessionsByTenant(tenantId)
+            ]);
+            setOfferings(offeringData);
+            setSessions(sessionData);
+
+            // Set default academic year to current session
+            const current = sessionData.find((s: AcademicSession) => s.isCurrent);
+            if (current) {
+                setAllocationData(prev => ({ ...prev, academicYear: current.name }));
+                setConcessionData(prev => ({ ...prev, academicYear: current.name }));
+            }
         } catch (error) {
-            console.error('Failed to fetch offerings', error);
+            console.error('Failed to fetch initial data', error);
         }
     };
 
@@ -123,16 +136,37 @@ const StudentLedgerPage: React.FC = () => {
     const fetchLedger = async (studentId: string) => {
         setIsLoading(true);
         try {
-            const [ledgerData, enrollmentData, guardianData, demandData, concessionDataRes, discountData] = await Promise.all([
+            const [ledgerData, enrollmentData, guardianData, mappingData, demandData, concessionDataRes, discountData] = await Promise.all([
                 financeService.getStudentLedger(studentId),
                 studentService.getStudentEnrollments(studentId),
                 studentService.getStudentGuardians(studentId),
+                studentService.getStudentGuardianMappings(studentId),
                 financeService.getStudentDemandNotes(studentId),
                 financeService.getConcessionsByStudent(studentId),
                 financeService.getFeeDiscounts()
             ]);
             setLedger(ledgerData);
-            setGuardians(guardianData.apiData || []);
+
+            // Merge guardians from both sources
+            const directGuardians = (guardianData.apiData || []).map((g: any) => ({
+                id: g.id,
+                guardianName: g.guardianName,
+                relation: g.relation,
+                phone: g.phone,
+                isPrimary: true
+            }));
+
+            const mappedGuardians = (mappingData.apiData || []).map((m: any) => ({
+                id: m.guardianId || m.id,
+                guardianName: m.guardianName,
+                relation: m.relation,
+                phone: m.guardianPhone || m.phone,
+                isPrimary: m.isPrimary
+            }));
+
+            // Combine and prioritize primary
+            const combinedGuardians = [...directGuardians, ...mappedGuardians].sort((a,b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0));
+            setGuardians(combinedGuardians);
             setDemandNotes(demandData || []);
             setConcessions(concessionDataRes || []);
             setFeeDiscounts(discountData || []);
@@ -598,14 +632,30 @@ const StudentLedgerPage: React.FC = () => {
                                 <p className="text-[10px] text-gray-400 px-1 mt-1">Fee allocation is based on the student's current enrollment.</p>
                             </div>
 
-                            <FloatingLabelInput
-                                label="Academic Year"
-                                placeholder="e.g. 2024-25"
-                                required
-                                value={allocationData.academicYear}
-                                onChange={e => setAllocationData({ ...allocationData, academicYear: e.target.value })}
-                                icon={<Calendar className="w-4 h-4" />}
-                            />
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-gray-500 uppercase px-1">Academic Year</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <Calendar className="w-4 h-4" />
+                                    </div>
+                                    <select 
+                                        required 
+                                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg bg-white text-sm focus:ring-2 focus:ring-indigo-500 transition-all outline-none appearance-none"
+                                        value={allocationData.academicYear} 
+                                        onChange={e => setAllocationData({ ...allocationData, academicYear: e.target.value })}
+                                    >
+                                        <option value="">Select Academic Year...</option>
+                                        {sessions.sort((a,b) => b.name.localeCompare(a.name)).map(s => (
+                                            <option key={s.id} value={s.name}>
+                                                {s.name} {s.isCurrent ? '(Current)' : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                                        <ArrowRight className="w-4 h-4 rotate-90" />
+                                    </div>
+                                </div>
+                            </div>
 
                             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs text-yellow-800 flex gap-2">
                                 <Clock className="w-6 h-6 shrink-0" />
@@ -839,13 +889,30 @@ const StudentLedgerPage: React.FC = () => {
                                 </select>
                             </div>
 
-                            <FloatingLabelInput
-                                label="Academic Year"
-                                required
-                                value={concessionData.academicYear}
-                                onChange={e => setConcessionData({ ...concessionData, academicYear: e.target.value })}
-                                icon={<Calendar className="w-4 h-4" />}
-                            />
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-gray-500 uppercase px-1">Academic Year</label>
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <Calendar className="w-4 h-4" />
+                                    </div>
+                                    <select 
+                                        required 
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-amber-500 transition-all outline-none appearance-none"
+                                        value={concessionData.academicYear} 
+                                        onChange={e => setConcessionData({ ...concessionData, academicYear: e.target.value })}
+                                    >
+                                        <option value="">Select Academic Year...</option>
+                                        {sessions.sort((a,b) => b.name.localeCompare(a.name)).map(s => (
+                                            <option key={s.id} value={s.name}>
+                                                {s.name} {s.isCurrent ? '(Current)' : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-400">
+                                        <ArrowRight className="w-4 h-4 rotate-90" />
+                                    </div>
+                                </div>
+                            </div>
 
                             <FloatingLabelInput
                                 label="Remarks / Reason"

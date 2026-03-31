@@ -21,6 +21,9 @@ public interface ImsStudentEnrollmentsRepo extends JpaRepository<ImsStudentEnrol
         boolean existsByStudentIdAndOfferingIdAndStatusAndTenantId(String studentId, String offeringId, String status,
                         String tenantId);
 
+        Optional<ImsStudentEnrollments> findByStudentIdAndStatusAndTenantId(String studentId, String status,
+                        String tenantId);
+
         org.springframework.data.domain.Page<ImsStudentEnrollments> findByOfferingIdAndStatusAndTenantId(
                         String offeringId,
                         String status, String tenantId, org.springframework.data.domain.Pageable pageable);

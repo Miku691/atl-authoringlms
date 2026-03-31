@@ -5,6 +5,7 @@ import com.atl.gateway.utility.JwtUnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -20,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
+@Slf4j
 public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private final GatewaySecurityConfig securityConfig;
@@ -83,6 +85,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                 });
 
         if (!isAuthorized) {
+            log.warn("Forbidden: User with roles {} is not authorized to access {} [{}]", roles, path, method);
             exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
             return exchange.getResponse().setComplete();
         }

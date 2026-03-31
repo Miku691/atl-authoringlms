@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="AttendanceSummary" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true">
+    <property name="net.sf.jasperreports.export.xls.auto.fit.column" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+    <property name="net.sf.jasperreports.export.xls.detect.cell.type" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.white.page.background" value="false"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.columns" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.remove.empty.space.between.rows" value="true"/>
+    <property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+    <property name="net.sf.jasperreports.export.csv.write.header" value="true"/>
+    <property name="net.sf.jasperreports.export.xls.font.size.fix.enabled" value="false"/>
+
+    <parameter name="param_tenant_id" class="java.lang.String"/>
+    <queryString>
+        <![CDATA[SELECT student_id, total_attendance_recorded, present_count, absent_count, late_count, attendance_percentage FROM v_student_attendance_summary WHERE tenant_id = $P{param_tenant_id}]]>
+    </queryString>
+    <field name="student_id" class="java.lang.String"/>
+    <field name="total_attendance_recorded" class="java.lang.Long"/>
+    <field name="present_count" class="java.math.BigDecimal"/>
+    <field name="absent_count" class="java.math.BigDecimal"/>
+    <field name="late_count" class="java.math.BigDecimal"/>
+    <field name="attendance_percentage" class="java.math.BigDecimal"/>
+    <columnHeader>
+        <band height="26">
+            <staticText><reportElement x="0" y="0" width="200" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Student ID]]></text></staticText>
+            <staticText><reportElement x="200" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Total Records]]></text></staticText>
+            <staticText><reportElement x="300" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Present]]></text></staticText>
+            <staticText><reportElement x="400" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Absent]]></text></staticText>
+            <staticText><reportElement x="500" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Late]]></text></staticText>
+            <staticText><reportElement x="600" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font isBold="true" size="11"/></textElement><text><![CDATA[Attendance %]]></text></staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="26">
+            <textField><reportElement x="0" y="0" width="200" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{student_id}]]></textFieldExpression></textField>
+            <textField><reportElement x="200" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{total_attendance_recorded}]]></textFieldExpression></textField>
+            <textField><reportElement x="300" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{present_count}]]></textFieldExpression></textField>
+            <textField><reportElement x="400" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{absent_count}]]></textFieldExpression></textField>
+            <textField><reportElement x="500" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{late_count}]]></textFieldExpression></textField>
+            <textField><reportElement x="600" y="0" width="100" height="26"/><box leftPadding="3" rightPadding="3"><pen lineWidth="0.5" lineColor="#000000"/></box><textElement verticalAlignment="Middle"><font size="10"/></textElement><textFieldExpression><![CDATA[$F{attendance_percentage}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+</jasperReport>

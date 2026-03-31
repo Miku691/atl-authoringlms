@@ -1,6 +1,7 @@
 package com.ims.finance.controller;
 
 import com.ims.finance.dto.CollectPaymentDTO;
+import com.ims.finance.dto.CollectionSummaryDTO;
 import com.ims.finance.dto.RefundDTO;
 import com.ims.finance.dto.TransactionDTO;
 import com.ims.finance.service.FinanceService;
@@ -37,7 +38,7 @@ public class FinanceController {
      */
     @GetMapping("/stats/collection-summary")
     @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'ACCOUNTANT')")
-    public ResponseEntity<ApiResponse<com.ims.finance.dto.CollectionSummaryDTO>> getCollectionSummary() {
+    public ResponseEntity<ApiResponse<CollectionSummaryDTO>> getCollectionSummary() {
         return ResponseEntity.ok(ApiResponse.success("Collection summary fetched successfully",
                 financeService.getCollectionSummary()));
     }

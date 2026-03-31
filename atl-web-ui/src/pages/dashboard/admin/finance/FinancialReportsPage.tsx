@@ -12,9 +12,11 @@ import { financeService } from '../../../../api/financeService';
 import type { Transaction, OutstandingFee, IncomeExpenseReport } from '../../../../types/finance';
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
+import { useCurrency } from '../../../../context/CurrencyContext';
 
 export const FinancialReportsPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'daybook' | 'outstanding' | 'income-expense'>('daybook');
+    const { format: formatCurrency } = useCurrency();
     const [isLoading, setIsLoading] = useState(false);
     
     // Day Book state
@@ -97,7 +99,7 @@ export const FinancialReportsPage: React.FC = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{t.referenceNumber || '-'}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">₹{t.amount.toLocaleString()}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">{formatCurrency(t.amount)}</td>
                                 </tr>
                             ))
                         )}
@@ -106,7 +108,7 @@ export const FinancialReportsPage: React.FC = () => {
                         <tr>
                             <td colSpan={4} className="px-6 py-4 text-right font-bold text-gray-900">Total Collection:</td>
                             <td className="px-6 py-4 text-right font-bold text-blue-600">
-                                ₹{dayBookTransactions.reduce((sum: number, t: any) => sum + t.amount, 0).toLocaleString()}
+                                {formatCurrency(dayBookTransactions.reduce((sum: number, t: any) => sum + t.amount, 0))}
                             </td>
                         </tr>
                     </tfoot>
@@ -141,9 +143,9 @@ export const FinancialReportsPage: React.FC = () => {
                                         <div className="text-xs text-gray-500">{f.enrollmentId}</div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{f.offeringId}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">₹{f.totalAllocated.toLocaleString()}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-red-600">₹{f.totalOverdue.toLocaleString()}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">₹{f.balance.toLocaleString()}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">{formatCurrency(f.totalAllocated)}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-red-600">{formatCurrency(f.totalOverdue)}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">{formatCurrency(f.balance)}</td>
                                 </tr>
                             ))
                         )}
@@ -177,14 +179,14 @@ export const FinancialReportsPage: React.FC = () => {
                                 <p className="text-sm font-medium text-gray-500">Total Income</p>
                                 <div className="p-2 bg-green-50 rounded-lg text-green-600"><TrendingUp className="h-4 w-4" /></div>
                             </div>
-                            <p className="text-2xl font-bold text-gray-900">₹{incomeExpenseData.totalIncome.toLocaleString()}</p>
+                            <p className="text-2xl font-bold text-gray-900">{formatCurrency(incomeExpenseData.totalIncome)}</p>
                         </div>
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <div className="flex items-center justify-between mb-2">
                                 <p className="text-sm font-medium text-gray-500">Total Expense</p>
                                 <div className="p-2 bg-red-50 rounded-lg text-red-600"><TrendingDown className="h-4 w-4" /></div>
                             </div>
-                            <p className="text-2xl font-bold text-gray-900">₹{incomeExpenseData.totalExpense.toLocaleString()}</p>
+                            <p className="text-2xl font-bold text-gray-900">{formatCurrency(incomeExpenseData.totalExpense)}</p>
                         </div>
                         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                             <div className="flex items-center justify-between mb-2">
@@ -194,7 +196,7 @@ export const FinancialReportsPage: React.FC = () => {
                                 </div>
                             </div>
                             <p className={`text-2xl font-bold ${incomeExpenseData.netProfit >= 0 ? 'text-blue-600' : 'text-orange-600'}`}>
-                                ₹{incomeExpenseData.netProfit.toLocaleString()}
+                                {formatCurrency(incomeExpenseData.netProfit)}
                             </p>
                         </div>
                     </div>
@@ -209,7 +211,7 @@ export const FinancialReportsPage: React.FC = () => {
                                 {Object.entries(incomeExpenseData.incomeByCategory).map(([cat, amount]) => (
                                     <div key={cat} className="flex justify-between items-center mb-3">
                                         <span className="text-sm text-gray-600">{cat}</span>
-                                        <span className="text-sm font-bold text-gray-900">₹{amount.toLocaleString()}</span>
+                                        <span className="text-sm font-bold text-gray-900">{formatCurrency(amount)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -223,7 +225,7 @@ export const FinancialReportsPage: React.FC = () => {
                                 {Object.entries(incomeExpenseData.expenseByCategory).map(([cat, amount]) => (
                                     <div key={cat} className="flex justify-between items-center mb-3">
                                         <span className="text-sm text-gray-600">{cat}</span>
-                                        <span className="text-sm font-bold text-gray-900">₹{amount.toLocaleString()}</span>
+                                        <span className="text-sm font-bold text-gray-900">{formatCurrency(amount)}</span>
                                     </div>
                                 ))}
                             </div>

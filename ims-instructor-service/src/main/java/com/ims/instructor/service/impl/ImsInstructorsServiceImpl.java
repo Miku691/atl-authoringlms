@@ -36,6 +36,12 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
     @Override
     public ImsInstructorsDto create(ImsInstructorsDto dto) {
 
+        if (dto.getEmployeeId() == null || dto.getEmployeeId().isEmpty()) {
+            dto.setEmployeeId(generateUniqueEmployeeId());
+        } else if (repo.existsByEmployeeId(dto.getEmployeeId())) {
+            throw new ResourceAlreadyExistException(dto.getEmployeeId(), "INSTRUCTOR", "Employee ID");
+        }
+
         if(dto.getUserId() != null){
             if (repo.existsByUserId(dto.getUserId())) {
                 throw new ResourceAlreadyExistException(dto.getUserId(), "INSTRUCTOR", "User ID");
@@ -62,7 +68,8 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
         existing.setAddress(dto.getAddress());
         existing.setQualification(dto.getQualification());
         existing.setSpecialization(dto.getSpecialization());
-        existing.setExperienceYears(dto.getExperienceYears());
+        existing.setExperience(dto.getExperience());
+        existing.setMonthlySalary(dto.getMonthlySalary());
         existing.setJoinDate(dto.getJoinDate());
         existing.setStatus(dto.getStatus());
 
@@ -153,5 +160,19 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
             String errorMsg = authResponse != null ? authResponse.getMessage() : "Unknown error from Auth Service";
             throw new RuntimeException("Failed to grant access: " + errorMsg);
         }
+    }
+
+    private String generateUniqueEmployeeId() {
+        String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        String code;
+        do {
+            StringBuilder sb = new StringBuilder(6);
+            for (int i = 0; i < 6; i++) {
+                sb.append(base.charAt(random.nextInt(base.length())));
+            }
+            code = com.ims.instructor.util.ApplicationConstant.EMP_ID_PREFIX + sb.toString();
+        } while (repo.existsByEmployeeId(code));
+        return code;
     }
 }

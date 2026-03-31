@@ -32,6 +32,12 @@ public class ImsStaffServiceImpl implements ImsStaffService {
     @Override
     public ImsStaffDto create(ImsStaffDto dto) {
 
+        if (dto.getEmployeeId() == null || dto.getEmployeeId().isEmpty()) {
+            dto.setEmployeeId(generateUniqueEmployeeId());
+        } else if (repo.existsByEmployeeId(dto.getEmployeeId())) {
+            throw new ResourceAlreadyExistException(dto.getEmployeeId(), "STAFF", "Employee ID");
+        }
+
         if (repo.existsByPhone(dto.getPhone())) {
             throw new ResourceAlreadyExistException(dto.getPhone(), "STAFF", "Phone Number");
         }
@@ -159,5 +165,19 @@ public class ImsStaffServiceImpl implements ImsStaffService {
             String errorMsg = authResponse != null ? authResponse.getMessage() : "Unknown error from Auth Service";
             throw new RuntimeException("Failed to grant access: " + errorMsg);
         }
+    }
+
+    private String generateUniqueEmployeeId() {
+        String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        String code;
+        do {
+            StringBuilder sb = new StringBuilder(6);
+            for (int i = 0; i < 6; i++) {
+                sb.append(base.charAt(random.nextInt(base.length())));
+            }
+            code = com.ims.staff.util.ApplicationConstant.EMP_ID_PREFIX + sb.toString();
+        } while (repo.existsByEmployeeId(code));
+        return code;
     }
 }

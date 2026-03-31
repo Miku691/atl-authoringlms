@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { Calculator, Calendar, CheckCircle2, AlertCircle, Info, Layers, ArrowRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { academicService, type ImsOffering } from '../../../../api/academicService';
+import { academicService, type ImsOffering, type AcademicSession } from '../../../../api/academicService';
 import { financeService } from '../../../../api/financeService';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../../../store/store';
+import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 
 const FeeAllocationPage: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.auth);
     const [offerings, setOfferings] = useState<ImsOffering[]>([]);
+    const [sessions, setSessions] = useState<AcademicSession[]>([]);
     const [selectedOffering, setSelectedOffering] = useState<string>('');
-    const [academicYear, setAcademicYear] = useState<string>(
-        new Date().getFullYear().toString() + '-' + (new Date().getFullYear() + 1).toString().slice(-2)
-    );
+    const [academicYear, setAcademicYear] = useState<string>('');
     const [isAllocating, setIsAllocating] = useState(false);
     const [isLoadingOfferings, setIsLoadingOfferings] = useState(true);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
     useEffect(() => {
         if (user?.tenantId) {
@@ -25,10 +26,20 @@ const FeeAllocationPage: React.FC = () => {
     const fetchOfferings = async (tenantId: string) => {
         setIsLoadingOfferings(true);
         try {
-            const data = await academicService.getOfferingsByTenant(tenantId);
-            setOfferings(data);
+            const [offeringData, sessionData] = await Promise.all([
+                academicService.getOfferingsByTenant(tenantId),
+                academicService.getSessionsByTenant(tenantId)
+            ]);
+            setOfferings(offeringData);
+            setSessions(sessionData);
+
+            // Default to current academic year
+            const current = sessionData.find((s: AcademicSession) => s.isCurrent);
+            if (current) {
+                setAcademicYear(current.name);
+            }
         } catch (error) {
-            toast.error('Failed to fetch offerings');
+            toast.error('Failed to fetch initial data');
         } finally {
             setIsLoadingOfferings(false);
         }
@@ -40,16 +51,16 @@ const FeeAllocationPage: React.FC = () => {
             toast.error('Please select an offering');
             return;
         }
+        setIsConfirmModalOpen(true);
+    };
 
-        if (!window.confirm('Are you sure you want to allocate fees to ALL students in this offering? This action will generate fee records for everyone based on the defined structure.')) {
-            return;
-        }
-
+    const executeAllocation = async () => {
         setIsAllocating(true);
         try {
             await financeService.bulkAllocateFees(selectedOffering, academicYear);
             toast.success('Bulk fee allocation triggered successfully! Records are being created.');
             setSelectedOffering('');
+            setIsConfirmModalOpen(false);
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Failed to trigger bulk allocation');
         } finally {
@@ -106,7 +117,7 @@ const FeeAllocationPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div>
+                                 <div>
                                     <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
                                         Academic Year
                                     </label>
@@ -114,15 +125,23 @@ const FeeAllocationPage: React.FC = () => {
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
                                             <Calendar className="w-4 h-4" />
                                         </div>
-                                        <input
-                                            type="text"
-                                            className="block w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none"
-                                            placeholder="e.g. 2024-25"
+                                        <select
+                                            className="block w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none appearance-none disabled:bg-gray-50 disabled:text-gray-400"
                                             value={academicYear}
                                             onChange={(e) => setAcademicYear(e.target.value)}
                                             disabled={isAllocating}
                                             required
-                                        />
+                                        >
+                                            <option value="">Select Academic Year...</option>
+                                            {sessions.sort((a,b) => b.name.localeCompare(a.name)).map(s => (
+                                                <option key={s.id} value={s.name}>
+                                                    {s.name} {s.isCurrent ? '(Current)' : ''}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400">
+                                            <ArrowRight className="w-4 h-4 rotate-90" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -196,6 +215,18 @@ const FeeAllocationPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            <ConfirmationModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={executeAllocation}
+                title="Confirm Bulk Fee Allocation"
+                message="Are you sure you want to allocate fees to ALL students in this offering? This action will generate fee records for everyone based on the defined structure."
+                confirmText="Yes, Allocate Fees"
+                cancelText="No, Cancel"
+                variant="warning"
+                isLoading={isAllocating}
+            />
         </div>
     );
 };

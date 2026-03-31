@@ -21,7 +21,6 @@ const CollectionDeskPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [summary, setSummary] = useState<CollectionSummary | null>(null);
 
-    // ... (keep paymentData state)
     const [paymentData, setPaymentData] = useState({
         amount: 0,
         paymentMode: 'CASH' as PaymentMode,
@@ -29,6 +28,21 @@ const CollectionDeskPage: React.FC = () => {
         feeRecordIds: [] as string[]
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const formatRelativeTime = (dateString: string) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInMs = Math.max(0, now.getTime() - date.getTime());
+        const diffInMins = Math.floor(diffInMs / (1000 * 60));
+        const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+
+        if (date.toDateString() === now.toDateString()) {
+            if (diffInMins < 1) return 'Just now';
+            if (diffInMins < 60) return `${diffInMins} min${diffInMins > 1 ? 's' : ''} ago`;
+            return `${diffInHours} hr${diffInHours > 1 ? 's' : ''} ago`;
+        }
+        return date.toLocaleDateString();
+    };
 
     useEffect(() => {
         if (!selectedStudent) {
@@ -313,24 +327,31 @@ const CollectionDeskPage: React.FC = () => {
                                     <div className="p-8 text-center text-gray-400 text-sm italic">No recent transactions</div>
                                 ) : (
                                     transactions.map(tx => (
-                                        <div key={tx.id} className="p-4 hover:bg-gray-50 transition-colors group">
-                                            <div className="flex justify-between items-start mb-1">
+                                        <div key={tx.id} className="p-4 hover:bg-gray-50/50 transition-colors group">
+                                            <div className="flex justify-between items-start mb-2">
                                                 <div>
-                                                    <p className="text-sm font-bold text-gray-900">{format(tx.amount)}</p>
-                                                    <p className="text-[10px] text-gray-500 font-medium">{new Date(tx.transactionDate).toLocaleString()}</p>
+                                                    <p className="text-sm font-bold text-gray-900">{tx.studentName || `${selectedStudent.firstName} ${selectedStudent.lastName}`}</p>
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
+                                                        {tx.offeringName ? `${tx.offeringName} • ` : ''}{tx.paymentMode} • {formatRelativeTime(tx.transactionDate)}
+                                                    </p>
                                                 </div>
-                                                <button
-                                                    onClick={() => handleDownloadReceipt(tx.id)}
-                                                    className="p-2 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
-                                                    title="Download Receipt"
-                                                >
-                                                    <Download className="w-4 h-4" />
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-sm font-black text-emerald-600">+{format(tx.amount)}</span>
+                                                    <button
+                                                        onClick={() => handleDownloadReceipt(tx.id)}
+                                                        className="p-1.5 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+                                                        title="Download Receipt"
+                                                    >
+                                                        <Download className="w-3.5 h-3.5" />
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-[10px] px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded font-bold uppercase">{tx.paymentMode}</span>
-                                                {tx.referenceNumber && <span className="text-[10px] text-gray-400 truncate">Ref: {tx.referenceNumber}</span>}
-                                            </div>
+                                            {tx.referenceNumber && (
+                                                <div className="flex items-center gap-1.5 mt-1 border-t border-gray-100 pt-1">
+                                                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />
+                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">REF: {tx.referenceNumber}</span>
+                                                </div>
+                                            )}
                                         </div>
                                     ))
                                 )}
@@ -403,7 +424,7 @@ const CollectionDeskPage: React.FC = () => {
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
                                         data={Object.entries(summary.collectionByOffering).map(([id, amount]) => ({
-                                            name: summary.offeringNames[id] || id,
+                                            name: summary.offeringNames?.[id] || id.substring(0, 8),
                                             amount: amount
                                         }))}
                                         margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -457,12 +478,17 @@ const CollectionDeskPage: React.FC = () => {
                                     summary.recentTransactions.map((tx: any) => (
                                         <div key={tx.id} className="p-4 hover:bg-gray-50/50 transition-colors flex items-center justify-between group">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-[10px] font-black uppercase">
+                                                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-black uppercase">
                                                     {tx.paymentMode?.[0]}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-bold text-gray-900">{format(tx.amount)}</p>
-                                                    <p className="text-[10px] text-gray-500 font-medium uppercase tracking-tight">{tx.paymentMode} • {new Date(tx.transactionDate).toLocaleDateString()}</p>
+                                                    <div className="flex items-center gap-2">
+                                                        <p className="text-sm font-bold text-gray-900">{tx.studentName || `Student: ${tx.studentId?.substring(0, 8)}`}</p>
+                                                        <span className="text-[10px] font-black text-emerald-600">+{format(tx.amount)}</span>
+                                                    </div>
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
+                                                        {tx.offeringName ? `${tx.offeringName} • ` : ''}{tx.paymentMode} • {formatRelativeTime(tx.transactionDate)}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-indigo-400 transition-colors" />

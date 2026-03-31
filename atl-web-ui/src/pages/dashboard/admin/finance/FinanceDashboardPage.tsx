@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { 
-    DollarSign, 
-    TrendingUp, 
-    TrendingDown, 
-    ArrowUpRight, 
+import {
+    TrendingUp,
+    TrendingDown,
+    ArrowUpRight,
     ArrowDownRight,
     Calendar,
     CreditCard,
     PieChart as PieChartIcon,
     BarChart3,
     MoreVertical,
-    Download
+    Download,
+    Banknote,
+    CircleDollarSign
 } from 'lucide-react';
 import { 
     BarChart, 
@@ -32,7 +33,7 @@ import toast from 'react-hot-toast';
 import { useCurrency } from '../../../../context/CurrencyContext';
 
 const FinanceDashboardPage: React.FC = () => {
-    const { format } = useCurrency();
+    const { format, currencySymbol } = useCurrency();
     const [summary, setSummary] = useState<CollectionSummary | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -41,6 +42,21 @@ const FinanceDashboardPage: React.FC = () => {
     const collectionBySource = summary?.feeDistribution || [];
 
     const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444'];
+
+    const formatRelativeTime = (dateString: string) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffInMs = Math.max(0, now.getTime() - date.getTime());
+        const diffInMins = Math.floor(diffInMs / (1000 * 60));
+        const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+
+        if (date.toDateString() === now.toDateString()) {
+            if (diffInMins < 1) return 'Just now';
+            if (diffInMins < 60) return `${diffInMins} min${diffInMins > 1 ? 's' : ''} ago`;
+            return `${diffInHours} hr${diffInHours > 1 ? 's' : ''} ago`;
+        }
+        return date.toLocaleDateString();
+    };
 
     useEffect(() => {
         fetchData();
@@ -73,7 +89,7 @@ const FinanceDashboardPage: React.FC = () => {
                         Export Ledger
                     </button>
                     <button className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 font-bold text-sm">
-                        <DollarSign size={16} />
+                        <CircleDollarSign size={16} />
                         Quick Collection
                     </button>
                 </div>
@@ -98,7 +114,7 @@ const FinanceDashboardPage: React.FC = () => {
                 <KPICard 
                     title="Annual Collection" 
                     value={format(summary?.yearCollection || 0)}
-                    icon={<DollarSign className="text-blue-600" />}
+                    icon={<Banknote className="text-blue-600" />}
                     trend={`Target: ${format(50000000)}`}
                     trendType="neutral"
                 />
@@ -135,7 +151,7 @@ const FinanceDashboardPage: React.FC = () => {
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} tickFormatter={(value) => `₹${value/1000}k`} />
+                                <YAxis axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 12}} tickFormatter={(value) => `${currencySymbol}${value/1000}k`} />
                                 <Tooltip 
                                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                                     formatter={(value: any) => [format(value), '']}
@@ -227,13 +243,17 @@ const FinanceDashboardPage: React.FC = () => {
                                         <ArrowUpRight size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-bold text-gray-900">Student: {t.studentId?.substring(0, 8)}</p>
-                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">{t.paymentMode || 'Online Payment'}</p>
+                                        <p className="text-sm font-bold text-gray-900">{t.studentName || `Student: ${t.studentId?.substring(0, 8)}`}</p>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                                            {t.offeringName ? `${t.offeringName} • ` : ''}{t.paymentMode || 'Online Payment'}
+                                        </p>
                                     </div>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-sm font-black text-emerald-600">+{format(t.amount || 0)}</p>
-                                    <p className="text-[10px] text-gray-400 font-medium">Just now</p>
+                                    <p className="text-[10px] text-gray-400 font-medium">
+                                        {formatRelativeTime(t.transactionDate)}
+                                    </p>
                                 </div>
                             </div>
                         ))}

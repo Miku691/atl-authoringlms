@@ -28,4 +28,5 @@ public class ApplicationConstant {
     public static final String ACCESS_DENIED_MSG = "Access Denied: You are not valid or don't have permission to access.";
 
     public static final String DEFAULT_PASSWORD = "changeMe@123";
+    public static final String TENANT_CODE_PREFIX = "IMS-";
 }

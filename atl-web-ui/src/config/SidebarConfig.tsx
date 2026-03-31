@@ -122,7 +122,9 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             roles: ['TENANT_ADMIN', 'INSTRUCTOR'],
             setupRequired: true,
             subItems: [
+                { path: '/academics/sessions', label: 'Academic Sessions', icon: Calendar, roles: ['TENANT_ADMIN'] },
                 { path: '/academics/offerings', label: offeringLabel, icon: Layers, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
+                { path: '/academics/promotion', label: 'Promotion Center', icon: GraduationCap, roles: ['TENANT_ADMIN'] },
                 { path: '/academics/subjects', label: 'Subjects', icon: BookOpen, roles: ['TENANT_ADMIN'] },
                 { path: '/academics/timetable', label: 'Timetable', icon: Clock, roles: ['TENANT_ADMIN', 'INSTRUCTOR'], condition: () => hasActiveOfferings },
                 { path: '/academics/grading', label: 'Grading Scales', icon: FileText, roles: ['TENANT_ADMIN'] },
@@ -197,6 +199,7 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
                 { path: '/finance/fee-heads', label: 'Fee Heads', icon: Tag, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
                 { path: '/finance/late-fee-rules', label: 'Late Fee Policies', icon: Clock, roles: ['TENANT_ADMIN'] },
                 { path: '/finance/config', label: 'Financial Masters', icon: Settings, roles: ['TENANT_ADMIN'] },
+                // { path: '/finance/concessions', label: 'Concessions', icon: FileText, roles: ['TENANT_ADMIN'] },
                 { path: '/finance/structure', label: 'Fee Structure', icon: FileText, roles: ['TENANT_ADMIN'] },
                 { path: '/finance/installment-plans', label: 'Installment Plans', icon: Calendar, roles: ['TENANT_ADMIN'] },
                 { path: '/finance/collection-desk', label: 'Collection Desk', icon: Banknote, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
@@ -252,9 +255,18 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             roles: ['TENANT_ADMIN'],
             setupRequired: true,
             subItems: [
-                { path: '/reports/academic', label: 'Academic Reports', icon: BarChart3 },
-                { path: '/reports/attendance', label: 'Attendance Reports', icon: ListChecks },
+                { path: '/reports/people', label: 'People Reports', icon: Users },
+                { path: '/reports/academic', label: 'Academic Reports', icon: BookOpen },
                 { path: '/reports/financial', label: 'Financial Reports', icon: DollarSign },
+            ]
+        },
+        {
+            path: '/templates',
+            label: 'Templates',
+            icon: Layers,
+            roles: ['TENANT_ADMIN'],
+            subItems: [
+                { path: '/system/templates/invoice', label: 'Invoice Template', icon: FileText, roles: ['TENANT_ADMIN'] },
             ]
         },
         {

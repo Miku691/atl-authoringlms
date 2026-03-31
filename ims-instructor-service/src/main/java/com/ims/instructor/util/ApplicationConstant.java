@@ -8,4 +8,5 @@ public class ApplicationConstant {
     public static final String ROLES_HEADER = "X-Roles";
     public static final String TENANT_ID_HEADER = "X-Tenant-Id";
     public static final String ROLE_PREFIX = "ROLE_";
+    public static final String EMP_ID_PREFIX = "IMS-";
 }

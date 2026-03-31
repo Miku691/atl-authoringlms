@@ -1,0 +1,32 @@
+package com.ims.reports.util;
+
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class ApiResponse<T> {
+    private String status;
+    private int statusCode;
+    private String message;
+    private T apiData;
+
+    public static <T> ApiResponse<T> success(int statusCode, String message, T apiData) {
+        return ApiResponse.<T>builder()
+                .status("SUCCESS")
+                .statusCode(statusCode)
+                .message(message)
+                .apiData(apiData)
+                .build();
+    }
+
+    public static <T> ApiResponse<T> failed(int statusCode, String message) {
+        return ApiResponse.<T>builder()
+                .status("FAILED")
+                .statusCode(statusCode)
+                .message(message)
+                .build();
+    }
+}

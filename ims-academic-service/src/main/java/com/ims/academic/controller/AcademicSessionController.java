@@ -2,6 +2,7 @@ package com.ims.academic.controller;
 
 import com.ims.academic.dto.AcademicSessionDto;
 import com.ims.academic.service.AcademicSessionService;
+import com.ims.academic.service.AcademicSessionCloneService;
 import com.ims.academic.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,17 @@ import java.util.List;
 public class AcademicSessionController {
 
     private final AcademicSessionService service;
+    private final AcademicSessionCloneService cloneService;
+
+    @PostMapping("/{id}/clone-structure")
+    public ResponseEntity<ApiResponse<Void>> cloneStructure(
+            @PathVariable String id,
+            @RequestParam String sourceSessionId,
+            @RequestHeader("X-Tenant-Id") String tenantId) {
+        
+        cloneService.cloneStructure(sourceSessionId, id, tenantId);
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Structure cloned successfully", null));
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<AcademicSessionDto>> create(@RequestBody AcademicSessionDto dto) {

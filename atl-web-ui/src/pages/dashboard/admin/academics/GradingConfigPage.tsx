@@ -37,7 +37,9 @@ const GradingConfigPage: React.FC = () => {
         setLoading(true);
         try {
             const response = await academicService.getGradingScales(user.tenantId);
-            setScales(response.apiData || []);
+            // Handle both wrapped and direct array responses
+            const data = Array.isArray(response) ? response : (response.apiData || []);
+            setScales(data);
         } catch (error) {
             console.error("Failed to fetch grading scales", error);
             toast.error("Failed to load grading scales");

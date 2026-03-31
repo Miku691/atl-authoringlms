@@ -72,6 +72,8 @@ export interface Transaction {
     paymentMode: PaymentMode;
     referenceNumber?: string;
     transactionDate: string;
+    studentName?: string;
+    offeringName?: string;
     tenantId: string;
     collectedBy: string;
 }

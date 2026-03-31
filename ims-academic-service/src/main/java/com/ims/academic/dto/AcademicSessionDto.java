@@ -14,5 +14,7 @@ public class AcademicSessionDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private boolean isCurrent;
+    private String status; // DRAFT, ENROLLMENT_OPEN, ACTIVE, YEP, CLOSED
+    private boolean isLocked;
     private String programId;
 }

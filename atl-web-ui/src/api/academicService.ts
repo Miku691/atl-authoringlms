@@ -62,6 +62,17 @@ export interface GradingScale {
     tenantId: string;
 }
 
+export interface AcademicSession {
+    id: string;
+    tenantId: string;
+    name: string;
+    startDate: string;
+    endDate: string;
+    isCurrent: boolean;
+    status: 'DRAFT' | 'ENROLLMENT_OPEN' | 'ACTIVE' | 'CLOSED';
+    programId?: string;
+}
+
 export const academicService = {
     // Departments
     getDepartments: async () => {
@@ -265,5 +276,11 @@ export const academicService = {
     getBulkSetupStatus: async (tenantId: string) => {
         const response = await api.get(`/ims-academic-service/api/v1/academic/bulk-setup/status?tenantId=${tenantId}`);
         return response.data;
+    },
+
+    // Sessions
+    getSessionsByTenant: async (tenantId: string) => {
+        const response = await api.get(`/ims-academic-service/sessions/tenant/${tenantId}`);
+        return response.data.apiData;
     }
 };

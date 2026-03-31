@@ -8,9 +8,10 @@ import DashboardChart from './components/DashboardChart';
 import {
     Users, BookOpen, GraduationCap, TrendingUp, Bell,
     PlusCircle, Calendar, ShieldCheck, ArrowUpRight, Clock, MapPin,
-    LayoutDashboard, UserPlus, FileText, Settings
+    LayoutDashboard, UserPlus, FileText, Settings, CreditCard
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { financeService } from '../../../api/financeService';
 
 const AdminDashboardHome: React.FC = () => {
     const navigate = useNavigate();
@@ -19,7 +20,14 @@ const AdminDashboardHome: React.FC = () => {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [genderStats, setGenderStats] = useState<GenderStat[]>([]);
     const [offeringStats, setOfferingStats] = useState<OfferingStat[]>([]);
+    const [financeSummary, setFinanceSummary] = useState<any>(null);
+    const [currentTime, setCurrentTime] = useState(new Date());
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
 
     useEffect(() => {
         if (user?.tenantId) {
@@ -31,16 +39,18 @@ const AdminDashboardHome: React.FC = () => {
         if (!user?.tenantId) return;
         setLoading(true);
         try {
-            const [announcRes, statsData, gStats, oStats] = await Promise.all([
+            const [announcRes, statsData, gStats, oStats, fSummary] = await Promise.all([
                 announcementService.getAnnouncementsByTenant(user.tenantId),
                 dashboardService.getStats(user.tenantId),
                 dashboardService.getGenderStats(user.tenantId),
-                dashboardService.getOfferingStats(user.tenantId)
+                dashboardService.getOfferingStats(user.tenantId),
+                financeService.getCollectionSummary().catch(() => null)
             ]);
             setAnnouncements(announcRes.apiData || []);
             setStats(statsData);
             setGenderStats(gStats);
             setOfferingStats(oStats);
+            setFinanceSummary(fSummary);
         } catch (error) {
             console.error("Dashboard data fetch failed", error);
             toast.error("Failed to load some dashboard metrics");
@@ -82,6 +92,22 @@ const AdminDashboardHome: React.FC = () => {
             color: 'purple',
             path: '/academics/offerings'
         },
+        {
+            label: "Today's Collection",
+            value: financeSummary ? `₹${financeSummary.todayCollection.toLocaleString()}` : '₹0',
+            change: '+12%',
+            icon: CreditCard,
+            color: 'emerald',
+            path: '/finance/dashboard'
+        },
+        {
+            label: 'Monthly Collection',
+            value: financeSummary ? `₹${financeSummary.monthCollection.toLocaleString()}` : '₹0',
+            change: '+5%',
+            icon: TrendingUp,
+            color: 'indigo',
+            path: '/finance/dashboard'
+        }
     ];
 
     const quickActions = [
@@ -101,9 +127,14 @@ const AdminDashboardHome: React.FC = () => {
                     </h1>
                 </div>
                 <div className="flex items-center gap-3">
-                    <div className="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Session 2024-25 ACTIVE</span>
+                    <div className="bg-white px-4 py-3 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4 hover:border-emerald-500/30 transition-colors group">
+                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">System Time</span>
+                            <span className="text-sm font-black text-slate-700 tracking-tight leading-none group-hover:text-emerald-600 transition-colors">
+                                {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {currentTime.toLocaleDateString([], { day: 'numeric', month: 'short' })}
+                            </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -125,7 +156,7 @@ const AdminDashboardHome: React.FC = () => {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
                 {statCards.map((stat, index) => (
                     <div
                         key={index}

@@ -5,7 +5,6 @@ import com.atl.auth.dto.ImsTenantsDto;
 import com.atl.auth.entity.AtlUser;
 import com.atl.auth.entity.ImsTenants;
 import com.atl.auth.exception.ApiResponse;
-import com.atl.auth.exception.ResourceAlreadyExistException;
 import com.atl.auth.exception.ResourceNotFoundException;
 import com.atl.auth.repo.AtlUserRepo;
 import com.atl.auth.repo.ImsTenantsRepo;
@@ -38,9 +37,9 @@ public class ImsTenantsService {
     }
 
     public ApiResponse<ImsTenantsDto> create(ImsTenantsDto dto) {
-        if (repo.existsByTenantCode(dto.getTenantCode())) {
-            throw new ResourceAlreadyExistException("Tenant Code", dto.getTenantCode());
-        }
+        // Generate unique tenant code
+        String tenantCode = generateUniqueTenantCode();
+        dto.setTenantCode(tenantCode);
         AtlUser user = userRepo.findByUsername(dto.getBootstrapUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("User Id", dto.getBootstrapUsername()));
 
@@ -110,5 +109,18 @@ public class ImsTenantsService {
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tenant setup not completed in Academic Service");
         }
+    }
+    private String generateUniqueTenantCode() {
+        String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        java.security.SecureRandom random = new java.security.SecureRandom();
+        String code;
+        do {
+            StringBuilder sb = new StringBuilder(6);
+            for (int i = 0; i < 6; i++) {
+                sb.append(base.charAt(random.nextInt(base.length())));
+            }
+            code = ApplicationConstant.TENANT_CODE_PREFIX + sb.toString();
+        } while (repo.existsByTenantCode(code));
+        return code;
     }
 }

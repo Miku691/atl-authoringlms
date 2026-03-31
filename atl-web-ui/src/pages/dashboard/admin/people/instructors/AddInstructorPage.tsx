@@ -13,7 +13,7 @@ import {
     Briefcase,
     GraduationCap,
     MapPin,
-    DollarSign,
+    Banknote,
     Loader2,
     BookOpen,
     Clock
@@ -39,7 +39,6 @@ const AddInstructorPage: React.FC = () => {
         lastName: '',
         email: '',
         phone: '',
-        employeeId: '',
         joinDate: new Date(),
         gender: 'Male',
         status: 'Active',
@@ -73,7 +72,6 @@ const AddInstructorPage: React.FC = () => {
             newErrors.phone = 'Phone number must be 10 digits';
         }
 
-        if (!formData.employeeId?.trim()) newErrors.employeeId = 'Employee ID is required';
         if (!formData.joinDate) newErrors.joinDate = 'Join date is required';
         if (!formData.dob) newErrors.dob = 'Date of birth is required';
         if (!formData.qualification?.trim()) newErrors.qualification = 'Qualification is required';
@@ -115,14 +113,21 @@ const AddInstructorPage: React.FC = () => {
         setIsSubmitting(true);
         try {
             const payload = {
-                ...formData,
-                userId: null, // Access will be granted later via management page
-                tenantId: tenantId,
-                status: formData.status?.toUpperCase() || 'ACTIVE',
-                joinDate: formData.joinDate ? formData.joinDate.toISOString().split('T')[0] : null,
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
                 dob: formData.dob ? formData.dob.toISOString().split('T')[0] : null,
+                gender: formData.gender,
+                address: formData.address,
+                qualification: formData.qualification,
+                specialization: formData.specialization,
+                experience: formData.experience,
+                joinDate: formData.joinDate ? formData.joinDate.toISOString().split('T')[0] : null,
+                status: formData.status?.toUpperCase() || 'ACTIVE',
                 monthlySalary: formData.monthlySalary ? parseFloat(formData.monthlySalary.toString()) : null,
-                experience: formData.experience
+                userId: null,
+                tenantId: tenantId
             };
 
             const response = await api.post('/ims-instructor-service/instructors', payload);
@@ -236,15 +241,6 @@ const AddInstructorPage: React.FC = () => {
                             </h2>
                         </div>
 
-                        <FloatingLabelInput
-                            label="Employee ID"
-                            name="employeeId"
-                            value={formData.employeeId}
-                            onChange={handleInputChange}
-                            icon={<Briefcase className="w-5 h-5" />}
-                            error={errors.employeeId}
-                            required
-                        />
 
                         <CustomDatePicker
                             label="Join Date"
@@ -291,7 +287,7 @@ const AddInstructorPage: React.FC = () => {
                             type="number"
                             value={formData.monthlySalary}
                             onChange={handleInputChange}
-                            icon={<DollarSign className="w-5 h-5" />}
+                            icon={<Banknote className="w-5 h-5" />}
                         />
 
                         <div className="col-span-full">

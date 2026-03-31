@@ -80,8 +80,8 @@ const FeeHeadManagementPage: React.FC = () => {
             toast.success("Fee Head removed");
             setIsDeleteModalOpen(false);
             fetchHeads();
-        } catch (error) {
-            toast.error("Deletion failed");
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || "Deletion failed");
         }
     };
 

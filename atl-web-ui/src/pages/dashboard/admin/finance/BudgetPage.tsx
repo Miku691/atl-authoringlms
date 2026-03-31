@@ -6,36 +6,58 @@ import { financeService } from '../../../../api/financeService';
 import type { Budget, ExpenseCategory } from '../../../../types/finance';
 import { useCurrency } from '../../../../context/CurrencyContext';
 import { getCurrencySymbol } from '../../../../utils/currency';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../../store/store';
+import { academicService, type AcademicSession } from '../../../../api/academicService';
 import toast from 'react-hot-toast';
 
 export const BudgetPage: React.FC = () => {
     const { format, currencyCode } = useCurrency();
+    const { user } = useSelector((state: RootState) => state.auth);
     const [budgets, setBudgets] = useState<Budget[]>([]);
     const [categories, setCategories] = useState<ExpenseCategory[]>([]);
+    const [sessions, setSessions] = useState<AcademicSession[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [academicYear, setAcademicYear] = useState('2023-24'); // Should be dynamic
+    const [academicYear, setAcademicYear] = useState('');
     const [formData, setFormData] = useState<Partial<Budget>>({
         categoryId: '',
         allocatedAmount: 0,
-        academicYear: '2023-24'
+        academicYear: ''
     });
 
     useEffect(() => {
-        fetchData();
-    }, [academicYear]);
+        if (user?.tenantId) {
+            fetchData();
+        }
+    }, [academicYear, user?.tenantId]);
 
     const fetchData = async () => {
+        if (!user?.tenantId) return;
         try {
             setIsLoading(true);
-            const [budgetData, catData] = await Promise.all([
+            const [budgetData, catData, sessionData] = await Promise.all([
                 financeService.getBudgets(academicYear),
-                financeService.getExpenseCategories()
+                financeService.getExpenseCategories(),
+                academicService.getSessionsByTenant(user.tenantId)
             ]);
             setBudgets(budgetData);
             setCategories(catData);
+            setSessions(sessionData);
+
+            // Set default academic year if not already set
+            if (!academicYear) {
+                const current = sessionData.find((s: AcademicSession) => s.isCurrent);
+                if (current) {
+                    setAcademicYear(current.name);
+                    setFormData(prev => ({ ...prev, academicYear: current.name }));
+                } else if (sessionData.length > 0) {
+                    setAcademicYear(sessionData[0].name);
+                    setFormData(prev => ({ ...prev, academicYear: sessionData[0].name }));
+                }
+            }
         } catch (error) {
-            toast.error('Failed to load budget data');
+            toast.error('Failed to load initial data');
         } finally {
             setIsLoading(false);
         }
@@ -79,11 +101,18 @@ export const BudgetPage: React.FC = () => {
                 <div className="flex items-center space-x-3">
                     <select
                         value={academicYear}
-                        onChange={(e) => setAcademicYear(e.target.value)}
+                        onChange={(e) => {
+                            setAcademicYear(e.target.value);
+                            setFormData(prev => ({ ...prev, academicYear: e.target.value }));
+                        }}
                         className="px-3 py-2 border border-gray-300 rounded-lg outline-none bg-white text-sm font-medium"
                     >
-                        <option value="2023-24">2023-24</option>
-                        <option value="2024-25">2024-25</option>
+                        <option value="">Select Year</option>
+                        {sessions.sort((a,b) => b.name.localeCompare(a.name)).map(s => (
+                            <option key={s.id} value={s.name}>
+                                {s.name} {s.isCurrent ? '(Current)' : ''}
+                            </option>
+                        ))}
                     </select>
                     <button
                         onClick={() => setIsModalOpen(true)}

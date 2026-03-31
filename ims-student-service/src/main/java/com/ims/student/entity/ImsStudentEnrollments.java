@@ -50,6 +50,12 @@ public class ImsStudentEnrollments {
     @Column(name = "status", length = 20)
     private String status; // ACTIVE / COMPLETED / WITHDRAWN
 
+    @Column(name = "result_status", length = 20)
+    private String resultStatus; // PASS / FAIL / PROBATION
+
+    @Column(name = "academic_snapshot", columnDefinition = "TEXT")
+    private String academicSnapshot; // JSON snapshot of grades/GPA
+
     @Column(name = "is_deleted")
     @Builder.Default
     private boolean isDeleted = false;

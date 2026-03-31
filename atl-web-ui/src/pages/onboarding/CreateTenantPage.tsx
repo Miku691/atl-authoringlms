@@ -19,7 +19,6 @@ const COUNTRY_CODES = [
 
 interface TenantDto {
     tenantName: string;
-    tenantCode: string;
     address: string;
     contactEmail: string;
     contactPhone: string;
@@ -38,7 +37,6 @@ const CreateTenantPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         tenantName: '',
-        tenantCode: '',
         address: '',
         contactEmail: user?.username || '',
         countryCode: '+91',
@@ -51,7 +49,6 @@ const CreateTenantPage: React.FC = () => {
     const validateForm = () => {
         const newErrors: { [key: string]: string } = {};
         if (!formData.tenantName.trim()) newErrors.tenantName = 'Institute Name is required';
-        if (!formData.tenantCode.trim()) newErrors.tenantCode = 'Institute Code is required';
         if (!formData.address.trim()) newErrors.address = 'Address is required';
         if (!formData.contactEmail) {
             newErrors.contactEmail = 'Contact Email is required';
@@ -88,7 +85,6 @@ const CreateTenantPage: React.FC = () => {
         try {
             const payload: TenantDto = {
                 tenantName: formData.tenantName,
-                tenantCode: formData.tenantCode,
                 address: formData.address,
                 contactEmail: formData.contactEmail,
                 contactPhone: `${formData.countryCode}${formData.contactPhone}`,
@@ -124,19 +120,6 @@ const CreateTenantPage: React.FC = () => {
         }
     };
 
-    // Auto-generate code from name
-    const handleNameBlur = () => {
-        if (formData.tenantName && !formData.tenantCode) {
-            const code = formData.tenantName
-                .toUpperCase()
-                .replace(/[^A-Z0-9]/g, '')
-                .substring(0, 6);
-            setFormData(prev => ({ ...prev, tenantCode: code }));
-            if (errors.tenantCode) {
-                setErrors(prev => ({ ...prev, tenantCode: '' }));
-            }
-        }
-    };
 
     return (
         <div className="min-h-screen bg-white flex">
@@ -177,22 +160,10 @@ const CreateTenantPage: React.FC = () => {
                             required
                             value={formData.tenantName}
                             onChange={handleChange}
-                            onBlur={handleNameBlur}
                             icon={<Building2 className="h-5 w-5" />}
                             error={errors.tenantName}
                         />
 
-                        <FloatingLabelInput
-                            label="Institute Code (Unique ID)"
-                            name="tenantCode"
-                            required
-                            maxLength={10}
-                            value={formData.tenantCode}
-                            onChange={handleChange}
-                            icon={<div className="h-5 w-5 font-mono text-xs flex items-center justify-center border-2 border-current rounded-md">ID</div>}
-                            error={errors.tenantCode}
-                            className="uppercase"
-                        />
 
                         <FloatingLabelInput
                             label="Address"

@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
-import java.time.LocalDate;
+import java.math.BigDecimal;
 
 @Repository
 public interface StudentFeeRecordRepository extends JpaRepository<StudentFeeRecord, String> {
@@ -29,15 +29,18 @@ public interface StudentFeeRecordRepository extends JpaRepository<StudentFeeReco
     
     List<StudentFeeRecord> findByTenantIdAndOfferingIdAndStatusInAndDueDateBefore(String tenantId, String offeringId, List<StudentFeeRecord.FeeStatus> statuses, java.time.LocalDate date);
 
-    List<StudentFeeRecord> findByTenantIdAndBalanceGreaterThan(String tenantId, java.math.BigDecimal balance);
+    List<StudentFeeRecord> findByTenantIdAndBalanceGreaterThan(String tenantId, BigDecimal balance);
 
     List<StudentFeeRecord> findByTenantIdAndAcademicYear(String tenantId, String academicYear);
 
     boolean existsByFeeHeadId(String feeHeadId);
 
     @Query("SELECT SUM(s.balance) FROM StudentFeeRecord s WHERE s.tenantId = :tenantId")
-    java.math.BigDecimal sumTotalBalance(@Param("tenantId") String tenantId);
+    BigDecimal sumTotalBalance(@Param("tenantId") String tenantId);
 
     @Query("SELECT s.feeHeadId, SUM(s.amountPaid) FROM StudentFeeRecord s WHERE s.tenantId = :tenantId GROUP BY s.feeHeadId")
     List<Object[]> sumPaidByFeeHead(@Param("tenantId") String tenantId);
+
+    @Query("SELECT SUM(s.balance) FROM StudentFeeRecord s WHERE s.studentId = :studentId AND s.academicYear = :year AND s.tenantId = :tenantId")
+    BigDecimal sumBalanceByStudentAndYear(@Param("studentId") String studentId, @Param("year") String year, @Param("tenantId") String tenantId);
 }
