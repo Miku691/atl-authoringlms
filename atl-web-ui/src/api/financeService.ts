@@ -184,6 +184,14 @@ export const financeService = {
         return response.data;
     },
 
+    downloadHighFidelityReceipt: async (receiptNo: string) => {
+        const response = await api.get(`/ims-reports-service/api/v1/reports/download-receipt`, {
+            params: { receiptNo },
+            responseType: 'blob'
+        });
+        return response.data;
+    },
+
     // Refunds
     processRefund: async (data: RefundRequest) => {
         const response = await api.post(`${BASE_URL}/refund`, data);

@@ -40,4 +40,10 @@ public class CollectPaymentDTO {
      * Whether to waive the applied late fee for the targeted fee records.
      */
     private Boolean waiveLateFee;
+
+    /**
+     * Specific breakdown of amounts per fee head record.
+     * This allows splitting a single transaction into multiple fee heads specifically.
+     */
+    private List<FeePaymentDetailDTO> splitBreakdown;
 }

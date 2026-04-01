@@ -111,6 +111,22 @@ public class FinanceController {
     }
 
     /**
+     * Retrieves all transactions associated with a specific receipt number.
+     *
+     * @param receiptNo receipt number
+     * @param tenantId  tenant ID
+     * @return list of transactions
+     */
+    @GetMapping("/transactions/receipt")
+    @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'ACCOUNTANT', 'STUDENT', 'GUARDIAN', 'PARENT')")
+    public ResponseEntity<ApiResponse<List<TransactionDTO>>> getTransactionsByReceipt(
+            @RequestParam String receiptNo,
+            @RequestParam String tenantId) {
+        List<TransactionDTO> transactions = financeService.getTransactionsByReceipt(receiptNo, tenantId);
+        return ResponseEntity.ok(ApiResponse.success("Transactions for receipt fetched successfully", transactions));
+    }
+
+    /**
      * Downloads a PDF receipt for a specific transaction.
      *
      * @param transactionId transaction ID

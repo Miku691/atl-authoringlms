@@ -36,5 +36,6 @@ public interface StudentServiceClient {
         private String lastName;
         private String enrollmentId;
         private String tenantId;
+        private String email;
     }
 }

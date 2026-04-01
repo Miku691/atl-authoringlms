@@ -12,6 +12,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.core.io.FileSystemResource;
+import java.io.File;
+import java.util.Objects;
 
 /**
  * Implementation of EmailService using JavaMailSender and @Async for
@@ -49,13 +52,6 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    private void sendTextEmail(EmailRequestDto request) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(request.getTo());
-        message.setSubject(request.getSubject());
-        message.setText(request.getBody());
-        mailSender.send(message);
-    }
 
     private void sendHtmlEmail(EmailRequestDto request) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
@@ -63,6 +59,31 @@ public class EmailServiceImpl implements EmailService {
         helper.setTo(request.getTo());
         helper.setSubject(request.getSubject());
         helper.setText(request.getBody(), true);
+
+        if (request.getAttachmentPath() != null && !request.getAttachmentPath().isEmpty()) {
+            File file = new File(request.getAttachmentPath());
+            if (file.exists()) {
+                FileSystemResource res = new FileSystemResource(file);
+                helper.addAttachment(Objects.requireNonNull(res.getFilename()), res);
+                log.info("Attached file: {} to email", request.getAttachmentPath());
+            } else {
+                log.warn("Attachment file not found at path: {}", request.getAttachmentPath());
+            }
+        }
+
+        mailSender.send(message);
+    }
+
+    private void sendTextEmail(EmailRequestDto request) throws MessagingException {
+        if (request.getAttachmentPath() != null && !request.getAttachmentPath().isEmpty()) {
+            // If attachment exists, we must use MimeMessage even for text
+            sendHtmlEmail(request); 
+            return;
+        }
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(request.getTo());
+        message.setSubject(request.getSubject());
+        message.setText(request.getBody());
         mailSender.send(message);
     }
 }

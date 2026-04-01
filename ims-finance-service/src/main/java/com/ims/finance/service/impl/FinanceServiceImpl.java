@@ -3,6 +3,7 @@ package com.ims.finance.service.impl;
 import com.ims.finance.client.StudentServiceClient;
 import com.ims.finance.dto.CollectPaymentDTO;
 import com.ims.finance.dto.CollectionSummaryDTO;
+import com.ims.finance.dto.FeePaymentDetailDTO;
 import com.ims.finance.dto.RefundDTO;
 import com.ims.finance.dto.TransactionDTO;
 import com.ims.finance.entity.DemandNote;
@@ -30,6 +31,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.GrantedAuthority;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,6 +52,7 @@ public class FinanceServiceImpl implements FinanceService {
     private final ExpenseCategoryRepository expenseCategoryRepository;
     private final StudentServiceClient studentServiceClient;
     private final com.ims.finance.client.OfferingServiceClient offeringServiceClient;
+    private final InvoiceAsyncService invoiceAsyncService;
     private final ModelMapper modelMapper;
 
     public FinanceServiceImpl(StudentFeeRecordRepository studentFeeRecordRepository,
@@ -60,6 +64,7 @@ public class FinanceServiceImpl implements FinanceService {
             ExpenseCategoryRepository expenseCategoryRepository,
             StudentServiceClient studentServiceClient,
             com.ims.finance.client.OfferingServiceClient offeringServiceClient,
+            InvoiceAsyncService invoiceAsyncService,
             ModelMapper modelMapper) {
         this.studentFeeRecordRepository = studentFeeRecordRepository;
         this.transactionRepository = transactionRepository;
@@ -70,6 +75,7 @@ public class FinanceServiceImpl implements FinanceService {
         this.expenseCategoryRepository = expenseCategoryRepository;
         this.studentServiceClient = studentServiceClient;
         this.offeringServiceClient = offeringServiceClient;
+        this.invoiceAsyncService = invoiceAsyncService;
         this.modelMapper = modelMapper;
     }
 
@@ -88,8 +94,8 @@ public class FinanceServiceImpl implements FinanceService {
         // Fetch offering names for the entire summary (including charts and recent tx)
         Map<String, String> offeringNames = new HashMap<>();
         try {
-            ApiResponse<List<com.ims.finance.client.OfferingServiceClient.OfferingResponse>> offeringRes = 
-                offeringServiceClient.getOfferingsByTenant(tenantId);
+            ApiResponse<List<com.ims.finance.client.OfferingServiceClient.OfferingResponse>> offeringRes = offeringServiceClient
+                    .getOfferingsByTenant(tenantId);
             if (offeringRes != null && offeringRes.getApiData() != null) {
                 offeringRes.getApiData().forEach(o -> offeringNames.put(o.getId(), o.getName()));
             }
@@ -103,29 +109,50 @@ public class FinanceServiceImpl implements FinanceService {
             collectionByOffering.put((String) row[0], (BigDecimal) row[1]);
         }
 
-        List<TransactionDTO> recent = transactionRepository.findAllByTenantIdOrderByTransactionDateDesc(tenantId)
+        // 1. Fetch recent transactions (fetch more to allow grouping)
+        List<Transaction> recentRaw = transactionRepository.findAllByTenantIdOrderByTransactionDateDesc(tenantId)
                 .stream()
-                .limit(10)
-                .map(t -> {
-                    TransactionDTO dto = modelMapper.map(t, TransactionDTO.class);
-                    // Fetch Student Name (Small batch, 10 items max)
-                    try {
-                        ApiResponse<StudentServiceClient.StudentResponse> studentRes = studentServiceClient.getStudentById(t.getStudentId());
-                        if (studentRes != null && studentRes.getApiData() != null) {
-                            dto.setStudentName(studentRes.getApiData().getFirstName() + " " + studentRes.getApiData().getLastName());
-                        } else {
-                            dto.setStudentName("Student: " + t.getStudentId().substring(0, 8));
-                        }
-                    } catch (Exception e) {
+                .limit(50) 
+                .collect(Collectors.toList());
+
+        // 2. Group by ReceiptNo 
+        Map<String, TransactionDTO> groupedRecent = new LinkedHashMap<>(); // Use LinkedHashMap to maintain time order
+
+        for (Transaction t : recentRaw) {
+            String groupKey = (t.getReceiptNo() != null && !t.getReceiptNo().isEmpty()) ? t.getReceiptNo() : t.getId();
+            
+            if (groupedRecent.containsKey(groupKey)) {
+                TransactionDTO existing = groupedRecent.get(groupKey);
+                existing.setAmount(existing.getAmount().add(t.getAmount()));
+                if (t.getFeeHeadName() != null && !t.getFeeHeadName().isEmpty()) {
+                    existing.setFeeHeadName(existing.getFeeHeadName() + ", " + t.getFeeHeadName());
+                }
+            } else {
+                TransactionDTO dto = modelMapper.map(t, TransactionDTO.class);
+                // Fetch Student Name (Small batch, 10 items max)
+                try {
+                    ApiResponse<StudentServiceClient.StudentResponse> studentRes = studentServiceClient
+                            .getStudentById(t.getStudentId());
+                    if (studentRes != null && studentRes.getApiData() != null) {
+                        dto.setStudentName(studentRes.getApiData().getFirstName() + " "
+                                + studentRes.getApiData().getLastName());
+                    } else {
                         dto.setStudentName("Student: " + t.getStudentId().substring(0, 8));
                     }
-                    
-                    if (t.getOfferingId() != null) {
-                        dto.setOfferingName(resolveOfferingName(t.getOfferingId(), offeringNames));
-                    }
-                    return dto;
-                })
-                .collect(Collectors.toList());
+                } catch (Exception e) {
+                    dto.setStudentName("Student: " + t.getStudentId().substring(0, 8));
+                }
+
+                if (t.getOfferingId() != null) {
+                    dto.setOfferingName(resolveOfferingName(t.getOfferingId(), offeringNames));
+                }
+                groupedRecent.put(groupKey, dto);
+            }
+            
+            if (groupedRecent.size() >= 10) break; // We only need top 10 grouped items
+        }
+
+        List<TransactionDTO> recent = new ArrayList<>(groupedRecent.values());
 
         // Ensure all offering IDs in the chart have names in the map
         for (String id : collectionByOffering.keySet()) {
@@ -136,38 +163,39 @@ public class FinanceServiceImpl implements FinanceService {
 
         // 1. Pending Receivables
         BigDecimal pendingReceivables = studentFeeRecordRepository.sumTotalBalance(tenantId);
-        if (pendingReceivables == null) pendingReceivables = BigDecimal.ZERO;
+        if (pendingReceivables == null)
+            pendingReceivables = BigDecimal.ZERO;
 
         // 2. Monthly Trend (Last 6 Months)
         LocalDate trendStart = LocalDate.now().minusMonths(5).withDayOfMonth(1);
         LocalDateTime trendStartDateTime = trendStart.atStartOfDay();
-        
+
         List<Object[]> incomeTrend = transactionRepository.sumAmountByMonth(tenantId, trendStartDateTime);
         List<Object[]> expenseTrend = expenseRepository.sumAmountByMonth(tenantId, trendStart);
-        
+
         List<Map<String, Object>> monthlyTrend = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             LocalDate monthDate = trendStart.plusMonths(i);
             int yearVal = monthDate.getYear();
             int monthVal = monthDate.getMonthValue();
             String monthName = monthDate.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, Locale.ENGLISH);
-            
+
             BigDecimal income = BigDecimal.ZERO;
             for (Object[] row : incomeTrend) {
-                if (((Number)row[0]).intValue() == yearVal && ((Number)row[1]).intValue() == monthVal) {
+                if (((Number) row[0]).intValue() == yearVal && ((Number) row[1]).intValue() == monthVal) {
                     income = (BigDecimal) row[2];
                     break;
                 }
             }
-            
+
             BigDecimal expense = BigDecimal.ZERO;
             for (Object[] row : expenseTrend) {
-                if (((Number)row[0]).intValue() == yearVal && ((Number)row[1]).intValue() == monthVal) {
+                if (((Number) row[0]).intValue() == yearVal && ((Number) row[1]).intValue() == monthVal) {
                     expense = (BigDecimal) row[2];
                     break;
                 }
             }
-            
+
             Map<String, Object> data = new HashMap<>();
             data.put("month", monthName);
             data.put("income", income);
@@ -181,7 +209,7 @@ public class FinanceServiceImpl implements FinanceService {
         List<FeeHead> allFeeHeads = feeHeadRepository.findAllByTenantId(tenantId);
         Map<String, String> headNames = allFeeHeads.stream()
                 .collect(Collectors.toMap(FeeHead::getId, FeeHead::getName, (a, b) -> a));
-        
+
         for (Object[] row : distributionData) {
             Map<String, Object> item = new HashMap<>();
             item.put("name", headNames.getOrDefault((String) row[0], "Other"));
@@ -209,160 +237,148 @@ public class FinanceServiceImpl implements FinanceService {
     public TransactionDTO collectPayment(CollectPaymentDTO collectPaymentDTO) {
         String tenantId = SecurityUtils.getCurrentTenantId();
         String collectedBy = SecurityUtils.getCurrentUserId();
-
-        // 1. Record the Transaction
-        Transaction transaction = new Transaction();
-        transaction.setStudentId(collectPaymentDTO.getStudentId());
-        transaction.setAmount(collectPaymentDTO.getAmount());
-        transaction.setPaymentMode(collectPaymentDTO.getPaymentMode());
-        transaction.setReferenceNumber(collectPaymentDTO.getReferenceNumber());
-        transaction.setTransactionDate(LocalDateTime.now());
-        transaction.setTenantId(tenantId);
-        transaction.setCollectedBy(collectedBy);
-
-        transactionRepository.save(transaction);
+        String roles = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+        String receiptNo = "RCPT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
 
         BigDecimal remainingAmount = collectPaymentDTO.getAmount();
+        List<Transaction> savedTransactions = new ArrayList<>();
 
-        // 2. Prioritize Demand Notes (Invoices)
-        List<DemandNote> pendingDemands = demandNoteRepository
-                .findAllByStudentIdAndTenantIdAndStatusNotOrderByDueDateAsc(
-                        collectPaymentDTO.getStudentId(), tenantId, DemandNote.DemandStatus.PAID);
-
-        for (DemandNote demand : pendingDemands) {
-            if (remainingAmount.compareTo(BigDecimal.ZERO) <= 0)
-                break;
-
-            BigDecimal balance = demand.getBalance();
-            BigDecimal amountToPay = remainingAmount.min(balance);
-
-            remainingAmount = remainingAmount.subtract(amountToPay);
-            demand.setAmountPaid(demand.getAmountPaid().add(amountToPay));
-            demand.setBalance(demand.getBalance().subtract(amountToPay));
-
-            if (demand.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
-                demand.setStatus(DemandNote.DemandStatus.PAID);
-            } else {
-                demand.setStatus(DemandNote.DemandStatus.PARTIAL);
+        // 1. Handle Explicit Split Breakdown (New Feature)
+        if (collectPaymentDTO.getSplitBreakdown() != null && !collectPaymentDTO.getSplitBreakdown().isEmpty()) {
+            for (FeePaymentDetailDTO detail : collectPaymentDTO.getSplitBreakdown()) {
+                studentFeeRecordRepository.findById(detail.getFeeRecordId()).ifPresent(record -> {
+                    BigDecimal amountToPay = detail.getAmount();
+                    applyPaymentToRecord(record, amountToPay, receiptNo, collectPaymentDTO.getPaymentMode(),
+                            collectPaymentDTO.getReferenceNumber(), collectedBy, tenantId, savedTransactions);
+                });
             }
-            demandNoteRepository.save(demand);
-
-            // Important: Reduce structural ledger for the linked Fee Head
-            studentFeeRecordRepository
-                    .findByStudentIdAndFeeHeadIdAndAcademicYearAndTenantId(
-                            collectPaymentDTO.getStudentId(), demand.getFeeHeadId(),
-                            demand.getAcademicYear(), tenantId)
-                    .ifPresent(record -> {
-                        record.setAmountPaid(record.getAmountPaid().add(amountToPay));
-                        record.setBalance(record.getBalance().subtract(amountToPay));
-
-                        if (record.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
-                            record.setStatus(StudentFeeRecord.FeeStatus.PAID);
-                        } else if (record.getAmountPaid().compareTo(BigDecimal.ZERO) > 0) {
-                            record.setStatus(StudentFeeRecord.FeeStatus.PARTIAL);
-                        }
-                        studentFeeRecordRepository.save(record);
-                    });
         }
-
-        // 3. General Collection (Remaining amount to structural ledger)
-        if (remainingAmount.compareTo(BigDecimal.ZERO) > 0) {
-            List<StudentFeeRecord> recordsToPay;
-
-            if (collectPaymentDTO.getFeeRecordIds() != null && !collectPaymentDTO.getFeeRecordIds().isEmpty()) {
-                // Pay against specific records
-                recordsToPay = studentFeeRecordRepository.findAllById(collectPaymentDTO.getFeeRecordIds());
-            } else {
-                // FIFO: Pay oldest unpaid records first
-                recordsToPay = studentFeeRecordRepository
-                        .findAllByStudentIdAndTenantId(collectPaymentDTO.getStudentId(), tenantId)
-                        .stream()
-                        .filter(r -> r.getStatus() != StudentFeeRecord.FeeStatus.PAID)
-                        .sorted(Comparator.comparing(StudentFeeRecord::getDueDate))
-                        .collect(Collectors.toList());
+        // 2. Handle Specific Fee Record IDs (Current logic - Auto-allocation)
+        else if (collectPaymentDTO.getFeeRecordIds() != null && !collectPaymentDTO.getFeeRecordIds().isEmpty()) {
+            List<StudentFeeRecord> recordsToPay = studentFeeRecordRepository
+                    .findAllById(collectPaymentDTO.getFeeRecordIds());
+            for (StudentFeeRecord record : recordsToPay) {
+                if (remainingAmount.compareTo(BigDecimal.ZERO) <= 0)
+                    break;
+                BigDecimal amountToPay = remainingAmount.min(record.getBalance());
+                applyPaymentToRecord(record, amountToPay, receiptNo, collectPaymentDTO.getPaymentMode(),
+                        collectPaymentDTO.getReferenceNumber(), collectedBy, tenantId, savedTransactions);
+                remainingAmount = remainingAmount.subtract(amountToPay);
             }
-
-            if (Boolean.TRUE.equals(collectPaymentDTO.getWaiveLateFee())) {
-                for (StudentFeeRecord record : recordsToPay) {
-                    if (Boolean.TRUE.equals(record.getLateFeeApplied()) && record.getLateFeeAmount().compareTo(BigDecimal.ZERO) > 0) {
-                        BigDecimal lateFee = record.getLateFeeAmount();
-                        
-                        // Deduct late fee from balance and amount due
-                        record.setAmountDue(record.getAmountDue().subtract(lateFee));
-                        record.setBalance(record.getBalance().subtract(lateFee));
-                        record.setLateFeeAmount(BigDecimal.ZERO);
-                        record.setLateFeeApplied(false);
-                        
-                        studentFeeRecordRepository.save(record);
-                        
-                        // Update the invoice if it's there
-                        demandNoteRepository.findByStudentIdAndFeeHeadIdAndAcademicYearAndTenantId(
-                            record.getStudentId(), record.getFeeHeadId(), record.getAcademicYear(), tenantId
-                        ).ifPresent(demand -> {
-                            demand.setBalance(demand.getBalance().subtract(lateFee));
-                            if (demand.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
-                                demand.setStatus(DemandNote.DemandStatus.PAID);
-                            }
-                            demandNoteRepository.save(demand);
-                        });
-                    }
-                }
-            }
+        }
+        // 3. Handle FIFO (Oldest first)
+        else {
+            List<StudentFeeRecord> recordsToPay = studentFeeRecordRepository
+                    .findAllByStudentIdAndTenantId(collectPaymentDTO.getStudentId(), tenantId)
+                    .stream()
+                    .filter(r -> r.getStatus() != StudentFeeRecord.FeeStatus.PAID)
+                    .sorted(Comparator.comparing(StudentFeeRecord::getDueDate))
+                    .collect(Collectors.toList());
 
             for (StudentFeeRecord record : recordsToPay) {
                 if (remainingAmount.compareTo(BigDecimal.ZERO) <= 0)
                     break;
-
-                BigDecimal balance = record.getBalance();
-                BigDecimal amountToPay = remainingAmount.min(balance);
-
+                BigDecimal amountToPay = remainingAmount.min(record.getBalance());
+                applyPaymentToRecord(record, amountToPay, receiptNo, collectPaymentDTO.getPaymentMode(),
+                        collectPaymentDTO.getReferenceNumber(), collectedBy, tenantId, savedTransactions);
                 remainingAmount = remainingAmount.subtract(amountToPay);
-                record.setAmountPaid(record.getAmountPaid().add(amountToPay));
-                record.setBalance(record.getBalance().subtract(amountToPay));
-                
-                // Set offering context in transaction if not already set
-                if (transaction.getOfferingId() == null) {
-                    transaction.setOfferingId(record.getOfferingId());
-                    transaction.setAcademicYear(record.getAcademicYear());
-                    transactionRepository.save(transaction);
-                }
-
-                if (record.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
-                    record.setStatus(StudentFeeRecord.FeeStatus.PAID);
-                } else {
-                    record.setStatus(StudentFeeRecord.FeeStatus.PARTIAL);
-                }
-                studentFeeRecordRepository.save(record);
             }
         }
 
-        return modelMapper.map(transaction, TransactionDTO.class);
+        // Trigger Async Invoice Generation (Passing Identity to fix 403)
+        invoiceAsyncService.generateAndSendInvoice(receiptNo, collectPaymentDTO.getStudentId(), tenantId, collectedBy, roles);
+
+        if (savedTransactions.isEmpty()) {
+            throw new RuntimeException("No payments were applied. Possible zero balance or invalid fee heads.");
+        }
+
+        // Return a representative DTO (using the last saved transaction or a summary)
+        TransactionDTO response = modelMapper.map(savedTransactions.get(0), TransactionDTO.class);
+        response.setAmount(collectPaymentDTO.getAmount()); // Show total amount in response
+        response.setReceiptNo(receiptNo);
+        return response;
+    }
+
+    private void applyPaymentToRecord(StudentFeeRecord record, BigDecimal amount, String receiptNo,
+            Transaction.PaymentMode mode, String refNo,
+            String collectedBy, String tenantId, List<Transaction> savedList) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0)
+            return;
+
+        // Update Record
+        record.setAmountPaid(record.getAmountPaid().add(amount));
+        record.setBalance(record.getBalance().subtract(amount));
+        if (record.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+            record.setStatus(StudentFeeRecord.FeeStatus.PAID);
+        } else {
+            record.setStatus(StudentFeeRecord.FeeStatus.PARTIAL);
+        }
+        studentFeeRecordRepository.save(record);
+
+        // Record Detailed Transaction
+        Transaction tx = new Transaction();
+        tx.setStudentId(record.getStudentId());
+        tx.setAmount(amount);
+        tx.setPaymentMode(mode);
+        tx.setReferenceNumber(refNo);
+        tx.setTransactionDate(LocalDateTime.now());
+        tx.setTenantId(tenantId);
+        tx.setCollectedBy(collectedBy);
+        tx.setReceiptNo(receiptNo);
+        tx.setFeeHeadId(record.getFeeHeadId());
+        tx.setAcademicYear(record.getAcademicYear());
+        tx.setOfferingId(record.getOfferingId());
+
+        // Fetch Fee Head Name for convenience in reporting
+        feeHeadRepository.findById(record.getFeeHeadId()).ifPresent(fh -> tx.setFeeHeadName(fh.getName()));
+
+        transactionRepository.save(tx);
+        savedList.add(tx);
+
+        // Update associated Demand Note if exists
+        demandNoteRepository.findByStudentIdAndFeeHeadIdAndAcademicYearAndTenantId(
+                record.getStudentId(), record.getFeeHeadId(), record.getAcademicYear(), tenantId).ifPresent(demand -> {
+                    demand.setAmountPaid(demand.getAmountPaid().add(amount));
+                    demand.setBalance(demand.getBalance().subtract(amount));
+                    if (demand.getBalance().compareTo(BigDecimal.ZERO) <= 0) {
+                        demand.setStatus(DemandNote.DemandStatus.PAID);
+                    } else {
+                        demand.setStatus(DemandNote.DemandStatus.PARTIAL);
+                    }
+                    demandNoteRepository.save(demand);
+                });
     }
 
     @Override
     public List<TransactionDTO> getStudentTransactions(String studentId) {
         String tenantId = SecurityUtils.getCurrentTenantId();
-        
+
         // Fetch student name once
         String studentName = "Student: " + studentId.substring(0, 8);
         try {
-            ApiResponse<StudentServiceClient.StudentResponse> studentRes = studentServiceClient.getStudentById(studentId);
+            ApiResponse<StudentServiceClient.StudentResponse> studentRes = studentServiceClient
+                    .getStudentById(studentId);
             if (studentRes != null && studentRes.getApiData() != null) {
                 studentName = studentRes.getApiData().getFirstName() + " " + studentRes.getApiData().getLastName();
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         final String finalStudentName = studentName;
 
-        // Fetch offering names for the tenant (caching would be better, but this is simple)
+        // Fetch offering names for the tenant (caching would be better, but this is
+        // simple)
         Map<String, String> offeringNames = new HashMap<>();
         try {
-            ApiResponse<List<com.ims.finance.client.OfferingServiceClient.OfferingResponse>> offeringRes = 
-                offeringServiceClient.getOfferingsByTenant(tenantId);
+            ApiResponse<List<com.ims.finance.client.OfferingServiceClient.OfferingResponse>> offeringRes = offeringServiceClient
+                    .getOfferingsByTenant(tenantId);
             if (offeringRes != null && offeringRes.getApiData() != null) {
                 offeringRes.getApiData().forEach(o -> offeringNames.put(o.getId(), o.getName()));
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         return transactionRepository.findAllByStudentIdAndTenantId(studentId, tenantId).stream()
                 .map(t -> {
@@ -377,14 +393,16 @@ public class FinanceServiceImpl implements FinanceService {
     }
 
     private String resolveOfferingName(String offeringId, Map<String, String> cache) {
-        if (offeringId == null) return null;
+        if (offeringId == null)
+            return null;
         if (cache.containsKey(offeringId)) {
             return cache.get(offeringId);
         }
-        
+
         // Try specific fetch from academic service if missing in tenant map
         try {
-            ApiResponse<com.ims.finance.client.OfferingServiceClient.OfferingResponse> res = offeringServiceClient.getOfferingById(offeringId);
+            ApiResponse<com.ims.finance.client.OfferingServiceClient.OfferingResponse> res = offeringServiceClient
+                    .getOfferingById(offeringId);
             if (res != null && res.getApiData() != null) {
                 String name = res.getApiData().getName();
                 log.info("Resolved offering name for ID {}: {}", offeringId, name);
@@ -396,7 +414,7 @@ public class FinanceServiceImpl implements FinanceService {
         } catch (Exception e) {
             log.error("Error connecting to academic service to resolve offering ID {}: {}", offeringId, e.getMessage());
         }
-        
+
         return "Class " + offeringId.substring(0, 8);
     }
 
@@ -487,16 +505,35 @@ public class FinanceServiceImpl implements FinanceService {
     }
 
     @Override
+    public List<TransactionDTO> getTransactionsByReceipt(String receiptNo, String tenantId) {
+        return transactionRepository.findByReceiptNoAndTenantId(receiptNo, tenantId).stream()
+                .map(t -> {
+                    TransactionDTO dto = modelMapper.map(t, TransactionDTO.class);
+                    // Student name is likely needed for the invoice
+                    try {
+                        ApiResponse<StudentServiceClient.StudentResponse> studentRes = studentServiceClient
+                                .getStudentById(t.getStudentId());
+                        if (studentRes != null && studentRes.getApiData() != null) {
+                            dto.setStudentName(studentRes.getApiData().getFirstName() + " "
+                                    + studentRes.getApiData().getLastName());
+                        }
+                    } catch (Exception e) {
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<com.ims.finance.dto.DefaulterDTO> getDefaulters(String offeringId) {
         String tenantId = SecurityUtils.getCurrentTenantId();
-        
+
         List<StudentFeeRecord.FeeStatus> unpaidStatuses = Arrays.asList(
-                StudentFeeRecord.FeeStatus.UNPAID, 
-                StudentFeeRecord.FeeStatus.PARTIAL
-        );
-        
+                StudentFeeRecord.FeeStatus.UNPAID,
+                StudentFeeRecord.FeeStatus.PARTIAL);
+
         List<StudentFeeRecord> overdueRecords;
-        
+
         if (offeringId != null && !offeringId.isEmpty()) {
             overdueRecords = studentFeeRecordRepository.findByTenantIdAndOfferingIdAndStatusInAndDueDateBefore(
                     tenantId, offeringId, unpaidStatuses, LocalDate.now());
@@ -531,19 +568,21 @@ public class FinanceServiceImpl implements FinanceService {
             // Fetch Student Name
             String studentName = "Unknown";
             try {
-                ApiResponse<StudentServiceClient.StudentResponse> response = 
-                    studentServiceClient.getStudentById(studentId);
+                ApiResponse<StudentServiceClient.StudentResponse> response = studentServiceClient
+                        .getStudentById(studentId);
                 if (response != null && response.getApiData() != null) {
                     StudentServiceClient.StudentResponse s = response.getApiData();
-                    studentName = (s.getFirstName() != null ? s.getFirstName() : "") + " " + 
-                                  (s.getLastName() != null ? s.getLastName() : "");
-                    if (studentName.trim().isEmpty()) studentName = "Unknown (" + studentId.substring(0, 8) + ")";
+                    studentName = (s.getFirstName() != null ? s.getFirstName() : "") + " " +
+                            (s.getLastName() != null ? s.getLastName() : "");
+                    if (studentName.trim().isEmpty())
+                        studentName = "Unknown (" + studentId.substring(0, 8) + ")";
                 }
             } catch (Exception e) {
                 // Ignore API error, keep Unknown
             }
 
-            // In a real app we might want to group by offering as well, but this is a simplified view
+            // In a real app we might want to group by offering as well, but this is a
+            // simplified view
             String recordOfferingId = studentRecords.get(0).getOfferingId();
 
             com.ims.finance.dto.DefaulterDTO dto = com.ims.finance.dto.DefaulterDTO.builder()
@@ -579,7 +618,7 @@ public class FinanceServiceImpl implements FinanceService {
     @Override
     public List<com.ims.finance.dto.OutstandingFeeDTO> getOutstandingFees() {
         String tenantId = SecurityUtils.getCurrentTenantId();
-        
+
         // Find all records with balance > 0
         List<StudentFeeRecord> outstandingRecords = studentFeeRecordRepository.findByTenantIdAndBalanceGreaterThan(
                 tenantId, BigDecimal.ZERO);
@@ -594,10 +633,13 @@ public class FinanceServiceImpl implements FinanceService {
             String studentId = entry.getKey();
             List<StudentFeeRecord> studentRecords = entry.getValue();
 
-            BigDecimal totalAllocated = studentRecords.stream().map(StudentFeeRecord::getAmountDue).reduce(BigDecimal.ZERO, BigDecimal::add);
-            BigDecimal totalPaid = studentRecords.stream().map(StudentFeeRecord::getAmountPaid).reduce(BigDecimal.ZERO, BigDecimal::add);
-            BigDecimal balance = studentRecords.stream().map(StudentFeeRecord::getBalance).reduce(BigDecimal.ZERO, BigDecimal::add);
-            
+            BigDecimal totalAllocated = studentRecords.stream().map(StudentFeeRecord::getAmountDue)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalPaid = studentRecords.stream().map(StudentFeeRecord::getAmountPaid).reduce(BigDecimal.ZERO,
+                    BigDecimal::add);
+            BigDecimal balance = studentRecords.stream().map(StudentFeeRecord::getBalance).reduce(BigDecimal.ZERO,
+                    BigDecimal::add);
+
             BigDecimal overdue = studentRecords.stream()
                     .filter(r -> r.getDueDate().isBefore(LocalDate.now()))
                     .map(StudentFeeRecord::getBalance)
@@ -611,9 +653,10 @@ public class FinanceServiceImpl implements FinanceService {
                 ApiResponse<StudentServiceClient.StudentResponse> res = studentServiceClient.getStudentById(studentId);
                 if (res != null && res.getApiData() != null) {
                     StudentServiceClient.StudentResponse s = res.getApiData();
-                    studentName = (s.getFirstName() != null ? s.getFirstName() : "") + " " + 
-                                  (s.getLastName() != null ? s.getLastName() : "");
-                    if (studentName.trim().isEmpty()) studentName = "Unknown (" + studentId.substring(0, 8) + ")";
+                    studentName = (s.getFirstName() != null ? s.getFirstName() : "") + " " +
+                            (s.getLastName() != null ? s.getLastName() : "");
+                    if (studentName.trim().isEmpty())
+                        studentName = "Unknown (" + studentId.substring(0, 8) + ")";
                     enrollmentId = s.getEnrollmentId();
                 }
             } catch (Exception e) {
@@ -622,12 +665,13 @@ public class FinanceServiceImpl implements FinanceService {
 
             // Also try to get offering name for report
             try {
-                ApiResponse<com.ims.finance.client.OfferingServiceClient.OfferingResponse> offRes = 
-                    offeringServiceClient.getOfferingById(studentRecords.get(0).getOfferingId());
+                ApiResponse<com.ims.finance.client.OfferingServiceClient.OfferingResponse> offRes = offeringServiceClient
+                        .getOfferingById(studentRecords.get(0).getOfferingId());
                 if (offRes != null && offRes.getApiData() != null) {
                     offeringName = offRes.getApiData().getName();
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
 
             report.add(com.ims.finance.dto.OutstandingFeeDTO.builder()
                     .studentId(studentId)
@@ -653,31 +697,34 @@ public class FinanceServiceImpl implements FinanceService {
 
         // 1. Calculate Income (Collected Fees)
         List<Transaction> transactions = transactionRepository.findByTenantIdAndAcademicYear(tenantId, academicYear);
-        BigDecimal totalIncome = transactions.stream().map(Transaction::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalIncome = transactions.stream().map(Transaction::getAmount).reduce(BigDecimal.ZERO,
+                BigDecimal::add);
 
         // Map income by category (Fee Head) - we fetch names from FeeHeadRepository
         List<com.ims.finance.entity.FeeHead> feeHeads = feeHeadRepository.findAllByTenantId(tenantId);
         Map<String, String> headNames = feeHeads.stream()
-                .collect(Collectors.toMap(com.ims.finance.entity.FeeHead::getId, com.ims.finance.entity.FeeHead::getName, (a, b) -> a));
+                .collect(Collectors.toMap(com.ims.finance.entity.FeeHead::getId,
+                        com.ims.finance.entity.FeeHead::getName, (a, b) -> a));
 
-        List<StudentFeeRecord> feeRecords = studentFeeRecordRepository.findByTenantIdAndAcademicYear(tenantId, academicYear);
+        List<StudentFeeRecord> feeRecords = studentFeeRecordRepository.findByTenantIdAndAcademicYear(tenantId,
+                academicYear);
         Map<String, BigDecimal> incomeByCategory = feeRecords.stream()
                 .collect(Collectors.groupingBy(
                         r -> headNames.getOrDefault(r.getFeeHeadId(), "Other"),
-                        Collectors.reducing(BigDecimal.ZERO, StudentFeeRecord::getAmountPaid, BigDecimal::add)
-                ));
+                        Collectors.reducing(BigDecimal.ZERO, StudentFeeRecord::getAmountPaid, BigDecimal::add)));
 
         // 2. Calculate Expenses
         // Expenses don't have academicYear property yet. We filter by tenant for now.
         // TODO: Add academicYear to Expense entity if needed.
         List<com.ims.finance.entity.Expense> expenses = expenseRepository.findByTenantId(tenantId);
-        BigDecimal totalExpense = expenses.stream().map(com.ims.finance.entity.Expense::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalExpense = expenses.stream().map(com.ims.finance.entity.Expense::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Map<String, BigDecimal> expenseByCategory = expenses.stream()
                 .collect(Collectors.groupingBy(
                         e -> e.getCategory().getName(),
-                        Collectors.reducing(BigDecimal.ZERO, com.ims.finance.entity.Expense::getAmount, BigDecimal::add)
-                ));
+                        Collectors.reducing(BigDecimal.ZERO, com.ims.finance.entity.Expense::getAmount,
+                                BigDecimal::add)));
 
         return com.ims.finance.dto.IncomeExpenseReportDTO.builder()
                 .academicYear(academicYear)
@@ -694,12 +741,12 @@ public class FinanceServiceImpl implements FinanceService {
     public void bootstrapFeeHeads() {
         String tenantId = SecurityUtils.getCurrentTenantId();
         String[][] standardHeads = {
-            {"Tuition Fee", "Regular academic tuition charges"},
-            {"Admission Fee", "One-time registration and admission charges"},
-            {"Security Deposit", "Refundable caution money"},
-            {"Lab Fee", "Laboratory and practical equipment usage"},
-            {"Library Fee", "Access to library and digital resources"},
-            {"Transportation Fee", "School bus or transit charges"}
+                { "Tuition Fee", "Regular academic tuition charges" },
+                { "Admission Fee", "One-time registration and admission charges" },
+                { "Security Deposit", "Refundable caution money" },
+                { "Lab Fee", "Laboratory and practical equipment usage" },
+                { "Library Fee", "Access to library and digital resources" },
+                { "Transportation Fee", "School bus or transit charges" }
         };
 
         for (String[] head : standardHeads) {
@@ -718,12 +765,12 @@ public class FinanceServiceImpl implements FinanceService {
     public void bootstrapExpenseCategories() {
         String tenantId = SecurityUtils.getCurrentTenantId();
         String[][] standardCategories = {
-            {"Salaries", "Payments to staff and faculty"},
-            {"Rent", "Building or infrastructure lease payments"},
-            {"Utilities", "Electricity, water, and digital subscriptions"},
-            {"Maintenance", "Repair and upkeep of institutional assets"},
-            {"Office Supplies", "Stationery and general administrative supplies"},
-            {"Advertising", "Promotion and enrollment marketing costs"}
+                { "Salaries", "Payments to staff and faculty" },
+                { "Rent", "Building or infrastructure lease payments" },
+                { "Utilities", "Electricity, water, and digital subscriptions" },
+                { "Maintenance", "Repair and upkeep of institutional assets" },
+                { "Office Supplies", "Stationery and general administrative supplies" },
+                { "Advertising", "Promotion and enrollment marketing costs" }
         };
 
         for (String[] cat : standardCategories) {

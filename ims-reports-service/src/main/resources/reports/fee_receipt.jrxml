@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="fee_receipt" pageWidth="595" pageHeight="842" columnWidth="515" leftMargin="40" rightMargin="40" topMargin="40" bottomMargin="40">
+
+	<parameter name="institutionName" class="java.lang.String"/>
+	<parameter name="address" class="java.lang.String"/>
+	<parameter name="contact" class="java.lang.String"/>
+	<parameter name="email" class="java.lang.String"/>
+	<parameter name="receiptNo" class="java.lang.String"/>
+	<parameter name="paymentDate" class="java.lang.String"/>
+	<parameter name="studentName" class="java.lang.String"/>
+	<parameter name="studentId" class="java.lang.String"/>
+	<parameter name="offeringName" class="java.lang.String"/>
+	<parameter name="paymentMode" class="java.lang.String"/>
+	<parameter name="totalAmount" class="java.math.BigDecimal"/>
+	<parameter name="amountInWords" class="java.lang.String"/>
+	<parameter name="academicSession" class="java.lang.String"/>
+
+	<field name="feeHeadName" class="java.lang.String"/>
+	<field name="amount" class="java.math.BigDecimal"/>
+	<field name="academicYear" class="java.lang.String"/>
+
+	<variable name="serialNumber" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[Boolean.TRUE]]></variableExpression>
+	</variable>
+
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+
+	<!-- ===== TITLE: Institution Header ===== -->
+	<title>
+		<band height="120" splitType="Stretch">
+			<!-- Institution Name -->
+			<textField>
+				<reportElement x="0" y="0" width="515" height="28"/>
+				<textElement textAlignment="Center">
+					<font size="18" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{institutionName}]]></textFieldExpression>
+			</textField>
+			<!-- Address -->
+			<textField>
+				<reportElement x="0" y="30" width="515" height="16" forecolor="#555555"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{address}]]></textFieldExpression>
+			</textField>
+			<!-- Contact | Email -->
+			<textField>
+				<reportElement x="0" y="46" width="515" height="16" forecolor="#555555"/>
+				<textElement textAlignment="Center">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Contact: " + $P{contact} + "  |  Email: " + $P{email}]]></textFieldExpression>
+			</textField>
+
+			<!-- Separator Line -->
+			<line>
+				<reportElement x="0" y="70" width="515" height="1" forecolor="#333333"/>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+
+			<!-- FEE RECEIPT badge -->
+			<staticText>
+				<reportElement mode="Opaque" x="195" y="80" width="125" height="28" backcolor="#333333" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FEE RECEIPT]]></text>
+			</staticText>
+		</band>
+	</title>
+
+	<!-- ===== PAGE HEADER: Receipt Meta + Student Info ===== -->
+	<pageHeader>
+		<band height="120" splitType="Stretch">
+			<!-- LEFT COLUMN: Receipt Details -->
+			<staticText>
+				<reportElement x="0" y="10" width="100" height="18" forecolor="#888888"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RECEIPT NUMBER]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="105" y="10" width="155" height="18"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{receiptNo}]]></textFieldExpression>
+			</textField>
+
+			<staticText>
+				<reportElement x="0" y="32" width="100" height="18" forecolor="#888888"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PAYMENT DATE]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="105" y="32" width="155" height="18"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{paymentDate}]]></textFieldExpression>
+			</textField>
+
+			<staticText>
+				<reportElement x="0" y="54" width="100" height="18" forecolor="#888888"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PAYMENT MODE]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="105" y="54" width="155" height="18"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{paymentMode}]]></textFieldExpression>
+			</textField>
+
+			<staticText>
+				<reportElement x="0" y="76" width="100" height="18" forecolor="#888888"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ACADEMIC SESSION]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="105" y="76" width="155" height="18"/>
+				<textElement>
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{academicSession}]]></textFieldExpression>
+			</textField>
+
+			<!-- RIGHT COLUMN: Student Details Card -->
+			<rectangle radius="5">
+				<reportElement mode="Opaque" x="280" y="5" width="235" height="100" backcolor="#F5F5F5" forecolor="#DDDDDD"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="290" y="10" width="215" height="14" forecolor="#888888"/>
+				<textElement>
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[STUDENT DETAILS]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="290" y="26" width="215" height="22"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{studentName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="290" y="50" width="215" height="16" forecolor="#666666"/>
+				<textElement>
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ID: " + $P{studentId}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="290" y="68" width="215" height="16" forecolor="#333333"/>
+				<textElement>
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{offeringName}]]></textFieldExpression>
+			</textField>
+
+			<!-- Separator before table -->
+			<line>
+				<reportElement x="0" y="115" width="515" height="1" forecolor="#DDDDDD"/>
+			</line>
+		</band>
+	</pageHeader>
+
+	<!-- ===== COLUMN HEADER: Table Header ===== -->
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<!-- Header background -->
+			<rectangle>
+				<reportElement mode="Opaque" x="0" y="0" width="515" height="28" backcolor="#333333" forecolor="#333333"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="10" y="0" width="40" height="28" forecolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SL NO.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="55" y="0" width="270" height="28" forecolor="#FFFFFF"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FEE PARTICULARS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="370" y="0" width="135" height="28" forecolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[AMOUNT (₹)]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+
+	<!-- ===== DETAIL: Fee Line Items ===== -->
+	<detail>
+		<band height="28" splitType="Stretch">
+			<!-- Sl No -->
+			<textField>
+				<reportElement x="10" y="0" width="40" height="28" forecolor="#999999"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{serialNumber}]]></textFieldExpression>
+			</textField>
+			<!-- Fee Head -->
+			<textField>
+				<reportElement x="55" y="0" width="270" height="28"/>
+				<textElement verticalAlignment="Middle">
+					<font size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{feeHeadName}]]></textFieldExpression>
+			</textField>
+			<!-- Amount -->
+			<textField pattern="#,##0.00">
+				<reportElement x="370" y="0" width="135" height="28"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+			</textField>
+			<!-- Row separator -->
+			<line>
+				<reportElement x="10" y="27" width="495" height="1" forecolor="#EEEEEE"/>
+			</line>
+		</band>
+	</detail>
+
+	<!-- ===== SUMMARY: Totals, Amount in Words, Footer ===== -->
+	<summary>
+		<band height="250" splitType="Stretch">
+			<!-- Separator above total -->
+			<line>
+				<reportElement x="280" y="10" width="235" height="1" forecolor="#333333"/>
+				<graphicElement>
+					<pen lineWidth="1.5"/>
+				</graphicElement>
+			</line>
+
+			<!-- TOTAL PAID label -->
+			<staticText>
+				<reportElement x="280" y="18" width="120" height="24"/>
+				<textElement verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL PAID]]></text>
+			</staticText>
+			<!-- TOTAL PAID value -->
+			<textField pattern="₹#,##0.00">
+				<reportElement x="400" y="18" width="115" height="24"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalAmount}]]></textFieldExpression>
+			</textField>
+
+			<!-- Amount in words box -->
+			<rectangle radius="4">
+				<reportElement mode="Opaque" x="0" y="55" width="515" height="30" backcolor="#F5F5F5" forecolor="#EEEEEE"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="10" y="55" width="100" height="30" forecolor="#888888"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[AMOUNT IN WORDS:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="115" y="55" width="390" height="30" forecolor="#444444"/>
+				<textElement verticalAlignment="Middle">
+					<font size="9" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{amountInWords}]]></textFieldExpression>
+			</textField>
+
+			<!-- Footer separator -->
+			<line>
+				<reportElement x="0" y="110" width="515" height="1" forecolor="#EEEEEE"/>
+			</line>
+
+			<!-- Terms & Conditions -->
+			<staticText>
+				<reportElement x="0" y="122" width="150" height="16" forecolor="#888888"/>
+				<textElement>
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TERMS & CONDITIONS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="140" width="300" height="14" forecolor="#999999"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[1. Fees once paid are not refundable.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="154" width="300" height="14" forecolor="#999999"/>
+				<textElement>
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[2. Please keep this receipt for future reference.]]></text>
+			</staticText>
+
+			<!-- Computer generated note -->
+			<staticText>
+				<reportElement x="0" y="185" width="280" height="16" forecolor="#CCCCCC"/>
+				<textElement>
+					<font size="7" isItalic="true" isBold="true"/>
+				</textElement>
+				<text><![CDATA[THIS IS A COMPUTER-GENERATED RECEIPT.]]></text>
+			</staticText>
+
+			<!-- Authorized Signatory -->
+			<line>
+				<reportElement x="380" y="200" width="135" height="1" forecolor="#CCCCCC"/>
+			</line>
+			<staticText>
+				<reportElement x="380" y="205" width="135" height="16"/>
+				<textElement textAlignment="Center">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Authorized Signatory]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="380" y="220" width="135" height="14" forecolor="#999999"/>
+				<textElement textAlignment="Center">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Accounts Department]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

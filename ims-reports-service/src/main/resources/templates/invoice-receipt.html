@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Fee Receipt</title>
+    <style th:inline="css">
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px;
+            color: #333;
+            background-color: #fff;
+            line-height: 1.5;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            display: table;
+            width: 100%;
+            border-bottom: 2px solid /*[[${primaryColor}]]*/ #4f46e5;
+            padding-bottom: 30px;
+            margin-bottom: 30px;
+        }
+        .header-left {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: left;
+        }
+        .header-right {
+           display: table-cell;
+           vertical-align: middle;
+           text-align: right;
+        }
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin-right: 20px;
+            vertical-align: middle;
+            display: inline-block;
+        }
+        .institution-details {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .institution-name {
+            font-size: 24px;
+            font-weight: 900;
+            color: /*[[${primaryColor}]]*/ #4f46e5;
+            text-transform: uppercase;
+            margin: 0;
+            line-height: 1.1;
+        }
+        .contact-info {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .badge {
+            display: inline-block;
+            background-color: /*[[${primaryColor}]]*/ #4f46e5;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .session-info {
+            font-size: 10px;
+            color: #999;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+        .session-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .metadata-section {
+            display: table;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        .meta-col {
+            display: table-cell;
+            width: 50%;
+            vertical-align: top;
+        }
+        .receipt-info-row {
+            border-bottom: 1px solid #eee;
+            padding: 8px 0;
+            display: table;
+            width: 100%;
+        }
+        .meta-label {
+            display: table-cell;
+            font-size: 10px;
+            color: #999;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .meta-value {
+            display: table-cell;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        
+        .student-card {
+            background-color: #f9fafb;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 15px;
+            margin-left: 20px;
+        }
+        .student-label {
+            font-size: 9px;
+            color: #999;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .student-name {
+            font-size: 18px;
+            font-weight: 900;
+            margin: 0;
+            color: #111;
+        }
+        .student-id {
+            font-size: 11px;
+            color: #666;
+        }
+        .student-class {
+            font-size: 12px;
+            font-weight: 700;
+            color: /*[[${primaryColor}]]*/ #4f46e5;
+            margin-top: 5px;
+        }
+
+        table.item-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .item-table th {
+            background-color: /*[[${primaryColor}]]*/ #4f46e5;
+            color: #fff;
+            text-align: left;
+            padding: 12px 15px;
+            font-size: 10px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .item-table th:first-child { border-radius: 8px 0 0 8px; }
+        .item-table th:last-child { border-radius: 0 8px 8px 0; text-align: right; }
+        
+        .item-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 13px;
+        }
+        .item-table td.amount {
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .summary-section {
+            width: 100%;
+            display: table;
+            margin-bottom: 30px;
+        }
+        .words-col {
+            display: table-cell;
+            width: 60%;
+            vertical-align: top;
+            padding-right: 20px;
+        }
+        .totals-col {
+            display: table-cell;
+            width: 40%;
+            vertical-align: top;
+        }
+        .amount-words {
+            background-color: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            color: #666;
+            font-style: italic;
+        }
+        .words-label {
+            font-weight: 900;
+            font-style: normal;
+            text-transform: uppercase;
+            color: #999;
+            font-size: 9px;
+            margin-right: 5px;
+        }
+
+        .total-row {
+            display: table;
+            width: 100%;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        .total-label { display: table-cell; color: #666; }
+        .total-value { display: table-cell; text-align: right; font-weight: 700; }
+        
+        .grand-total {
+            border-top: 2px solid /*[[${primaryColor}]]*/ #4f46e5;
+            margin-top: 10px;
+            padding-top: 10px;
+            display: table;
+            width: 100%;
+        }
+        .gt-label { display: table-cell; font-size: 12px; font-weight: 900; text-transform: uppercase; color: #111; }
+        .gt-value { display: table-cell; text-align: right; font-size: 18px; font-weight: 900; color: /*[[${primaryColor}]]*/ #4f46e5; }
+
+        .footer {
+            margin-top: 50px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+            display: table;
+            width: 100%;
+        }
+        .footer-left { display: table-cell; width: 60%; vertical-align: bottom; }
+        .footer-right { display: table-cell; width: 40%; text-align: center; vertical-align: bottom; }
+        
+        .terms-title { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #999; margin-bottom: 5px; }
+        .terms-text { font-size: 9px; color: #666; line-height: 1.4; }
+        .footer-note { font-size: 10px; color: #ccc; font-style: italic; margin-top: 30px; text-transform: uppercase; }
+
+        .signatory-box { border-top: 1px solid #eee; padding-top: 10px; margin-top: 40px; }
+        .sign-title { font-size: 11px; font-weight: 900; text-transform: uppercase; color: #333; margin-bottom: 2px; }
+        .sign-dept { font-size: 9px; color: #999; text-transform: uppercase; }
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 100px;
+            color: rgba(0,0,0,0.03);
+            font-weight: 900;
+            z-index: -1;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="watermark">Receipt</div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <img th:if="${logoUrl != null && !logoUrl.isEmpty()}" th:src="${logoUrl}" class="logo" alt="Logo"/>
+                <div class="institution-details">
+                    <h1 class="institution-name" th:text="${institutionName}">INSTITUTE NAME</h1>
+                    <div class="contact-info">
+                        <span th:text="${address}">Address</span><br/>
+                        <span th:text="${'Contact: ' + contact + ' | Email: ' + email}">Contact</span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="badge">Fee Receipt</div>
+                <div class="session-info">Academic Session</div>
+                <div class="session-value" th:text="${academicSession}">2024-25</div>
+            </div>
+        </div>
+
+        <div class="metadata-section">
+            <div class="meta-col">
+                <div class="receipt-info-row">
+                    <span class="meta-label">Receipt Number</span>
+                    <span class="meta-value" th:text="${receiptNo}">RCPT-100234</span>
+                </div>
+                <div class="receipt-info-row">
+                    <span class="meta-label">Payment Date</span>
+                    <span class="meta-value" th:text="${paymentDate}">01/04/2026</span>
+                </div>
+                <div class="receipt-info-row" style="border: none;">
+                    <span class="meta-label">Payment Mode</span>
+                    <span class="meta-value" th:text="${paymentMode}">CASH</span>
+                </div>
+            </div>
+            <div class="meta-col">
+                <div class="student-card">
+                    <div class="student-label">Student Details</div>
+                    <h3 class="student-name" th:text="${studentName}">Mukulakar Soni</h3>
+                    <div class="student-id" th:text="${'ID: ' + studentId}">ID: STU-001</div>
+                    <div class="student-class" th:text="${offeringName}">XII - Science (Section A)</div>
+                </div>
+            </div>
+        </div>
+
+        <table class="item-table">
+            <thead>
+                <tr>
+                    <th>Particulars</th>
+                    <th style="text-align: right">Amount (₹)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${transactions}">
+                    <td th:text="${item.feeHeadName}">Tuition Fee</td>
+                    <td class="amount" th:text="${#numbers.formatDecimal(item.amount, 1, 'COMMA', 2, 'POINT')}">1,500.00</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="summary-section">
+            <div class="words-col">
+                <div class="amount-words">
+                    <span class="words-label">Amount in Words:</span>
+                    <span th:text="${amountInWords}">Sixteen Thousand Two Hundred Only</span>
+                </div>
+            </div>
+            <div class="totals-col">
+                <div class="grand-total">
+                    <span class="gt-label">Total Paid</span>
+                    <span class="gt-value" th:text="${'₹' + #numbers.formatDecimal(totalAmount, 1, 'COMMA', 2, 'POINT')}">₹1,500.00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-left">
+                <div class="terms-title">Terms &amp; Conditions</div>
+                <div class="terms-text" th:text="${termsAndConditions}">1. Fees once paid are not refundable.</div>
+                <div class="footer-note" th:text="${footerNote}">This is a computer generated receipt.</div>
+            </div>
+            <div class="footer-right">
+                <div class="signatory-box">
+                    <div class="sign-title">Authorized Signatory</div>
+                    <div class="sign-dept">Accounts Department</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

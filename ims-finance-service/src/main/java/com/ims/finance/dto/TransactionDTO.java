@@ -24,4 +24,6 @@ public class TransactionDTO {
     private String offeringName;
     private String tenantId;
     private String collectedBy;
+    private String receiptNo;
+    private String feeHeadName;
 }

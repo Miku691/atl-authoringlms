@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base-layout :: main-layout(~{::.receipt-body}, 'Payment Receipt')}">
+
+<body>
+    <div class="receipt-body">
+        <p>Dear <strong th:text="${studentName}">Student</strong>,</p>
+        <p>Greetings! We have successfully received your fee payment. Below is a summary of the transaction for your
+            records:</p>
+
+        <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td style="padding: 5px 0; color: #6b7280; font-size: 14px; font-weight: 600;" width="40%">Receipt Number</td>
+                    <td style="padding: 5px 0; color: #111827; font-size: 14px; font-weight: 700; text-align: right;" width="60%" th:text="${receiptNo}">RCPT-12345</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px 0; color: #6b7280; font-size: 14px; font-weight: 600;">Student Name</td>
+                    <td style="padding: 5px 0; color: #111827; font-size: 14px; font-weight: 700; text-align: right;" th:text="${studentName}">John Doe</td>
+                </tr>
+                <tr th:if="${offeringName}">
+                    <td style="padding: 5px 0; color: #6b7280; font-size: 14px; font-weight: 600;">Offering/Course</td>
+                    <td style="padding: 5px 0; color: #111827; font-size: 14px; font-weight: 700; text-align: right;" th:text="${offeringName}">Offering</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px 0; color: #6b7280; font-size: 14px; font-weight: 600;">Payment Date</td>
+                    <td style="padding: 5px 0; color: #111827; font-size: 14px; font-weight: 700; text-align: right;" th:text="${paymentDate}">2026-04-01</td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="border-top: 2px solid #e5e7eb; margin-top: 15px; padding-top: 15px;">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                            <tr>
+                                <td style="color: #4f46e5; font-size: 16px; font-weight: 700;">Total Amount</td>
+                                <td style="color: #4f46e5; font-size: 20px; font-weight: 800; text-align: right;" th:text="${amount}">₹ 0.00</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>Please find the official receipt attached as a PDF to this email for more details.</p>
+        <p>If you have any questions or concerns regarding this payment, please feel free to reach out to the accounts department.</p>
+        <p>Best regards,<br /><strong>The Accounts Team</strong></p>
+    </div>
+</body>
+
+</html>

@@ -40,6 +40,15 @@ public class Transaction {
     @Column
     private String academicYear; // The academic year context
 
+    @Column
+    private String receiptNo; // Common ID for a single payment session
+
+    @Column
+    private String feeHeadId; // Specific fee head being paid
+
+    @Column
+    private String feeHeadName; // Name of the fee head for reporting convenience
+
     @Column(nullable = false)
     private BigDecimal amount;
 

@@ -60,6 +60,15 @@ public interface FinanceService {
     java.util.Map<String, List<TransactionDTO>> getWardsTransactions();
     
     /**
+     * Retrieves all transactions associated with a specific receipt number.
+     *
+     * @param receiptNo receipt number
+     * @param tenantId  tenant ID
+     * @return list of transactions
+     */
+    List<TransactionDTO> getTransactionsByReceipt(String receiptNo, String tenantId);
+    
+    /**
      * Retrieves a list of defaulters (students with overdue fees).
      * @param offeringId optional filter by offering
      * @return list of defaulters

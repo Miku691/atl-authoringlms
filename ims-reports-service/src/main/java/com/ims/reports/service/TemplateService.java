@@ -38,11 +38,46 @@ public class TemplateService {
         return existing;
     }
 
-    private ReportTemplate generateDefaultInvoiceTemplate(String tenantId) {
-        String institutionName = "Your Institute Name";
-        String address = "123 Academic Street, Education City";
-        String contact = "+1 234 567 8900";
-        String email = "info@institute.com";
+    /**
+     * Returns a flattened map of branding parameters, merging saved config with defaults.
+     */
+    public java.util.Map<String, Object> getFlattenedConfig(String tenantId, String type) {
+        java.util.Map<String, Object> finalConfig = getDefaultBranding(tenantId);
+        
+        getTemplate(tenantId, type).ifPresent(template -> {
+            try {
+                java.util.Map<String, Object> saved = objectMapper.readValue(template.getConfig(), 
+                        new com.fasterxml.jackson.core.type.TypeReference<java.util.AbstractMap.SimpleEntry<String, Object>>() {}.getClass() == null ? null : 
+                        new com.fasterxml.jackson.core.type.TypeReference<java.util.Map<String, Object>>() {});
+                if (saved != null) {
+                    finalConfig.putAll(saved);
+                }
+            } catch (Exception e) {
+                // Fallback to defaults already in finalConfig
+            }
+        });
+        
+        return finalConfig;
+    }
+
+    public java.util.Map<String, Object> getDefaultBranding(String tenantId) {
+        java.util.Map<String, Object> branding = new java.util.HashMap<>();
+        branding.put("institutionName", "Your Institute Name");
+        branding.put("address", "123 Academic Street, Education City");
+        branding.put("contact", "+1 234 567 8900");
+        branding.put("email", "info@institute.com");
+        branding.put("website", "www.institute.com");
+        branding.put("logoUrl", "");
+        branding.put("primaryColor", "#4f46e5");
+        branding.put("accentColor", "#f3f4f6");
+        branding.put("fontFamily", "Inter");
+        branding.put("showLogo", true);
+        branding.put("showStudentPhoto", false);
+        branding.put("showBalanceDue", true);
+        branding.put("showPreviousDues", true);
+        branding.put("receiptPrefix", "RCPT-");
+        branding.put("footerNote", "This is a computer-generated receipt.");
+        branding.put("termsAndConditions", "1. Fees once paid are not refundable.\n2. Please keep this receipt for future reference.");
 
         try {
             java.util.Map<String, Object> response = authServiceClient.getTenantById(tenantId);
@@ -50,38 +85,23 @@ public class TemplateService {
                 @SuppressWarnings("unchecked")
                 java.util.Map<String, Object> data = (java.util.Map<String, Object>) response.get("apiData");
                 if (data != null) {
-                    institutionName = (String) data.getOrDefault("tenantName", institutionName);
-                    address = (String) data.getOrDefault("address", address);
-                    contact = (String) data.getOrDefault("contactPhone", contact);
-                    email = (String) data.getOrDefault("contactEmail", email);
+                    branding.put("institutionName", data.getOrDefault("tenantName", branding.get("institutionName")));
+                    branding.put("address", data.getOrDefault("address", branding.get("address")));
+                    branding.put("contact", data.getOrDefault("contactPhone", branding.get("contact")));
+                    branding.put("email", data.getOrDefault("contactEmail", branding.get("email")));
                 }
             }
         } catch (Exception e) {
-            // Log error but proceed with hardcoded defaults
             System.err.println("Failed to fetch tenant details via Feign: " + e.getMessage());
         }
+        return branding;
+    }
 
-        // Construct the default JSON matching Frontend's InvoiceConfig
-        java.util.Map<String, Object> defaultConfig = new java.util.HashMap<>();
-        defaultConfig.put("institutionName", institutionName);
-        defaultConfig.put("address", address);
-        defaultConfig.put("contact", contact);
-        defaultConfig.put("email", email);
-        defaultConfig.put("website", "www.institute.com");
-        defaultConfig.put("logoUrl", "");
-        defaultConfig.put("primaryColor", "#4f46e5");
-        defaultConfig.put("accentColor", "#f3f4f6");
-        defaultConfig.put("fontFamily", "Inter");
-        defaultConfig.put("showLogo", true);
-        defaultConfig.put("showStudentPhoto", false);
-        defaultConfig.put("showBalanceDue", true);
-        defaultConfig.put("showPreviousDues", true);
-        defaultConfig.put("receiptPrefix", "RCPT-");
-        defaultConfig.put("footerNote", "This is a computer-generated receipt.");
-        defaultConfig.put("termsAndConditions", "1. Fees once paid are not refundable.\n2. Please keep this receipt for future reference.");
+    private ReportTemplate generateDefaultInvoiceTemplate(String tenantId) {
+        java.util.Map<String, Object> branding = getDefaultBranding(tenantId);
 
         try {
-            String configJson = objectMapper.writeValueAsString(defaultConfig);
+            String configJson = objectMapper.writeValueAsString(branding);
             return ReportTemplate.builder()
                     .tenantId(tenantId)
                     .templateType("INVOICE")

@@ -243,10 +243,15 @@ const FinanceDashboardPage: React.FC = () => {
                                         <ArrowUpRight size={16} />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-bold text-gray-900">{t.studentName || `Student: ${t.studentId?.substring(0, 8)}`}</p>
+                                        <p className="text-sm font-bold text-gray-900">{t.studentName}</p>
                                         <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
                                             {t.offeringName ? `${t.offeringName} • ` : ''}{t.paymentMode || 'Online Payment'}
                                         </p>
+                                        {t.feeHeadName && (
+                                            <p className="text-[9px] text-gray-400 font-medium italic truncate max-w-[150px]" title={t.feeHeadName}>
+                                                {t.feeHeadName}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="text-right">

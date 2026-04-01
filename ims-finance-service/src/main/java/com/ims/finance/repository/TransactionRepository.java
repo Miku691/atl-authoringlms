@@ -30,4 +30,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     List<Transaction> findAllByTenantIdAndTransactionDateBetween(String tenantId, LocalDateTime start, LocalDateTime end);
 
     List<Transaction> findByTenantIdAndAcademicYear(String tenantId, String academicYear);
+
+    List<Transaction> findByReceiptNo(String receiptNo);
+
+    List<Transaction> findByReceiptNoAndTenantId(String receiptNo, String tenantId);
 }

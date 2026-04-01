@@ -27,6 +27,7 @@ const CollectionDeskPage: React.FC = () => {
         referenceNumber: '',
         feeRecordIds: [] as string[]
     });
+    const [amountsPerRecord, setAmountsPerRecord] = useState<Record<string, number>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const formatRelativeTime = (dateString: string) => {
@@ -91,8 +92,9 @@ const CollectionDeskPage: React.FC = () => {
             setLedger(ledgerData);
             setTransactions(txData);
 
-            // Let user enter amount manually
+            // Reset payment data
             setPaymentData(prev => ({ ...prev, amount: 0, feeRecordIds: [] }));
+            setAmountsPerRecord({});
         } catch (error) {
             toast.error('Failed to fetch student financial data');
         } finally {
@@ -113,11 +115,17 @@ const CollectionDeskPage: React.FC = () => {
 
         setIsSubmitting(true);
         try {
+            const splitBreakdown = paymentData.feeRecordIds.map(id => ({
+                feeRecordId: id,
+                amount: amountsPerRecord[id] || 0
+            }));
+
             await financeService.collectPayment({
                 studentId: selectedStudent.id,
-                ...paymentData
+                ...paymentData,
+                splitBreakdown
             });
-            toast.success('Payment collected successfully');
+            toast.success('Payment collected successfully. Invoice generation in progress...');
             fetchStudentData(selectedStudent.id);
             // Don't clear student, just refresh data
         } catch (error: any) {
@@ -127,18 +135,30 @@ const CollectionDeskPage: React.FC = () => {
         }
     };
 
-    const handleDownloadReceipt = async (txId: string) => {
+    const handleDownloadReceipt = async (txId: string, receiptNo?: string) => {
         try {
-            const blob = await financeService.downloadReceipt(txId);
+            let blob;
+            let filename;
+            
+            if (receiptNo) {
+                toast.loading('Fetching detailed receipt...', { id: 'downloading' });
+                blob = await financeService.downloadHighFidelityReceipt(receiptNo);
+                filename = `receipt_${receiptNo}.pdf`;
+                toast.success('Detailed receipt downloaded', { id: 'downloading' });
+            } else {
+                blob = await financeService.downloadReceipt(txId);
+                filename = `receipt_${txId}.pdf`;
+            }
+
             const url = window.URL.createObjectURL(new Blob([blob]));
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `receipt_${txId}.pdf`);
+            link.setAttribute('download', filename);
             document.body.appendChild(link);
             link.click();
             link.remove();
         } catch (error) {
-            toast.error('Failed to download receipt');
+            toast.error('Failed to download receipt', { id: 'downloading' });
         }
     };
 
@@ -210,12 +230,12 @@ const CollectionDeskPage: React.FC = () => {
                             <form onSubmit={handlePaymentSubmit} className="p-6 space-y-5">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <FloatingLabelInput
-                                        label="Amount to Collect"
+                                        label="Total Amount to Collect"
                                         type="number"
-                                        required
+                                        readOnly
                                         value={paymentData.amount}
-                                        onChange={e => setPaymentData({ ...paymentData, amount: parseFloat(e.target.value) })}
                                         icon={<span>{getCurrencySymbol(currencyCode)}</span>}
+                                        className="bg-gray-50"
                                     />
                                     <div className="space-y-1">
                                         <label className="text-xs font-semibold text-gray-500 uppercase px-1">Payment Mode</label>
@@ -247,15 +267,10 @@ const CollectionDeskPage: React.FC = () => {
 
                                 <div>
                                     <div className="flex items-center justify-between px-1 mb-2">
-                                        <p className="text-xs font-semibold text-gray-500 uppercase">Select Fee Head (One at a time)</p>
-                                        {paymentData.feeRecordIds.length > 0 && paymentData.amount > 0 && (
-                                            <div className="flex items-center gap-2 animate-in slide-in-from-right-2 duration-300">
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Live Balance:</span>
-                                                <div className="px-2 py-0.5 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black border border-orange-100 flex items-center gap-1">
-                                                    {format((ledger.find(r => r.id === paymentData.feeRecordIds[0])?.balance || 0) - paymentData.amount > 0
-                                                        ? ((ledger.find(r => r.id === paymentData.feeRecordIds[0])?.balance || 0) - paymentData.amount)
-                                                        : 0)} {(ledger.find(r => r.id === paymentData.feeRecordIds[0])?.balance || 0) - paymentData.amount <= 0 && '(FULLY PAID)'}
-                                                </div>
+                                        <p className="text-xs font-semibold text-gray-500 uppercase">Select Fee Heads & Enter Amounts</p>
+                                        {paymentData.feeRecordIds.length > 0 && (
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Selected: {paymentData.feeRecordIds.length}</span>
                                             </div>
                                         )}
                                     </div>
@@ -263,33 +278,64 @@ const CollectionDeskPage: React.FC = () => {
                                         {ledger.filter(r => r.status !== 'PAID').map(record => (
                                             <div
                                                 key={record.id}
-                                                onClick={() => {
-                                                    // Enforce single selection (Phase 9.3 requirement)
-                                                    setPaymentData(prev => ({
-                                                        ...prev,
-                                                        feeRecordIds: prev.feeRecordIds.includes(record.id) ? [] : [record.id]
-                                                        // Removed automatic amount setting to allow user to enter custom amount (e.g. partial)
-                                                    }));
-                                                }}
-                                                className={`p-3 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${paymentData.feeRecordIds.includes(record.id)
+                                                className={`p-3 rounded-xl border transition-all flex items-center justify-between ${paymentData.feeRecordIds.includes(record.id)
                                                     ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200 shadow-sm'
                                                     : 'bg-white border-gray-100 hover:border-gray-200'
                                                     }`}
                                             >
-                                                <div className="flex items-center gap-3">
-                                                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center ${paymentData.feeRecordIds.includes(record.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-gray-300'
-                                                        }`}>
+                                                <div className="flex items-center gap-3 flex-1">
+                                                    <div
+                                                        onClick={() => {
+                                                            const isSelected = paymentData.feeRecordIds.includes(record.id);
+                                                            const newIds = isSelected
+                                                                ? paymentData.feeRecordIds.filter(id => id !== record.id)
+                                                                : [...paymentData.feeRecordIds, record.id];
+
+                                                            const newAmounts = { ...amountsPerRecord };
+                                                            if (!isSelected) {
+                                                                newAmounts[record.id] = record.balance;
+                                                            } else {
+                                                                delete newAmounts[record.id];
+                                                            }
+
+                                                            const total = Object.values(newAmounts).reduce((a, b) => a + b, 0);
+
+                                                            setPaymentData(prev => ({
+                                                                ...prev,
+                                                                feeRecordIds: newIds,
+                                                                amount: total
+                                                            }));
+                                                            setAmountsPerRecord(newAmounts);
+                                                        }}
+                                                        className={`w-5 h-5 rounded-full border flex items-center justify-center cursor-pointer ${paymentData.feeRecordIds.includes(record.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-gray-300'
+                                                            }`}>
                                                         {paymentData.feeRecordIds.includes(record.id) && <CheckCircle2 className="w-3 h-3" />}
                                                     </div>
                                                     <div>
                                                         <p className="text-sm font-bold text-gray-800">{record.feeHeadName}</p>
-                                                        <p className="text-[10px] text-gray-500 font-medium">Due: {new Date(record.dueDate).toLocaleDateString()}</p>
+                                                        <p className="text-[10px] text-gray-500 font-medium">Due: {new Date(record.dueDate).toLocaleDateString()} â€¢ Bal: {format(record.balance)}</p>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="text-sm font-black text-gray-900">{format(record.balance)}</p>
-                                                    <p className="text-[10px] text-gray-400 font-bold">Total: {format(record.amountDue)}</p>
-                                                </div>
+
+                                                {paymentData.feeRecordIds.includes(record.id) && (
+                                                    <div className="w-32 animate-in slide-in-from-left-2 duration-200">
+                                                        <input
+                                                            type="number"
+                                                            max={record.balance}
+                                                            className="block w-full px-2 py-1 text-sm border border-indigo-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                            placeholder="Amount"
+                                                            value={amountsPerRecord[record.id] || ''}
+                                                            onChange={(e) => {
+                                                                const val = parseFloat(e.target.value) || 0;
+                                                                const finalVal = Math.min(val, record.balance);
+                                                                const newAmounts = { ...amountsPerRecord, [record.id]: finalVal };
+                                                                const total = Object.values(newAmounts).reduce((a, b) => a + b, 0);
+                                                                setAmountsPerRecord(newAmounts);
+                                                                setPaymentData(prev => ({ ...prev, amount: total }));
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -326,34 +372,93 @@ const CollectionDeskPage: React.FC = () => {
                                 ) : transactions.length === 0 ? (
                                     <div className="p-8 text-center text-gray-400 text-sm italic">No recent transactions</div>
                                 ) : (
-                                    transactions.map(tx => (
-                                        <div key={tx.id} className="p-4 hover:bg-gray-50/50 transition-colors group">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <div>
-                                                    <p className="text-sm font-bold text-gray-900">{tx.studentName || `${selectedStudent.firstName} ${selectedStudent.lastName}`}</p>
-                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
-                                                        {tx.offeringName ? `${tx.offeringName} • ` : ''}{tx.paymentMode} • {formatRelativeTime(tx.transactionDate)}
-                                                    </p>
+                                    (() => {
+                                        // Grouping transactions by receiptNo
+                                        const grouped: Record<string, Transaction[]> = {};
+                                        const unformatted: Transaction[] = [];
+
+                                        transactions.forEach((tx: any) => {
+                                            if (tx.receiptNo) {
+                                                if (!grouped[tx.receiptNo]) grouped[tx.receiptNo] = [];
+                                                grouped[tx.receiptNo].push(tx);
+                                            } else {
+                                                unformatted.push(tx);
+                                            }
+                                        });
+
+                                        // Convert grouped to comparable list items
+                                        const uniqueGroups = Object.keys(grouped).map(rNo => {
+                                            const items = grouped[rNo];
+                                            const total = items.reduce((sum, tx) => sum + tx.amount, 0);
+                                            // Use most recent date in group
+                                            const newest = items.reduce((prev, current) => 
+                                                new Date(prev.transactionDate) > new Date(current.transactionDate) ? prev : current
+                                            );
+                                            
+                                            return {
+                                                id: rNo, // Use receiptNo as ID for list
+                                                receiptNo: rNo,
+                                                studentName: newest.studentName,
+                                                amount: total,
+                                                transactionDate: newest.transactionDate,
+                                                paymentMode: newest.paymentMode,
+                                                offeringName: newest.offeringName,
+                                                referenceNumber: newest.referenceNumber,
+                                                items: items.map(i => i.feeHeadName).filter(Boolean).join(', ')
+                                            };
+                                        });
+
+                                        const allItems = [
+                                            ...uniqueGroups,
+                                            ...unformatted.map(tx => ({ ...tx, items: tx.feeHeadName }))
+                                        ].sort((a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime());
+
+                                        return allItems.map((item: any) => (
+                                            <div key={item.id} className="p-4 hover:bg-gray-50/50 transition-colors group border-b last:border-0">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <div className="flex-1 pr-4">
+                                                        <p className="text-sm font-black text-gray-900 leading-tight">
+                                                            {item.studentName || `${selectedStudent.firstName} ${selectedStudent.lastName}`}
+                                                        </p>
+                                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">
+                                                            {item.offeringName ? `${item.offeringName} • ` : ''}{item.paymentMode} • {formatRelativeTime(item.transactionDate)}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-sm font-black text-emerald-600">+{format(item.amount)}</span>
+                                                        <button
+                                                            onClick={() => handleDownloadReceipt(item.id, item.receiptNo)}
+                                                            className="p-1.5 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-600 hover:text-white transition-all shadow-sm group-hover:scale-110"
+                                                            title={item.receiptNo ? "Download Unified Receipt" : "Download Receipt"}
+                                                        >
+                                                            <Download className={`w-3.5 h-3.5 ${item.receiptNo ? 'animate-pulse text-indigo-700' : ''}`} />
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-black text-emerald-600">+{format(tx.amount)}</span>
-                                                    <button
-                                                        onClick={() => handleDownloadReceipt(tx.id)}
-                                                        className="p-1.5 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
-                                                        title="Download Receipt"
-                                                    >
-                                                        <Download className="w-3.5 h-3.5" />
-                                                    </button>
+                                                
+                                                {item.items && (
+                                                    <p className="text-[10px] font-medium text-gray-500 italic truncate mb-1" title={item.items}>
+                                                        Incl: {item.items}
+                                                    </p>
+                                                )}
+
+                                                <div className="flex items-center gap-3">
+                                                    {item.receiptNo && (
+                                                        <div className="flex items-center gap-1">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                                                            <span className="text-[9px] font-black text-indigo-400 tracking-tighter uppercase">ID: {item.receiptNo}</span>
+                                                        </div>
+                                                    )}
+                                                    {item.referenceNumber && (
+                                                        <div className="flex items-center gap-1">
+                                                            <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />
+                                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">REF: {item.referenceNumber}</span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
-                                            {tx.referenceNumber && (
-                                                <div className="flex items-center gap-1.5 mt-1 border-t border-gray-100 pt-1">
-                                                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />
-                                                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">REF: {tx.referenceNumber}</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))
+                                        ));
+                                    })()
                                 )}
                             </div>
                         </div>
@@ -486,9 +591,14 @@ const CollectionDeskPage: React.FC = () => {
                                                         <p className="text-sm font-bold text-gray-900">{tx.studentName || `Student: ${tx.studentId?.substring(0, 8)}`}</p>
                                                         <span className="text-[10px] font-black text-emerald-600">+{format(tx.amount)}</span>
                                                     </div>
-                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none">
+                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mb-1">
                                                         {tx.offeringName ? `${tx.offeringName} • ` : ''}{tx.paymentMode} • {formatRelativeTime(tx.transactionDate)}
                                                     </p>
+                                                    {tx.feeHeadName && (
+                                                        <p className="text-[9px] text-gray-400 font-medium italic truncate max-w-[150px]" title={tx.feeHeadName}>
+                                                            {tx.feeHeadName}
+                                                        </p>
+                                                    )}
                                                 </div>
                                             </div>
                                             <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-indigo-400 transition-colors" />

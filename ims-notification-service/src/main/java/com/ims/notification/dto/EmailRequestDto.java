@@ -32,4 +32,6 @@ public class EmailRequestDto {
     private Map<String, Object> templateData;
 
     private boolean isHtml;
+
+    private String attachmentPath;
 }

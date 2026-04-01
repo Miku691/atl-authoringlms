@@ -21,6 +21,7 @@
 		<java.version>17</java.version>
 		<spring-cloud.version>2025.0.0</spring-cloud.version>
 		<jasperreports.version>6.21.3</jasperreports.version>
+		<openhtmltopdf.version>1.0.10</openhtmltopdf.version>
 	</properties>
 	<dependencies>
 		<!-- Common Spring Boot -->
@@ -66,7 +67,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 
 
 		<!-- Apache POI for Excel Export in JasperReports -->

@@ -260,15 +260,17 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
                 { path: '/reports/financial', label: 'Financial Reports', icon: DollarSign },
             ]
         },
-        {
-            path: '/templates',
-            label: 'Templates',
-            icon: Layers,
-            roles: ['TENANT_ADMIN'],
-            subItems: [
-                { path: '/system/templates/invoice', label: 'Invoice Template', icon: FileText, roles: ['TENANT_ADMIN'] },
-            ]
-        },
+        // NOTE: Templates section hidden for initial release. Will be enabled when
+        // Playwright-based dynamic template rendering is implemented.
+        // {
+        //     path: '/templates',
+        //     label: 'Templates',
+        //     icon: Layers,
+        //     roles: ['TENANT_ADMIN'],
+        //     subItems: [
+        //         { path: '/system/templates/invoice', label: 'Invoice Template', icon: FileText, roles: ['TENANT_ADMIN'] },
+        //     ]
+        // },
         {
             path: '/system',
             label: 'System',

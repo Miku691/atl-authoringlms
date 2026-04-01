@@ -76,6 +76,13 @@ export interface Transaction {
     offeringName?: string;
     tenantId: string;
     collectedBy: string;
+    receiptNo?: string;
+    feeHeadName?: string;
+}
+
+export interface FeePaymentDetail {
+    feeRecordId: string;
+    amount: number;
 }
 
 export interface CollectPaymentRequest {
@@ -84,6 +91,7 @@ export interface CollectPaymentRequest {
     paymentMode: PaymentMode;
     referenceNumber?: string;
     feeRecordIds?: string[];
+    splitBreakdown?: FeePaymentDetail[];
     waiveLateFee?: boolean;
 }
 
