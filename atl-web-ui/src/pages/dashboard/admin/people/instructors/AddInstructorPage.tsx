@@ -16,8 +16,10 @@ import {
     Banknote,
     Loader2,
     BookOpen,
-    Clock
+    Clock,
+    UserCheck
 } from 'lucide-react';
+import PageHeader from '../../../../../components/common/PageHeader';
 import FloatingLabelInput from '../../../../../components/common/FloatingLabelInput';
 import CustomDatePicker from '../../../../../components/common/CustomDatePicker';
 import CustomSelect from '../../../../../components/common/CustomSelect';
@@ -145,20 +147,19 @@ const AddInstructorPage: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col gap-6 max-w-5xl mx-auto">
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-500"
-                    >
-                        <ArrowLeft className="w-6 h-6" />
-                    </button>
-                    <div>
-                        <h1 className="text-2xl font-black text-gray-900">Add New Instructor</h1>
-                        <p className="text-sm text-gray-500">Register a new faculty member to your institution</p>
-                    </div>
-                </div>
+        <div className="space-y-6">
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                </button>
+                <PageHeader
+                    title="Add New Instructor"
+                    description="Register a new faculty member and define their expertise."
+                    icon={UserCheck}
+                />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">

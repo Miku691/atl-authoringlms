@@ -4,6 +4,7 @@ import { type RootState } from '../../../../../store/store';
 import api from '../../../../../utils/api';
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../../../../../components/common/ConfirmationModal';
+import PageHeader from '../../../../../components/common/PageHeader';
 import {
     Search,
     Edit,
@@ -97,7 +98,7 @@ const InstructorManagementPage: React.FC = () => {
         }
     };
 
-    const handleEditClick = (instructor: Instructor) => {
+    const handleEditClick = (_instructor: Instructor) => {
         toast.error("Edit page not implemented yet. Redirecting to All Instructors.");
     };
 
@@ -130,36 +131,33 @@ const InstructorManagementPage: React.FC = () => {
     );
 
     return (
-        <div className="flex flex-col gap-4">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-100">
-                        <UserCheck className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-black text-gray-900">Faculty Roster</h1>
-                        <p className="text-sm text-gray-500">Manage {instructors.length} academic staff members</p>
-                    </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-                    <div className="relative flex-1 sm:min-w-[320px] group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
-                        <input
-                            type="text"
-                            className="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
-                            placeholder="Find instructor by name or ID..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
+        <div className="space-y-6">
+            <PageHeader
+                title="Faculty Roster"
+                description="Manage academic staff members, expertise, and login access."
+                icon={UserCheck}
+                actions={
                     <button
-                        className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 whitespace-nowrap"
+                        className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-all shadow-sm whitespace-nowrap gap-2"
                         onClick={() => navigate('/people/instructors/add')}
                     >
-                        <UserPlus className="w-5 h-5 mr-2" />
+                        <UserPlus className="w-4 h-4" />
                         Add Instructor
                     </button>
+                }
+            />
+
+            {/* Search & Filters */}
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div className="relative max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                        type="text"
+                        className="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
+                        placeholder="Find instructor by name or ID..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
             </div>
 

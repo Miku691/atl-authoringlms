@@ -3,7 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { type RootState } from '../../../../store/store';
 import { academicService, type GradingScale } from '../../../../api/academicService';
-import {
+import toast from 'react-hot-toast';
+import PageHeader from '../../../../components/common/PageHeader';
+import { 
     Plus,
     Trash2,
     Edit2,
@@ -13,7 +15,6 @@ import {
     X,
     Loader2
 } from 'lucide-react';
-import { toast } from 'react-hot-toast';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 
 
@@ -113,22 +114,20 @@ const GradingConfigPage: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                        <Award className="w-8 h-8 text-indigo-600" />
-                        Grading Configuration
-                    </h1>
-                    <p className="text-gray-500">Define your institute's grading scales and performance standards</p>
-                </div>
-                <button
-                    onClick={handleOpenAdd}
-                    className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
-                >
-                    <Plus className="w-4 h-4" />
-                    Add Grade Level
-                </button>
-            </div>
+            <PageHeader
+                title="Grading Configuration"
+                description="Define your institute's grading scales and performance standards"
+                icon={Award}
+                actions={
+                    <button
+                        onClick={handleOpenAdd}
+                        className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Add Grade Level
+                    </button>
+                }
+            />
 
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="overflow-x-auto">

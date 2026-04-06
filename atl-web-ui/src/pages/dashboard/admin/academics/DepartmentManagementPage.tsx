@@ -4,6 +4,7 @@ import { academicService, type Department } from '../../../../api/academicServic
 import { useSelector } from 'react-redux';
 import { type RootState } from '../../../../store/store';
 import toast from 'react-hot-toast';
+import PageHeader from '../../../../components/common/PageHeader';
 
 const DepartmentManagementPage: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.auth);
@@ -73,19 +74,19 @@ const DepartmentManagementPage: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Departments</h1>
-                    <p className="text-gray-500">Manage academic departments and faculties</p>
-                </div>
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
-                >
-                    <Plus className="w-4 h-4" />
-                    Add Department
-                </button>
-            </div>
+            <PageHeader
+                title="Departments"
+                description="Manage academic departments and faculties"
+                actions={
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Add Department
+                    </button>
+                }
+            />
 
             {loading ? (
                 <div className="text-center py-10">Loading...</div>

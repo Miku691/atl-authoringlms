@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { type RootState } from '../../../../store/store';
 import api from '../../../../utils/api';
 import toast from 'react-hot-toast';
+import PageHeader from '../../../../components/common/PageHeader';
 import { BookOpen, Layers, GraduationCap, Loader2, Plus, Trash2, Edit2, X, UserCheck } from 'lucide-react';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 import SubjectMappingModal from './SubjectMappingModal';
@@ -312,13 +313,11 @@ const AcademicStructurePage: React.FC = () => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-4 md:p-8">
-            <div className="mb-6 flex justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Academic Structure</h1>
-                    <p className="text-sm text-gray-500">Manage your classes and sections.</p>
-                </div>
-                {isAdmin && programs.length > 0 && (
+        <div className="space-y-6">
+            <PageHeader
+                title="Academic Structure"
+                description="Manage your classes and sections."
+                actions={isAdmin && programs.length > 0 && (
                     <button
                         onClick={() => { setSelectedProgramId(programs[0].id); setIsAddClassOpen(true); }}
                         className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition-colors"
@@ -326,7 +325,7 @@ const AcademicStructurePage: React.FC = () => {
                         <Plus className="w-4 h-4" /> Add Class
                     </button>
                 )}
-            </div>
+            />
 
             <div className="space-y-8">
                 {programs.filter(p => isAdmin || getClassesForProgram(p.id).length > 0).map((program) => {

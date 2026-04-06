@@ -5,6 +5,7 @@ import { type RootState } from '../../../../store/store';
 import api from '../../../../utils/api';
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
+import PageHeader from '../../../../components/common/PageHeader';
 import {
     Briefcase,
     Search,
@@ -100,7 +101,7 @@ const StaffManagementPage: React.FC = () => {
         }
     };
 
-    const handleEditClick = (staffMember: StaffMember) => {
+    const handleEditClick = (_staffMember: StaffMember) => {
         toast.error("Edit page not implemented yet. Redirecting to All Staff.");
     };
 
@@ -136,39 +137,35 @@ const StaffManagementPage: React.FC = () => {
     );
 
     return (
-        <div className="flex flex-col gap-4">
-            {/* Compact Header & Actions */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-indigo-100 rounded-lg">
-                        <Briefcase className="w-6 h-6 text-indigo-600" />
-                    </div>
-                    <div>
-                        <h1 className="text-xl font-bold text-gray-900">Staff</h1>
-                        <p className="text-xs text-gray-500 hidden sm:block">Manage support staff</p>
-                    </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                    <div className="relative flex-1 sm:min-w-[300px]">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
-                            placeholder="Search by name, ID or role..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
+        <div className="space-y-6">
+            <PageHeader
+                title="Staff Management"
+                description="Manage support staff, roles, and administrative access."
+                icon={Briefcase}
+                actions={
                     <button
-                        className="inline-flex items-center justify-center px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-black hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 whitespace-nowrap"
+                        className="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-all shadow-sm whitespace-nowrap gap-2"
                         onClick={() => navigate('/people/staff/add')}
                     >
-                        <UserPlus className="w-5 h-5 mr-2" />
-                        Add Staff
+                        <UserPlus className="w-4 h-4" />
+                        Add Staff Member
                     </button>
+                }
+            />
+
+            {/* Search & Filters */}
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <div className="relative max-w-md">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <input
+                        type="text"
+                        className="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
+                        placeholder="Search by name, employee ID or role..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                 </div>
             </div>
 

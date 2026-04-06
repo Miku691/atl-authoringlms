@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { type RootState } from '../../../../store/store';
 import api from '../../../../utils/api';
 import toast from 'react-hot-toast';
+import PageHeader from '../../../../components/common/PageHeader';
 import { 
     Calendar, 
     Plus, 
@@ -128,20 +129,20 @@ const SessionManagementPage: React.FC = () => {
     };
 
     return (
-        <div className="max-w-7xl mx-auto p-4 md:p-8 animate-fade-in">
-            <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Academic Sessions</h1>
-                    <p className="text-gray-500 mt-1">Manage institutional academic cycles and structural transitions.</p>
-                </div>
-                <button
-                    onClick={() => setIsWizardOpen(true)}
-                    className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                    <Plus className="w-5 h-5" />
-                    New Session Setup
-                </button>
-            </div>
+        <div className="space-y-6">
+            <PageHeader
+                title="Academic Sessions"
+                description="Manage institutional academic cycles and structural transitions."
+                actions={
+                    <button
+                        onClick={() => setIsWizardOpen(true)}
+                        className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                        <Plus className="w-5 h-5" />
+                        New Session Setup
+                    </button>
+                }
+            />
 
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center h-64 gap-3">

@@ -26,7 +26,8 @@ import {
     Target,
     Package,
     Truck,
-    Banknote
+    Banknote,
+    Trophy
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -109,6 +110,13 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             setupRequired: true
         },
         {
+            path: '/student/results',
+            label: 'My Results',
+            icon: Trophy,
+            roles: ['STUDENT'],
+            setupRequired: true
+        },
+        {
             path: '/guardian/finance',
             label: 'Ward Finance',
             icon: DollarSign,
@@ -129,6 +137,7 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
                 { path: '/academics/timetable', label: 'Timetable', icon: Clock, roles: ['TENANT_ADMIN', 'INSTRUCTOR'], condition: () => hasActiveOfferings },
                 { path: '/academics/grading', label: 'Grading Scales', icon: FileText, roles: ['TENANT_ADMIN'] },
                 { path: '/academics/syllabus', label: 'Syllabus', icon: FileText, roles: ['TENANT_ADMIN', 'INSTRUCTOR'], condition: () => hasActiveOfferings },
+                { path: '/teacher/exams', label: 'Exams', icon: FileText, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
             ]
         },
         {
@@ -186,6 +195,7 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
                 { path: '/lms/assignments', label: 'Assignments', icon: FileText, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
                 { path: '/operations/timetable', label: 'Timetable', icon: Clock, roles: ['TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT'] },
                 { path: '/operations/calendar', label: 'Calendar', icon: Calendar, roles: ['TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT'] },
+                { path: '/instructor/gradebook', label: 'Gradebook', icon: Trophy, roles: ['INSTRUCTOR'] },
             ]
         },
         {

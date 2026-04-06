@@ -51,4 +51,13 @@ public interface ImsStudentsRepo extends JpaRepository<ImsStudents, String> {
             "AND (e.isDeleted IS NULL OR e.isDeleted = false) " +
             "AND (s.isDeleted IS NULL OR s.isDeleted = false)")
     List<ImsStudents> findByOffering(String tenantId, String offeringId);
+
+    @Query("SELECT DISTINCT s FROM ImsStudents s " +
+            "JOIN ImsStudentEnrollments e ON s.id = e.studentId " +
+            "WHERE s.tenantId = :tenantId " +
+            "AND e.offeringId IN :offeringIds " +
+            "AND e.status = 'ACTIVE' " +
+            "AND (e.isDeleted IS NULL OR e.isDeleted = false) " +
+            "AND (s.isDeleted IS NULL OR s.isDeleted = false)")
+    List<ImsStudents> findByOfferingIn(String tenantId, List<String> offeringIds);
 }

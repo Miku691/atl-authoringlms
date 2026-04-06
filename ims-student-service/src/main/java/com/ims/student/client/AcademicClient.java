@@ -1,6 +1,7 @@
 package com.ims.student.client;
 
 import com.ims.student.dto.external.ImsClassesDto;
+import com.ims.student.dto.external.ImsOfferingInstructorsDto;
 import com.ims.student.dto.external.ImsOfferingsDto;
 import com.ims.student.dto.external.ImsSectionsDto;
 import com.ims.student.util.ApiResponse;
@@ -33,4 +34,7 @@ public interface AcademicClient {
 
     @GetMapping("/sections/{id}")
     ApiResponse<ImsSectionsDto> getSectionById(@PathVariable("id") String id);
+
+    @GetMapping("/offering-instructors/instructor/{instructorId}")
+    ApiResponse<List<ImsOfferingInstructorsDto>> getByInstructorId(@PathVariable("instructorId") String instructorId);
 }

@@ -2,10 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { type RootState } from '../../../../store/store';
-import { CheckCircle, Circle, Plus, Trash2, ChevronDown, ChevronRight, X, Loader2, Edit2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import PageHeader from '../../../../components/common/PageHeader';
+import { CheckCircle, Circle, Plus, Trash2, ChevronDown, ChevronRight, X, Loader2, Edit2, Layout } from 'lucide-react';
 import { academicService } from '../../../../api/academicService';
 import { instructorService } from '../../../../api/instructorService';
-import toast from 'react-hot-toast';
 
 interface Chapter {
     id: string;
@@ -307,11 +308,12 @@ const SyllabusTrackingPage: React.FC = () => {
     };
 
     return (
-        <div className="space-y-6 p-6">
-            <div>
-                <h1 className="text-2xl font-bold text-gray-900">Syllabus Tracking</h1>
-                <p className="text-gray-500">Monitor academic progress and topic coverage</p>
-            </div>
+        <div className="space-y-6">
+            <PageHeader
+                title="Syllabus Tracking"
+                description="Monitor academic progress and topic coverage"
+                icon={Layout}
+            />
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <div className="mb-6 grid md:grid-cols-2 gap-4">

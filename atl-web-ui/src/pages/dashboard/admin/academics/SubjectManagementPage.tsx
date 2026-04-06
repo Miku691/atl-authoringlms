@@ -5,6 +5,7 @@ import { academicService, type Subject } from '../../../../api/academicService';
 import { Plus, Trash2, Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
+import PageHeader from '../../../../components/common/PageHeader';
 
 const SubjectManagementPage: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.auth);
@@ -113,19 +114,19 @@ const SubjectManagementPage: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Subject Master</h1>
-                    <p className="text-sm text-gray-500">Manage the master list of subjects for your institute.</p>
-                </div>
-                <button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                    <Plus className="w-4 h-4" />
-                    Add Subject
-                </button>
-            </div>
+            <PageHeader
+                title="Subject Master"
+                description="Manage the master list of subjects for your institute."
+                actions={
+                    <button
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                        <Plus className="w-4 h-4" />
+                        Add Subject
+                    </button>
+                }
+            />
 
             {/* Search and List */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">

@@ -7,6 +7,7 @@ import { timetableService, type TimetableMaster, type TimetableSlot } from '../.
 import { Calendar, Plus, Trash2, X, Clock, BookOpen, User as UserIcon, Edit2, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
+import PageHeader from '../../../../components/common/PageHeader';
 
 export default function TimetableManagementPage() {
     const user = useSelector((state: RootState) => state.auth.user);
@@ -343,13 +344,11 @@ export default function TimetableManagementPage() {
     };
 
     return (
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-800">Timetable Management</h1>
-                    <p className="text-slate-500">Manage class schedules and teacher assignments</p>
-                </div>
-            </div>
+        <div className="space-y-6">
+            <PageHeader
+                title="Timetable Management"
+                description="Manage class schedules and teacher assignments"
+            />
 
             {/* Selection Area */}
             <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">

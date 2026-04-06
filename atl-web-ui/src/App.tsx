@@ -73,6 +73,9 @@ import AssignmentManagementPage from './pages/dashboard/admin/operations/Assignm
 import AnnouncementManagementPage from './pages/dashboard/admin/communication/AnnouncementManagementPage';
 import TeacherDashboard from './pages/dashboard/teacher/TeacherDashboard';
 import InstructorClassHubPage from './pages/dashboard/teacher/InstructorClassHubPage';
+import ExamManagementPage from './pages/dashboard/teacher/ExamManagementPage';
+import InstructorGradebook from './pages/dashboard/teacher/InstructorGradebook';
+import MyResultsPage from './pages/dashboard/student/MyResultsPage';
 
 // Protected Route Wrapper
 import { useSelector } from 'react-redux';
@@ -161,6 +164,7 @@ const App: React.FC = () => {
               <Route path="/student/attendance" element={<MyAttendancePage />} />
               <Route path="/student/assignments" element={<MyAssignmentsPage />} />
               <Route path="/student/finance" element={<MyFinancePage />} />
+              <Route path="/student/results" element={<MyResultsPage />} />
 
               {/* Guardian Routes */}
               <Route path="/guardian/finance" element={<WardFinancePage />} />
@@ -194,6 +198,8 @@ const App: React.FC = () => {
               <Route path="/people/instructors/:id/subjects" element={<InstructorSubjectsPage />} />
               <Route path="/people/instructors/:id" element={<InstructorProfilePage />} />
               <Route path="/instructor/class/:offeringId" element={<InstructorClassHubPage />} />
+              <Route path="/teacher/exams" element={<ExamManagementPage />} />
+              <Route path="/instructor/gradebook" element={<InstructorGradebook />} />
               <Route path="/people/staff" element={<StaffManagementPage />} />
               <Route path="/people/staff/all" element={<StaffManagementPage />} />
               <Route path="/people/staff/add" element={<AddStaffPage />} />

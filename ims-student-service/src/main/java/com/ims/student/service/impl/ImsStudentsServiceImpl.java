@@ -1,7 +1,9 @@
 package com.ims.student.service.impl;
 
+import com.ims.student.client.AcademicClient;
 import com.ims.student.client.AuthClient;
 import com.ims.student.dto.AuthSignupRequestDto;
+import com.ims.student.dto.external.ImsOfferingInstructorsDto;
 import com.ims.student.entity.ImsStudents;
 import com.ims.student.dto.ImsStudentsDto;
 import com.ims.student.exception.ResourceAlreadyExistException;
@@ -26,6 +28,7 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
     private final ImsStudentsRepo repo;
     private final ModelMapper modelMapper;
     private final AuthClient authClient;
+    private final AcademicClient academicClient;
 
     private ImsStudentsDto toDto(ImsStudents e) {
         return modelMapper.map(e, ImsStudentsDto.class);
@@ -212,6 +215,29 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
     @Override
     public List<ImsStudentsDto> getByOffering(String tenantId, String offeringId) {
         return repo.findByOffering(tenantId, offeringId).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImsStudentsDto> getByInstructorId(String instructorId, String tenantId) {
+        ApiResponse<List<ImsOfferingInstructorsDto>> assignmentsRes = academicClient.getByInstructorId(instructorId);
+
+        if (assignmentsRes == null || assignmentsRes.getApiData() == null || assignmentsRes.getApiData().isEmpty()) {
+            return List.of();
+        }
+
+        List<String> offeringIds = assignmentsRes.getApiData().stream()
+                .map(ImsOfferingInstructorsDto::getOfferingId)
+                .filter(java.util.Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (offeringIds.isEmpty()) {
+            return List.of();
+        }
+
+        return repo.findByOfferingIn(tenantId, offeringIds).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }

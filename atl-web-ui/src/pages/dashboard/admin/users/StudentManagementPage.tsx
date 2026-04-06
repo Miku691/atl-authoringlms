@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 import CustomDatePicker from '../../../../components/common/CustomDatePicker';
 import CustomSelect from '../../../../components/common/CustomSelect';
+import PageHeader from '../../../../components/common/PageHeader';
 import {
     GraduationCap,
     Search,
@@ -18,8 +19,11 @@ import {
     Key,
     ChevronLeft,
     ChevronRight,
-    Filter
-} from 'lucide-react'; import StudentDocumentsModal from './StudentDocumentsModal';
+    Filter,
+    Plus,
+    Layout
+} from 'lucide-react'; 
+import StudentDocumentsModal from './StudentDocumentsModal';
 import AuthenticatedAvatar from '../../../../components/common/AuthenticatedAvatar';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { studentService } from '../../../../api/studentService';
@@ -395,70 +399,76 @@ const StudentManagementPage: React.FC = () => {
 
 
     return (
-        <div className="flex flex-col gap-4">
-            {/* Compact Header & Actions */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                    <div className="p-2 bg-indigo-100 rounded-lg">
-                        <GraduationCap className="w-6 h-6 text-indigo-600" />
+        <div className="space-y-6">
+            <PageHeader
+                title="Students"
+                description="Manage and monitor student records across the institution."
+                icon={GraduationCap}
+                actions={
+                    <button
+                        onClick={() => {
+                            setFormData(initialFormState);
+                            setSelectedStudentId(null);
+                            setIsModalOpen(true);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-semibold"
+                    >
+                        <Plus className="w-4 h-4" /> Add Student
+                    </button>
+                }
+            />
+
+            {/* Filters row */}
+            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center">
+                <div className="relative flex-1">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search className="h-4 w-4 text-gray-400" />
                     </div>
-                    <div>
-                        <h1 className="text-xl font-bold text-gray-900">Students</h1>
-                        <p className="text-xs text-gray-500 hidden sm:block">Manage student records</p>
-                    </div>
+                    <input
+                        type="text"
+                        className="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
+                        placeholder="Search by name, email or admission no..."
+                        value={searchTerm}
+                        onChange={(e) => {
+                            setSearchTerm(e.target.value);
+                            setCurrentPage(0);
+                        }}
+                    />
                 </div>
 
-                <div className="flex flex-col lg:flex-row gap-3 w-full lg:w-auto items-center">
-                    <div className="relative flex-1 sm:min-w-[250px]">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Search className="h-4 w-4 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            className="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-gray-50 placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors"
-                            placeholder="Name or Admission No..."
-                            value={searchTerm}
+                <div className="flex items-center gap-3 w-full md:w-auto">
+                    <div className="relative flex-1 md:w-40">
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <select
+                            className="pl-9 pr-8 py-2 block w-full border border-gray-200 rounded-lg bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none cursor-pointer translate-y-0"
+                            value={genderFilter}
                             onChange={(e) => {
-                                setSearchTerm(e.target.value);
+                                setGenderFilter(e.target.value);
                                 setCurrentPage(0);
                             }}
-                        />
+                        >
+                            <option value="">Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-                        <div className="relative flex-1 sm:flex-none">
-                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                            <select
-                                className="pl-9 pr-8 py-2 block w-full border border-gray-300 rounded-lg bg-gray-50 text-sm focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
-                                value={genderFilter}
-                                onChange={(e) => {
-                                    setGenderFilter(e.target.value);
-                                    setCurrentPage(0);
-                                }}
-                            >
-                                <option value="">Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-
-                        <div className="relative flex-1 sm:flex-none">
-                            <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                            <select
-                                className="pl-9 pr-8 py-2 block w-full border border-gray-300 rounded-lg bg-gray-50 text-sm focus:ring-indigo-500 focus:border-indigo-500 appearance-none"
-                                value={offeringFilter}
-                                onChange={(e) => {
-                                    setOfferingFilter(e.target.value);
-                                    setCurrentPage(0);
-                                }}
-                            >
-                                <option value="">All Classes</option>
-                                {offerings.map(o => (
-                                    <option key={o.id} value={o.id}>{o.name}</option>
-                                ))}
-                            </select>
-                        </div>
+                    <div className="relative flex-1 md:w-48">
+                        <Layout className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <select
+                            className="pl-9 pr-8 py-2 block w-full border border-gray-200 rounded-lg bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none cursor-pointer"
+                            value={offeringFilter}
+                            onChange={(e) => {
+                                setOfferingFilter(e.target.value);
+                                setCurrentPage(0);
+                            }}
+                        >
+                            <option value="">All Offerings</option>
+                            {offerings.map(o => (
+                                <option key={o.id} value={o.id}>{o.name}</option>
+                            ))}
+                        </select>
                     </div>
                 </div>
             </div>

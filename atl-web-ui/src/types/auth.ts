@@ -8,6 +8,8 @@ export interface User {
     tenantType?: 'SCHOOL' | 'COLLEGE' | 'COACHING';
     email?: string;
     id: string;
+    studentId?: string | null;
+    instructorId?: string | null;
 }
 
 export interface AuthState {

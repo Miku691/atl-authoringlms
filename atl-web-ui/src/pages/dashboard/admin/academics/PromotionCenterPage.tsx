@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { type RootState } from '../../../../store/store';
 import api from '../../../../utils/api';
 import toast from 'react-hot-toast';
+import PageHeader from '../../../../components/common/PageHeader';
 import { 
     ArrowRightLeft, 
     Users, 
@@ -142,11 +143,24 @@ const PromotionCenterPage: React.FC = () => {
     }, [source.offeringId]);
 
     return (
-        <div className="max-w-7xl mx-auto p-4 md:p-8 animate-fade-in">
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Student Promotion Center</h1>
-                <p className="text-gray-500 mt-1">Orchestrate grade transitions, promotions, and session roll-overs.</p>
-            </div>
+        <div className="space-y-6">
+            <PageHeader
+                title="Student Promotion Center"
+                description="Orchestrate grade transitions, promotions, and session roll-overs."
+                actions={
+                    <div className="p-3 bg-indigo-50 rounded-xl border border-indigo-100">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-white rounded-lg shadow-sm">
+                                <Users className="w-5 h-5 text-indigo-600" />
+                            </div>
+                            <div>
+                                <p className="text-xs font-medium text-indigo-600 uppercase tracking-wider">Total Selected</p>
+                                <p className="text-2xl font-bold text-indigo-900">{students.filter(s => s.selected).length}</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            />
 
             {/* Stepper Header */}
             <div className="flex items-center gap-4 mb-8 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">

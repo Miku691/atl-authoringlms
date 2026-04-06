@@ -34,4 +34,6 @@ public interface ImsStudentsService {
                                         String offeringId, String searchTerm, Pageable pageable);
 
     List<ImsStudentsDto> getByOffering(String tenantId, String offeringId);
+
+    List<ImsStudentsDto> getByInstructorId(String instructorId, String tenantId);
 }
