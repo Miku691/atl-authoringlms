@@ -24,22 +24,27 @@ const DocumentsTab: React.FC<Props> = ({ studentId }) => {
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [showUploadModal, setShowUploadModal] = useState(false);
-    const [selectedType, setSelectedType] = useState('AADHAR');
+    const [masterTypes, setMasterTypes] = useState<any[]>([]);
+    const [selectedType, setSelectedType] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const docTypes = [
-        { id: 'AADHAR', label: 'Government ID (Aadhar/PAN)' },
-        { id: 'BIRTH_CERT', label: 'Birth Certificate' },
-        { id: 'MARK_SHEET', label: 'Previous Mark Sheet' },
-        { id: 'TRANSFER_CERT', label: 'Transfer Certificate (TC)' },
-        { id: 'PASSPORT_PHOTO', label: 'Passport Photo' },
-        { id: 'OTHER', label: 'Other Document' }
-    ];
-
     useEffect(() => {
         fetchDocs();
+        fetchMasterTypes();
     }, [studentId]);
+
+    const fetchMasterTypes = async () => {
+        try {
+            const res = await documentService.getMasterDocumentTypes();
+            if (res.status === 'SUCCESS') {
+                setMasterTypes(res.apiData);
+                if (res.apiData.length > 0) setSelectedType(res.apiData[0].code);
+            }
+        } catch (error) {
+            console.error("Failed to load master types", error);
+        }
+    };
 
     const fetchDocs = async () => {
         setLoading(true);
@@ -139,7 +144,9 @@ const DocumentsTab: React.FC<Props> = ({ studentId }) => {
                                             <FileCheck2 className="w-6 h-6" />
                                         </div>
                                         <div>
-                                            <p className="font-black text-gray-900 text-sm font-outfit uppercase leading-tight">{doc.documentType.replace('_', ' ')}</p>
+                                            <p className="font-black text-gray-900 text-sm font-outfit uppercase leading-tight">
+                                                {masterTypes.find(t => t.code === doc.documentType)?.label || doc.documentType.replace('_', ' ')}
+                                            </p>
                                             <div className="flex items-center gap-1.5 mt-1">
                                                 {getStatusIcon(doc.verificationStatus)}
                                                 <span className="text-[10px] font-black uppercase tracking-tighter text-gray-400">
@@ -202,7 +209,7 @@ const DocumentsTab: React.FC<Props> = ({ studentId }) => {
                                     value={selectedType}
                                     onChange={(e) => setSelectedType(e.target.value)}
                                 >
-                                    {docTypes.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+                                    {masterTypes.map(t => <option key={t.id} value={t.code}>{t.label}</option>)}
                                 </select>
                             </div>
 

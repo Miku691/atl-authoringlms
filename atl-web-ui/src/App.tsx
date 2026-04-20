@@ -60,7 +60,10 @@ import PromotionCenterPage from './pages/dashboard/admin/academics/PromotionCent
 import { ReportsDashboardPage } from './pages/dashboard/admin/reports/ReportsDashboardPage';
 import InvoiceTemplatePage from './pages/dashboard/admin/templates/InvoiceTemplatePage';
 import ComingSoonPage from './pages/common/ComingSoonPage';
+import InstituteCalendarPage from './pages/dashboard/common/InstituteCalendarPage';
 import StudentDashboardHome from './pages/dashboard/student/StudentDashboardHome';
+import PlatformDashboardHome from './pages/dashboard/platform/PlatformDashboardHome';
+import DemoLeadsPage from './pages/dashboard/platform/DemoLeadsPage';
 import MyProfilePage from './pages/dashboard/student/MyProfilePage';
 import MyAcademicsPage from './pages/dashboard/student/MyAcademicsPage';
 import MyTimetablePage from './pages/dashboard/student/MyTimetablePage';
@@ -76,6 +79,7 @@ import InstructorClassHubPage from './pages/dashboard/teacher/InstructorClassHub
 import ExamManagementPage from './pages/dashboard/teacher/ExamManagementPage';
 import InstructorGradebook from './pages/dashboard/teacher/InstructorGradebook';
 import MyResultsPage from './pages/dashboard/student/MyResultsPage';
+import LeaveRequestPage from './pages/dashboard/student/LeaveRequestPage';
 
 // Protected Route Wrapper
 import { useSelector } from 'react-redux';
@@ -123,6 +127,9 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
 
 const DashboardWrapper = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+  if (user?.roles.includes('SUPER_ADMIN')) {
+    return <PlatformDashboardHome />;
+  }
   if (user?.roles.includes('STUDENT')) {
     return <StudentDashboardHome />;
   }
@@ -135,6 +142,8 @@ const DashboardWrapper = () => {
   return <AdminDashboardHome />;
 };
 
+import LandingPage from './public/LandingPage';
+
 const App: React.FC = () => {
   return (
     <Provider store={store}>
@@ -142,6 +151,7 @@ const App: React.FC = () => {
         <Toaster position="top-right" reverseOrder={false} />
         <Router>
           <Routes>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/otp" element={<OtpPage />} />
             <Route path="/register-institute" element={<RegisterInstitutePage />} />
@@ -155,6 +165,7 @@ const App: React.FC = () => {
               </ProtectedRoute>
             }>
               <Route path="/dashboard" element={<DashboardWrapper />} />
+              <Route path="/operations/calendar" element={<InstituteCalendarPage />} />
 
               {/* Student Routes */}
               <Route path="/student/profile" element={<MyProfilePage />} />
@@ -165,6 +176,7 @@ const App: React.FC = () => {
               <Route path="/student/assignments" element={<MyAssignmentsPage />} />
               <Route path="/student/finance" element={<MyFinancePage />} />
               <Route path="/student/results" element={<MyResultsPage />} />
+              <Route path="/student/leaves" element={<LeaveRequestPage />} />
 
               {/* Guardian Routes */}
               <Route path="/guardian/finance" element={<WardFinancePage />} />
@@ -246,6 +258,7 @@ const App: React.FC = () => {
               <Route path="/lms/*" element={<ComingSoonPage />} />
 
               {/* System */}
+              <Route path="/platform/leads" element={<DemoLeadsPage />} />
               <Route path="/system/templates/invoice" element={<InvoiceTemplatePage />} />
               <Route path="/system/setup-master" element={<SetupMasterPage />} />
               <Route path="/system/users" element={<StudentManagementPage />} />
@@ -269,7 +282,7 @@ const App: React.FC = () => {
               </ProtectedRoute>
             } />
 
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
             <Route path="/unauthorized" element={<div>Unauthorized Access</div>} />
             <Route path="*" element={<div>Page Not Found</div>} />
           </Routes>

@@ -10,6 +10,11 @@ export interface StudentDashboardData {
         presentDays: number;
         percentage: number;
     };
+    assignmentSummary: {
+        totalAssignments: number;
+        completedAssignments: number;
+        pendingAssignments: number;
+    };
     todayClasses: TimetableEntry[];
     activeAnnouncements: any[];
 }
@@ -30,6 +35,7 @@ export const studentDashboardService = {
                         student: null,
                         enrollments: [],
                         attendanceSummary: { totalDays: 0, presentDays: 0, percentage: 0 },
+                        assignmentSummary: { totalAssignments: 0, completedAssignments: 0, pendingAssignments: 0 },
                         todayClasses: [],
                         activeAnnouncements: []
                     };
@@ -42,22 +48,27 @@ export const studentDashboardService = {
                     student: null,
                     enrollments: [],
                     attendanceSummary: { totalDays: 0, presentDays: 0, percentage: 0 },
+                    assignmentSummary: { totalAssignments: 0, completedAssignments: 0, pendingAssignments: 0 },
                     todayClasses: [],
                     activeAnnouncements: []
                 };
             }
 
-            // 2. Fetch Enrichments in parallel with individual resilience
-            // If one enrichment fails, we still want the dashboard to load.
-            const [enrollResult, attendanceResult, announcResult] = await Promise.allSettled([
-                api.get(`/ims-student-service/enrollments/student/${student.id}`),
+            // 2. Fetch Enrollments first to get context
+            const enrollRes = await api.get(`/ims-student-service/enrollments/student/${student.id}`);
+            const enrollments = enrollRes.data.apiData || [];
+            const offeringId = enrollments.length > 0 ? enrollments[0].offeringId : '';
+
+            // 3. Fetch Enrichments in parallel
+            const [attendanceResult, announcResult, assignmentResult] = await Promise.allSettled([
                 api.get(`/ims-academic-service/attendance-records/student/${student.id}/summary`),
-                api.get(`/ims-academic-service/announcements/tenant/${tenantId}`)
+                api.get(`/ims-academic-service/announcements/tenant/${tenantId}`),
+                api.get(`/ims-academic-service/assignments/student/${student.id}/summary?offeringId=${offeringId}&tenantId=${tenantId}`)
             ]);
 
-            const enrollments = enrollResult.status === 'fulfilled' ? (enrollResult.value.data.apiData || []) : [];
             const attendance = attendanceResult.status === 'fulfilled' ? (attendanceResult.value.data.apiData || { totalDays: 0, presentDays: 0 }) : { totalDays: 0, presentDays: 0 };
             const activeAnnouncements = announcResult.status === 'fulfilled' ? (announcResult.value.data.apiData || []) : [];
+            const assignmentSummary = assignmentResult.status === 'fulfilled' ? (assignmentResult.value.data.apiData || { totalAssignments: 0, completedAssignments: 0, pendingAssignments: 0 }) : { totalAssignments: 0, completedAssignments: 0, pendingAssignments: 0 };
 
             if (attendanceResult.status === 'rejected') {
                 console.error("Dashboard: Failed to fetch attendance summary", attendanceResult.reason);
@@ -89,6 +100,7 @@ export const studentDashboardService = {
                     presentDays,
                     percentage: Math.round(percentage)
                 },
+                assignmentSummary,
                 todayClasses,
                 activeAnnouncements
             };

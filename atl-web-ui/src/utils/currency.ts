@@ -1,4 +1,4 @@
-export type CurrencyCode = 'INR' | 'USD' | 'GBP' | 'AED';
+export type CurrencyCode = 'INR' | 'USD' | 'GBP' | 'AED' | 'AUD' | 'CAD';
 
 export interface CurrencyConfig {
     code: CurrencyCode;
@@ -11,6 +11,8 @@ export const CURRENCIES = [
     { code: 'USD', label: 'US Dollar ($)', symbol: '$' },
     { code: 'GBP', label: 'British Pound (£)', symbol: '£' },
     { code: 'AED', label: 'UAE Dirham (د.إ)', symbol: 'د.إ' },
+    { code: 'AUD', label: 'Australian Dollar ($)', symbol: '$' },
+    { code: 'CAD', label: 'Canadian Dollar ($)', symbol: '$' },
 ];
 
 export const CURRENCY_CONFIGS: Record<CurrencyCode, CurrencyConfig> = {
@@ -18,6 +20,8 @@ export const CURRENCY_CONFIGS: Record<CurrencyCode, CurrencyConfig> = {
     USD: { code: 'USD', symbol: '$', locale: 'en-US' },
     GBP: { code: 'GBP', symbol: '£', locale: 'en-GB' },
     AED: { code: 'AED', symbol: 'د.إ', locale: 'ar-AE' },
+    AUD: { code: 'AUD', symbol: '$', locale: 'en-AU' },
+    CAD: { code: 'CAD', symbol: '$', locale: 'en-CA' },
 };
 
 export const formatCurrency = (amount: number, currencyCode: string = 'INR'): string => {

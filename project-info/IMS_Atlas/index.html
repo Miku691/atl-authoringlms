@@ -24,6 +24,7 @@
             <li><a href="services/ims-student-service.html">Student Service</a></li>
             <li><a href="services/ims-instructor-service.html">Instructor Service</a></li>
             <li><a href="services/ims-staff-service.html">Staff Service</a></li>
+            <li><a href="services/ims-platform-service.html">Platform Service</a></li>
             <li><strong>Key Flows</strong></li>
             <li><a href="flows/auth-flow.html">Authentication Flow</a></li>
         </ul>
@@ -51,6 +52,7 @@
                 Student[Student Service]
                 Instructor[Instructor Service]
                 Staff[Staff Service]
+                Platform[Platform Service]
                 end
 
                 Client --> WebUI
@@ -62,12 +64,14 @@
                 Gateway --> Student
                 Gateway --> Instructor
                 Gateway --> Staff
+                Gateway --> Platform
 
                 Academic -.-> Discovery
                 Student -.-> Discovery
                 Instructor -.-> Discovery
                 Staff -.-> Discovery
                 Auth -.-> Discovery
+                Platform -.-> Discovery
                 Gateway -.-> Discovery
             </div>
         </section>

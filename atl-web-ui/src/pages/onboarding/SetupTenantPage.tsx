@@ -8,7 +8,6 @@ import { School, GraduationCap, Users, CheckCircle, Plus, Trash2, ArrowLeft, Loa
 import toast from 'react-hot-toast';
 
 import FloatingLabelInput from '../../components/common/FloatingLabelInput';
-import { CURRENCIES } from '../../utils/currency';
 
 // --- Types ---
 
@@ -55,7 +54,6 @@ const InitialSetupPage: React.FC = () => {
     // State
     const [type, setType] = useState<InstitutionType | null>(null);
     const [academicYear, setAcademicYear] = useState<string>(`${new Date().getFullYear()}-${new Date().getFullYear() + 1}`);
-    const [currency, setCurrency] = useState<string>(user?.currency || 'INR');
 
     // School State - Defaults 1-2, Section A (1)
     const [schoolDetails, setSchoolDetails] = useState({
@@ -112,7 +110,7 @@ const InitialSetupPage: React.FC = () => {
                     // Better to just fetch existing or send only what's needed if API allows.
                     // Let's assume the API requires a full DTO or at least the fields we want to change.
                     tenantName: user.tenantName,
-                    currency: currency
+                    currency: user.currency || 'INR'
                 });
 
                 // Verify setup in Auth Service
@@ -186,20 +184,6 @@ const InitialSetupPage: React.FC = () => {
                 />
             </div>
 
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
-                    Functional Currency
-                </label>
-                <select
-                    value={currency}
-                    onChange={(e) => setCurrency(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 sm:text-sm transition-all bg-white"
-                >
-                    {CURRENCIES.map(c => (
-                        <option key={c.code} value={c.code}>{c.label}</option>
-                    ))}
-                </select>
-            </div>
 
             {/* School Specific */}
             {type === 'SCHOOL' && (

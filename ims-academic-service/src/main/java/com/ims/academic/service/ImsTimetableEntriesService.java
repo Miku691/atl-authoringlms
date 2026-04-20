@@ -15,5 +15,7 @@ public interface ImsTimetableEntriesService {
 
     List<ImsTimetableEntriesDto> getByInstructorId(String instructorId);
 
+    List<ImsTimetableEntriesDto> getTodayEntriesByOfferingId(String offeringId);
+
     void delete(String id);
 }

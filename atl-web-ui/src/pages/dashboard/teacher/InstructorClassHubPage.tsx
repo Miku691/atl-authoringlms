@@ -12,9 +12,11 @@ import {
     Search,
     MoreHorizontal,
     Mail,
-    Phone
+    Phone,
+    ChevronRight
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import AuthenticatedAvatar from '../../../components/common/AuthenticatedAvatar';
 
 const InstructorClassHubPage: React.FC = () => {
     const { offeringId } = useParams<{ offeringId: string }>();
@@ -26,33 +28,35 @@ const InstructorClassHubPage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'students' | 'attendance' | 'syllabus'>('students');
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [pageSize] = useState(10);
+
     useEffect(() => {
         if (offeringId) {
             loadHubData();
         }
-    }, [offeringId]);
+    }, [offeringId, currentPage]);
 
     const loadHubData = async () => {
         setLoading(true);
         try {
             const [offResult, stdResult] = await Promise.allSettled([
                 academicService.getOfferingById(offeringId!),
-                studentService.getStudentsByOffering(offeringId!)
+                studentService.getStudentsByOffering(offeringId!, currentPage, pageSize)
             ]);
 
             if (offResult.status === 'fulfilled' && offResult.value.status === 'SUCCESS') {
                 setOffering(offResult.value.apiData);
-            } else {
-                console.error("Hub: Failed to fetch offering", offResult.status === 'rejected' ? offResult.reason : 'API Error');
-                toast.error("Failed to load offering details");
             }
 
             if (stdResult.status === 'fulfilled' && stdResult.value.status === 'SUCCESS') {
-                setStudents(stdResult.value.apiData.content || []);
-            } else {
-                console.error("Hub: Failed to fetch students", stdResult.status === 'rejected' ? stdResult.reason : 'API Error');
-                // Don't toast for students unless offering also failed, maybe? 
-                // Or just warning.
+                const data = stdResult.value.apiData;
+                setStudents(data.content || []);
+                setTotalPages(data.totalPages || 0);
+                setTotalElements(data.totalElements || 0);
             }
 
         } catch (error) {
@@ -152,12 +156,12 @@ const InstructorClassHubPage: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-3 text-sm text-gray-500 font-medium px-2">
                                 <Users className="w-4 h-4" />
-                                Total: {filteredStudents.length} Students
+                                Total: {totalElements} Students
                             </div>
                         </div>
 
                         <div className="overflow-x-auto">
-                            <table className="w-full border-separate border-spacing-y-3">
+                            <table className="w-full border-separate border-spacing-y-1">
                                 <thead className="text-xs font-black text-gray-400 uppercase tracking-widest text-left">
                                     <tr>
                                         <th className="px-4 pb-2">Roll</th>
@@ -171,23 +175,27 @@ const InstructorClassHubPage: React.FC = () => {
                                 <tbody>
                                     {filteredStudents.map((std) => (
                                         <tr key={std.studentId} className="group hover:bg-gray-50 transition-colors">
-                                            <td className="px-4 py-4 bg-white border-y border-l border-gray-50 rounded-l-2xl font-black text-indigo-600">
+                                            <td className="px-4 py-2 bg-white border-y border-l border-gray-50 rounded-l-2xl font-black text-indigo-600">
                                                 #{std.rollNo || '-'}
                                             </td>
-                                            <td className="px-4 py-4 bg-white border-y border-gray-50">
+                                            <td className="px-4 py-2 bg-white border-y border-gray-50">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-700 font-bold border-2 border-white shadow-sm overflow-hidden">
-                                                        {std.avatarUrl ? (
-                                                            <img src={std.avatarUrl} alt={std.name} className="w-full h-full object-cover" />
-                                                        ) : std.name[0]}
+                                                    <div className="h-10 w-10 flex-shrink-0 shadow-sm transition-transform group-hover:scale-105">
+                                                        <AuthenticatedAvatar
+                                                            imageUrl={std.avatarUrl}
+                                                            fallbackInitial={std.name[0]}
+                                                            alt={std.name}
+                                                            size="sm"
+                                                            className="h-full w-full"
+                                                        />
                                                     </div>
                                                     <span className="font-bold text-gray-900">{std.name}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 bg-white border-y border-gray-50 text-sm font-medium text-gray-500">
+                                            <td className="px-4 py-2 bg-white border-y border-gray-50 text-sm font-medium text-gray-500">
                                                 {std.admissionNo}
                                             </td>
-                                            <td className="px-4 py-4 bg-white border-y border-gray-50">
+                                            <td className="px-4 py-2 bg-white border-y border-gray-50">
                                                 <div className="flex items-center gap-3">
                                                     <a href={`mailto:${std.email}`} className="p-2 bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all" title={std.email}>
                                                         <Mail className="w-4 h-4" />
@@ -197,13 +205,13 @@ const InstructorClassHubPage: React.FC = () => {
                                                     </a>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-4 bg-white border-y border-gray-50">
+                                            <td className="px-4 py-2 bg-white border-y border-gray-50">
                                                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${std.enrollmentStatus === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
                                                     }`}>
                                                     {std.enrollmentStatus}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-4 bg-white border-y border-r border-gray-50 rounded-r-2xl">
+                                            <td className="px-4 py-2 bg-white border-y border-r border-gray-50 rounded-r-2xl">
                                                 <button className="p-2 text-gray-300 hover:text-indigo-600 transition-colors rounded-lg">
                                                     <MoreHorizontal className="w-5 h-5" />
                                                 </button>
@@ -217,6 +225,37 @@ const InstructorClassHubPage: React.FC = () => {
                                 <div className="text-center py-20 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
                                     <Users className="w-12 h-12 text-gray-200 mx-auto mb-3" />
                                     <p className="text-gray-400 italic">No students found matching your search.</p>
+                                </div>
+                            )}
+
+                            {/* Pagination Controls */}
+                            {totalPages > 1 && (
+                                <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
+                                    <div className="text-sm font-medium text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
+                                        Showing {students.length} of {totalElements} Students
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            disabled={currentPage === 0}
+                                            onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                                            className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-black text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                                        >
+                                            <ChevronLeft className="w-4 h-4" /> Previous
+                                        </button>
+                                        <div className="flex items-center gap-1.5 px-4 h-10 bg-indigo-50 rounded-xl border border-indigo-100">
+                                            <span className="text-sm font-black text-indigo-600">{currentPage + 1}</span>
+                                            <span className="text-[10px] font-black text-indigo-300 uppercase tracking-tighter">of</span>
+                                            <span className="text-sm font-black text-indigo-600">{totalPages}</span>
+                                        </div>
+                                        <button
+                                            disabled={currentPage >= totalPages - 1}
+                                            onClick={() => setCurrentPage(prev => prev + 1)}
+                                            className="px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-black hover:bg-indigo-700 disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-indigo-100 transition-all flex items-center gap-2"
+                                        >
+                                            Next <ChevronRight className="w-4 h-4" />
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>

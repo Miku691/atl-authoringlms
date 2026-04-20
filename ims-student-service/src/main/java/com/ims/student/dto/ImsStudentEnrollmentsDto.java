@@ -21,6 +21,7 @@ public class ImsStudentEnrollmentsDto {
     private boolean isDeleted;
     private Integer rollNo;
     private String academicYear;
+    private Integer graduationYear;
     private Instant createdAt;
     private Instant updatedAt;
 }

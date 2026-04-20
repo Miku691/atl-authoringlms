@@ -1,6 +1,8 @@
 package com.ims.instructor.service;
 
 import com.ims.instructor.dto.ImsInstructorsDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -15,9 +17,9 @@ public interface ImsInstructorsService {
 
     ImsInstructorsDto getByEmailAndTenantId(String email, String tenantId);
 
-    List<ImsInstructorsDto> getByTenant(String tenantId);
+    Page<ImsInstructorsDto> getByTenant(String tenantId, Pageable pageable);
 
-    List<ImsInstructorsDto> getAll();
+    Page<ImsInstructorsDto> getAll(Pageable pageable);
 
     void delete(String id);
 

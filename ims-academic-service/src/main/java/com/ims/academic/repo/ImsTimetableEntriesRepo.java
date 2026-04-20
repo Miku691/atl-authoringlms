@@ -10,6 +10,10 @@ public interface ImsTimetableEntriesRepo extends JpaRepository<ImsTimetableEntri
 
     List<ImsTimetableEntries> findByInstructorId(String instructorId);
 
+    List<ImsTimetableEntries> findByOfferingId(String offeringId);
+
+    List<ImsTimetableEntries> findByOfferingIdAndTimetableSlotDayOfWeek(String offeringId, Integer dayOfWeek);
+
     boolean existsByTimetableSlotIdAndOfferingIdAndSubjectIdAndInstructorIdAndTenantId(String timetableSlotId,
             String offeringId,
             String subjectId, String instructorId, String tenantId);

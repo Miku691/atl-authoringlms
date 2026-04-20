@@ -85,14 +85,32 @@ public class ImsStudents {
     @Column(name = "previous_education", columnDefinition = "TEXT")
     private String previousEducation;
 
-    @Column(name = "birth_form_id", length = 50)
-    private String birthFormId;
+    @Column(name = "father_name")
+    private String fatherName;
 
-    @Column(name = "is_orphan")
-    private Boolean isOrphan;
+    @Column(name = "mother_name")
+    private String motherName;
 
-    @Column(name = "caste", length = 50)
-    private String caste;
+    @Column(name = "id_proof_type", length = 50)
+    private String idProofType; // E.g., AADHAR, PAN, NATIONAL_ID
+
+    @Column(name = "id_proof_number", length = 50)
+    private String idProofNumber;
+
+    @Column(name = "ethnicity", length = 50)
+    private String ethnicity;
+
+    @Column(name = "languages", length = 255)
+    private String languages;
+
+    @Column(name = "nationality", length = 50)
+    private String nationality;
+
+    @Column(name = "marital_status", length = 20)
+    private String maritalStatus;
+
+    @Column(name = "enrollment_type", length = 20)
+    private String enrollmentType; // FULL_TIME, DISTANCE
 
     @Column(name = "previous_school", length = 255)
     private String previousSchool;

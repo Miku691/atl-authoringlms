@@ -69,6 +69,10 @@ public class ImsTenantsService {
         if (dto.getContactPhone() != null) existing.setContactPhone(dto.getContactPhone());
         if (dto.getIsActive() != null) existing.setIsActive(dto.getIsActive());
         if (dto.getCurrency() != null) existing.setCurrency(dto.getCurrency());
+        if (dto.getCountry() != null) existing.setCountry(dto.getCountry());
+        if (dto.getState() != null) existing.setState(dto.getState());
+        if (dto.getLatitude() != null) existing.setLatitude(dto.getLatitude());
+        if (dto.getLongitude() != null) existing.setLongitude(dto.getLongitude());
 
         ImsTenants updated = repo.save(existing);
         return convertToDto(updated);

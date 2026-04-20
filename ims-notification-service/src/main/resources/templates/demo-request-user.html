@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base-layout :: main-layout(~{::section}, 'Demo Request Received')}">
+<head>
+    <title>Demo Request Received</title>
+</head>
+<body>
+    <section>
+        <p>Hi <span th:text="${name}">User</span>,</p>
+        <p>Thank you for your interest in EduFlow! We've received your request for a live product demo.</p>
+        
+        <p>Your preferred slot is: <strong><span th:text="${date}">2026-04-20</span></strong> at <strong><span th:text="${time}">10:00 AM</span></strong>.</p>
+        
+        <p>Our team is currently reviewing the schedule. Once confirmed, you will receive another email containing the meeting link.</p>
+
+        <p>Meanwhile, you can explore our <a href="http://localhost:3000/#features">features</a> or check our <a href="http://localhost:3000/#pricing">pricing</a>.</p>
+        
+        <p>Excited to show you the future of school management!</p>
+        
+        <p>Best Regards,<br/>Team EduFlow</p>
+    </section>
+</body>
+</html>

@@ -18,6 +18,7 @@ import com.ims.academic.dto.ImsTimetableSlotsDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -136,6 +137,15 @@ public class ImsTimetableEntriesServiceImpl implements ImsTimetableEntriesServic
     @Override
     public List<ImsTimetableEntriesDto> getByInstructorId(String instructorId) {
         return repo.findByInstructorId(instructorId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImsTimetableEntriesDto> getTodayEntriesByOfferingId(String offeringId) {
+        int today = LocalDate.now().getDayOfWeek().getValue();
+        return repo.findByOfferingIdAndTimetableSlotDayOfWeek(offeringId, today)
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());

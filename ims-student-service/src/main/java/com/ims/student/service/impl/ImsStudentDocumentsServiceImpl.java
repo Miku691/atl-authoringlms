@@ -72,8 +72,8 @@ public class ImsStudentDocumentsServiceImpl implements ImsStudentDocumentsServic
 
             ImsStudentDocuments saved = repo.save(doc);
 
-            // If it's a profile image, update the student record with the SERVING URL
-            if ("PROFILE_IMAGE".equalsIgnoreCase(documentType)) {
+            // If it's a passport photo or profile image, update the student record with the SERVING URL
+            if ("PROFILE_IMAGE".equalsIgnoreCase(documentType) || "PASSPORT_PHOTO".equalsIgnoreCase(documentType)) {
                 ImsStudents student = studentsRepo.findById(studentId)
                         .orElseThrow(() -> new ResourceNotFoundException("Student ID", studentId));
                 // URL Pattern: /ims-student-service/student-documents/view/{documentId}

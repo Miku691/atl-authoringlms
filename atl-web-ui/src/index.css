@@ -2,13 +2,126 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .custom-scrollbar::-webkit-scrollbar {
-    display: none;
+/* ─────────────────────────────────────────────
+   EduFlow Design System — Google Fonts
+   Source: Stitch Project 15155094690541932935
+───────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700;0,14..32,800;1,14..32,300;1,14..32,400;1,14..32,600&display=swap');
+
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
   }
-  
-  .custom-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #FFFFFF;
+    color: #0F1D3A;
+  }
+}
+
+@layer utilities {
+  /* Scrollbar hiding */
+  .custom-scrollbar::-webkit-scrollbar { display: none; }
+  .custom-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* EduFlow design tokens as CSS utilities */
+  .text-edu-primary   { color: #0F1D3A; }
+  .text-edu-secondary { color: #5A6B88; }
+  .text-edu-muted     { color: #8FA3C0; }
+  .text-edu-brand     { color: #2A6DF4; }
+
+  .bg-edu-surface     { background-color: #FFFFFF; }
+  .bg-edu-bg          { background-color: #F7F9FF; }
+  .bg-edu-brand-light { background-color: #EBF1FE; }
+
+  .border-edu         { border-color: #E2E8F8; }
+
+  /* Button base patterns */
+  .btn-edu-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.75rem 1.5rem;
+    background: #2A6DF4;
+    color: #FFFFFF;
+    border-radius: 9999px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    box-shadow: 0 4px 16px rgba(42,109,244,0.35);
+    transition: background 150ms ease, transform 100ms ease, box-shadow 150ms ease;
+    cursor: pointer;
+  }
+  .btn-edu-primary:hover {
+    background: #1A5CE0;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(42,109,244,0.45);
+  }
+
+  .btn-edu-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.6875rem 1.5rem;
+    background: transparent;
+    color: #2A6DF4;
+    border: 1.5px solid #2A6DF4;
+    border-radius: 9999px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition: background 150ms ease;
+    cursor: pointer;
+  }
+  .btn-edu-ghost:hover {
+    background: #EBF1FE;
+  }
+
+  /* Card */
+  .card-edu {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F8;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: box-shadow 200ms ease, transform 200ms ease;
+  }
+  .card-edu:hover {
+    box-shadow: 0 8px 24px rgba(42,109,244,0.10);
+    transform: translateY(-2px);
+  }
+
+  /* Badge */
+  .badge-edu {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: #EBF1FE;
+    color: #2A6DF4;
+  }
+
+  /* Section wrapper */
+  .section-edu {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  .section-heading-edu {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -0.01em;
+    color: #0F1D3A;
   }
 }

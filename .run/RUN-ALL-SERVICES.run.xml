@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="RUN-ALL-SERVICES" type="CompoundRunConfigurationType">
+    <toRun name="AtlAuthServiceApplication" type="Application" />
+    <toRun name="AtlDiscoveryServerApplication" type="Application" />
+    <toRun name="AtlGatewayServiceApplication" type="Application" />
+    <toRun name="ImsAcademicServiceApplication" type="Application" />
+    <toRun name="ImsFinanceServiceApplication" type="Application" />
+    <toRun name="ImsInstructorServiceApplication" type="Application" />
+    <toRun name="ImsNotificationServiceApplication" type="Application" />
+    <toRun name="ImsPlatformServiceApplication" type="Application" />
+    <toRun name="ImsReportsServiceApplication" type="Application" />
+    <toRun name="ImsStaffServiceApplication" type="Application" />
+    <toRun name="ImsStudentServiceApplication" type="Application" />
+    <toRun name="InventoryServiceApplication" type="Application" />
+    <method v="2" />
+  </configuration>
+</component>

@@ -146,11 +146,16 @@ export default function TimetableManagementPage() {
             // 2. Get full instructor details for the tenant to get names
             const instRes = await instructorService.getInstructorsByTenant(user.tenantId);
             if (instRes.status === 'SUCCESS' && instRes.apiData) {
-                const enriched = instRes.apiData
-                    .filter((i: any) => assignedIds.includes(i.id))
+                // Defensive check: handle both direct array and Page structure
+                const instList = Array.isArray(instRes.apiData) 
+                    ? instRes.apiData 
+                    : (instRes.apiData.content || []);
+
+                const enriched = instList
+                    .filter((i: any) => i && assignedIds.includes(i.id))
                     .map((i: any) => ({
                         id: i.id,
-                        name: `${i.firstName || ''} ${i.lastName || ''}`.trim() || 'Unnamed Instructor'
+                        name: `${i.firstName || ''} ${i.lastName || ''}`.trim() || i.username || 'Unnamed Instructor'
                     }));
                 setInstructors(enriched);
             } else {

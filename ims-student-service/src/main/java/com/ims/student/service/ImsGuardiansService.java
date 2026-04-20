@@ -1,6 +1,8 @@
 package com.ims.student.service;
 
 import com.ims.student.dto.ImsGuardiansDto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 /**
@@ -13,7 +15,7 @@ public interface ImsGuardiansService {
 
     ImsGuardiansDto getById(String id);
 
-    List<ImsGuardiansDto> getByTenant(String tenantId);
+    Page<ImsGuardiansDto> getByTenant(String tenantId, Pageable pageable);
 
     ImsGuardiansDto getByPhoneAndTenant(String phone, String tenantId);
 

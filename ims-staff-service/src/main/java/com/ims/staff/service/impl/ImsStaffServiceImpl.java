@@ -8,6 +8,8 @@ import com.ims.staff.repo.ImsStaffRepo;
 import com.ims.staff.service.ImsStaffService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -112,17 +114,15 @@ public class ImsStaffServiceImpl implements ImsStaffService {
     }
 
     @Override
-    public List<ImsStaffDto> getByTenant(String tenantId) {
-        return repo.findByTenantId(tenantId)
-                .stream().map(this::toDto)
-                .collect(Collectors.toList());
+    public Page<ImsStaffDto> getByTenant(String tenantId, Pageable pageable) {
+        return repo.findByTenantId(tenantId, pageable)
+                .map(this::toDto);
     }
-
+ 
     @Override
-    public List<ImsStaffDto> getAll() {
-        return repo.findAll()
-                .stream().map(this::toDto)
-                .collect(Collectors.toList());
+    public Page<ImsStaffDto> getAll(Pageable pageable) {
+        return repo.findAll(pageable)
+                .map(this::toDto);
     }
 
     @Override

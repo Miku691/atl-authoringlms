@@ -18,4 +18,8 @@ public class ImsTenantsDto {
     private String contactPhone;
     private Boolean isActive;
     private String currency;
+    private String country;
+    private String state;
+    private Double latitude;
+    private Double longitude;
 }

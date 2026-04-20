@@ -57,6 +57,17 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             roles: ['SUPER_ADMIN', 'TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT']
         },
         {
+            path: '/platform',
+            label: 'Platform Control',
+            icon: ShieldCheck,
+            roles: ['SUPER_ADMIN'],
+            subItems: [
+                { path: '/dashboard', label: 'Overview', icon: LayoutDashboard },
+                { path: '/platform/leads', label: 'Demo Leads', icon: Users },
+                { path: '/system/settings', label: 'Global Settings', icon: Settings },
+            ]
+        },
+        {
             path: '/student/profile',
             label: 'My Profile',
             icon: UserCircle,
@@ -113,6 +124,13 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             path: '/student/results',
             label: 'My Results',
             icon: Trophy,
+            roles: ['STUDENT'],
+            setupRequired: true
+        },
+        {
+            path: '/student/leaves',
+            label: 'Apply Leave',
+            icon: Clock,
             roles: ['STUDENT'],
             setupRequired: true
         },
@@ -187,14 +205,14 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             path: '/operations',
             label: 'Operations',
             icon: ClipboardList,
-            roles: ['TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT'],
+            roles: ['TENANT_ADMIN', 'INSTRUCTOR'],
             setupRequired: true,
             condition: () => hasActiveOfferings, // Entire section hidden if no active offerings
             subItems: [
                 { path: '/operations/attendance', label: 'Attendance', icon: ListChecks, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
                 { path: '/lms/assignments', label: 'Assignments', icon: FileText, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
-                { path: '/operations/timetable', label: 'Timetable', icon: Clock, roles: ['TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT'] },
-                { path: '/operations/calendar', label: 'Calendar', icon: Calendar, roles: ['TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT'] },
+                { path: '/operations/timetable', label: 'Timetable', icon: Clock, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
+                { path: '/operations/calendar', label: 'Calendar', icon: Calendar, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
                 { path: '/instructor/gradebook', label: 'Gradebook', icon: Trophy, roles: ['INSTRUCTOR'] },
             ]
         },
@@ -239,7 +257,7 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             path: '/lms',
             label: 'Learning (LMS)',
             icon: GraduationCap,
-            roles: ['TENANT_ADMIN', 'INSTRUCTOR', 'STUDENT'],
+            roles: ['TENANT_ADMIN', 'INSTRUCTOR'],
             setupRequired: true,
             condition: () => hasActiveOfferings,
             subItems: [

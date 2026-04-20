@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base-layout :: main-layout(~{::section}, 'New Demo Request Received')}">
+<head>
+    <title>New Demo Request</title>
+</head>
+<body>
+    <section>
+        <p>Hello Product Owner,</p>
+        <p>A new demo request has been submitted from the landing page. Here are the details:</p>
+        
+        <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; margin: 20px 0;">
+            <p><strong>Name:</strong> <span th:text="${name}">John Doe</span></p>
+            <p><strong>Email:</strong> <span th:text="${email}">john@example.com</span></p>
+            <p><strong>Phone:</strong> <span th:text="${phone}">+91 9876543210</span></p>
+            <p><strong>Institute:</strong> <span th:text="${institute}">St. Xavier School</span></p>
+            <p><strong>Preferred Slot:</strong> <span th:text="${date}">2026-04-20</span> at <span th:text="${time}">10:00 AM</span></p>
+        </div>
+
+        <p>Please log in to the Platform Dashboard to confirm the meeting and send the link.</p>
+        
+        <a href="http://localhost:3000/platform/leads" class="button">Go to Leads Pipeline</a>
+    </section>
+</body>
+</html>

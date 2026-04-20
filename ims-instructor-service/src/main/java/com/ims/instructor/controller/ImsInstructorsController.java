@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @RestController
@@ -69,26 +71,28 @@ public class ImsInstructorsController {
         }
 
         @GetMapping("/tenant/{tenantId}")
-        public ResponseEntity<ApiResponse<List<ImsInstructorsDto>>> getByTenant(@PathVariable String tenantId) {
-                List<ImsInstructorsDto> list = service.getByTenant(tenantId);
+        public ResponseEntity<ApiResponse<Page<ImsInstructorsDto>>> getByTenant(
+                        @PathVariable String tenantId,
+                        Pageable pageable) {
+                Page<ImsInstructorsDto> page = service.getByTenant(tenantId, pageable);
                 return ResponseEntity.ok(
-                                ApiResponse.<List<ImsInstructorsDto>>builder()
+                                ApiResponse.<Page<ImsInstructorsDto>>builder()
                                                 .status("SUCCESS")
                                                 .statusCode(HttpStatus.OK.value())
                                                 .message("Instructors fetched successfully")
-                                                .apiData(list)
+                                                .apiData(page)
                                                 .build());
         }
 
         @GetMapping
-        public ResponseEntity<ApiResponse<List<ImsInstructorsDto>>> getAll() {
-                List<ImsInstructorsDto> list = service.getAll();
+        public ResponseEntity<ApiResponse<Page<ImsInstructorsDto>>> getAll(Pageable pageable) {
+                Page<ImsInstructorsDto> page = service.getAll(pageable);
                 return ResponseEntity.ok(
-                                ApiResponse.<List<ImsInstructorsDto>>builder()
+                                ApiResponse.<Page<ImsInstructorsDto>>builder()
                                                 .status("SUCCESS")
                                                 .statusCode(HttpStatus.OK.value())
                                                 .message("All instructors fetched")
-                                                .apiData(list)
+                                                .apiData(page)
                                                 .build());
         }
 

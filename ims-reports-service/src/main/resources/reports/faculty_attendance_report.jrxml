@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FacultyAttendance" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+    <parameter name="param_tenant_id" class="java.lang.String"/>
+    <queryString>
+        <![CDATA[SELECT person_id as faculty_id, person_name, 
+        COUNT(*) as total_classes,
+        SUM(CASE WHEN status = 'PRESENT' THEN 1 ELSE 0 END) as present_count,
+        SUM(CASE WHEN status = 'ABSENT' THEN 1 ELSE 0 END) as absent_count,
+        (SUM(CASE WHEN status = 'PRESENT' THEN 1 ELSE 0 END) / COUNT(*)) * 100 as attendance_percentage
+        FROM ims_attendance_records 
+        WHERE tenant_id = $P{param_tenant_id} AND person_type = 'STAFF'
+        GROUP BY person_id, person_name]]>
+    </queryString>
+    <field name="faculty_id" class="java.lang.String"/>
+    <field name="person_name" class="java.lang.String"/>
+    <field name="total_classes" class="java.lang.Long"/>
+    <field name="present_count" class="java.lang.Long"/>
+    <field name="absent_count" class="java.lang.Long"/>
+    <field name="attendance_percentage" class="java.lang.Double"/>
+    
+    <title>
+        <band height="50">
+            <staticText>
+                <reportElement x="0" y="0" width="802" height="30"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Faculty Attendance Summary Report]]></text>
+            </staticText>
+        </band>
+    </title>
+    
+    <columnHeader>
+        <band height="30">
+            <staticText><reportElement x="0" y="0" width="150" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><text><![CDATA[Faculty ID]]></text></staticText>
+            <staticText><reportElement x="150" y="0" width="250" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><text><![CDATA[Name]]></text></staticText>
+            <staticText><reportElement x="400" y="0" width="100" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><text><![CDATA[Total Classes]]></text></staticText>
+            <staticText><reportElement x="500" y="0" width="100" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><text><![CDATA[Present]]></text></staticText>
+            <staticText><reportElement x="600" y="0" width="100" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><text><![CDATA[Absent]]></text></staticText>
+            <staticText><reportElement x="700" y="0" width="102" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"><font isBold="true"/></textElement><text><![CDATA[Percentage (%)]]></text></staticText>
+        </band>
+    </columnHeader>
+    
+    <detail>
+        <band height="30">
+            <textField><reportElement x="0" y="0" width="150" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"/><textFieldExpression><![CDATA[$F{faculty_id}]]></textFieldExpression></textField>
+            <textField><reportElement x="150" y="0" width="250" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Left" verticalAlignment="Middle"/><textFieldExpression><![CDATA[$F{person_name}]]></textFieldExpression></textField>
+            <textField><reportElement x="400" y="0" width="100" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"/><textFieldExpression><![CDATA[$F{total_classes}]]></textFieldExpression></textField>
+            <textField><reportElement x="500" y="0" width="100" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"/><textFieldExpression><![CDATA[$F{present_count}]]></textFieldExpression></textField>
+            <textField><reportElement x="600" y="0" width="100" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"/><textFieldExpression><![CDATA[$F{absent_count}]]></textFieldExpression></textField>
+            <textField pattern="###.##"><reportElement x="700" y="0" width="102" height="30"/><box><pen lineWidth="0.5"/></box><textElement textAlignment="Center" verticalAlignment="Middle"/><textFieldExpression><![CDATA[$F{attendance_percentage}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+</jasperReport>

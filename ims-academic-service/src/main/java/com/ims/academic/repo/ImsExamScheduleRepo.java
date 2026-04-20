@@ -16,4 +16,6 @@ public interface ImsExamScheduleRepo extends JpaRepository<ImsExamSchedule, Stri
     List<ImsExamSchedule> findByExamMasterIdAndOfferingId(String examMasterId, String offeringId);
 
     List<ImsExamSchedule> findByExamMasterIdAndSubjectId(String examMasterId, String subjectId);
+
+    List<ImsExamSchedule> findByTenantIdAndExamDateBetween(String tenantId, java.time.LocalDate start, java.time.LocalDate end);
 }

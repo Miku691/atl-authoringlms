@@ -6,7 +6,7 @@ import AuthenticatedAvatar from '../../../../../components/common/AuthenticatedA
 import {
     User, Book, FileText, Activity, CreditCard, ArrowLeft,
     Mail, Phone, MapPin, Calendar, Droplet, UserCheck, Users, Loader2, X, Trash2, UserPlus, Info,
-    Hash, Heart, Globe, School, Banknote
+    CheckCircle2, School
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import DocumentsTab from './components/DocumentsTab';
@@ -16,104 +16,352 @@ import GuardianSearchAndLink from '../../../../../components/dashboard/students/
 
 // --- Sub-components ---
 
-const PersonalInfoTab = ({ student }: { student: Student }) => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 animate-fade-in">
-        <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <User className="w-5 h-5 text-indigo-500" /> Personal Details
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                    <User className="w-4 h-4 text-gray-400 mt-1" />
+const PersonalInfoTab = ({ student, onUpdate }: { student: Student; onUpdate: () => void }) => {
+    const [isEditing, setIsEditing] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState<Partial<Student>>({ ...student });
+
+    const handleSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            const res = await studentService.updateStudent(student.id, formData);
+            if (res.status === 'SUCCESS') {
+                toast.success("Profile updated successfully");
+                setIsEditing(false);
+                onUpdate();
+            }
+        } catch (error) {
+            toast.error("Failed to update profile");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (isEditing) {
+        return (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 animate-fade-in">
+                <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-xl font-black text-gray-900 flex items-center gap-3 font-outfit uppercase tracking-tight">
+                        <User className="w-6 h-6 text-indigo-600" /> Modify Profile
+                    </h3>
+                    <button
+                        onClick={() => setIsEditing(false)}
+                        className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                </div>
+
+                <form onSubmit={handleSave} className="space-y-8">
+                    {/* Basic & Identification */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">First Name</label>
+                            <input
+                                type="text"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+                                value={formData.firstName || ''}
+                                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Last Name</label>
+                            <input
+                                type="text"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+                                value={formData.lastName || ''}
+                                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Gender</label>
+                            <select
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
+                                value={formData.gender || ''}
+                                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                            >
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* Parents & Demographics */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Parental Info */}
+                        <div className="space-y-4">
+                            <h4 className="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-50 pb-2">Parental Information</h4>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Father's Name</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+                                        value={formData.fatherName || ''}
+                                        onChange={(e) => setFormData({ ...formData, fatherName: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Mother's Name</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+                                        value={formData.motherName || ''}
+                                        onChange={(e) => setFormData({ ...formData, motherName: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Demographic info */}
+                        <div className="space-y-4">
+                            <h4 className="text-xs font-black text-indigo-600 uppercase tracking-widest border-b border-indigo-50 pb-2">Demographics</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Nationality</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+                                        value={formData.nationality || ''}
+                                        onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Ethnicity</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+                                        value={formData.ethnicity || ''}
+                                        onChange={(e) => setFormData({ ...formData, ethnicity: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* ID Proof Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">ID Proof Type</label>
+                            <select
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all cursor-pointer"
+                                value={formData.idProofType || ''}
+                                onChange={(e) => setFormData({ ...formData, idProofType: e.target.value })}
+                            >
+                                <option value="">Select ID Type</option>
+                                <option value="AADHAR">Aadhar Card</option>
+                                <option value="PAN">PAN Card</option>
+                                <option value="VOTER_ID">Voter ID</option>
+                                <option value="PASSPORT">Passport</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">ID Proof Number</label>
+                            <input
+                                type="text"
+                                className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+                                value={formData.idProofNumber || ''}
+                                onChange={(e) => setFormData({ ...formData, idProofNumber: e.target.value })}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-4 border-t border-gray-50">
+                        <button
+                            type="button"
+                            onClick={() => setIsEditing(false)}
+                            className="px-6 py-3 rounded-2xl text-sm font-black text-gray-500 hover:bg-gray-100 transition-all uppercase tracking-widest"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="px-8 py-3 bg-indigo-600 text-white rounded-2xl text-sm font-black shadow-xl shadow-indigo-100 hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2 transition-all transform hover:scale-105 uppercase tracking-widest"
+                        >
+                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle2 className="w-5 h-5" />}
+                            Update Vault
+                        </button>
+                    </div>
+                </form>
+            </div>
+        );
+    }
+
+    return (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-10 animate-fade-in">
+            <div className="flex justify-between items-center mb-12">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-100 transform -rotate-3 transition-transform hover:rotate-0 cursor-default">
+                        <User className="w-6 h-6" />
+                    </div>
                     <div>
-                        <p className="text-xs text-gray-500 uppercase">Full Name</p>
-                        <p className="font-medium text-gray-900">{student.firstName} {student.lastName}</p>
+                        <h3 className="text-2xl font-black text-gray-900 font-outfit uppercase tracking-tight leading-none">
+                            Identity Profile
+                        </h3>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Authentic Personnel Records</p>
                     </div>
                 </div>
-                <div className="flex items-start gap-3">
-                    <Calendar className="w-4 h-4 text-gray-400 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Date of Birth</p>
-                        <p className="font-medium text-gray-900">{student.dob || 'N/A'}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3">
-                    <UserCheck className="w-4 h-4 text-gray-400 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Gender</p>
-                        <p className="font-medium text-gray-900">{student.gender || 'N/A'}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3">
-                    <Droplet className="w-4 h-4 text-red-400 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Blood Group</p>
-                        <p className="font-medium text-gray-900">{student.bloodGroup || 'N/A'}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3">
-                    <Hash className="w-4 h-4 text-gray-400 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Birth Form ID</p>
-                        <p className="font-medium text-gray-900">{student.birthFormId || 'N/A'}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3">
-                    <Heart className="w-4 h-4 text-pink-400 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Orphan Status</p>
-                        <p className="font-medium text-gray-900">{student.isOrphan ? 'Yes' : 'No'}</p>
-                    </div>
-                </div>
+                <button
+                    onClick={() => setIsEditing(true)}
+                    className="flex items-center gap-2 bg-white text-indigo-600 border border-indigo-100 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-sm hover:shadow-indigo-50"
+                >
+                    Edit Records
+                </button>
             </div>
 
-            <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                    <Mail className="w-4 h-4 text-gray-400 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Email</p>
-                        <p className="font-medium text-gray-900">{student.email}</p>
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                {/* Column 1: Core Records */}
+                <div className="space-y-12">
+                    <section>
+                        <div className="flex items-center gap-3 mb-8">
+                            <span className="w-1 h-6 bg-indigo-600 rounded-full"></span>
+                            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Biological Info</h4>
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-10 ml-4">
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0"><User className="w-5 h-5" /></div>
+                                <div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Full Name</p>
+                                    <p className="font-bold text-gray-900 text-sm">{student.firstName} {student.lastName}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0"><Calendar className="w-5 h-5" /></div>
+                                <div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Date of Birth</p>
+                                    <p className="font-bold text-gray-900 text-sm font-mono tracking-tight">{student.dob || <span className="text-gray-300 italic font-normal text-xs">Not Captured</span>}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 shrink-0"><UserCheck className="w-5 h-5" /></div>
+                                <div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Gender</p>
+                                    <p className="font-bold text-gray-900 text-sm uppercase tracking-tighter">{student.gender || <span className="text-gray-300 italic font-normal text-xs">Not Captured</span>}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center text-red-500 shrink-0"><Droplet className="w-5 h-5" /></div>
+                                <div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Blood Group</p>
+                                    <p className="font-bold text-red-600 text-sm">{student.bloodGroup || <span className="text-gray-300 italic font-normal text-xs">Not Set</span>}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <div className="flex items-center gap-3 mb-8">
+                            <span className="w-1 h-6 bg-indigo-200 rounded-full"></span>
+                            <h4 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em]">Parental Information</h4>
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-10 ml-4">
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-indigo-50/50 flex items-center justify-center text-indigo-400 shrink-0"><Users className="w-5 h-5" /></div>
+                                <div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Father's Name</p>
+                                    <p className="font-bold text-gray-900 text-sm">{student.fatherName || <span className="text-gray-300 italic font-normal text-xs">Not Captured</span>}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-indigo-50/50 flex items-center justify-center text-indigo-400 shrink-0"><Users className="w-5 h-5" /></div>
+                                <div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Mother's Name</p>
+                                    <p className="font-bold text-gray-900 text-sm">{student.motherName || <span className="text-gray-300 italic font-normal text-xs">Not Captured</span>}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="bg-gray-50/50 p-6 rounded-3xl border border-gray-100">
+                        <div className="flex items-center gap-3 mb-6">
+                            <h4 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.2em]">Identification Vault</h4>
+                        </div>
+                        <div className="flex items-start gap-5">
+                            <div className="w-12 h-12 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-indigo-600 shadow-sm shrink-0"><FileText className="w-6 h-6" /></div>
+                            <div>
+                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 leading-none">{student.idProofType || 'Legal ID'} Verification</p>
+                                <p className="font-black text-gray-900 text-lg font-mono tracking-widest leading-none">{student.idProofNumber || 'XXXXXXXXXXXX'}</p>
+                            </div>
+                        </div>
+                    </section>
                 </div>
-                <div className="flex items-start gap-3">
-                    <Phone className="w-4 h-4 text-gray-400 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Phone</p>
-                        <p className="font-medium text-gray-900">{student.phone}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3">
-                    <MapPin className="w-4 h-4 text-gray-400 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Address</p>
-                        <p className="font-medium text-gray-900">{student.address || 'N/A'}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3">
-                    <Globe className="w-4 h-4 text-gray-400 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Caste / Category</p>
-                        <p className="font-medium text-gray-900">{student.caste || student.category || 'N/A'} {student.religion ? `(${student.religion})` : ''}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3">
-                    <School className="w-4 h-4 text-gray-400 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Previous School</p>
-                        <p className="font-medium text-gray-900">{student.previousSchool || 'N/A'}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3">
-                    <Banknote className="w-4 h-4 text-green-500 mt-1" />
-                    <div>
-                        <p className="text-xs text-gray-500 uppercase">Fee Discount</p>
-                        <p className="font-medium text-gray-900">{student.admissionDiscount ? `${student.admissionDiscount}%` : 'Standard Rates'}</p>
+
+                {/* Column 2: connectivity & Meta */}
+                <div className="space-y-12">
+                    <section>
+                        <div className="flex items-center gap-3 mb-8">
+                            <span className="w-1 h-6 bg-purple-600 rounded-full"></span>
+                            <h4 className="text-[11px] font-black text-gray-900 uppercase tracking-[0.2em]">Connectivity</h4>
+                        </div>
+                        <div className="space-y-6 ml-4">
+                            <div className="flex items-center gap-4 group cursor-pointer hover:translate-x-1 transition-transform">
+                                <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors"><Mail className="w-5 h-5" /></div>
+                                <div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 led-none">Electronic Mail</p>
+                                    <p className="text-sm font-bold text-gray-900 tracking-tight leading-none">{student.email}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4 group cursor-pointer hover:translate-x-1 transition-transform">
+                                <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors"><Phone className="w-5 h-5" /></div>
+                                <div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 led-none">Tele-Communication</p>
+                                    <p className="text-sm font-bold text-gray-900 tracking-tight leading-none">{student.phone}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4 group cursor-pointer hover:translate-x-1 transition-transform">
+                                <div className="w-10 h-10 rounded-xl bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors mt-1"><MapPin className="w-5 h-5" /></div>
+                                <div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 led-none">Registry Address</p>
+                                    <p className="text-sm font-bold text-gray-900 leading-relaxed max-w-xs">{student.address || <span className="text-gray-300 italic font-normal">Location Hidden</span>}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <div className="flex items-center gap-3 mb-8">
+                            <span className="w-1 h-6 bg-gray-200 rounded-full"></span>
+                            <h4 className="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em]">Institutional Demographics</h4>
+                        </div>
+                        <div className="grid grid-cols-2 gap-x-8 gap-y-10 ml-4">
+                            <div>
+                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Citizenship</p>
+                                <p className="font-bold text-gray-900 text-sm uppercase tracking-tighter">{student.nationality || '----'}</p>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Ethnicity</p>
+                                <p className="font-bold text-gray-900 text-sm uppercase tracking-tighter">{student.ethnicity || '----'}</p>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Civil Status</p>
+                                <p className="font-bold text-gray-900 text-sm uppercase tracking-tighter">{student.maritalStatus || '----'}</p>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5 leading-none">Languages</p>
+                                <p className="font-bold text-gray-900 text-sm truncate uppercase tracking-tighter">{student.languages || '----'}</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <div className="p-6 bg-gradient-to-br from-indigo-600 via-indigo-700 to-indigo-800 rounded-3xl text-white shadow-2xl shadow-indigo-100 flex items-center justify-between border border-white/10 group cursor-default">
+                        <div>
+                            <p className="text-[10px] font-black text-indigo-200 uppercase tracking-widest leading-none mb-2">Enrollment Identity</p>
+                            <p className="font-black text-xl font-outfit uppercase tracking-wider group-hover:scale-105 transition-transform duration-300 inline-block">{student.enrollmentType || 'REGULAR'}</p>
+                        </div>
+                        <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/10 shadow-inner group-hover:rotate-12 transition-transform duration-300">
+                            <School className="w-8 h-8 opacity-80" />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-);
+    );
+};
 
 const AcademicTab = ({ studentId }: { studentId: string }) => {
     const [enrollments, setEnrollments] = useState<any[]>([]);
@@ -419,7 +667,7 @@ const StudentProfilePage: React.FC = () => {
 
             {/* Tab Content */}
             <div className="animate-fade-in-up">
-                {activeTab === 'info' && <PersonalInfoTab student={student} />}
+                {activeTab === 'info' && <PersonalInfoTab student={student} onUpdate={fetchStudent} />}
                 {activeTab === 'academic' && <AcademicTab studentId={student.id} />}
                 {activeTab === 'guardians' && <GuardianTab studentId={student.id} />}
                 {activeTab === 'docs' && <DocumentsTab studentId={student.id} />}

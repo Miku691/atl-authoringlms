@@ -17,6 +17,20 @@ public class ImsAssignmentsController {
 
     private final ImsAssignmentsService service;
 
+    @GetMapping("/student/{studentId}/summary")
+    public ResponseEntity<com.ims.academic.util.ApiResponse<com.ims.academic.dto.StudentAssignmentSummaryDto>> getStudentSummary(
+            @PathVariable String studentId,
+            @RequestParam String offeringId,
+            @RequestParam String tenantId) {
+        return ResponseEntity.ok(
+                com.ims.academic.util.ApiResponse.<com.ims.academic.dto.StudentAssignmentSummaryDto>builder()
+                        .status("SUCCESS")
+                        .statusCode(HttpStatus.OK.value())
+                        .message("Assignment summary fetched successfully")
+                        .apiData(service.getStudentSummary(offeringId, studentId, tenantId))
+                        .build());
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<ImsAssignmentsDto>> create(@RequestBody ImsAssignmentsDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(

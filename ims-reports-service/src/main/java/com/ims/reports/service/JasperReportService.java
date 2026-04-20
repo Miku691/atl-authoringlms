@@ -95,6 +95,8 @@ public class JasperReportService {
                 xlsxExporter.setExporterOutput(new SimpleOutputStreamExporterOutput(outputStream));
                 xlsxExporter.exportReport();
                 break;
+            case "PDF":
+                return JasperExportManager.exportReportToPdf(jasperPrint);
             case "CSV":
                 JRCsvExporter csvExporter = new JRCsvExporter();
                 csvExporter.setExporterInput(new SimpleExporterInput(jasperPrint));

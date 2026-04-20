@@ -29,6 +29,7 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
     private final ModelMapper modelMapper;
     private final AuthClient authClient;
     private final AcademicClient academicClient;
+    private final com.ims.student.service.ImsStudentSeqConfigService seqConfigService;
 
     private ImsStudentsDto toDto(ImsStudents e) {
         return modelMapper.map(e, ImsStudentsDto.class);
@@ -57,6 +58,11 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
         // Set default status if missing
         if (dto.getStatus() == null) {
             dto.setStatus("ACTIVE");
+        }
+
+        // Automated Admission No Generation if not provided
+        if (dto.getAdmissionNo() == null || dto.getAdmissionNo().trim().isEmpty()) {
+            dto.setAdmissionNo(seqConfigService.generateNextAdmissionNo(dto.getTenantId()));
         }
 
         ImsStudents saved = repo.save(toEntity(dto));
@@ -100,9 +106,18 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
         existing.setAddress(dto.getAddress());
         existing.setMedicalHistory(dto.getMedicalHistory());
         existing.setPreviousEducation(dto.getPreviousEducation());
-        existing.setBirthFormId(dto.getBirthFormId());
-        existing.setIsOrphan(dto.getIsOrphan());
-        existing.setCaste(dto.getCaste());
+        
+        // New Fields
+        existing.setFatherName(dto.getFatherName());
+        existing.setMotherName(dto.getMotherName());
+        existing.setIdProofType(dto.getIdProofType());
+        existing.setIdProofNumber(dto.getIdProofNumber());
+        existing.setEthnicity(dto.getEthnicity());
+        existing.setLanguages(dto.getLanguages());
+        existing.setNationality(dto.getNationality());
+        existing.setMaritalStatus(dto.getMaritalStatus());
+        existing.setEnrollmentType(dto.getEnrollmentType());
+
         existing.setPreviousSchool(dto.getPreviousSchool());
         existing.setAdmissionDiscount(dto.getAdmissionDiscount());
 

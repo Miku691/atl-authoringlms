@@ -51,6 +51,18 @@ public class ImsTenants {
     @Column(name = "currency")
     private String currency;
 
+    @Column(name = "country")
+    private String country;
+
+    @Column(name = "state")
+    private String state;
+
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
     @OneToMany(mappedBy = "tenant", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<AtlUser> users = new ArrayList<>();
 

@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -92,19 +94,15 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
     }
 
     @Override
-    public List<ImsInstructorsDto> getByTenant(String tenantId) {
-        return repo.findByTenantId(tenantId)
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public Page<ImsInstructorsDto> getByTenant(String tenantId, Pageable pageable) {
+        return repo.findByTenantId(tenantId, pageable)
+                .map(this::toDto);
     }
 
     @Override
-    public List<ImsInstructorsDto> getAll() {
-        return repo.findAll()
-                .stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    public Page<ImsInstructorsDto> getAll(Pageable pageable) {
+        return repo.findAll(pageable)
+                .map(this::toDto);
     }
 
     @Override

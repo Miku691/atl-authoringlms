@@ -11,16 +11,22 @@ export interface Student {
     dob?: string;
     gender?: string;
     bloodGroup?: string;
-    category?: string;
     religion?: string;
     address?: string;
     profileImageUrl?: string;
-    birthFormId?: string;
-    isOrphan?: boolean;
-    caste?: string;
     previousSchool?: string;
     admissionDiscount?: number;
     tenantId: string;
+    // New Fields
+    fatherName?: string;
+    motherName?: string;
+    idProofType?: string;
+    idProofNumber?: string;
+    ethnicity?: string;
+    languages?: string;
+    nationality?: string;
+    maritalStatus?: string;
+    enrollmentType?: string;
 }
 
 export interface BulkAdmissionRequest {
@@ -101,6 +107,10 @@ export const studentService = {
         tenantId: string;
     }) => {
         const response = await api.post('/ims-student-service/enrollments/bulk-promote', data);
+        return response.data;
+    },
+    updateStudent: async (id: string, data: Partial<Student>) => {
+        const response = await api.put(`/ims-student-service/students/${id}`, data);
         return response.data;
     }
 };

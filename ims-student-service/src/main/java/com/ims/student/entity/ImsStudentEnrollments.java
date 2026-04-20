@@ -66,6 +66,9 @@ public class ImsStudentEnrollments {
     @Column(name = "academic_year", length = 20)
     private String academicYear;
 
+    @Column(name = "graduation_year")
+    private Integer graduationYear;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;

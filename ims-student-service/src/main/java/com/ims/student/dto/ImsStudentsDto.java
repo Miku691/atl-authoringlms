@@ -33,9 +33,15 @@ public class ImsStudentsDto {
     private String address;
     private String medicalHistory;
     private String previousEducation;
-    private String birthFormId;
-    private Boolean isOrphan;
-    private String caste;
+    private String fatherName;
+    private String motherName;
+    private String idProofType;
+    private String idProofNumber;
+    private String ethnicity;
+    private String languages;
+    private String nationality;
+    private String maritalStatus;
+    private String enrollmentType;
     private String previousSchool;
     private Double admissionDiscount;
     private Instant createdAt;

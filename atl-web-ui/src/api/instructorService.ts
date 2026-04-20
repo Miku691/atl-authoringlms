@@ -30,14 +30,20 @@ export interface Instructor {
 
 export const instructorService = {
     // Basic CRUD
-    getAllInstructors: async () => {
-        const response = await api.get('/ims-instructor-service/instructors');
+    getAllInstructors: async (page = 0, size = 10) => {
+        const response = await api.get(`/ims-instructor-service/instructors?page=${page}&size=${size}`);
         return response.data;
     },
 
-    getInstructorsByTenant: async (tenantId: string) => {
-        const response = await api.get(`/ims-instructor-service/instructors/tenant/${tenantId}`);
-        return response.data;
+    getInstructorsByTenant: async (tenantId: string, page = 0, size = 100) => {
+        const response = await api.get(`/ims-instructor-service/instructors/tenant/${tenantId}?page=${page}&size=${size}`);
+        
+        // Extract the actual array from various response structures
+        const data = response.data?.apiData;
+        if (data && typeof data === 'object' && 'content' in data) {
+            return data.content;
+        }
+        return data || [];
     },
 
     getInstructorById: async (id: string) => {

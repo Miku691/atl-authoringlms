@@ -22,13 +22,13 @@ export interface Staff {
 }
 
 export const staffService = {
-    getAllStaff: async () => {
-        const response = await api.get('/ims-staff-service/staff');
+    getAllStaff: async (page = 0, size = 10) => {
+        const response = await api.get(`/ims-staff-service/staff?page=${page}&size=${size}`);
         return response.data;
     },
 
-    getStaffByTenant: async (tenantId: string) => {
-        const response = await api.get(`/ims-staff-service/staff/tenant/${tenantId}`);
+    getStaffByTenant: async (tenantId: string, page = 0, size = 10) => {
+        const response = await api.get(`/ims-staff-service/staff/tenant/${tenantId}?page=${page}&size=${size}`);
         return response.data;
     },
 

@@ -1,20 +1,30 @@
 package com.ims.academic.service.impl;
 
+import com.ims.academic.client.AuthClient;
+import com.ims.academic.client.NotificationClient;
+import com.ims.academic.client.StudentClient;
 import com.ims.academic.dto.AttendanceBatchRequestDto;
 import com.ims.academic.dto.AttendanceRecordDto;
 import com.ims.academic.dto.MessageDto;
+import com.ims.academic.dto.external.EmailRequestDto;
+import com.ims.academic.dto.external.ImsStudentGuardiansDto;
+import com.ims.academic.dto.external.ImsStudentsDto;
 import com.ims.academic.entity.ImsAttendanceMaster;
 import com.ims.academic.entity.ImsAttendanceRecords;
+import com.ims.academic.enums.AttendanceStatus;
 import com.ims.academic.exception.ResourceNotFoundException;
 import com.ims.academic.repo.ImsAttendanceMasterRepo;
 import com.ims.academic.repo.ImsAttendanceRecordsRepo;
 import com.ims.academic.service.AttendanceService;
+import com.ims.academic.util.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +36,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     private final ImsAttendanceMasterRepo masterRepo;
     private final ImsAttendanceRecordsRepo recordsRepo;
+    private final AuthClient authClient;
+    private final StudentClient studentClient;
+    private final NotificationClient notificationClient;
 
     @Override
     @Transactional
@@ -73,7 +86,89 @@ public class AttendanceServiceImpl implements AttendanceService {
             recordsRepo.save(record);
         }
 
+        // 3. Trigger Alerts for Absences
+        if ("STUDENT".equalsIgnoreCase(personType)) {
+            triggerAbsenceAlerts(tenantId, master, request.getRecords());
+        }
+
         return new MessageDto("Attendance marked successfully", "SUCCESS");
+    }
+
+    private void triggerAbsenceAlerts(String tenantId, ImsAttendanceMaster master, List<AttendanceRecordDto> records) {
+        try {
+            ApiResponse<AuthClient.TenantDetailDto> tenantRes = authClient.getTenantById(tenantId);
+            if (tenantRes == null || tenantRes.getApiData() == null) return;
+
+            String type = tenantRes.getApiData().getType();
+
+            List<AttendanceRecordDto> absentees = records.stream()
+                    .filter(r -> r.getStatus() == AttendanceStatus.ABSENT)
+                    .collect(Collectors.toList());
+
+            if (absentees.isEmpty()) return;
+
+            if ("COACHING".equalsIgnoreCase(type)) {
+                // Instant alerts for coaching
+                for (AttendanceRecordDto absentee : absentees) {
+                    sendInstantAbsenceAlert(tenantId, master, absentee);
+                }
+            } else {
+                // For School/College, they prefer daily summaries.
+                // TODO: Implement end-of-day summary job.
+                log.info("Daily summary alert queued for {} absentees in {}/{}", absentees.size(), tenantId, type);
+            }
+        } catch (Exception e) {
+            log.error("Failed to trigger absence alerts for tenant: {}", tenantId, e);
+        }
+    }
+
+    @Async
+    protected void sendInstantAbsenceAlert(String tenantId, ImsAttendanceMaster master, AttendanceRecordDto absentee) {
+        try {
+            // 1. Get Student Details
+            ApiResponse<ImsStudentsDto> studentRes = studentClient.getStudentById(absentee.getPersonId());
+            if (studentRes == null || studentRes.getApiData() == null) return;
+            ImsStudentsDto student = studentRes.getApiData();
+
+            // 2. Get Primary Guardian
+            ApiResponse<List<ImsStudentGuardiansDto>> guardianRes = studentClient.getGuardiansByStudentId(student.getId());
+            Optional<ImsStudentGuardiansDto> primaryGuardian = guardianRes != null && guardianRes.getApiData() != null
+                    ? guardianRes.getApiData().stream().filter(ImsStudentGuardiansDto::isPrimary).findFirst()
+                    : Optional.empty();
+
+            String studentEmail = student.getEmail();
+            String guardianEmail = primaryGuardian.isPresent() ? primaryGuardian.get().getGuardianEmail() : null;
+
+            // 3. Construct Message
+            String subject = "Absence Alert: " + student.getFirstName() + " " + student.getLastName();
+            String body = String.format(
+                "Dear Parent/Student,\n\n" +
+                "This is to inform you that %s %s was marked ABSENT for the class: %s on %s.\n\n" +
+                "Regards,\nInstitute Management System",
+                student.getFirstName(), student.getLastName(), 
+                master.getSubjectId() != null ? master.getSubjectId() : "scheduled session",
+                master.getDate().toString()
+            );
+
+            // 4. Send Emails
+            List<String> recipients = new ArrayList<>();
+            if (studentEmail != null) recipients.add(studentEmail);
+            if (guardianEmail != null) recipients.add(guardianEmail);
+
+            for (String to : recipients) {
+                notificationClient.sendEmail(EmailRequestDto.builder()
+                        .to(to)
+                        .subject(subject)
+                        .body(body)
+                        .tenantId(tenantId)
+                        .build());
+            }
+
+            log.info("Instant absence alert sent for student {} in tenant {}", student.getId(), tenantId);
+
+        } catch (Exception e) {
+            log.error("Failed to send instant absence alert for student: {}", absentee.getPersonId(), e);
+        }
     }
 
     @Override

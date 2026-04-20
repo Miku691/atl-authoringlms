@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.util.AntPathMatcher;
 import reactor.core.publisher.Mono;
 
 import javax.crypto.SecretKey;
@@ -25,6 +26,7 @@ import java.util.List;
 public class JwtAuthFilter implements GlobalFilter, Ordered {
 
     private final GatewaySecurityConfig securityConfig;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Value("${atl.jwt.secret}")
     private String jwtSecret;
@@ -45,63 +47,70 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
             return chain.filter(exchange);
         }
 
-        if (securityConfig.getPublicPaths().stream().anyMatch(publicPath -> {
-            String cleanPath = path.replaceAll("/+", "/");
-            String cleanPublic = publicPath.trim().replaceAll("/+", "/");
-            return cleanPath.equals(cleanPublic) || cleanPath.startsWith(cleanPublic);
-        })) {
-            return chain.filter(exchange);
-        }
+        boolean isPublicPath = securityConfig.getPublicPaths().stream()
+                .anyMatch(publicPath -> pathMatcher.match(publicPath, path));
 
         String authHeader = exchange.getRequest().getHeaders().getFirst("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new JwtUnauthorizedException("Invalid or missing token");
-        }
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                String token = authHeader.split(" ")[1];
+                Claims claims = Jwts.parser()
+                        .verifyWith(getSecretKey())
+                        .build()
+                        .parseSignedClaims(token)
+                        .getPayload();
 
-        String token = authHeader.split(" ")[1];
-        Claims claims = Jwts.parser()
-                .verifyWith(getSecretKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+                // Token is valid, check role-based access if it's NOT a public path
+                if (!isPublicPath) {
+                    @SuppressWarnings("unchecked")
+                    List<String> roles = claims.get("roles", List.class);
+                    String method = exchange.getRequest().getMethod().name();
 
-        // check role based access.
-        @SuppressWarnings("unchecked")
-        List<String> roles = claims.get("roles", List.class);
+                    boolean isAuthorized = securityConfig.getRolePaths().entrySet().stream()
+                            .filter(entry -> path.startsWith(entry.getKey()))
+                            .allMatch(entry -> {
+                                if (method.equals("GET")) return true;
+                                return roles.stream().anyMatch(entry.getValue()::contains);
+                            });
 
-        // --- START ROLE VALIDATION ---
-        String method = exchange.getRequest().getMethod().name();
-
-        boolean isAuthorized = securityConfig.getRolePaths().entrySet().stream()
-                .filter(entry -> path.startsWith(entry.getKey()))
-                .allMatch(entry -> {
-                    // Industrial Standard: Allow GET requests for domain services at gateway level
-                    // Fine-grained authorization should be handled at the service level
-                    if (method.equals("GET")) {
-                        return true;
+                    if (!isAuthorized) {
+                        log.warn("Forbidden: User with roles {} is not authorized to access {} [{}]", roles, path, method);
+                        exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                        return exchange.getResponse().setComplete();
                     }
-                    return roles.stream().anyMatch(entry.getValue()::contains);
-                });
+                }
 
-        if (!isAuthorized) {
-            log.warn("Forbidden: User with roles {} is not authorized to access {} [{}]", roles, path, method);
-            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-            return exchange.getResponse().setComplete();
+                // Inject headers and proceed
+                ServerHttpRequest.Builder builder = exchange.getRequest().mutate()
+                        .header("X-User-Id", claims.getSubject())
+                        .header("X-Roles", String.join(",", (List<String>) claims.get("roles", List.class)));
+
+                Object tenantIdObj = claims.get("tenantId");
+                if (tenantIdObj != null) {
+                    builder.header("X-Tenant-Id", tenantIdObj.toString());
+                }
+
+                return chain.filter(exchange.mutate().request(builder.build()).build());
+
+            } catch (Exception e) {
+                // If token is invalid and it's NOT a public path, reject
+                if (!isPublicPath) {
+                    log.error("JWT Validation failed for private path {}: {}", path, e.getMessage());
+                    throw new JwtUnauthorizedException("Invalid or expired token");
+                }
+                // If token is invalid but it IS a public path, just proceed without headers
+                log.warn("JWT Validation failed for public path {}. Proceeding as guest.", path);
+                return chain.filter(exchange);
+            }
         }
 
-        ServerHttpRequest.Builder builder = exchange.getRequest().mutate()
-                .header("X-User-Id", claims.getSubject())
-                .header("X-Roles", String.join(",", claims.get("roles", List.class)));
-
-        Object tenantIdObj = claims.get("tenantId");
-        if (tenantIdObj != null) {
-            builder.header("X-Tenant-Id", tenantIdObj.toString());
+        // No token present
+        if (isPublicPath) {
+            return chain.filter(exchange);
         }
 
-        ServerHttpRequest serverHttpRequest = builder.build();
-
-        return chain.filter(exchange.mutate().request(serverHttpRequest).build());
+        throw new JwtUnauthorizedException("Invalid or missing token");
     }
 
     // private Mono<Void> onError(ServerWebExchange exchange, String message,

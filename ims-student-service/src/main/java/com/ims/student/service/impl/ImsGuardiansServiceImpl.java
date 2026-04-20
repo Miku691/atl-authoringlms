@@ -7,6 +7,8 @@ import com.ims.student.repo.ImsGuardiansRepo;
 import com.ims.student.service.ImsGuardiansService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,10 +53,9 @@ public class ImsGuardiansServiceImpl implements ImsGuardiansService {
     }
 
     @Override
-    public List<ImsGuardiansDto> getByTenant(String tenantId) {
-        return repo.findByTenantId(tenantId).stream()
-                .map(entity -> modelMapper.map(entity, ImsGuardiansDto.class))
-                .collect(Collectors.toList());
+    public Page<ImsGuardiansDto> getByTenant(String tenantId, Pageable pageable) {
+        return repo.findByTenantId(tenantId, pageable)
+                .map(entity -> modelMapper.map(entity, ImsGuardiansDto.class));
     }
 
     @Override

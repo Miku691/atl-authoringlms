@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Service - IMS Atlas</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">IMS Atlas</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">System Overview</a></li>
+            <li><strong>Services</strong></li>
+            <li><a href="atl-gateway-service.html">Gateway Service</a></li>
+            <li><a href="ims-platform-service.html" class="active">Platform Service</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Platform Management Service</h1>
+            <p>Handles platform-wide operations, leads management, and super-admin dashboards.</p>
+        </header>
+
+        <section class="card">
+            <h2>Responsibilities</h2>
+            <ul>
+                <li>Capture and manage "Book a Demo" lead requests.</li>
+                <li>Automate email notifications for lead captures and meeting scheduling.</li>
+                <li>Provide platform-wide analytics for Super Admins.</li>
+                <li>Manage global system settings and configurations.</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>Data Ownership</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Entity</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DemoRequest</td>
+                        <td>Stores lead information, preferred slots, and meeting links.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="card">
+            <h2>Communication Flows</h2>
+            <ul>
+                <li><strong>Public:</strong> Captures demo requests via unprotected endpoints.</li>
+                <li><strong>Secured:</strong> Restricts lead management to <code>SUPER_ADMIN</code> users.</li>
+                <li><strong>Validation:</strong> Enforces <code>Google Meet</code> links for scheduling and mandatory feedback for cycle completion.</li>
+                <li><strong>External:</strong> Integrates with <code>ims-notification-service</code> for verified email dispatch.</li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html>

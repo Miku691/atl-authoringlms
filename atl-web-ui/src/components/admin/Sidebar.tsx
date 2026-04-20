@@ -118,12 +118,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             {/* Logo Section */}
             <div className="h-16 flex items-center justify-between px-4 bg-slate-950/50 backdrop-blur-sm border-b border-slate-800">
                 <div className={`flex items-center gap-3 overflow-hidden ${!isOpen && 'justify-center w-full'}`}>
-                    <div className="bg-indigo-600 p-2 rounded-lg flex-shrink-0">
+                    <div className={`${user?.roles.includes('SUPER_ADMIN') ? 'bg-rose-600' : 'bg-primary'} p-2 rounded-lg flex-shrink-0 transition-colors`}>
                         <GraduationCap className="w-5 h-5 text-white" />
                     </div>
                     {isOpen && (
-                        <span className="text-white font-bold text-lg tracking-wide whitespace-nowrap">
-                            EduMatrix
+                        <span className="text-white font-bold text-lg tracking-wide whitespace-nowrap italic">
+                            {user?.roles.includes('SUPER_ADMIN') ? 'EduMatrix Platform' : 'EduMatrix'}
                         </span>
                     )}
                 </div>

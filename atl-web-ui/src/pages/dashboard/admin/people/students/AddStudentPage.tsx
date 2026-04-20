@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { type RootState } from '../../../../../store/store';
 import api from '../../../../../utils/api';
 import toast from 'react-hot-toast';
-import { User, BookOpen, Save, X, Loader2 } from 'lucide-react';
+import { User, BookOpen, Save, Loader2 } from 'lucide-react';
 import CustomDatePicker from '../../../../../components/common/CustomDatePicker';
 
 interface Section {
@@ -53,9 +53,15 @@ const AddStudentPage: React.FC = () => {
         rollNo: '',
 
         // Phase 1 Additional Fields
-        birthFormId: '',
-        isOrphan: false,
-        caste: '',
+        fatherName: '',
+        motherName: '',
+        idProofType: '',
+        idProofNumber: '',
+        ethnicity: '',
+        languages: '',
+        nationality: '',
+        maritalStatus: '',
+        enrollmentType: 'FULL_TIME',
         previousSchool: '',
         admissionDiscount: ''
     });
@@ -130,9 +136,15 @@ const AddStudentPage: React.FC = () => {
                 category: formData.category,
                 religion: formData.religion,
                 address: formData.address,
-                birthFormId: formData.birthFormId,
-                isOrphan: formData.isOrphan,
-                caste: formData.caste,
+                fatherName: formData.fatherName,
+                motherName: formData.motherName,
+                idProofType: formData.idProofType,
+                idProofNumber: formData.idProofNumber,
+                ethnicity: formData.ethnicity,
+                languages: formData.languages,
+                nationality: formData.nationality,
+                maritalStatus: formData.maritalStatus,
+                enrollmentType: formData.enrollmentType,
                 previousSchool: formData.previousSchool,
                 admissionDiscount: formData.admissionDiscount ? parseFloat(formData.admissionDiscount) : null,
                 status: 'ACTIVE'
@@ -199,9 +211,6 @@ const AddStudentPage: React.FC = () => {
                     <h1 className="text-2xl font-bold text-gray-900">Add New Student</h1>
                     <p className="text-sm text-gray-500">Enter personal and academic details.</p>
                 </div>
-                <button onClick={() => navigate('/people/students')} className="text-gray-500 hover:text-gray-700">
-                    <X className="w-6 h-6" />
-                </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
@@ -324,20 +333,15 @@ const AddStudentPage: React.FC = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Birth Form ID</label>
-                            <input
-                                name="birthFormId" value={formData.birthFormId} onChange={handleChange}
-                                placeholder="B-Form or National ID"
-                                className="mt-1 w-full p-2 border rounded"
-                            />
+                            <label className="block text-sm font-medium text-gray-700">Category</label>
+                            <input name="category" value={formData.category} onChange={handleChange} className="mt-1 w-full p-2 border rounded" placeholder="e.g. Regular, Private" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Caste / Tribe</label>
-                            <input
-                                name="caste" value={formData.caste} onChange={handleChange}
-                                placeholder="e.g. Balochi, Punjabi"
-                                className="mt-1 w-full p-2 border rounded"
-                            />
+                            <label className="block text-sm font-medium text-gray-700">Enrollment Type</label>
+                            <select name="enrollmentType" value={formData.enrollmentType} onChange={handleChange} className="mt-1 w-full p-2 border rounded">
+                                <option value="FULL_TIME">Full Time</option>
+                                <option value="DISTANCE">Distance</option>
+                            </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Blood Group</label>
@@ -346,24 +350,61 @@ const AddStudentPage: React.FC = () => {
                                 {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
                             </select>
                         </div>
+                    </div>
 
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Category</label>
-                            <input name="category" value={formData.category} onChange={handleChange} className="mt-1 w-full p-2 border rounded" placeholder="e.g. Regular, Private" />
+                            <label className="block text-sm font-medium text-gray-700">Father's Name</label>
+                            <input name="fatherName" value={formData.fatherName} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Religion</label>
-                            <input name="religion" value={formData.religion} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
+                            <label className="block text-sm font-medium text-gray-700">Mother's Name</label>
+                            <input name="motherName" value={formData.motherName} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
                         </div>
-                        <div className="flex items-center gap-2 pt-6">
-                            <input
-                                type="checkbox"
-                                name="isOrphan"
-                                checked={formData.isOrphan}
-                                onChange={handleChange}
-                                className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                            />
-                            <label className="text-sm font-medium text-gray-700">Is Orphan?</label>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">ID Proof Type</label>
+                            <select name="idProofType" value={formData.idProofType} onChange={handleChange} className="mt-1 w-full p-2 border rounded">
+                                <option value="">Select Type</option>
+                                <option value="AADHAR">Aadhar Card</option>
+                                <option value="PAN">PAN Card</option>
+                                <option value="NATIONAL_ID">National ID / CNIC</option>
+                                <option value="PASSPORT">Passport</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">ID Proof Number</label>
+                            <input name="idProofNumber" value={formData.idProofNumber} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Ethnicity</label>
+                            <input name="ethnicity" value={formData.ethnicity} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Nationality</label>
+                            <input name="nationality" value={formData.nationality} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Marital Status</label>
+                            <select name="maritalStatus" value={formData.maritalStatus} onChange={handleChange} className="mt-1 w-full p-2 border rounded">
+                                <option value="">Select Status</option>
+                                <option value="SINGLE">Single</option>
+                                <option value="MARRIED">Married</option>
+                                <option value="DIVORCED">Divorced</option>
+                                <option value="WIDOWED">Widowed</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Languages Known</label>
+                            <input name="languages" value={formData.languages} onChange={handleChange} className="mt-1 w-full p-2 border rounded" placeholder="e.g. English, Spanish" />
                         </div>
                     </div>
 

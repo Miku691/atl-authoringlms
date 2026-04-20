@@ -11,7 +11,9 @@ import {
     Trash2,
     UserCheck,
     UserPlus,
-    Key
+    Key,
+    ChevronLeft,
+    ChevronRight
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -45,6 +47,12 @@ const InstructorManagementPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [pageSize] = useState(10);
+
     // Grant Access Modal State
     const [isGrantAccessModalOpen, setIsGrantAccessModalOpen] = useState(false);
     const [instructorToGrantAccess, setInstructorToGrantAccess] = useState<Instructor | null>(null);
@@ -59,14 +67,17 @@ const InstructorManagementPage: React.FC = () => {
         if (tenantId) {
             fetchInstructors();
         }
-    }, [tenantId]);
+    }, [tenantId, currentPage]);
 
     const fetchInstructors = async () => {
         setIsLoading(true);
         try {
-            const response = await api.get(`/ims-instructor-service/instructors/tenant/${tenantId}`);
+            const response = await api.get(`/ims-instructor-service/instructors/tenant/${tenantId}?page=${currentPage}&size=${pageSize}`);
             if (response.data.status === 'SUCCESS') {
-                setInstructors(response.data.apiData);
+                const data = response.data.apiData;
+                setInstructors(data.content || []);
+                setTotalPages(data.totalPages || 0);
+                setTotalElements(data.totalElements || 0);
             }
         } catch (error: any) {
             toast.error('Failed to fetch instructors');
@@ -216,6 +227,36 @@ const InstructorManagementPage: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination footer */}
+                {totalPages > 1 && (
+                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                        <div className="text-sm text-gray-500 font-medium tracking-tight">
+                            Showing <span className="text-indigo-600 font-black">{instructors.length}</span> of <span className="text-indigo-600 font-black">{totalElements}</span> Faculty Members
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                                disabled={currentPage === 0}
+                                className="p-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-white disabled:opacity-30 transition-all cursor-pointer shadow-sm"
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </button>
+                            <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-lg shadow-sm">
+                                <span className="text-sm font-black text-indigo-600">{currentPage + 1}</span>
+                                <span className="text-[10px] font-black text-gray-200 uppercase tracking-tighter">/</span>
+                                <span className="text-sm font-black text-gray-400">{totalPages}</span>
+                            </div>
+                            <button
+                                onClick={() => setCurrentPage(prev => prev + 1)}
+                                disabled={currentPage >= totalPages - 1}
+                                className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-30 transition-all font-bold shadow-md shadow-indigo-100 cursor-pointer"
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Modal components for Add/Edit have been removed */}

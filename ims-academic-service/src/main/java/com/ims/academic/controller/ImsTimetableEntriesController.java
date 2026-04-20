@@ -77,6 +77,19 @@ public class ImsTimetableEntriesController {
                                                 .build());
         }
 
+        @GetMapping("/offering/{offeringId}/today")
+        public ResponseEntity<ApiResponse<List<ImsTimetableEntriesDto>>> getTodayEntries(
+                        @PathVariable String offeringId) {
+
+                return ResponseEntity.ok(
+                                ApiResponse.<List<ImsTimetableEntriesDto>>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Today's Timetable fetched successfully")
+                                                .apiData(service.getTodayEntriesByOfferingId(offeringId))
+                                                .build());
+        }
+
         @DeleteMapping("/{id}")
         public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
 

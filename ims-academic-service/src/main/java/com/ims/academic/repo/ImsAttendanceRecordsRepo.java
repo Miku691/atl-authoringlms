@@ -18,4 +18,7 @@ public interface ImsAttendanceRecordsRepo extends JpaRepository<ImsAttendanceRec
 
     java.util.List<ImsAttendanceRecords> findByPersonIdAndPersonTypeAndAttendanceMasterDateBetween(
             String personId, String personType, java.time.LocalDate start, java.time.LocalDate end);
+
+    java.util.List<ImsAttendanceRecords> findByStatusAndAttendanceMasterDate(
+            com.ims.academic.enums.AttendanceStatus status, java.time.LocalDate date);
 }

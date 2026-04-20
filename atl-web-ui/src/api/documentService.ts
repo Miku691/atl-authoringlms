@@ -30,6 +30,9 @@ export const documentService = {
     getDocumentById: (id: string) => api.get(`/ims-student-service/student-documents/${id}`),
 
     deleteDocument: (id: string) => api.delete(`/ims-student-service/student-documents/${id}`),
-
-    getViewUrl: (id: string) => `${api.defaults.baseURL}/ims-student-service/student-documents/view/${id}`
+    getViewUrl: (id: string) => `${api.defaults.baseURL}/ims-student-service/student-documents/view/${id}`,
+    getMasterDocumentTypes: async () => {
+        const response = await api.get('/ims-student-service/master-document-types');
+        return response.data;
+    }
 };

@@ -76,17 +76,20 @@ const InstructorAssignmentModal: React.FC<Props> = ({ isOpen, onClose, offeringI
                 instructorService.getAssignmentsByOffering(offeringId)
             ]);
 
-            setAllInstructors(instRes.status === 'SUCCESS' ? instRes.apiData : []);
-            setOfferingSubjects(subjectsRes.status === 'SUCCESS' ? subjectsRes.apiData : []);
+            const instList = instRes.status === 'SUCCESS' && instRes.apiData
+                ? (Array.isArray(instRes.apiData) ? instRes.apiData : (instRes.apiData.content || []))
+                : [];
+            
+            setAllInstructors(instList);
+            setOfferingSubjects(subjectsRes.status === 'SUCCESS' && subjectsRes.apiData ? subjectsRes.apiData : []);
 
-            const rawAssignments = assignRes.status === 'SUCCESS' ? assignRes.apiData : [];
+            const rawAssignments = assignRes.status === 'SUCCESS' && assignRes.apiData ? assignRes.apiData : [];
 
-            // Enrich assignments with names
             const enriched = rawAssignments
                 .filter((a: any) => a != null)
                 .map((a: any) => {
-                    const inst = instRes.apiData?.find((i: any) => i && i.id === a.instructorId);
-                    const sub = subjectsRes.apiData?.find((s: any) => s && s.subjectId === a.subjectId);
+                    const inst = instList.find((i: any) => i && i.id === a.instructorId);
+                    const sub = offeringSubjects.find((s: any) => s && s.id === a.subjectId); // Note: check field name
                     return {
                         ...a,
                         instructorName: inst ? `${inst.firstName || ''} ${inst.lastName || ''}`.trim() || inst.username : 'Unknown Instructor',

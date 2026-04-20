@@ -27,7 +27,8 @@ export const guardianService = {
     createGuardian: (data: Guardian) => api.post('/ims-student-service/master-guardians', data),
     updateGuardian: (id: string, data: Guardian) => api.put(`/ims-student-service/master-guardians/${id}`, data),
     getGuardian: (id: string) => api.get(`/ims-student-service/master-guardians/${id}`),
-    getTenantGuardians: (tenantId: string) => api.get(`/ims-student-service/master-guardians/tenant/${tenantId}`),
+    getTenantGuardians: (tenantId: string, page = 0, size = 10) => 
+        api.get(`/ims-student-service/master-guardians/tenant/${tenantId}?page=${page}&size=${size}`),
     searchGuardianByPhone: (tenantId: string, phone: string) =>
         api.get(`/ims-student-service/master-guardians/tenant/${tenantId}/search?phone=${phone}`),
     deleteGuardian: (id: string) => api.delete(`/ims-student-service/master-guardians/${id}`),

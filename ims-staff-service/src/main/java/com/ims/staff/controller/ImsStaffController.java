@@ -8,7 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @RestController
 @RequestMapping("/staff")
@@ -56,24 +57,26 @@ public class ImsStaffController {
     }
 
     @GetMapping("/tenant/{tenantId}")
-    public ResponseEntity<ApiResponse<List<ImsStaffDto>>> getByTenant(@PathVariable String tenantId) {
+    public ResponseEntity<ApiResponse<Page<ImsStaffDto>>> getByTenant(
+            @PathVariable String tenantId,
+            Pageable pageable) {
         return ResponseEntity.ok(
-                ApiResponse.<List<ImsStaffDto>>builder()
+                ApiResponse.<Page<ImsStaffDto>>builder()
                         .status("SUCCESS")
                         .statusCode(HttpStatus.OK.value())
                         .message("Staff fetched successfully")
-                        .apiData(service.getByTenant(tenantId))
+                        .apiData(service.getByTenant(tenantId, pageable))
                         .build());
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ImsStaffDto>>> getAll() {
+    public ResponseEntity<ApiResponse<Page<ImsStaffDto>>> getAll(Pageable pageable) {
         return ResponseEntity.ok(
-                ApiResponse.<List<ImsStaffDto>>builder()
+                ApiResponse.<Page<ImsStaffDto>>builder()
                         .status("SUCCESS")
                         .statusCode(HttpStatus.OK.value())
                         .message("All staff fetched")
-                        .apiData(service.getAll())
+                        .apiData(service.getAll(pageable))
                         .build());
     }
 

@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 /**
@@ -58,14 +60,16 @@ public class ImsGuardianController {
         }
 
         @GetMapping("/tenant/{tenantId}")
-        public ResponseEntity<ApiResponse<List<ImsGuardiansDto>>> getByTenant(@PathVariable String tenantId) {
-                List<ImsGuardiansDto> list = service.getByTenant(tenantId);
+        public ResponseEntity<ApiResponse<Page<ImsGuardiansDto>>> getByTenant(
+                        @PathVariable String tenantId,
+                        Pageable pageable) {
+                Page<ImsGuardiansDto> page = service.getByTenant(tenantId, pageable);
                 return ResponseEntity.ok(
-                                ApiResponse.<List<ImsGuardiansDto>>builder()
+                                ApiResponse.<Page<ImsGuardiansDto>>builder()
                                                 .status("SUCCESS")
                                                 .statusCode(HttpStatus.OK.value())
                                                 .message("Guardians fetched for tenant")
-                                                .apiData(list)
+                                                .apiData(page)
                                                 .build());
         }
 

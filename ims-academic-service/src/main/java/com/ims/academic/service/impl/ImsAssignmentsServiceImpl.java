@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 public class ImsAssignmentsServiceImpl implements ImsAssignmentsService {
 
     private final ImsAssignmentsRepo repo;
+    private final com.ims.academic.repo.ImsAssignmentSubmissionsRepo submissionRepo;
     private final ModelMapper modelMapper;
 
     private ImsAssignmentsDto toDto(ImsAssignments entity) {
@@ -81,6 +82,23 @@ public class ImsAssignmentsServiceImpl implements ImsAssignmentsService {
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public com.ims.academic.dto.StudentAssignmentSummaryDto getStudentSummary(String offeringId, String studentId, String tenantId) {
+        List<ImsAssignments> totalAssignments = repo.findByTenantIdAndOfferingId(tenantId, offeringId);
+        long totalCount = totalAssignments.size();
+
+        long completedCount = submissionRepo.findByStudentId(studentId).stream()
+                .filter(sub -> totalAssignments.stream()
+                        .anyMatch(a -> a.getId().equals(sub.getAssignment().getId())))
+                .count();
+
+        return com.ims.academic.dto.StudentAssignmentSummaryDto.builder()
+                .totalAssignments(totalCount)
+                .completedAssignments(completedCount)
+                .pendingAssignments(Math.max(0, totalCount - completedCount))
+                .build();
     }
 
     @Override

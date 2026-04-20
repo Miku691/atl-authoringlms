@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { type RootState } from '../../../store/store';
 import { studentDashboardService, type StudentDashboardData } from '../../../api/studentDashboardService';
 import { financeService } from '../../../api/financeService';
+import { instructorService } from '../../../api/instructorService';
 import type { FinanceSummary } from '../../../types/finance';
 import {
     BookOpen, Clock, Bell, Calendar,
@@ -29,10 +30,25 @@ const StudentDashboardHome: React.FC = () => {
         if (!user?.email || !user?.tenantId) return;
         setLoading(true);
         try {
-            const [dashboardData, summary] = await Promise.all([
+            const [dashboardData, summary, instructorsRes] = await Promise.all([
                 studentDashboardService.getDashboardData(user.email, user.tenantId),
-                financeService.getMySummary()
+                financeService.getMySummary(),
+                instructorService.getInstructorsByTenant(user.tenantId)
             ]);
+
+            // Enrich todayClasses with instructor names
+            if (dashboardData.todayClasses && instructorsRes) {
+                const instructorMap: Record<string, string> = {};
+                instructorsRes.forEach((inst: any) => {
+                    instructorMap[inst.id] = `${inst.firstName} ${inst.lastName}`;
+                });
+
+                dashboardData.todayClasses = dashboardData.todayClasses.map(cls => ({
+                    ...cls,
+                    instructorName: cls.instructorId ? (instructorMap[cls.instructorId] || 'Academy Faculty') : 'Academy Faculty'
+                }));
+            }
+
             setData(dashboardData);
             setFinanceSummary(summary);
         } catch (error) {
@@ -92,179 +108,196 @@ const StudentDashboardHome: React.FC = () => {
     ];
 
     return (
-        <div className="space-y-8 pb-12">
-            {/* Elegant Header with Personal Context */}
-            <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-900 via-indigo-800 to-slate-900 p-8 md:p-12 shadow-2xl">
-                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-                    <div className="space-y-2">
-                        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-                            Hey, {data?.student?.firstName || user?.username}! 🚀
+        <div className="max-w-7xl mx-auto space-y-8 pb-12 animate-fade-in">
+            {/* Flagship Header - Proportional & Premium */}
+            <div className="relative overflow-hidden rounded-[3rem] bg-[#0A0C10] p-10 md:p-14 shadow-2xl border border-white/5 group">
+                <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-10">
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                            <span className="px-3 py-1 bg-indigo-500/10 rounded-full text-[9px] font-black text-indigo-400 uppercase tracking-[0.2em] border border-indigo-500/20">Institutional Intelligence</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-slate-800"></div>
+                            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{data?.enrollments?.[0]?.offeringName || 'Standard Operations'}</span>
+                        </div>
+                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter italic uppercase leading-none">
+                            Welcome, <span className="text-indigo-400">{data?.student?.firstName || user?.username}</span>
                         </h1>
-                        <p className="text-indigo-200/80 font-medium text-lg max-w-xl">
-                            You're doing great! You've attended <span className="text-white font-black underline decoration-indigo-400">{data?.attendanceSummary.percentage}%</span> of your classes this term.
+                        <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] max-w-xl leading-relaxed opacity-80">
+                            Your performance index is currently <span className="text-white">OPTIMIZED</span> at <span className="text-indigo-400 font-black">{data?.attendanceSummary.percentage}%</span> metrics density.
                         </p>
                     </div>
 
-                    <div className="flex gap-4">
-                        <div className="p-6 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 text-center flex flex-col items-center">
-                            <Award className="w-8 h-8 text-amber-400 mb-2" />
-                            <span className="text-xs font-black text-indigo-300 uppercase tracking-widest">Level</span>
-                            <span className="text-2xl font-black text-white mt-1">PRO</span>
-                        </div>
-                        <div className="p-6 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 text-center flex flex-col items-center">
-                            <Zap className="w-8 h-8 text-indigo-400 mb-2 shadow-inner" />
-                            <span className="text-xs font-black text-indigo-300 uppercase tracking-widest">Streak</span>
-                            <span className="text-2xl font-black text-white mt-1">12D</span>
+                    <div className="flex items-center gap-4">
+                        <div className="px-8 py-5 bg-white/5 backdrop-blur-xl rounded-[2rem] border border-white/10 text-center min-w-[140px] group-hover:bg-white/10 transition-all duration-500">
+                            <p className="text-[8px] font-black text-indigo-300 uppercase tracking-widest mb-2 opacity-60">System state</p>
+                            <p className="text-xs font-black text-emerald-400 flex items-center justify-center gap-2 italic">
+                                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.5)]"></span> VERIFIED
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Decorative Elements */}
-                <div className="absolute -top-24 -right-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-[120px]"></div>
-                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-500/10 rounded-full blur-[100px]"></div>
+                {/* Abstract Visual Elements */}
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4"></div>
+                <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-900/10 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/4"></div>
             </div>
 
-            {/* Quick Access Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Premium Strategic Links */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 {quickLinks.map((link, idx) => (
                     <button
                         key={idx}
                         onClick={() => navigate(link.path)}
-                        className="flex flex-col items-center gap-3 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group"
+                        className="group flex items-center gap-5 p-6 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:bg-slate-900 transition-all duration-500"
                     >
-                        <div className={`p-4 rounded-2xl ${link.color} group-hover:scale-110 transition-transform`}>
-                            <link.icon className="w-6 h-6" />
+                        <div className={`p-4 rounded-3xl ${link.color} group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-sm`}>
+                            <link.icon className="w-5 h-5" />
                         </div>
-                        <span className="text-xs font-black text-slate-800 uppercase tracking-widest">{link.label}</span>
+                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-widest group-hover:text-white transition-colors">{link.label}</span>
                     </button>
                 ))}
             </div>
 
-            {/* Main Content Sections */}
+            {/* Dynamic Dashboard Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-                {/* Real-time Schedule Widget */}
+                {/* Schedule Engine */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-xl font-black text-slate-900 flex items-center gap-3">
-                            <div className="p-2 bg-indigo-100 rounded-xl"><Clock className="w-5 h-5 text-indigo-600" /></div>
-                            TODAY'S SCHEDULE
+                    <div className="flex items-center justify-between px-4">
+                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-3">
+                            <Clock className="w-3.5 h-3.5 text-indigo-600" /> Operational Schedule
                         </h3>
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                        <div className="flex items-center gap-2 text-[9px] font-black text-slate-300 uppercase italic tracking-widest">
                             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
-                        </span>
+                        </div>
                     </div>
 
                     <div className="space-y-4">
                         {data?.todayClasses && data.todayClasses.length > 0 ? (
                             data.todayClasses.map((cls, idx) => (
-                                <div key={idx} className="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-md transition-all group flex items-center justify-between gap-6">
-                                    <div className="flex items-center gap-6">
-                                        <div className="flex flex-col items-center">
-                                            <span className="text-lg font-black text-indigo-600 leading-none">{cls.startTime?.substring(0, 5) || '--:--'}</span>
-                                            <span className="text-[10px] font-black text-slate-400 uppercase mt-1 tracking-tighter">to {cls.endTime?.substring(0, 5) || '--:--'}</span>
+                                <div key={idx} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 group flex items-center justify-between gap-8 relative overflow-hidden">
+                                    <div className="flex items-center gap-8 relative z-10">
+                                        <div className="flex flex-col items-center min-w-[70px]">
+                                            <span className="text-lg font-black text-indigo-600 tracking-tighter italic">{cls.startTime?.substring(0, 5) || '--:--'}</span>
+                                            <span className="text-[8px] font-black text-slate-300 uppercase mt-0.5 tracking-widest leading-none">to {cls.endTime?.substring(0, 5) || '--:--'}</span>
                                         </div>
-                                        <div className="w-px h-12 bg-slate-100"></div>
+                                        <div className="w-px h-12 bg-slate-100 group-hover:bg-indigo-50 transition-colors"></div>
                                         <div>
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <span className="px-2 py-0.5 bg-slate-100 rounded text-[9px] font-black text-slate-500 uppercase">Period {cls.periodNumber || '?'}</span>
-                                                <span className="px-2 py-0.5 bg-indigo-50 rounded text-[9px] font-black text-indigo-600 uppercase italic">LIVE SOON</span>
+                                            <div className="flex items-center gap-3 mb-1.5 opacity-60">
+                                                <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest italic flex items-center gap-1.5">
+                                                    <div className="w-1 h-1 bg-indigo-400 rounded-full"></div> Slot {cls.periodNumber || '?'}
+                                                </span>
+                                                <div className="w-1 h-1 bg-slate-200 rounded-full"></div>
+                                                <span className="text-[8px] font-black text-indigo-500 uppercase tracking-widest italic">Unit {cls.room || 'N/A'}</span>
                                             </div>
-                                            <h4 className="text-lg font-black text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{cls.subjectName || 'Academic Session'}</h4>
-                                            <p className="text-xs font-bold text-slate-400 flex items-center gap-1">
-                                                By {cls.instructorName || 'Academy Faculty'} • Room {cls.room || 'A-101'}
-                                            </p>
+                                            <h4 className="text-xl font-black text-slate-900 uppercase tracking-tight italic leading-none group-hover:text-indigo-600 transition-colors">{cls.subjectName || 'Session'}</h4>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2">{cls.instructorName || 'Academy Faculty'}</p>
                                         </div>
                                     </div>
-                                    <button className="p-3 rounded-full bg-slate-50 text-slate-400 group-hover:bg-indigo-600 group-hover:text-white transition-all transform group-hover:rotate-45">
-                                        <ArrowUpRight className="w-5 h-5" />
-                                    </button>
+                                    <ArrowUpRight className="w-5 h-5 text-slate-200 group-hover:text-indigo-600 transition-all group-hover:translate-x-1 group-hover:-translate-y-1" />
+                                    
+                                    {/* Backdrop ID */}
+                                    <div className="absolute -right-4 -bottom-4 text-[60px] font-black text-slate-50 opacity-0 group-hover:opacity-100 transition-all italic leading-none pointer-events-none uppercase">
+                                        #{cls.periodNumber}
+                                    </div>
                                 </div>
                             ))
                         ) : (
-                            <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] p-20 flex flex-col items-center justify-center text-center">
-                                <Calendar className="w-12 h-12 text-slate-200 mb-4" />
-                                <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest">No Classes Today</h4>
-                                <p className="text-xs font-medium text-slate-300 mt-2">Perfect time for some self-study or relaxation!</p>
+                            <div className="bg-white border-2 border-dashed border-slate-100 rounded-[3rem] p-20 flex flex-col items-center justify-center text-center">
+                                <div className="p-8 bg-slate-50 rounded-full mb-6 grayscale opacity-30 group-hover:grayscale-0 transition-all">
+                                    <Calendar className="w-10 h-10 text-slate-200" />
+                                </div>
+                                <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em]">Operational Downtime</h4>
+                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-2 leading-relaxed opacity-60">No academic events detected for the current cycle</p>
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Sidebar: Announcements & Progress */}
+                {/* Intelligence Sidebar */}
                 <div className="space-y-8">
-                    {/* Notice Board */}
-                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-                        <div className="p-6 border-b border-slate-50 bg-slate-50/50 flex justify-between items-center">
-                            <h3 className="text-xs font-black text-slate-900 flex items-center gap-2 tracking-widest uppercase">
-                                <Bell className="w-4 h-4 text-rose-500" /> Campus Portal
+                    {/* Notice Engine */}
+                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm flex flex-col min-h-[350px] overflow-hidden group">
+                        <div className="p-8 border-b border-slate-50 flex justify-between items-center group-hover:bg-slate-50 transition-colors">
+                            <h3 className="text-[10px] font-black text-slate-900 flex items-center gap-3 tracking-[0.2em] uppercase">
+                                <Bell className="w-4 h-4 text-rose-500" /> Intelligence Feed
                             </h3>
-                            <div className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></div>
+                            {data?.activeAnnouncements && data.activeAnnouncements.length > 0 && (
+                                <span className="px-3 py-1 bg-rose-50 text-rose-600 text-[8px] font-black rounded-full uppercase italic">{data.activeAnnouncements.length} NEW</span>
+                            )}
                         </div>
-                        <div className="p-6 space-y-4 max-h-[400px] overflow-y-auto custom-scrollbar">
+                        <div className="p-6 space-y-4 flex-1 overflow-y-auto max-h-[350px] custom-scrollbar">
                             {data?.activeAnnouncements && data.activeAnnouncements.length > 0 ? (
-                                data.activeAnnouncements.map((item) => (
-                                    <div key={item.id} className="group p-4 rounded-3xl border border-slate-50 hover:border-indigo-100 hover:bg-indigo-50/10 transition-all cursor-pointer">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            <span className={`text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest ${item.priority === 'URGENT' ? 'bg-rose-100 text-rose-600' : 'bg-blue-100 text-blue-600'
-                                                }`}>
+                                data.activeAnnouncements.slice(0, 5).map((item) => (
+                                    <div key={item.id} className="group/item p-5 rounded-[1.5rem] border border-transparent hover:bg-slate-50 hover:border-slate-100 transition-all cursor-pointer relative overflow-hidden">
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <span className={`text-[7px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest italic ${item.priority === 'URGENT' ? 'bg-rose-100 text-rose-600' : 'bg-slate-100 text-slate-500'}`}>
                                                 {item.priority}
                                             </span>
-                                            <span className="text-[10px] font-black text-slate-300">{new Date(item.createdAt!).toLocaleDateString()}</span>
+                                            <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest italic">{new Date(item.createdAt!).toLocaleDateString()}</span>
                                         </div>
-                                        <h4 className="text-[13px] font-black text-slate-800 mb-1 group-hover:text-indigo-600 transition-colors uppercase leading-tight">{item.title}</h4>
-                                        <p className="text-[11px] text-slate-400 font-medium line-clamp-2 leading-relaxed">{item.content}</p>
+                                        <h4 className="text-xs font-black text-slate-800 line-clamp-2 leading-relaxed group-hover/item:text-indigo-600 uppercase tracking-tight italic">{item.title}</h4>
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover/item:opacity-100 transition-opacity">
+                                            <ArrowUpRight className="w-3 h-3 text-indigo-400" />
+                                        </div>
                                     </div>
                                 ))
                             ) : (
-                                <div className="text-center py-12 text-slate-300">
-                                    <Bell className="w-10 h-10 mx-auto mb-3 opacity-20" />
-                                    <p className="text-[10px] font-black uppercase tracking-widest">No Announcements</p>
+                                <div className="text-center py-16 opacity-20">
+                                    <Bell className="w-12 h-12 mx-auto mb-4 text-slate-200" />
+                                    <p className="text-[9px] font-black text-slate-300 uppercase tracking-[0.3em] italic">Station Silent</p>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    {/* Quick Profile Summary */}
-                    <div className="p-8 bg-slate-900 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden">
+                    {/* Academic Pulse - Premium Dark */}
+                    <div className="p-10 bg-[#0A0C10] rounded-[3rem] text-white shadow-2xl border border-white/5 relative overflow-hidden group">
                         <div className="relative z-10">
-                            <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-6 italic">My Academic Pulse</h3>
+                            <div className="flex items-center justify-between mb-8">
+                                <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em] italic">Metric pulse</h3>
+                                <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:bg-indigo-500 group-hover:border-indigo-400 transition-all duration-500">
+                                    <Zap className="w-4 h-4 text-indigo-400 group-hover:text-white" />
+                                </div>
+                            </div>
 
-                            <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <div className="flex justify-between items-end mb-1">
-                                        <span className="text-xs font-black uppercase tracking-widest text-slate-400">Term Attendance</span>
-                                        <span className="text-2xl font-black">{data?.attendanceSummary.percentage}%</span>
+                            <div className="space-y-8">
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-end">
+                                        <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-500 italic">Attendance flow</span>
+                                        <span className="text-[32px] font-black italic tracking-tighter leading-none">{data?.attendanceSummary.percentage}%</span>
                                     </div>
-                                    <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden p-0.5 border border-white/5">
+                                    <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
                                         <div
-                                            className="h-full bg-gradient-to-r from-indigo-600 to-indigo-400 rounded-full shadow-[0_0_10px_rgba(79,70,229,0.5)] transition-all duration-1000"
+                                            className="h-full bg-gradient-to-r from-indigo-600 to-indigo-400 rounded-full transition-all duration-1000 shadow-[0_0_15px_rgba(99,102,241,0.3)]"
                                             style={{ width: `${data?.attendanceSummary.percentage}%` }}
                                         ></div>
                                     </div>
                                 </div>
 
-                                <div className="pt-6 border-t border-white/5 flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="p-3 bg-white/5 rounded-2xl border border-white/10">
+                                <div className="pt-8 border-t border-white/5 flex items-center justify-between">
+                                    <div className="flex items-center gap-5">
+                                        <div className="p-3 bg-white/5 rounded-2xl border border-white/10 group-hover:bg-emerald-500/10 transition-colors">
                                             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                                         </div>
                                         <div>
-                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Assignment Status</p>
-                                            <p className="text-[13px] font-black">4 Pending • 12 Done</p>
+                                            <p className="text-[7px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1.5 italic">Deliverables</p>
+                                            <p className="text-[10px] font-black uppercase tracking-widest italic">{data?.assignmentSummary.completedAssignments} Complete • <span className="text-rose-400">{data?.assignmentSummary.pendingAssignments} Backlog</span></p>
                                         </div>
                                     </div>
-                                    <ArrowUpRight className="w-4 h-4 text-slate-600" />
                                 </div>
-                            </div>
 
-                            <button className="w-full mt-10 py-5 bg-indigo-600 hover:bg-white hover:text-indigo-900 text-[10px] font-black uppercase tracking-[0.2em] rounded-3xl transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2 group">
-                                <PlayCircle className="w-4 h-4" /> Start Learning Now
-                            </button>
+                                <button
+                                    onClick={() => navigate('/student/academics')}
+                                    className="w-full mt-4 py-5 bg-white text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-[1.5rem] hover:bg-indigo-500 hover:text-white transition-all duration-500 flex items-center justify-center gap-3 group/btn shadow-xl"
+                                >
+                                    <PlayCircle className="w-4 h-4 group-hover/btn:rotate-12 transition-transform" /> 
+                                    <span>Execute Portfolio View</span>
+                                </button>
+                            </div>
                         </div>
 
-                        {/* Glow */}
-                        <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-indigo-600/20 rounded-full blur-[100px]"></div>
+                        {/* Visual Glow */}
+                        <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]"></div>
                     </div>
                 </div>
             </div>

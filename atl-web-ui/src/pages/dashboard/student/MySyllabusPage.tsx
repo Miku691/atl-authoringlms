@@ -68,10 +68,12 @@ const MySyllabusPage: React.FC = () => {
 
     const fetchSyllabusDetails = async () => {
         try {
-            const subjectId = selectedOS.subject?.id;
+            const subjectId = selectedOS.subjectId;
             if (!subjectId) return;
 
-            const chaptersData = await academicService.getChaptersByOfferingSubject(selectedOS.id);
+            const chaptersDataRaw = await academicService.getChaptersByOfferingSubject(selectedOS.id);
+            const chaptersData = Array.isArray(chaptersDataRaw) ? chaptersDataRaw : [];
+
             const coverageResponse = await academicService.getSyllabusCoverage(selectedOS.id);
             const coverageList = coverageResponse.apiData || [];
 
@@ -128,137 +130,181 @@ const MySyllabusPage: React.FC = () => {
         : 0;
 
     return (
-        <div className="space-y-8 pb-12">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                <div>
-                    <h1 className="text-4xl font-black text-slate-900 tracking-tight italic uppercase">My Syllabus</h1>
-                    <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-2 flex items-center gap-2">
-                        <Target className="w-3 h-3 text-indigo-500" /> Live Curriculum & Progress Tracking
+        <div className="max-w-7xl mx-auto space-y-12 pb-12 animate-fade-in px-4 lg:px-0">
+            {/* Page Header - Professional & Airy */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-4">
+                <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></div>
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Curriculum Index</span>
+                    </div>
+                    <h1 className="text-5xl lg:text-6xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">The Syllabus</h1>
+                    <p className="text-slate-500 font-bold uppercase tracking-[0.1em] text-[10px] flex items-center gap-2 opacity-70">
+                        Live Academic Blueprint & Progression Matrix
                     </p>
                 </div>
+                {selectedOS && (
+                    <div className="flex bg-white px-8 py-5 rounded-[2.5rem] border border-slate-100 shadow-sm items-center gap-5 group hover:shadow-xl transition-all duration-500">
+                        <div className="relative w-12 h-12 flex items-center justify-center">
+                            <svg className="w-full h-full transform -rotate-90">
+                                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-50" />
+                                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray={126} strokeDashoffset={126 - (126 * percentage) / 100} className="text-indigo-600 transition-all duration-1000" strokeLinecap="round" />
+                            </svg>
+                            <span className="absolute text-[10px] font-black text-indigo-600 italic tracking-tighter">{percentage}%</span>
+                        </div>
+                        <div>
+                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Domain Saturation</p>
+                             <p className="text-xs font-black text-slate-900 uppercase italic tracking-tight">{selectedOS.subjectName}</p>
+                        </div>
+                    </div>
+                )}
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-8">
-                {/* Subject Navigation */}
-                <div className="lg:w-80 shrink-0">
-                    <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100 shadow-sm sticky top-24">
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-6 px-2">Academic Domains</h3>
-                        <div className="space-y-2">
+            <div className="flex flex-col lg:flex-row gap-12">
+                {/* Subject Navigation - Premium Sidebar */}
+                <div className="lg:w-96 shrink-0">
+                    <div className="bg-white rounded-[3.5rem] p-10 border border-slate-50 shadow-sm sticky top-32 group/nav hover:shadow-2xl transition-all duration-700">
+                        <div className="flex items-center justify-between mb-10 px-2">
+                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic leading-none">Knowledge Domains</h3>
+                            <Layers className="w-4 h-4 text-slate-200" />
+                        </div>
+                        <div className="space-y-4">
                             {offeringSubjects.map(os => (
                                 <button
                                     key={os.id}
                                     onClick={() => setSelectedOS(os)}
-                                    className={`w-full text-left px-5 py-4 rounded-2xl transition-all group flex items-center justify-between ${selectedOS?.id === os.id
-                                        ? 'bg-slate-900 text-white shadow-xl italic'
-                                        : 'text-slate-600 hover:bg-slate-50 font-bold'
+                                    className={`w-full text-left p-6 rounded-[2rem] transition-all duration-500 group flex items-center justify-between relative overflow-hidden ${selectedOS?.id === os.id
+                                        ? 'bg-slate-900 text-white shadow-2xl scale-[1.02] italic'
+                                        : 'text-slate-600 hover:bg-slate-50 font-black'
                                         }`}
                                 >
-                                    <div className="flex items-center gap-3 truncate">
-                                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black ${selectedOS?.id === os.id ? 'bg-indigo-600' : 'bg-indigo-50 text-indigo-600'
+                                    <div className="flex items-center gap-5 truncate relative z-10">
+                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 shadow-sm border ${selectedOS?.id === os.id ? 'bg-indigo-600 text-white border-indigo-500 rotate-6' : 'bg-white text-indigo-600 border-slate-100'
                                             }`}>
-                                            {os.subject?.name?.[0]}
+                                            {os.subjectName?.[0] || 'S'}
                                         </div>
-                                        <span className="truncate text-sm">{os.subject?.name}</span>
+                                        <div>
+                                            <p className={`text-[8px] font-black uppercase tracking-widest leading-none mb-1.5 transition-opacity ${selectedOS?.id === os.id ? 'text-indigo-300 opacity-60' : 'text-slate-400 opacity-40'}`}>Faculty Block</p>
+                                            <span className="truncate text-sm font-black uppercase tracking-tight italic leading-none">{os.subjectName}</span>
+                                        </div>
                                     </div>
-                                    {selectedOS?.id === os.id && <ChevronRight className="w-4 h-4 text-indigo-400" />}
+                                    {selectedOS?.id === os.id && (
+                                        <div className="relative z-10">
+                                            <ChevronRight className="w-5 h-5 text-indigo-400 animate-pulse" />
+                                        </div>
+                                    )}
+                                    {/* Abstract background highlight */}
+                                    {selectedOS?.id === os.id && (
+                                        <div className="absolute top-0 right-0 w-32 h-full bg-indigo-500/5 rotate-12 blur-2xl"></div>
+                                    )}
                                 </button>
                             ))}
                             {offeringSubjects.length === 0 && (
-                                <div className="p-10 text-center text-slate-300">
-                                    <Layers className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                                    <p className="text-[10px] font-black uppercase tracking-widest">No Subjects</p>
+                                <div className="p-16 text-center opacity-30 grayscale rounded-[2.5rem] bg-slate-50/50 border border-dashed border-slate-100">
+                                    <Layers className="w-14 h-14 mx-auto mb-6 text-slate-200" />
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] italic text-slate-400">No Domains Detected</p>
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* Progress & Content Tree */}
-                <div className="flex-1 space-y-8">
+                {/* Content Area - Premium Curriculum Feed */}
+                <div className="flex-1 space-y-12">
                     {selectedOS ? (
                         <>
-                            {/* Summary Card */}
-                            <div className="bg-indigo-600 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
-                                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                                    <div className="space-y-4 text-center md:text-left">
-                                        <p className="text-[10px] font-black text-indigo-200 uppercase tracking-widest">Global Analytics: {selectedOS.subject?.name}</p>
-                                        <h2 className="text-4xl font-black italic tracking-tight">{percentage}% Coverage</h2>
-                                        <p className="text-indigo-100 text-sm font-medium opacity-80 max-w-sm">
-                                            {coverageStats.completed} out of {coverageStats.total} total topics have been marked as completed by your instructors.
-                                        </p>
-                                    </div>
-                                    <div className="relative w-32 h-32 flex items-center justify-center">
-                                        <svg className="w-full h-full transform -rotate-90">
-                                            <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-indigo-900/30" />
-                                            <circle cx="64" cy="64" r="58" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray={364} strokeDashoffset={364 - (364 * percentage) / 100} className="text-white transition-all duration-1000" strokeLinecap="round" />
-                                        </svg>
-                                        <GraduationCap className="absolute w-10 h-10 text-white" />
-                                    </div>
-                                </div>
-                                {/* Glow */}
-                                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl transform -translate-y-1/2 translate-x-1/2"></div>
-                            </div>
-
                             {/* Detailed Tree */}
-                            <div className="bg-white rounded-[3rem] p-10 border border-slate-100 shadow-sm pb-16">
-                                <div className="flex items-center justify-between mb-12">
-                                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
-                                        <BookOpen className="w-5 h-5 text-indigo-600" /> Syllabus Blueprint
-                                    </h3>
-                                    <div className="flex items-center gap-4">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-lg shadow-emerald-500/30"></div>
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Completed</span>
-                                        </div>
+                            <div className="bg-white rounded-[4rem] p-12 lg:p-16 border border-slate-50 shadow-sm relative overflow-hidden group/content hover:shadow-2xl transition-all duration-700">
+                                <div className="flex items-center justify-between mb-16 relative z-10">
+                                    <div className="space-y-2">
+                                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-4 italic">
+                                            <BookOpen className="w-5 h-5 text-indigo-600" /> Subject Infrastructure
+                                        </h3>
+                                        <p className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">{selectedOS.subjectName}</p>
+                                    </div>
+                                    <div className="flex items-center gap-6">
+                                         <div className="px-6 py-2.5 bg-emerald-50 rounded-full border border-emerald-100 flex items-center gap-3 shadow-sm shadow-emerald-50">
+                                              <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_emerald-500] animate-pulse"></div>
+                                              <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest italic">Encrypted Sync</span>
+                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="space-y-8">
+                                <div className="space-y-8 relative z-10">
                                     {chapters.map((chapter) => (
                                         <div key={chapter.id} className="group/chapter">
                                             <div
-                                                className="flex items-center justify-between p-6 rounded-[2rem] bg-slate-50 border border-slate-50 cursor-pointer hover:bg-white hover:border-indigo-100 transition-all"
+                                                className={`flex items-center justify-between p-8 rounded-[2.5rem] border transition-all duration-500 cursor-pointer shadow-sm ${
+                                                    chapter.isExpanded ? 'bg-slate-900 text-white shadow-2xl scale-[1.01] border-slate-800' : 'bg-slate-50/30 border-slate-50 hover:bg-white hover:border-slate-100 hover:shadow-xl'
+                                                }`}
                                                 onClick={() => toggleChapter(chapter.id)}
                                             >
-                                                <div className="flex items-center gap-5">
-                                                    <div className="w-10 h-10 rounded-2xl bg-white flex items-center justify-center shadow-sm text-indigo-600 font-black italic">
-                                                        {chapter.orderIndex}
+                                                <div className="flex items-center gap-8">
+                                                    <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-xl font-black italic shadow-lg transition-all duration-500 transform ${
+                                                        chapter.isExpanded ? 'bg-indigo-600 text-white rotate-6' : 'bg-white text-indigo-600 border border-slate-50'
+                                                    }`}>
+                                                        {chapter.orderIndex < 10 ? `0${chapter.orderIndex}` : chapter.orderIndex}
                                                     </div>
                                                     <div>
-                                                        <h4 className="font-black text-slate-800 uppercase tracking-tight italic group-hover/chapter:text-indigo-600 transition-colors">
+                                                        <h4 className="text-xl font-black uppercase tracking-tight italic leading-none mb-2">
                                                             {chapter.title}
                                                         </h4>
-                                                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{chapter.topics.length} Academic Topics</p>
+                                                        <div className="flex items-center gap-3">
+                                                            <p className={`text-[10px] font-black uppercase tracking-widest ${chapter.isExpanded ? 'text-indigo-400 opacity-80' : 'text-slate-400 opacity-60'}`}>
+                                                                {chapter.topics.length} Operational Nodes
+                                                            </p>
+                                                            <div className={`w-1 h-1 rounded-full ${chapter.isExpanded ? 'bg-indigo-400 opacity-40' : 'bg-slate-200'}`}></div>
+                                                            <p className={`text-[9px] font-black uppercase tracking-widest ${chapter.isExpanded ? 'text-indigo-400 opacity-80' : 'text-slate-400 opacity-60 italic'}`}>
+                                                                Block 0{chapter.orderIndex}
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                {chapter.isExpanded ? <ChevronDown className="w-5 h-5 text-slate-300" /> : <ChevronRight className="w-5 h-5 text-slate-300" />}
+                                                {chapter.isExpanded ? <ChevronDown className="w-6 h-6 text-indigo-400" /> : <ChevronRight className="w-6 h-6 text-slate-300 group-hover/chapter:text-indigo-400 transition-colors" />}
                                             </div>
 
                                             {chapter.isExpanded && (
-                                                <div className="mt-4 ml-6 pl-8 border-l-2 border-slate-50 space-y-4 py-2">
+                                                <div className="mt-6 ml-10 pl-14 border-l-2 border-slate-100/50 space-y-4 py-4 animate-premium-slide">
                                                     {chapter.topics.map((topic) => (
                                                         <div
                                                             key={topic.id}
-                                                            className={`flex items-center justify-between p-5 rounded-2xl border transition-all ${topic.status === 'COMPLETED'
-                                                                ? 'bg-emerald-50/30 border-emerald-100 text-emerald-900'
-                                                                : 'bg-white border-slate-100 text-slate-600 grayscale opacity-70'
+                                                            className={`flex items-center justify-between p-6 lg:p-8 rounded-[2rem] border transition-all duration-500 relative overflow-hidden group/topic cursor-default ${topic.status === 'COMPLETED'
+                                                                ? 'bg-emerald-50/50 border-emerald-100 shadow-sm shadow-emerald-50'
+                                                                : 'bg-white border-slate-100 hover:shadow-xl hover:border-slate-200'
                                                                 }`}
                                                         >
-                                                            <div className="flex items-center gap-4">
-                                                                {topic.status === 'COMPLETED'
-                                                                    ? <CheckCircle className="w-5 h-5 text-emerald-500 shadow-emerald-500/20" />
-                                                                    : <Circle className="w-5 h-5 text-slate-200" />
-                                                                }
-                                                                <span className="text-sm font-black uppercase tracking-tight">{topic.title}</span>
+                                                            <div className="flex items-center gap-6 relative z-10">
+                                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-sm border ${
+                                                                    topic.status === 'COMPLETED' ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-slate-50 text-slate-200 border-slate-100 group-hover/topic:text-indigo-400'
+                                                                }`}>
+                                                                    {topic.status === 'COMPLETED' ? <CheckCircle className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
+                                                                </div>
+                                                                <div>
+                                                                    <p className={`text-base font-black uppercase tracking-tight italic transition-all duration-500 ${topic.status === 'COMPLETED' ? 'text-slate-900 translate-x-1' : 'text-slate-400 group-hover/topic:text-slate-600'}`}>
+                                                                        {topic.title}
+                                                                    </p>
+                                                                    <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest italic opacity-60">System Topic Marker: TP-0{topic.orderIndex}</p>
+                                                                </div>
                                                             </div>
                                                             {topic.status === 'COMPLETED' && (
-                                                                <span className="text-[9px] font-black text-emerald-600 bg-white border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-widest">Verified</span>
+                                                                <div className="flex items-center gap-3 bg-white px-5 py-2.5 rounded-full border border-emerald-100 shadow-sm shadow-emerald-50 relative z-10 group-hover:scale-105 transition-transform">
+                                                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                                                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest italic">Faculty Verified</span>
+                                                                </div>
+                                                            )}
+                                                            
+                                                            {/* Topic background visual flair */}
+                                                            {topic.status === 'COMPLETED' && (
+                                                                <div className="absolute top-0 right-0 w-48 h-full bg-gradient-to-l from-emerald-500/10 to-transparent pointer-events-none opacity-50"></div>
                                                             )}
                                                         </div>
                                                     ))}
                                                     {chapter.topics.length === 0 && (
-                                                        <div className="py-4 text-center text-slate-300 font-bold uppercase text-[10px] tracking-widest italic flex items-center gap-2 justify-center">
-                                                            <Info className="w-4 h-4" /> No mapped topics in this chapter
+                                                        <div className="py-12 bg-slate-50/30 rounded-[2.5rem] border border-dashed border-slate-100 flex flex-col items-center justify-center grayscale opacity-40 group hover:opacity-60 transition-all">
+                                                            <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
+                                                                <Info className="w-6 h-6 text-slate-300 group-hover:rotate-12 transition-transform" />
+                                                            </div>
+                                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] italic text-slate-400">Structural Node Empty • No Topics Mapped</p>
                                                         </div>
                                                     )}
                                                 </div>
@@ -266,20 +312,29 @@ const MySyllabusPage: React.FC = () => {
                                         </div>
                                     ))}
                                     {chapters.length === 0 && (
-                                        <div className="py-32 text-center">
-                                            <Layers className="w-16 h-16 text-slate-100 mx-auto mb-6 opacity-50" />
-                                            <p className="text-slate-400 font-black uppercase tracking-widest text-xs">Infrastructure Pending</p>
-                                            <p className="text-slate-500 mt-2 text-sm font-medium max-w-xs mx-auto">No syllabus blueprint has been defined for this subject yet.</p>
+                                        <div className="py-32 text-center grayscale opacity-30 group hover:opacity-50 transition-all duration-700">
+                                            <div className="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-10 border border-slate-100 shadow-inner group-hover:rotate-12 transition-transform duration-700">
+                                                <Layers className="w-16 h-16 text-slate-200" />
+                                            </div>
+                                            <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">Structural Pending</h3>
+                                            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 mt-4 italic">No Curriculum blueprint detected for this domain</p>
                                         </div>
                                     )}
+                                </div>
+
+                                {/* Background decoration */}
+                                <div className="absolute -right-20 -bottom-20 text-[200px] font-black text-slate-50 italic leading-none pointer-events-none uppercase transition-transform group-hover/content:scale-110 duration-700 opacity-40">
+                                    CORE
                                 </div>
                             </div>
                         </>
                     ) : (
-                        <div className="bg-white rounded-[3rem] p-24 text-center border border-slate-100 shadow-sm opacity-50 grayscale transition-all">
-                            <BookOpen className="w-20 h-20 text-slate-200 mx-auto mb-6 hover:scale-110 transition-transform" />
-                            <h3 className="text-2xl font-black text-slate-300 uppercase tracking-tighter italic">Selection Required</h3>
-                            <p className="text-slate-400 mt-2 font-medium">Please select a subject from the academic domains to view coverage status.</p>
+                        <div className="bg-white rounded-[4rem] p-40 text-center border-2 border-dashed border-slate-50 shadow-sm grayscale opacity-30 hover:opacity-50 hover:bg-slate-50 transition-all duration-700 cursor-default group">
+                            <div className="w-32 h-32 bg-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-12 shadow-2xl border border-slate-50 group-hover:rotate-12 transition-transform duration-700">
+                                <BookOpen className="w-16 h-16 text-slate-200" />
+                            </div>
+                            <h3 className="text-3xl font-black text-slate-300 uppercase tracking-tighter italic">Operational Silence</h3>
+                            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 mt-6 italic">Initialize a Knowledge Domain to reveal curriculum nodes</p>
                         </div>
                     )}
                 </div>

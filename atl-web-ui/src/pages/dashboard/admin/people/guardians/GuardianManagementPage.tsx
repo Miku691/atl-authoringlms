@@ -10,6 +10,7 @@ import {
     Phone,
     Mail,
     ChevronDown,
+    ChevronLeft,
     ChevronRight,
     Loader2,
     X,
@@ -30,6 +31,12 @@ const GuardianManagementPage: React.FC = () => {
     const [expandedGuardianId, setExpandedGuardianId] = useState<string | null>(null);
     const [guardianStudents, setGuardianStudents] = useState<Record<string, StudentGuardianMapping[]>>({});
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [pageSize] = useState(10);
+
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,14 +51,17 @@ const GuardianManagementPage: React.FC = () => {
 
     useEffect(() => {
         if (tenantId) fetchGuardians();
-    }, [tenantId]);
+    }, [tenantId, currentPage]);
 
     const fetchGuardians = async () => {
         setLoading(true);
         try {
-            const response = await guardianService.getTenantGuardians(tenantId!);
+            const response = await guardianService.getTenantGuardians(tenantId!, currentPage, pageSize);
             if (response.data.status === 'SUCCESS') {
-                setGuardians(response.data.apiData);
+                const data = response.data.apiData;
+                setGuardians(data.content || []);
+                setTotalPages(data.totalPages || 0);
+                setTotalElements(data.totalElements || 0);
             }
         } catch (error) {
             toast.error("Failed to fetch guardians");
@@ -261,6 +271,37 @@ const GuardianManagementPage: React.FC = () => {
                                 </div>
                             </div>
                         ))}
+                    </div>
+                )}
+
+                {/* Pagination footer */}
+                {totalPages > 1 && (
+                    <div className="px-8 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                        <div className="text-sm text-gray-400 font-bold uppercase tracking-widest flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-sm shadow-indigo-200"></div>
+                            {totalElements} Guardian Profiles
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
+                                disabled={currentPage === 0}
+                                className="p-2 border border-gray-200 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-white disabled:opacity-30 transition-all cursor-pointer shadow-sm hover:border-indigo-200 hover:shadow-indigo-50"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+                            <div className="flex items-center gap-1.5 px-4 h-10 bg-white border border-gray-100 rounded-xl shadow-inner-sm">
+                                <span className="text-sm font-black text-indigo-600 tracking-tighter">{currentPage + 1}</span>
+                                <span className="text-[10px] font-black text-indigo-200 uppercase">/</span>
+                                <span className="text-sm font-black text-indigo-300">{totalPages}</span>
+                            </div>
+                            <button
+                                onClick={() => setCurrentPage(prev => prev + 1)}
+                                disabled={currentPage >= totalPages - 1}
+                                className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-30 transition-all font-bold shadow-lg shadow-indigo-100 cursor-pointer"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
