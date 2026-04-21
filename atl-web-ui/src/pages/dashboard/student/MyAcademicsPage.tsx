@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react';
 import {
     BookOpen, GraduationCap, Loader2,
     ShieldCheck, Star, Info,
-    ChevronRight, Zap
+    ChevronRight, Zap, Target,
+    Calendar, Inbox, Map,
+    BookMarked,
+    Clock
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { type RootState } from '../../../store/store';
@@ -44,18 +47,19 @@ const MyAcademicsPage: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-96">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                <Loader2 className="w-8 h-8 animate-spin text-[#0054d1] mb-4" />
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Compiling Academic Map...</p>
             </div>
         );
     }
 
     if (!enrollment) {
         return (
-            <div className="bg-white rounded-[2.5rem] p-16 text-center border border-slate-100 shadow-sm mt-10">
-                <GraduationCap className="w-20 h-20 text-slate-100 mx-auto mb-6" />
-                <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Academics Not Active</h2>
-                <p className="text-slate-500 max-w-sm mx-auto mt-2 font-medium">
+            <div className="bg-white rounded-2xl p-16 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] mt-10">
+                <GraduationCap className="w-16 h-16 text-slate-200 mx-auto mb-6" />
+                <h2 className="text-xl font-bold text-[#1a3d8a]">Academics Not Active</h2>
+                <p className="text-sm text-slate-500 max-w-sm mx-auto mt-2 font-medium">
                     You are currently not enrolled in any active class. Please complete your admission or contact management.
                 </p>
             </div>
@@ -63,153 +67,154 @@ const MyAcademicsPage: React.FC = () => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-12 animate-fade-in">
-            {/* Page Header - Professional & Airy */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-4">
-                <div className="space-y-3">
+        <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-700 px-4 lg:px-0">
+            {/* Page Header Block */}
+            <div className="bg-[#f1f3f9] rounded-2xl p-8 md:p-10 relative overflow-hidden mb-10">
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <span className="text-[10px] font-semibold text-[#3c5ba9] uppercase tracking-widest mb-2 block">Academic Context</span>
+                        <h1 className="text-3xl md:text-4xl font-bold text-[#1a3d8a] tracking-tight">My Academics</h1>
+                        <p className="text-sm text-[#424655] mt-1 max-w-md">Institutional Grade Subject Matrix & Enrollment Verification</p>
+                    </div>
                     <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Academic Infrastructure</span>
-                    </div>
-                    <h1 className="text-5xl lg:text-6xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">My Academics</h1>
-                    <p className="text-slate-500 font-bold uppercase tracking-[0.1em] text-[10px] flex items-center gap-2 opacity-70">
-                        Institutional Grade Subject Matrix & Enrollment Verified
-                    </p>
-                </div>
-                <div className="flex items-center gap-4">
-                    <div className="px-8 py-5 bg-white rounded-[2rem] border border-slate-100 shadow-sm flex items-center gap-5 group hover:shadow-xl transition-all duration-500">
-                        <ShieldCheck className="w-5 h-5 text-indigo-600 group-hover:scale-110 transition-transform" />
-                        <div>
-                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Status</p>
-                            <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest leading-none italic">Verified Active</p>
-                        </div>
+                         <div className="px-4 py-2.5 bg-emerald-50 rounded-xl border border-emerald-100 flex items-center gap-2.5 shadow-sm">
+                              <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                              <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">Verified Active</span>
+                         </div>
                     </div>
                 </div>
+                <div className="absolute -top-8 -right-8 w-40 h-40 bg-[#2a6df4]/5 rounded-full blur-3xl"></div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                {/* Left Column: Enrollment Summary & Quick Stats */}
-                <div className="space-y-10">
-                    {/* Primary Offering Card - Premium Dark */}
-                    <div className="bg-[#0A0C10] rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden group">
-                        <div className="relative z-10">
-                            <div className="w-16 h-16 bg-white/5 rounded-2xl border border-white/10 flex items-center justify-center mb-10 group-hover:bg-indigo-600 group-hover:border-indigo-500 transition-all duration-500 shadow-lg">
-                                <GraduationCap className="w-8 h-8 text-indigo-400 group-hover:text-white" />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Left Column: Enrollment Detail */}
+                <div className="lg:col-span-4 space-y-8">
+                    {/* Primary Enrollment Card */}
+                    <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                        <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
+                                <GraduationCap className="w-5 h-5 text-[#2a6df4]" />
                             </div>
-
-                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-3 opacity-60">Primary Academic Unit</p>
-                            <h3 className="text-4xl font-black italic tracking-tighter leading-none mb-12 group-hover:text-indigo-400 transition-colors uppercase">
-                                {enrollment.offeringName}
-                            </h3>
-
-                            <div className="space-y-6 pt-10 border-t border-white/5">
-                                <div className="flex justify-between items-center group/item">
-                                    <span className="text-slate-500 uppercase tracking-widest text-[8px] font-black italic">Cycle Period</span>
-                                    <span className="bg-white/5 px-4 py-1.5 rounded-full border border-white/10 text-[10px] font-black uppercase italic tracking-widest group-hover/item:text-indigo-400 transition-colors">2024-25 Cycle</span>
-                                </div>
-                                <div className="flex justify-between items-center group/item">
-                                    <span className="text-slate-500 uppercase tracking-widest text-[8px] font-black italic">Enrollment Mode</span>
-                                    <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest italic leading-none">Operational / Regular</span>
-                                </div>
+                            <div>
+                                <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Academic Hub</h3>
+                                <p className="text-xs text-slate-400 font-medium">Standard Enrollment</p>
                             </div>
                         </div>
-                        {/* Interactive decorative glow */}
-                        <div className="absolute -bottom-24 -right-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] group-hover:bg-indigo-500/20 transition-all duration-1000"></div>
+
+                        <div className="p-8 space-y-6">
+                             <div className="space-y-1">
+                                 <p className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Offering Name</p>
+                                 <h4 className="text-xl font-bold text-[#1a3d8a] tracking-tight">{enrollment.offeringName}</h4>
+                             </div>
+
+                             <div className="h-px bg-[#f1f3f9] w-full"></div>
+
+                             <div className="grid grid-cols-1 gap-4">
+                                  <div className="flex items-center justify-between">
+                                       <div className="flex items-center gap-2">
+                                            <Calendar className="w-4 h-4 text-slate-300" />
+                                            <span className="text-[10px] font-bold text-[#64748b] uppercase tracking-wider">Academic Year</span>
+                                       </div>
+                                       <span className="text-[10px] font-bold text-[#181c20] bg-[#f7f9ff] px-2.5 py-1 rounded-md">2024-25 CYCLE</span>
+                                  </div>
+                                  <div className="flex items-center justify-between">
+                                       <div className="flex items-center gap-2">
+                                            <Clock className="w-4 h-4 text-slate-300" />
+                                            <span className="text-[10px] font-bold text-[#64748b] uppercase tracking-wider">Status Code</span>
+                                       </div>
+                                       <span className="text-[10px] font-bold text-emerald-600 uppercase">ACTIVE_REGULAR</span>
+                                  </div>
+                             </div>
+                        </div>
                     </div>
 
                     {/* Stats Widget */}
-                    <div className="bg-white rounded-[3rem] p-12 border border-slate-100 shadow-sm relative overflow-hidden group hover:shadow-2xl transition-all duration-500">
-                        <div className="flex items-center gap-3 mb-10">
-                            <Star className="w-4 h-4 text-amber-500" />
-                            <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em]">Curriculum Metric</h3>
-                        </div>
-                        <div className="flex items-end justify-between relative z-10">
-                            <div>
-                                <p className="text-7xl font-black text-slate-900 italic tracking-tighter leading-none group-hover:scale-110 origin-left transition-transform duration-500">{subjects.length}</p>
-                                <p className="text-[10px] text-slate-400 font-black uppercase mt-4 tracking-widest opacity-60 italic">Course Density</p>
+                    <div className="bg-[#181c20] rounded-2xl p-8 relative overflow-hidden group">
+                        <div className="relative z-10 flex items-center justify-between">
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-3">
+                                    <Target className="w-4 h-4 text-[#2a6df4]" />
+                                    <h3 className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Subject Matrix</h3>
+                                </div>
+                                <div className="flex items-baseline gap-2">
+                                    <span className="text-5xl font-bold text-white tracking-tighter">{subjects.length}</span>
+                                    <span className="text-[10px] font-bold text-white/40 uppercase">Units</span>
+                                </div>
                             </div>
-                            <div className="p-6 bg-slate-50 rounded-[2rem] text-slate-200 transition-all duration-500 group-hover:bg-indigo-600 group-hover:text-white group-hover:rotate-12 shadow-sm border border-slate-100">
-                                <BookOpen className="w-8 h-8" />
+                            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-[#2a6df4] group-hover:rotate-6 transition-all duration-500">
+                                <BookOpen className="w-8 h-8 text-[#2a6df4] group-hover:text-white" />
                             </div>
                         </div>
-                        {/* Background Decoration */}
-                        <div className="absolute -left-4 -bottom-4 text-[100px] font-black text-slate-50 opacity-0 group-hover:opacity-100 transition-all italic leading-none pointer-events-none uppercase">
-                            CORE
-                        </div>
+                        <div className="absolute -bottom-6 -right-6 text-6xl font-black text-white/5 italic select-none pointer-events-none">MAP</div>
                     </div>
                 </div>
 
-                {/* Right Column: Subject Grid */}
-                <div className="lg:col-span-2 space-y-10">
-                    <div className="bg-white rounded-[3.5rem] p-12 border border-slate-100 shadow-sm min-h-[600px] flex flex-col">
-                        <div className="flex items-center justify-between mb-12">
-                            <div className="space-y-1">
-                                <h3 className="text-[10px] font-black text-slate-900 uppercase tracking-[0.2em] flex items-center gap-3">
-                                    <Zap className="w-4 h-4 text-indigo-600 animate-pulse" /> Intellectual Mapping
-                                </h3>
-                                <p className="text-[8px] font-bold text-slate-400 uppercase tracking-widest ml-7 italic">Authorized Course Structure</p>
+                {/* Right Column: Knowledge Matrix */}
+                <div className="lg:col-span-8 space-y-8">
+                     <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                        <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
+                             <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
+                                    <Zap className="w-5 h-5 text-[#2a6df4]" />
+                                </div>
+                                <div>
+                                    <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Intellectual Mapping</h3>
+                                    <p className="text-xs text-slate-400 font-medium">Authorized Subject Registry</p>
+                                </div>
                             </div>
-                            <span className="px-5 py-2 bg-slate-900 text-white text-[10px] font-black rounded-full uppercase italic tracking-widest shadow-xl">
-                                {subjects.length} Units
+                            <span className="px-4 py-1.5 bg-[#f7f9ff] text-[#0054d1] text-[10px] font-bold rounded-lg uppercase tracking-widest border border-[#dae2ff]">
+                                {subjects.length} Total Units
                             </span>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            {subjects.map((subject, idx) => (
-                                <div key={idx} className="p-8 rounded-[2.5rem] border border-slate-50 bg-slate-50/20 hover:bg-white hover:border-indigo-100 hover:shadow-2xl transition-all duration-500 group flex items-center gap-6 relative overflow-hidden">
-                                    <div className="w-16 h-16 rounded-[1.5rem] bg-white border border-slate-100 flex items-center justify-center font-black text-indigo-600 text-2xl italic shadow-sm group-hover:bg-indigo-600 group-hover:text-white group-hover:rotate-6 transition-all duration-500 relative z-10">
-                                        {subject.subjectName?.[0]}
-                                    </div>
-                                    <div className="flex-1 min-w-0 relative z-10">
-                                        <div className="flex items-center justify-between mb-2">
-                                            <span className={`text-[8px] font-black px-3 py-1 rounded-full border uppercase tracking-widest italic ${subject.isOptional ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-indigo-50 text-indigo-600 border-indigo-100'
-                                                }`}>
-                                                {subject.isOptional ? 'Optional' : 'Core Unit'}
-                                            </span>
-                                        </div>
-                                        <h4 className="text-xl font-black text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors truncate italic uppercase">
-                                            {subject.subjectName}
-                                        </h4>
-                                        <div className="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
-                                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest italic leading-none">Syllabus Active</p>
-                                        </div>
-                                    </div>
-                                    <ChevronRight className="w-5 h-5 text-slate-200 group-hover:text-indigo-400 transition-all group-hover:translate-x-1" />
-                                    
-                                    {/* Subject ID ID */}
-                                    <div className="absolute -right-4 -bottom-4 text-[40px] font-black text-slate-50 opacity-0 group-hover:opacity-100 transition-all italic leading-none pointer-events-none uppercase">
-                                        #{idx + 1}
-                                    </div>
-                                </div>
-                            ))}
-                            {subjects.length === 0 && (
-                                <div className="col-span-full py-32 text-center">
-                                    <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8 border border-dashed border-slate-200">
-                                        <Info className="w-10 h-10 text-slate-200" />
-                                    </div>
-                                    <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Matrix Empty</h4>
-                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-3 opacity-60">No subjects detected in current academic unit</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
+                        <div className="p-8">
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                 {subjects.map((subject, idx) => (
+                                     <div key={idx} className="p-6 rounded-2xl border border-[#f1f3f9] hover:bg-[#f7f9ff] hover:border-[#dae2ff] transition-all group flex items-center gap-5">
+                                          <div className="w-12 h-12 rounded-xl bg-white border border-[#f1f3f9] flex items-center justify-center font-bold text-[#2a6df4] shadow-sm group-hover:bg-[#0054d1] group-hover:text-white transition-all">
+                                              {subject.subjectName?.[0] || 'S'}
+                                          </div>
+                                          <div className="flex-1 min-w-0">
+                                               <div className="flex items-center gap-2 mb-1">
+                                                    <span className={`text-[8px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+                                                        subject.isOptional ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
+                                                    }`}>
+                                                        {subject.isOptional ? 'Elective' : 'Core Unit'}
+                                                    </span>
+                                               </div>
+                                               <h4 className="text-sm font-bold text-[#181c20] truncate group-hover:text-[#0054d1] transition-colors">
+                                                   {subject.subjectName}
+                                               </h4>
+                                          </div>
+                                          <ChevronRight className="w-4 h-4 text-slate-200 group-hover:translate-x-1 group-hover:text-[#2a6df4] transition-all" />
+                                     </div>
+                                 ))}
 
-                    {/* Policy Awareness Card */}
-                    <div className="bg-indigo-50 rounded-[3rem] p-12 flex flex-col md:flex-row items-center gap-10 lg:gap-14 relative overflow-hidden group hover:shadow-xl transition-all duration-500">
-                        <div className="w-20 h-20 bg-white rounded-[2.5rem] shadow-2xl shadow-indigo-300/50 flex items-center justify-center relative z-10 group-hover:rotate-12 transition-transform duration-500 border border-indigo-100">
-                            <Info className="w-10 h-10 text-indigo-600" />
+                                 {subjects.length === 0 && (
+                                     <div className="col-span-full py-20 text-center">
+                                          <div className="w-20 h-20 bg-[#f7f9ff] rounded-full flex items-center justify-center mx-auto mb-6">
+                                               <BookMarked className="w-10 h-10 text-slate-200" />
+                                          </div>
+                                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Knowledge Matrix Empty</p>
+                                     </div>
+                                 )}
+                             </div>
                         </div>
-                        <div className="relative z-10 text-center md:text-left flex-1">
-                            <h4 className="text-xl font-black text-indigo-950 uppercase tracking-tighter italic leading-none mb-4">Infrastructure Policy Awareness</h4>
-                            <p className="text-xs text-indigo-600 font-bold uppercase tracking-widest leading-relaxed opacity-70">
-                                Your academic subjects are managed by the institution. Any updates to the curriculum will be instantly reflected here.
-                                Attendance and performance tracking are scoped to these registered subjects.
-                            </p>
-                        </div>
-                        {/* Interactive glow effect */}
-                        <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-100 rounded-full -mr-24 -mt-24 group-hover:scale-150 transition-all duration-1000 blur-3xl opacity-50"></div>
-                    </div>
+                     </div>
+
+                     {/* Policy Info */}
+                     <div className="bg-[#f0f4ff] rounded-2xl p-8 flex items-center gap-8 relative overflow-hidden group">
+                         <div className="w-14 h-14 bg-white rounded-xl shadow-lg shadow-indigo-100 flex items-center justify-center shrink-0 border border-indigo-50 relative z-10 transition-transform group-hover:rotate-6">
+                             <Inbox className="w-7 h-7 text-[#0054d1]" />
+                         </div>
+                         <div className="relative z-10">
+                             <h4 className="text-sm font-bold text-[#1a3d8a] mb-1">Infrastructure Policy Awareness</h4>
+                             <p className="text-[11px] text-[#424655] font-medium leading-relaxed max-w-xl opacity-80">
+                                 Academic nodes are managed by the institutional gateway. Attendance and performance metrics are strictly scoped to these registered subjects.
+                             </p>
+                         </div>
+                         <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/40 rounded-full blur-2xl"></div>
+                     </div>
                 </div>
             </div>
         </div>

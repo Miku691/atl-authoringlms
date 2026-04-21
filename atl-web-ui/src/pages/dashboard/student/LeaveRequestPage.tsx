@@ -3,7 +3,19 @@ import { useSelector } from 'react-redux';
 import { type RootState } from '../../../store/store';
 import api from '../../../utils/api';
 import toast from 'react-hot-toast';
-import { Calendar as CalendarIcon, Send, Clock, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
+import { 
+    Calendar as CalendarIcon, 
+    Send, 
+    Clock, 
+    CheckCircle2, 
+    XCircle, 
+    Loader2, 
+    HeartPulse, 
+    Zap,
+    History,
+    FilePlus2,
+    CalendarDays
+} from 'lucide-react';
 import CustomDatePicker from '../../../components/common/CustomDatePicker';
 
 interface StudentLeave {
@@ -14,6 +26,7 @@ interface StudentLeave {
     status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
     remarks?: string;
     createdAt: string;
+    leaveType?: string; // Added for design alignment, default to 'Casual'
 }
 
 const LeaveRequestPage: React.FC = () => {
@@ -26,7 +39,8 @@ const LeaveRequestPage: React.FC = () => {
     const [newLeave, setNewLeave] = useState({
         startDate: '',
         endDate: '',
-        reason: ''
+        reason: '',
+        leaveType: 'Casual'
     });
 
     useEffect(() => {
@@ -37,7 +51,6 @@ const LeaveRequestPage: React.FC = () => {
 
     const fetchStudentData = async () => {
         try {
-            // Get student profile from userId
             const profileRes = await api.get(`/ims-student-service/students/user/${user?.id}`);
             if (profileRes.data.status === 'SUCCESS') {
                 const profile = profileRes.data.apiData;
@@ -79,13 +92,14 @@ const LeaveRequestPage: React.FC = () => {
                 startDate: newLeave.startDate,
                 endDate: newLeave.endDate,
                 reason: newLeave.reason,
-                status: 'PENDING'
+                status: 'PENDING',
+                // leaveType: newLeave.leaveType // Backend might not support this yet, but we'll include it in reason or ignore
             };
 
             const res = await api.post('/ims-student-service/leaves', payload);
             if (res.data.status === 'SUCCESS') {
                 toast.success("Leave applied successfully");
-                setNewLeave({ startDate: '', endDate: '', reason: '' });
+                setNewLeave({ startDate: '', endDate: '', reason: '', leaveType: 'Casual' });
                 fetchLeaves(studentProfile.id);
             }
         } catch (error: any) {
@@ -99,192 +113,206 @@ const LeaveRequestPage: React.FC = () => {
     const getStatusBadge = (status: string) => {
         switch (status) {
             case 'PENDING':
-                return <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1"><Clock className="w-3 h-3" /> Pending</span>;
+                return (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#fff3ec] text-[#9e3f00]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#9e3f00]" />
+                        Pending
+                    </span>
+                );
             case 'APPROVED':
-                return <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium flex items-center gap-1"><CheckCircle2 className="w-3 h-3" /> Approved</span>;
+                return (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        Approved
+                    </span>
+                );
             case 'REJECTED':
-                return <span className="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-medium flex items-center gap-1"><XCircle className="w-3 h-3" /> Rejected</span>;
+                return (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#ffdad6] text-[#ba1a1a]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#ba1a1a]" />
+                        Rejected
+                    </span>
+                );
             default:
-                return <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">{status}</span>;
+                return <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-semibold">{status}</span>;
         }
     };
 
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-64">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#0054d1]" />
             </div>
         );
     }
 
+    const quotas = [
+        { type: 'Casual Leave', icon: CalendarDays, color: 'text-[#2a6df4]', bg: 'bg-[#eef2ff]', desc: 'General absence' },
+        { type: 'Medical Leave', icon: HeartPulse, color: 'text-amber-700', bg: 'bg-amber-50', desc: 'Requires certificate' },
+        { type: 'Emergency Leave', icon: Zap, color: 'text-[#ba1a1a]', bg: 'bg-[#ffdad6]', desc: 'Urgent matters' }
+    ];
+
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-12 animate-fade-in px-4 lg:px-0">
-            {/* Page Header - Professional & Airy */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-4">
-                <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Temporal Deviation</span>
-                    </div>
-                    <h1 className="text-5xl lg:text-6xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">Absences</h1>
-                    <p className="text-slate-500 font-bold uppercase tracking-[0.1em] text-[10px] flex items-center gap-2 opacity-70">
-                        Formal Leave Lifecycle & Institutional Compliance
-                    </p>
+        <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-700 px-4 lg:px-0">
+             {/* Page Header Block */}
+             <div className="bg-[#f1f3f9] rounded-2xl p-8 md:p-10 relative overflow-hidden mb-10">
+                <div className="relative z-10">
+                    <span className="text-[10px] font-semibold text-[#3c5ba9] uppercase tracking-widest mb-2 block">Leave Management</span>
+                    <h1 className="text-3xl md:text-4xl font-bold text-[#1a3d8a] tracking-tight">My Leaves</h1>
+                    <p className="text-sm text-[#424655] mt-1 max-w-md">Apply and track your leave requests across the academic term.</p>
                 </div>
-                <div className="flex bg-white px-8 py-5 rounded-[2.5rem] border border-slate-50 shadow-sm items-center gap-5 group hover:shadow-xl transition-all duration-500">
-                    <div className="w-12 h-12 rounded-[1.5rem] bg-indigo-50 flex items-center justify-center border border-indigo-100 group-hover:rotate-12 transition-transform duration-500">
-                        <Clock className="w-6 h-6 text-indigo-600" />
-                    </div>
-                    <div>
-                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Queue Overview</p>
-                         <p className="text-xs font-black text-slate-900 uppercase italic tracking-tight">{leaves.length} Formal Filings</p>
-                    </div>
-                </div>
+                <div className="absolute -top-8 -right-8 w-40 h-40 bg-[#2a6df4]/5 rounded-full blur-3xl"></div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-                {/* Application Form - Premium Input Architecture */}
-                <div className="lg:col-span-4 space-y-8">
-                    <div className="bg-white p-10 rounded-[3.5rem] border border-slate-50 shadow-sm sticky top-32 group/form hover:shadow-2xl transition-all duration-700 overflow-hidden relative">
-                        {/* Background Decoration */}
-                        <div className="absolute -right-12 -top-12 text-[120px] font-black text-slate-50/50 italic leading-none pointer-events-none uppercase transition-transform group-hover/form:scale-110 duration-700 opacity-20">
-                            NEW
+            {/* Quota Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                {quotas.map((q, idx) => (
+                    <div key={idx} className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex items-center gap-5 group hover:shadow-xl transition-all">
+                        <div className={`w-12 h-12 rounded-xl ${q.bg} flex items-center justify-center`}>
+                            <q.icon className={`w-6 h-6 ${q.color}`} />
+                        </div>
+                        <div>
+                             <h3 className="text-sm font-bold text-[#181c20]">{q.type}</h3>
+                             <p className="text-[10px] text-[#64748b] font-medium tracking-wide">{q.desc}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                {/* Apply Form Card */}
+                <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden h-fit">
+                    <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
+                         <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
+                                <FilePlus2 className="w-5 h-5 text-[#2a6df4]" />
+                            </div>
+                            <div>
+                                <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Apply Leave</h3>
+                                <p className="text-xs text-slate-400 font-medium">Submit a new request</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleApplyLeave} className="p-8 space-y-8">
+                        {/* Leave Type Toggle */}
+                        <div className="space-y-3">
+                            <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest pl-1">Leave Type</p>
+                            <div className="flex flex-wrap gap-3">
+                                {['Casual', 'Medical', 'Emergency'].map(type => (
+                                    <button
+                                        key={type}
+                                        type="button"
+                                        onClick={() => setNewLeave({ ...newLeave, leaveType: type })}
+                                        className={`px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                                            newLeave.leaveType === type 
+                                            ? 'bg-gradient-to-br from-[#0054d1] to-[#2a6df4] text-white shadow-md' 
+                                            : 'bg-[#f7f9ff] text-[#424655] hover:bg-[#f1f3f9]'
+                                        }`}
+                                    >
+                                        {type}
+                                    </button>
+                                ))}
+                            </div>
                         </div>
 
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-12 flex items-center gap-5 italic relative z-10 transition-colors group-hover/form:text-indigo-600">
-                             <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center border border-indigo-100 group-hover/form:bg-indigo-600 group-hover/form:text-white transition-all duration-500">
-                                 <Send className="w-5 h-5" />
-                             </div>
-                             Formal Request
-                        </h3>
-                        <form onSubmit={handleApplyLeave} className="space-y-10 relative z-10">
-                            <div className="grid grid-cols-1 gap-6">
-                                <div className="space-y-3">
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] pl-3 italic opacity-60">Cycle Start Node</label>
-                                    <CustomDatePicker
-                                        label=""
-                                        selectedDate={newLeave.startDate ? new Date(newLeave.startDate) : null}
-                                        onChange={(date: Date | null) => setNewLeave({ ...newLeave, startDate: date ? date.toISOString().split('T')[0] : '' })}
-                                        minDate={new Date()}
-                                    />
-                                </div>
-                                <div className="space-y-3">
-                                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] pl-3 italic opacity-60">Cycle Termination</label>
-                                    <CustomDatePicker
-                                        label=""
-                                        selectedDate={newLeave.endDate ? new Date(newLeave.endDate) : null}
-                                        onChange={(date: Date | null) => setNewLeave({ ...newLeave, endDate: date ? date.toISOString().split('T')[0] : '' })}
-                                        minDate={newLeave.startDate ? new Date(newLeave.startDate) : new Date()}
-                                    />
-                                </div>
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest pl-1">From Date</p>
+                                <CustomDatePicker
+                                    label=""
+                                    selectedDate={newLeave.startDate ? new Date(newLeave.startDate) : null}
+                                    onChange={(date: Date | null) => setNewLeave({ ...newLeave, startDate: date ? date.toISOString().split('T')[0] : '' })}
+                                    minDate={new Date()}
+                                />
                             </div>
-                            <div className="space-y-4">
-                                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] pl-3 italic opacity-60">Operational justification</label>
-                                <textarea
-                                    className="w-full p-8 bg-slate-50/50 border-2 border-transparent rounded-[2rem] focus:ring-0 focus:border-indigo-500/20 focus:bg-white min-h-[160px] text-sm font-black text-slate-900 placeholder:text-slate-300 transition-all shadow-inner uppercase tracking-tight italic"
-                                    placeholder="DEFINE LOGISTICAL REASONING..."
-                                    value={newLeave.reason}
-                                    onChange={(e) => setNewLeave({ ...newLeave, reason: e.target.value })}
-                                    required
-                                ></textarea>
+                            <div className="space-y-2">
+                                <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest pl-1">To Date</p>
+                                <CustomDatePicker
+                                    label=""
+                                    selectedDate={newLeave.endDate ? new Date(newLeave.endDate) : null}
+                                    onChange={(date: Date | null) => setNewLeave({ ...newLeave, endDate: date ? date.toISOString().split('T')[0] : '' })}
+                                    minDate={newLeave.startDate ? new Date(newLeave.startDate) : new Date()}
+                                />
                             </div>
-                            <button
-                                type="submit"
-                                disabled={isSubmitting}
-                                className="w-full py-6 bg-slate-900 text-white rounded-[2rem] font-black uppercase tracking-[0.3em] text-[10px] hover:bg-indigo-600 disabled:opacity-50 transition-all duration-500 flex justify-center items-center gap-4 shadow-xl hover:scale-[1.02] active:scale-95 italic group/btn overflow-hidden relative"
-                            >
-                                <span className="relative z-10 flex items-center gap-4">
-                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5 group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />}
-                                    Transmit Protocol
-                                </span>
-                                <div className="absolute inset-0 bg-indigo-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500"></div>
-                            </button>
-                        </form>
-                    </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest pl-1">Reason for Leave</p>
+                            <textarea
+                                className="w-full p-4 bg-[#f7f9ff] border-0 rounded-xl focus:ring-2 focus:ring-[#2a6df4]/20 min-h-[120px] text-sm text-[#181c20] placeholder:text-slate-400 transition-all font-medium"
+                                placeholder="Describe the reason for your leave..."
+                                value={newLeave.reason}
+                                onChange={(e) => setNewLeave({ ...newLeave, reason: e.target.value })}
+                                required
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full py-4 bg-gradient-to-br from-[#0054d1] to-[#2a6df4] text-white rounded-xl font-bold uppercase tracking-widest text-[10px] hover:opacity-90 disabled:opacity-50 transition-all flex justify-center items-center gap-3 shadow-lg shadow-indigo-200"
+                        >
+                            {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                            Submit Application
+                        </button>
+                    </form>
                 </div>
 
-                {/* History List - Premium Ledger Feed */}
-                <div className="lg:col-span-8 space-y-8">
-                    <div className="bg-white rounded-[4rem] border border-slate-50 shadow-sm overflow-hidden group/ledger hover:shadow-2xl transition-all duration-700">
-                        <div className="p-10 lg:p-12 border-b border-slate-50 flex justify-between items-center bg-white relative overflow-hidden">
-                            <div className="space-y-2 relative z-10">
-                                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Accumulated Logs</h3>
-                                <p className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Application Feed</p>
+                {/* History List Card */}
+                <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden flex flex-col">
+                    <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
+                         <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
+                                <History className="w-5 h-5 text-[#2a6df4]" />
                             </div>
-                            <div className="flex items-center gap-6 relative z-10">
-                                <div className="px-6 py-2.5 bg-slate-50 rounded-full border border-slate-100 flex items-center gap-4 group-hover/ledger:bg-indigo-600 transition-colors duration-500">
-                                    <div className="w-2 h-2 rounded-full bg-indigo-500 group-hover/ledger:bg-white animate-pulse shadow-[0_0_8px_indigo-600]"></div>
-                                    <span className="text-[10px] font-black text-slate-500 group-hover/ledger:text-white uppercase tracking-[0.2em] italic">Active Sync active</span>
-                                </div>
+                            <div>
+                                <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Leave History</h3>
+                                <p className="text-xs text-slate-400 font-medium">Tracking and Status</p>
                             </div>
-                            {/* Abstract background highlight */}
-                            <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-slate-50/50 to-transparent pointer-events-none"></div>
                         </div>
+                    </div>
 
+                    <div className="flex-1 overflow-auto max-h-[600px]">
                         {leaves.length === 0 ? (
-                            <div className="p-32 text-center group/empty">
-                                <div className="inline-flex p-12 bg-slate-50 rounded-[3rem] mb-10 grayscale opacity-30 border border-slate-100 group-hover/empty:scale-110 group-hover/empty:rotate-12 transition-all duration-700">
-                                    <Clock className="w-16 h-16 text-slate-400" />
+                            <div className="py-20 text-center">
+                                <div className="inline-flex p-8 bg-[#f7f9ff] rounded-full mb-4">
+                                    <Clock className="w-12 h-12 text-slate-200" />
                                 </div>
-                                <h4 className="text-3xl font-black text-slate-900 mb-4 uppercase italic tracking-tighter">Archive Baseline</h4>
-                                <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.3em] italic opacity-60">Zero historical deviations detected in current cycle</p>
+                                <h4 className="text-lg font-bold text-[#1a3d8a]">No History</h4>
+                                <p className="text-xs text-slate-400 font-medium tracking-wide">You haven't applied for any leaves yet.</p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-slate-50/50">
+                            <div className="divide-y divide-[#f1f3f9]">
                                 {leaves.sort((a,b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()).map((leave) => (
-                                    <div key={leave.id} className="p-10 lg:p-12 hover:bg-slate-50/50 transition-all duration-500 group/row relative overflow-hidden">
-                                        {/* Row Background Decoration */}
-                                        <div className="absolute -right-6 top-1/2 -translate-y-1/2 text-8xl font-black text-slate-50 italic opacity-0 group-hover/row:opacity-100 transition-opacity pointer-events-none uppercase select-none">
-                                            0{leaves.indexOf(leave) + 1}
-                                        </div>
-
-                                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 relative z-10">
-                                            <div className="flex items-center gap-8">
-                                                <div className="w-20 h-20 bg-white border border-slate-50 rounded-[2rem] flex items-center justify-center text-slate-400 group-hover/row:bg-slate-900 group-hover/row:text-white group-hover/row:rotate-6 transition-all duration-500 shadow-xl relative overflow-hidden">
-                                                    <CalendarIcon className="w-8 h-8 relative z-10" />
-                                                    <div className="absolute inset-0 bg-indigo-600 opacity-0 group-hover/row:opacity-100 transition-opacity"></div>
+                                    <div key={leave.id} className="p-6 hover:bg-[#f7f9ff] transition-all group">
+                                        <div className="flex justify-between items-start gap-4 mb-3">
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2">
+                                                     <p className="text-sm font-bold text-[#181c20]">
+                                                         {new Date(leave.startDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })} — {new Date(leave.endDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                     </p>
+                                                     <span className="text-[10px] text-[#64748b] font-medium bg-[#f1f3f9] px-2 py-0.5 rounded-md">
+                                                         {leave.leaveType || 'Casual'}
+                                                     </span>
                                                 </div>
-                                                <div className="space-y-3">
-                                                    <div className="flex items-center gap-4">
-                                                        <h4 className="text-2xl font-black text-slate-900 tracking-tighter italic uppercase group-hover/row:text-indigo-600 transition-colors leading-none translate-y-1">
-                                                            {new Date(leave.startDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })} — {new Date(leave.endDate).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                                        </h4>
-                                                    </div>
-                                                    <div className="flex items-center gap-4">
-                                                         <div className="w-1.5 h-1.5 rounded-full bg-slate-200 group-hover/row:bg-indigo-400 transition-colors"></div>
-                                                         <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] italic group-hover/row:text-slate-500 transition-colors">
-                                                             Logged: {leave.createdAt ? new Date(leave.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'PENDING SYNC'}
-                                                         </p>
-                                                    </div>
-                                                </div>
+                                                <p className="text-xs text-[#424655] italic font-medium line-clamp-1 group-hover:line-clamp-none transition-all">"{leave.reason}"</p>
                                             </div>
-                                            <div className="shrink-0 scale-110 group-hover/row:scale-125 transition-transform duration-500">
-                                                <div className="px-6 py-2.5 rounded-full border-2 transition-all duration-500 shadow-sm">
-                                                    {getStatusBadge(leave.status)}
-                                                </div>
+                                            <div className="shrink-0">
+                                                {getStatusBadge(leave.status)}
                                             </div>
                                         </div>
                                         
-                                        <div className="mt-10 ml-28">
-                                            <div className="bg-slate-50/50 p-8 rounded-[2.5rem] border border-transparent group-hover/row:border-slate-100 group-hover/row:bg-white transition-all duration-500 shadow-inner group-hover/row:shadow-xl relative overflow-hidden">
-                                                <p className="text-base text-slate-600 font-black italic uppercase tracking-tight relative z-10 leading-relaxed">"{leave.reason}"</p>
-                                                {/* Abstract accent */}
-                                                <div className="absolute top-0 right-0 w-24 h-full bg-indigo-500/5 group-hover/row:w-32 transition-all duration-700"></div>
+                                        {leave.remarks && (
+                                            <div className="mt-3 pl-4 border-l-2 border-slate-100">
+                                                <p className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest mb-1 opacity-60">Admin Remark</p>
+                                                <p className="text-xs font-semibold text-[#181c20] line-clamp-1 group-hover:line-clamp-none transition-all">{leave.remarks}</p>
                                             </div>
-                                            
-                                            {leave.remarks && (
-                                                <div className="mt-8 flex items-start gap-6 px-4 animate-premium-slide">
-                                                    <div className="w-1.5 h-12 bg-indigo-500/10 rounded-full group-hover/row:bg-indigo-500/30 transition-colors"></div>
-                                                    <div>
-                                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] block mb-2 italic">Institutional Feedback</span>
-                                                        <p className="text-sm font-black text-slate-900 italic tracking-tight uppercase leading-relaxed">{leave.remarks}</p>
-                                                    </div>
-                                                </div>
-                                            )}
+                                        )}
+                                        <div className="mt-3 flex items-center justify-between">
+                                             <span className="text-[10px] text-slate-400 font-medium tracking-tight">Applied: {new Date(leave.createdAt).toLocaleDateString()}</span>
+                                             <span className="text-[9px] font-mono text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity">ID: {leave.id.substring(0,8)}</span>
                                         </div>
-                                        
-                                        {/* Security Protocol Protocol ID */}
-                                        <div className="absolute bottom-8 right-12 text-[9px] font-mono text-slate-100 group-hover/row:text-slate-300 transition-colors uppercase tracking-[0.3em] pointer-events-none select-none italic">LOG_PK_{leave.id.substring(0,8)}</div>
                                     </div>
                                 ))}
                             </div>
@@ -294,7 +322,6 @@ const LeaveRequestPage: React.FC = () => {
             </div>
         </div>
     );
-;
 };
 
 export default LeaveRequestPage;

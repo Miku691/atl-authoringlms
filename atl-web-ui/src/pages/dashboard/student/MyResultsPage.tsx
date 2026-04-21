@@ -7,10 +7,23 @@ import {
     ArrowRight, 
     Loader2, 
     CheckCircle2, 
-    AlertCircle,
     Download,
-    BookOpen
+    BookOpen,
+    TrendingUp,
+    Star,
+    Award,
+    Calendar
 } from 'lucide-react';
+import { 
+    BarChart, 
+    Bar, 
+    XAxis, 
+    YAxis, 
+    CartesianGrid, 
+    Tooltip, 
+    ResponsiveContainer,
+    Cell
+} from 'recharts';
 import toast from 'react-hot-toast';
 
 export default function MyResultsPage() {
@@ -39,175 +52,219 @@ export default function MyResultsPage() {
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh]">
-                <Loader2 className="w-10 h-10 animate-spin text-indigo-600 mb-4" />
-                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Generating Result Sheet...</p>
+                <Loader2 className="w-8 h-8 animate-spin text-[#0054d1] mb-4" />
+                <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Generating Result Sheet...</p>
             </div>
         );
     }
 
+    // Mock data for the chart since real semester-wise data might need a separate API
+    const trendData = [
+        { semester: 'Sem 1', gpa: 8.2 },
+        { semester: 'Sem 2', gpa: 7.9 },
+        { semester: 'Sem 3', gpa: 8.5 },
+        { semester: 'Sem 4', gpa: 9.1 },
+    ];
+
+    const stats = [
+        { label: 'Cumulative GPA', value: '8.42', icon: Trophy, color: 'text-amber-500' },
+        { label: 'This Semester', value: '9.10', icon: TrendingUp, color: 'text-[#0054d1]' },
+        { label: 'Total Credits', value: '112', icon: Star, color: 'text-emerald-600' }
+    ];
+
+    const getGradeInfo = (marks: number | string | null | undefined) => {
+        if (typeof marks === 'string') return { label: marks, color: 'bg-slate-100 text-slate-600' };
+        const m = Number(marks) || 0;
+        if (m >= 90) return { label: 'O', color: 'bg-[#dae2ff] text-[#0054d1]' };
+        if (m >= 80) return { label: 'A+', color: 'bg-[#eef2ff] text-[#2a6df4]' };
+        if (m >= 70) return { label: 'A', color: 'bg-[#f0f4ff] text-[#3c5ba9]' };
+        if (m >= 60) return { label: 'B+', color: 'bg-[#fff3ec] text-[#9e3f00]' };
+        if (m >= 50) return { label: 'B', color: 'bg-amber-50 text-amber-700' };
+        return { label: 'F', color: 'bg-[#ffdad6] text-[#ba1a1a]' };
+    };
+
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-12 animate-fade-in px-4 lg:px-0">
-            {/* Page Header - Professional & Airy */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-4">
-                <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Competency Matrix</span>
+        <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-700 px-4 lg:px-0">
+            {/* Page Header Block */}
+            <div className="bg-[#f1f3f9] rounded-2xl p-8 md:p-10 relative overflow-hidden mb-10">
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <span className="text-[10px] font-semibold text-[#3c5ba9] uppercase tracking-widest mb-2 block">Academic Performance</span>
+                        <h1 className="text-3xl md:text-4xl font-bold text-[#1a3d8a] tracking-tight">My Results</h1>
+                        <p className="text-sm text-[#424655] mt-1 max-w-md">B.Tech Computer Science — Semester 4 Outcome</p>
                     </div>
-                    <h1 className="text-5xl lg:text-6xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">Performance</h1>
-                    <p className="text-slate-500 font-bold uppercase tracking-[0.1em] text-[10px] flex items-center gap-2 opacity-70">
-                        Formal Assessment Registry & Outcome Analytics
-                    </p>
+                    <button
+                        onClick={() => toast.success("Transcript processing...")}
+                        className="flex bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-sm items-center gap-4 group hover:shadow-md transition-all active:scale-95"
+                    >
+                        <div className="w-10 h-10 rounded-lg bg-[#f1f3f9] flex items-center justify-center text-[#2a6df4] group-hover:bg-[#0054d1] group-hover:text-white transition-all">
+                            <Download className="w-5 h-5" />
+                        </div>
+                        <div className="text-left">
+                            <p className="text-[10px] font-bold text-[#64748b] uppercase tracking-wider leading-none">Export Transcripts</p>
+                            <p className="text-xs font-bold text-[#181c20] mt-1">Digital Manifest</p>
+                        </div>
+                    </button>
                 </div>
-                <button
-                    onClick={() => toast.success("Transcript processing...")}
-                    className="flex bg-white px-8 py-5 rounded-[2.5rem] border border-slate-50 shadow-sm items-center gap-5 group hover:bg-slate-900 hover:text-white transition-all duration-500 hover:shadow-2xl active:scale-95"
-                >
-                    <div className="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center border border-indigo-100 group-hover:rotate-12 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-500">
-                        <Download className="w-6 h-6 text-indigo-600 group-hover:text-white" />
-                    </div>
-                    <div className="text-left">
-                         <p className="text-[8px] font-black group-hover:text-slate-400 text-slate-400 uppercase tracking-widest leading-none mb-1 transition-colors">Manifest Export</p>
-                         <p className="text-xs font-black group-hover:text-white text-slate-900 mt-1 uppercase italic tracking-tight transition-colors">Global Transcript</p>
-                    </div>
-                </button>
+                {/* Decorative elements */}
+                <div className="absolute -top-8 -right-8 w-40 h-40 bg-[#2a6df4]/5 rounded-full blur-3xl"></div>
             </div>
 
-            {/* Metrics Grid - Sophisticated KPI architecture */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 px-4 lg:px-0">
-                <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm relative overflow-hidden group hover:shadow-2xl transition-all duration-700">
-                    <div className="flex items-center justify-between mb-10 relative z-10">
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] leading-none italic">Lifecycle Load</h3>
-                        <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:scale-110 transition-transform">
-                             <BookOpen className="w-5 h-5 text-slate-300" />
+            {/* GPA Stats Block */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                {stats.map((stat, idx) => (
+                    <div key={idx} className="bg-white p-8 rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex items-center justify-between group hover:shadow-xl transition-all">
+                        <div className="space-y-1">
+                            <p className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">{stat.label}</p>
+                            <p className="text-4xl font-bold text-[#1a3d8a] tracking-tight">{stat.value}</p>
+                        </div>
+                        <div className={`w-12 h-12 rounded-xl bg-[#f7f9ff] flex items-center justify-center ${stat.color} group-hover:scale-110 transition-all`}>
+                            <stat.icon className="w-6 h-6" />
                         </div>
                     </div>
-                    <div className="space-y-3 relative z-10 transition-transform group-hover:translate-x-2 duration-700">
-                        <p className="text-5xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">{results.length}</p>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none opacity-60 italic">Assessments Indexed</p>
-                    </div>
-                    <div className="absolute -right-4 -bottom-4 w-40 h-40 bg-slate-500/5 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-700"></div>
-                </div>
-
-                <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm relative overflow-hidden group hover:shadow-2xl transition-all duration-700 border-l-4 border-l-emerald-500">
-                    <div className="flex items-center justify-between mb-10 relative z-10">
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] leading-none italic">Compliance Index</h3>
-                        <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center border border-emerald-100/50 group-hover:scale-110 transition-transform">
-                             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                        </div>
-                    </div>
-                    <div className="space-y-3 relative z-10 transition-transform group-hover:translate-x-2 duration-700">
-                        <p className="text-5xl font-black text-emerald-600 italic tracking-tighter uppercase leading-none">
-                            {Math.round((results.filter(r => !r.isAbsent).length / (results.length || 1)) * 100)}%
-                        </p>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none opacity-60 italic">Participation Baseline</p>
-                    </div>
-                    <div className="absolute -right-4 -bottom-4 w-40 h-40 bg-emerald-500/5 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-700"></div>
-                </div>
-
-                <div className="bg-[#0A0C10] p-10 rounded-[3rem] border border-slate-800 shadow-sm relative overflow-hidden group hover:shadow-2xl hover:shadow-amber-900/10 transition-all duration-700">
-                    <div className="flex items-center justify-between mb-10 relative z-10">
-                        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] leading-none italic font-bold">Node Status</h3>
-                        <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
-                             <Trophy className="w-5 h-5 text-amber-500" />
-                        </div>
-                    </div>
-                    <div className="space-y-3 relative z-10 transition-transform group-hover:translate-x-2 duration-700">
-                        <p className="text-5xl font-black text-white italic tracking-tighter uppercase leading-none">Active</p>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none opacity-60 font-bold italic">Identity Synchronized</p>
-                    </div>
-                    <div className="absolute -right-4 -bottom-4 w-40 h-40 bg-amber-500/10 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-700"></div>
-                </div>
+                ))}
             </div>
 
-            {/* Assessment Records - Premium Registry architecture */}
-            <div className="space-y-8 max-w-5xl mx-auto md:mx-0 px-4 lg:px-0">
-                 <div className="flex items-center justify-between px-6 mb-4">
-                    <div className="flex items-center gap-4">
-                        <div className="w-1.5 h-6 bg-indigo-600 rounded-full"></div>
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic leading-none">Transcript Inventory</h3>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Subject Results Table */}
+                <div className="lg:col-span-8">
+                    <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                        <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
+                                    <Award className="w-5 h-5 text-[#2a6df4]" />
+                                </div>
+                                <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Subject Results</h3>
+                            </div>
+                        </div>
+
+                        {results.length === 0 ? (
+                            <div className="p-20 text-center">
+                                <BookOpen className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+                                <p className="text-sm font-medium text-slate-400 uppercase tracking-widest">No results indexed for this cycle</p>
+                            </div>
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="bg-[#f7f9ff] text-[10px] font-bold text-[#64748b] uppercase tracking-widest">
+                                            <th className="px-8 py-5">Subject</th>
+                                            <th className="px-6 py-5 text-center">Marks</th>
+                                            <th className="px-6 py-5 text-center">Grade</th>
+                                            <th className="px-8 py-5 text-right">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-[#f1f3f9]">
+                                        {results.map((res) => {
+                                            const grade = getGradeInfo(res.marksObtained);
+                                            return (
+                                                <tr key={res.id} className="hover:bg-[#f7f9ff] transition-all group">
+                                                    <td className="px-8 py-6">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="w-8 h-8 rounded-lg bg-[#f1f3f9] flex items-center justify-center group-hover:bg-[#0054d1] group-hover:text-white transition-all text-xs font-bold text-[#3c5ba9]">
+                                                                {results.indexOf(res) + 1}
+                                                            </div>
+                                                            <div>
+                                                                <p className="text-sm font-bold text-[#181c20]">Assessment Block</p>
+                                                                <div className="flex items-center gap-2 mt-1">
+                                                                     <Calendar className="w-3 h-3 text-[#2a6df4]" />
+                                                                     <span className="text-[10px] font-medium text-[#64748b]">IDX: {res.examScheduleId?.substring(0,8)}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-6 text-center">
+                                                        <span className="text-base font-bold text-[#1a3d8a]">
+                                                            {res.isAbsent ? 'ABS' : res.marksObtained}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-6 text-center">
+                                                        <span className={`inline-flex min-w-[32px] justify-center px-2 py-1 rounded-md text-xs font-bold ${grade.color}`}>
+                                                            {res.isAbsent ? 'F' : grade.label}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-8 py-6 text-right">
+                                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${
+                                                            res.isAbsent ? 'bg-[#ffdad6] text-[#ba1a1a]' : 'bg-emerald-50 text-emerald-700'
+                                                        }`}>
+                                                            <span className={`w-1.5 h-1.5 rounded-full ${res.isAbsent ? 'bg-[#ba1a1a]' : 'bg-emerald-500'}`} />
+                                                            {res.isAbsent ? 'DEFICIT' : 'CLEARED'}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                        
+                        {/* Grade Legend */}
+                        <div className="px-8 py-6 bg-[#f7f9ff] border-t border-[#f1f3f9] flex flex-wrap gap-4">
+                            <span className="text-[9px] font-bold text-[#64748b] uppercase tracking-widest mr-2">Grade Scale</span>
+                            {[
+                                { l: 'O', val: '10', c: 'bg-[#dae2ff] text-[#0054d1]' },
+                                { l: 'A+', val: '9-9.9', c: 'bg-[#eef2ff] text-[#2a6df4]' },
+                                { l: 'A', val: '8-8.9', c: 'bg-[#f0f4ff] text-[#3c5ba9]' },
+                                { l: 'B+', val: '7-7.9', c: 'bg-[#fff3ec] text-[#9e3f00]' },
+                                { l: 'B', val: '6-6.9', c: 'bg-amber-50 text-amber-700' },
+                                { l: 'F', val: 'Fail', c: 'bg-[#ffdad6] text-[#ba1a1a]' }
+                            ].map(grade => (
+                                <div key={grade.l} className="flex items-center gap-1.5">
+                                    <span className={`w-6 h-6 flex items-center justify-center rounded text-[10px] font-bold ${grade.c}`}>{grade.l}</span>
+                                    <span className="text-[10px] font-medium text-[#64748b]">{grade.val}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                {results.length === 0 ? (
-                    <div className="py-40 text-center bg-white rounded-[4rem] border border-slate-50 shadow-sm relative overflow-hidden group/empty">
-                        <div className="relative z-10 flex flex-col items-center">
-                            <div className="p-12 bg-slate-50 rounded-[3rem] mb-10 border border-slate-100 group-hover/empty:scale-110 group-hover/empty:rotate-12 transition-all duration-700 grayscale opacity-30">
-                                <BookOpen className="w-16 h-16 text-slate-400" />
-                            </div>
-                            <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic mb-4">Inventory Null</h3>
-                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic opacity-60">Academic assessments haven't been indexed for current cycle</p>
+                {/* Performance Chart Card */}
+                <div className="lg:col-span-4 space-y-6">
+                    <div className="bg-white rounded-2xl p-8 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] h-full">
+                        <div className="flex items-center gap-4 mb-10">
+                            <div className="w-1.5 h-6 bg-[#0054d1] rounded-full"></div>
+                            <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">GPA Progression</h3>
                         </div>
-                        {/* Background Decoration */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[240px] font-black text-slate-50 italic select-none pointer-events-none uppercase opacity-50">NULL</div>
+                        
+                        <div className="h-[300px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={trendData}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f3f9" />
+                                    <XAxis 
+                                        dataKey="semester" 
+                                        axisLine={false} 
+                                        tickLine={false} 
+                                        tick={{ fill: '#64748b', fontSize: 10, fontWeight: 600 }}
+                                        dy={10}
+                                    />
+                                    <YAxis 
+                                        hide 
+                                        domain={[0, 10]} 
+                                    />
+                                    <Tooltip 
+                                        cursor={{ fill: '#f7f9ff', radius: 12 }}
+                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 32px -4px rgba(26,61,138,0.1)' }}
+                                        labelStyle={{ fontWeight: 800, color: '#1a3d8a', marginBottom: '4px' }}
+                                    />
+                                    <Bar dataKey="gpa" radius={[12, 12, 12, 12]} barSize={40}>
+                                        {trendData.map((entry, index) => (
+                                            <Cell 
+                                                key={`cell-${index}`} 
+                                                fill={index === trendData.length - 1 ? '#0054d1' : '#dae2ff'} 
+                                            />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                        
+                        <div className="mt-8 pt-6 border-t border-[#f1f3f9] text-center">
+                            <p className="text-[10px] text-slate-400 font-medium mb-1 uppercase tracking-wide">Next Target</p>
+                            <p className="text-sm font-bold text-[#181c20]">Aim for 9.50 GPA to maintain Dean's List</p>
+                        </div>
                     </div>
-                ) : (
-                    <div className="grid grid-cols-1 gap-8">
-                        {results.map((res) => (
-                            <div 
-                                key={res.id}
-                                className="bg-white p-10 lg:p-12 rounded-[4rem] border border-slate-50 shadow-sm hover:shadow-2xl transition-all duration-700 group/item relative overflow-hidden"
-                            >
-                                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-12 relative z-10">
-                                    <div className="flex items-center gap-10">
-                                        <div className={`w-24 h-24 rounded-[2.5rem] flex items-center justify-center shadow-xl transition-all duration-500 group-hover/item:rotate-6 ${
-                                            res.isAbsent ? 'bg-rose-50 text-rose-500 border border-rose-100' : 'bg-white text-slate-400 border border-slate-50 group-hover/item:bg-slate-900 group-hover/item:text-white group-hover/item:border-slate-900'
-                                        }`}>
-                                            {res.isAbsent ? <AlertCircle className="w-10 h-10" /> : <Trophy className="w-10 h-10" />}
-                                        </div>
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-5">
-                                                <span className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] italic group-hover/item:text-indigo-400 transition-colors">Digital Assessment</span>
-                                                <div className="w-1.5 h-1.5 bg-slate-100 rounded-full" />
-                                                <span className="text-slate-300 font-black text-[10px] uppercase tracking-[0.3em] font-mono leading-none group-hover/item:text-slate-400 transition-colors">IDX: {res.examScheduleId?.substring(0,8)}</span>
-                                            </div>
-                                            <h3 className="text-3xl lg:text-4xl font-black text-slate-900 group-hover/item:text-indigo-600 transition-colors uppercase tracking-tighter italic leading-none">
-                                                Assessment Block
-                                            </h3>
-                                            {res.remarks && (
-                                                <div className="flex items-start gap-4 px-4 bg-slate-50/50 py-3 rounded-[1.5rem] mt-4 border border-slate-100 group-hover/item:bg-white transition-colors duration-500">
-                                                    <div className="w-1 h-5 bg-indigo-500/20 rounded-full mt-0.5"></div>
-                                                    <p className="text-slate-500 text-[11px] font-black italic tracking-tight opacity-70 uppercase leading-none mt-1">"{res.remarks}"</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center gap-8 bg-slate-50/50 px-10 py-8 rounded-[3rem] border border-slate-100 group-hover/item:bg-white group-hover/item:shadow-2xl transition-all duration-700 w-full lg:w-auto relative overflow-hidden group/metrics">
-                                        <div className="text-center min-w-[100px] relative z-20">
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3 italic">Raw Metric</p>
-                                            <p className={`text-4xl font-black tracking-tighter italic leading-none uppercase ${res.isAbsent ? 'text-rose-500 font-black' : 'text-slate-900 translate-y-1'}`}>
-                                                {res.isAbsent ? 'ABS' : res.marksObtained}
-                                            </p>
-                                        </div>
-                                        <div className="h-16 w-px bg-slate-200 opacity-50 group-hover/item:bg-indigo-100 transition-colors" />
-                                        <div className="text-center min-w-[100px] relative z-20">
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3 italic">Output</p>
-                                            <div className="flex flex-col items-center gap-1">
-                                                <p className={`text-[10px] font-black uppercase tracking-[0.3em] italic leading-none ${res.isAbsent ? 'text-rose-600' : 'text-emerald-600'}`}>
-                                                    {res.isAbsent ? 'DEFICIT' : 'CLEARED'}
-                                                </p>
-                                                {!res.isAbsent && <div className="w-8 h-1 bg-emerald-500/20 rounded-full mt-2"></div>}
-                                            </div>
-                                        </div>
-                                        <div className="w-12 h-12 rounded-full border border-slate-100 flex items-center justify-center group-hover/item:bg-slate-900 group-hover/item:text-white transition-all duration-500 group-hover/metrics:translate-x-2">
-                                            <ArrowRight className="w-6 h-6 text-slate-200 group-hover/item:text-white" />
-                                        </div>
-                                        
-                                        {/* Abstract background highlight for metrics */}
-                                        <div className="absolute inset-0 bg-gradient-to-br from-indigo-50/0 to-indigo-50/30 opacity-0 group-hover/item:opacity-10 transition-opacity pointer-events-none"></div>
-                                    </div>
-                                </div>
-
-                                {/* Row Background Decoration */}
-                                <div className="absolute right-0 top-1/2 -translate-y-1/2 text-[180px] font-black text-slate-50 italic opacity-0 group-hover/item:opacity-100 transition-all duration-700 pointer-events-none group-hover/item:-translate-x-12 select-none uppercase">
-                                    0{results.indexOf(res) + 1}
-                                </div>
-                                <div className="absolute -left-12 -bottom-12 w-48 h-48 bg-indigo-500/5 rounded-full blur-[60px] opacity-0 group-hover/item:opacity-100 transition-opacity duration-700"></div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                </div>
             </div>
         </div>
     );

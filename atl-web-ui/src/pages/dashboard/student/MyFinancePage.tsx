@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
-    DollarSign,
     CreditCard,
     AlertCircle,
     History,
     FileText,
     TrendingDown,
     TrendingUp,
-    Download
+    Download,
+    Loader2,
+    CheckCircle2
 } from 'lucide-react';
 import { financeService } from '../../../api/financeService';
 import type { StudentFeeRecord, FinanceSummary, Transaction } from '../../../types/finance';
@@ -38,7 +39,6 @@ const MyFinancePage: React.FC = () => {
                 setLoading(false);
             }
         };
-
         fetchData();
     }, []);
 
@@ -58,181 +58,156 @@ const MyFinancePage: React.FC = () => {
         }
     };
 
-    const getStatusColor = (status: string) => {
+    const getStatusConfig = (status: string) => {
         switch (status) {
-            case 'PAID': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
-            case 'PARTIAL': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
-            case 'UNPAID': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-            default: return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
+            case 'PAID':    return { bg: 'bg-[#dae2ff]', text: 'text-[#0054d1]', dot: 'bg-[#0054d1]' };
+            case 'PARTIAL': return { bg: 'bg-amber-50', text: 'text-amber-700', dot: 'bg-amber-500' };
+            case 'UNPAID':  return { bg: 'bg-[#ffdad6]', text: 'text-[#ba1a1a]', dot: 'bg-[#ba1a1a]' };
+            default:        return { bg: 'bg-[#eceef4]', text: 'text-[#424655]', dot: 'bg-[#424655]' };
         }
     };
 
     if (loading) {
         return (
             <div className="flex items-center justify-center min-h-[400px]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <Loader2 className="w-8 h-8 animate-spin text-[#2a6df4]" />
             </div>
         );
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-12 animate-fade-in px-4 lg:px-0">
-            {/* Page Header - Professional & Airy */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-4">
-                <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Settlement Matrix</span>
+        <div className="max-w-7xl mx-auto space-y-8 pb-12 animate-fade-in">
+
+            {/* ── Page Header ── */}
+            <div className="rounded-2xl bg-[#f1f3f9] p-8 md:p-10 relative overflow-hidden">
+                <div className="relative z-10">
+                    <span className="text-[10px] font-semibold text-[#3c5ba9] uppercase tracking-widest">Financial Ledger</span>
+                    <h1 className="mt-2 text-3xl font-bold text-[#1a3d8a]">My Finance</h1>
+                    <p className="text-sm text-[#424655] mt-1">Fee records, transactions, and payment status</p>
+                </div>
+                <div className="absolute -top-8 -right-8 w-40 h-40 bg-[#2a6df4]/8 rounded-full blur-3xl pointer-events-none" />
+            </div>
+
+            {/* ── 3 Summary KPI Cards ── */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Total Fees */}
+                <div className="group bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                    <div className="flex items-center justify-between mb-5">
+                        <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Total Fees</p>
+                        <div className="w-9 h-9 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
+                            <FileText className="w-4 h-4 text-[#424655]" />
+                        </div>
                     </div>
-                    <h1 className="text-5xl lg:text-6xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">Finance</h1>
-                    <p className="text-slate-500 font-bold uppercase tracking-[0.1em] text-[10px] flex items-center gap-2 opacity-70">
-                        Operational Fee Logistics & Asset Tracking
+                    <p className="text-3xl font-bold text-[#181c20]">₹{summary?.totalDue?.toLocaleString() ?? '0'}</p>
+                    <p className="text-xs text-[#64748b] mt-2">Total amount due</p>
+                </div>
+
+                {/* Amount Paid */}
+                <div className="group bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                    <div className="flex items-center justify-between mb-5">
+                        <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Amount Paid</p>
+                        <div className="w-9 h-9 rounded-xl bg-[#dae2ff] flex items-center justify-center">
+                            <TrendingUp className="w-4 h-4 text-[#0054d1]" />
+                        </div>
+                    </div>
+                    <p className="text-3xl font-bold text-[#0054d1]">₹{summary?.totalPaid?.toLocaleString() ?? '0'}</p>
+                    <p className="text-xs text-[#64748b] mt-2">Verified payments</p>
+                </div>
+
+                {/* Outstanding Balance */}
+                <div className={`group rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300 ${
+                    (summary?.balance ?? 0) > 0 ? 'bg-gradient-to-br from-[#9e3f00] to-[#c65100] text-white' : 'bg-white'
+                }`}>
+                    <div className="flex items-center justify-between mb-5">
+                        <p className={`text-[10px] font-semibold uppercase tracking-widest ${(summary?.balance ?? 0) > 0 ? 'text-white/70' : 'text-[#64748b]'}`}>
+                            Outstanding
+                        </p>
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${(summary?.balance ?? 0) > 0 ? 'bg-white/20' : 'bg-[#ffdad6]'}`}>
+                            {(summary?.balance ?? 0) > 0
+                                ? <TrendingDown className="w-4 h-4 text-white" />
+                                : <CheckCircle2 className="w-4 h-4 text-[#0054d1]" />
+                            }
+                        </div>
+                    </div>
+                    <p className={`text-3xl font-bold ${(summary?.balance ?? 0) > 0 ? 'text-white' : 'text-[#0054d1]'}`}>
+                        {(summary?.balance ?? 0) > 0 ? `₹${summary?.balance?.toLocaleString()}` : 'Cleared'}
+                    </p>
+                    <p className={`text-xs mt-2 ${(summary?.balance ?? 0) > 0 ? 'text-white/70' : 'text-[#64748b]'}`}>
+                        {(summary?.balance ?? 0) > 0 ? 'Balance due' : 'All payments complete'}
                     </p>
                 </div>
-                <div className="flex bg-white px-8 py-5 rounded-[2.5rem] border border-slate-50 shadow-sm items-center gap-5 group hover:shadow-xl transition-all duration-500">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center border border-emerald-100/50 group-hover:rotate-12 transition-transform duration-500">
-                        <TrendingUp className="w-6 h-6 text-emerald-600" />
-                    </div>
+            </div>
+
+            {/* ── Fee Ledger Table ── */}
+            <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                <div className="px-6 py-5 border-b border-[#f1f3f9] flex items-center justify-between">
                     <div>
-                         <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Account Protocol</p>
-                         <p className="text-xs font-black text-emerald-600 mt-1 uppercase italic tracking-tight">Active Settlement</p>
+                        <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest mb-1">Fee Structure</p>
+                        <h3 className="text-base font-bold text-[#181c20]">Fee Ledger</h3>
                     </div>
-                </div>
-            </div>
-
-            {/* Summary Grid - Sophisticated Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 px-4 lg:px-0">
-                <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm relative overflow-hidden group hover:shadow-2xl transition-all duration-700">
-                    <div className="flex items-center justify-between mb-10 relative z-10">
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] leading-none italic">Net Liability</h3>
-                        <div className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center border border-slate-100 group-hover:scale-110 transition-transform">
-                             <DollarSign className="w-5 h-5 text-slate-300" />
-                        </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-[#2a6df4] animate-pulse" />
+                        <span className="text-xs text-[#64748b] font-medium">FY 2026</span>
                     </div>
-                    <div className="space-y-3 relative z-10">
-                        <p className="text-4xl font-black text-slate-900 italic tracking-tighter uppercase leading-none">₹{summary?.totalDue?.toLocaleString() ?? '0'}</p>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none opacity-60">Global Accumulated Due</p>
-                    </div>
-                    <div className="absolute -right-6 -bottom-6 text-8xl font-black text-slate-50 italic opacity-40 select-none group-hover:scale-110 transition-transform duration-700">Σ</div>
                 </div>
 
-                <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm relative overflow-hidden group hover:shadow-2xl transition-all duration-700">
-                    <div className="flex items-center justify-between mb-10 relative z-10">
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] leading-none italic">Cleared Assets</h3>
-                        <div className="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center border border-emerald-100/50 group-hover:scale-110 transition-transform">
-                             <TrendingUp className="w-5 h-5 text-emerald-400" />
-                        </div>
-                    </div>
-                    <div className="space-y-3 relative z-10">
-                        <p className="text-4xl font-black text-emerald-600 italic tracking-tighter uppercase leading-none">₹{summary?.totalPaid?.toLocaleString() ?? '0'}</p>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none opacity-60">Verified Collections</p>
-                    </div>
-                    <div className="absolute -right-4 -bottom-4 w-40 h-40 bg-emerald-500/5 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-700"></div>
-                </div>
-
-                <div className="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm relative overflow-hidden group hover:shadow-2xl transition-all duration-700">
-                    <div className="flex items-center justify-between mb-10 relative z-10">
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] leading-none italic">Deficit Balance</h3>
-                        <div className="w-10 h-10 rounded-2xl bg-rose-50 flex items-center justify-center border border-rose-100/50 group-hover:scale-110 transition-transform">
-                             <TrendingDown className="w-5 h-5 text-rose-400" />
-                        </div>
-                    </div>
-                    <div className="space-y-3 relative z-10">
-                        <p className="text-4xl font-black text-rose-600 italic tracking-tighter uppercase leading-none">₹{summary?.balance?.toLocaleString() ?? '0'}</p>
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none opacity-60">Outstanding Dues</p>
-                    </div>
-                    <div className="absolute -right-4 -bottom-4 w-40 h-40 bg-rose-500/5 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-700"></div>
-                </div>
-
-                <div className="bg-[#0A0C10] p-10 rounded-[3rem] border border-slate-800 shadow-sm relative overflow-hidden group hover:shadow-2xl hover:shadow-amber-900/10 transition-all duration-700">
-                    <div className="flex items-center justify-between mb-10 relative z-10">
-                        <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] leading-none italic font-bold">Queue Count</h3>
-                        <div className="w-10 h-10 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform">
-                             <FileText className="w-5 h-5 text-amber-500" />
-                        </div>
-                    </div>
-                    <div className="space-y-3 relative z-10">
-                        <p className="text-4xl font-black text-white italic tracking-tighter uppercase leading-none">{summary?.pendingInvoices ?? '0'}</p>
-                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none opacity-60 font-bold">Pending Invoices</p>
-                    </div>
-                    <div className="absolute -right-4 -bottom-4 w-40 h-40 bg-amber-500/10 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-700"></div>
-                </div>
-            </div>
-
-            {/* Detailed Ledger - Modern Table Architecture */}
-            <div className="bg-white rounded-[4rem] border border-slate-50 shadow-sm overflow-hidden group/ledger hover:shadow-2xl transition-all duration-700">
-                <div className="p-10 lg:p-12 border-b border-slate-50 flex flex-col md:flex-row items-center justify-between bg-white relative overflow-hidden">
-                    <div className="space-y-2 relative z-10">
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Accumulated Inventory</h3>
-                        <p className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Fee Ledger Index</p>
-                    </div>
-                    <div className="flex items-center gap-6 mt-6 md:mt-0 relative z-10">
-                         <div className="px-6 py-2.5 bg-slate-50 rounded-full border border-slate-100 flex items-center gap-4 group-hover:bg-white transition-colors duration-500">
-                              <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse shadow-[0_0_8px_indigo-600]"></div>
-                              <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] italic">FY 2026 Operational</span>
-                         </div>
-                    </div>
-                    {/* Abstract background highlight */}
-                    <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-slate-50/50 to-transparent pointer-events-none"></div>
-                </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-slate-50/30 text-slate-400 text-[10px] uppercase font-black tracking-[0.2em]">
-                            <tr>
-                                <th className="px-12 py-8 font-black italic">Category Mapping</th>
-                                <th className="px-12 py-8 font-black italic">Temporal Due</th>
-                                <th className="px-12 py-8 font-black italic">Amount Allocated</th>
-                                <th className="px-12 py-8 font-black italic">Settled Assets</th>
-                                <th className="px-12 py-8 font-black italic">Current Deficit</th>
-                                <th className="px-12 py-8 font-black text-center italic">Node Status</th>
+                        <thead>
+                            <tr className="bg-[#f7f9ff] text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">
+                                <th className="px-6 py-4 font-semibold">Fee Type</th>
+                                <th className="px-6 py-4 font-semibold">Due Date</th>
+                                <th className="px-6 py-4 font-semibold">Amount</th>
+                                <th className="px-6 py-4 font-semibold">Paid</th>
+                                <th className="px-6 py-4 font-semibold">Balance</th>
+                                <th className="px-6 py-4 font-semibold text-center">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50/50">
+                        <tbody>
                             {ledger.length > 0 ? (
-                                ledger.map((record) => (
-                                    <tr key={record.id} className="group/row hover:bg-slate-50 transition-all duration-500">
-                                        <td className="px-12 py-8">
-                                            <div className="flex items-center gap-6 group-hover/row:translate-x-2 transition-transform duration-500">
-                                                <div className="w-14 h-14 rounded-[1.5rem] bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover/row:bg-slate-900 group-hover/row:text-white group-hover/row:rotate-6 transition-all duration-500 shadow-sm overflow-hidden relative">
-                                                    <CreditCard className="w-6 h-6 relative z-10" />
-                                                    <div className="absolute inset-0 bg-indigo-600 opacity-0 group-hover/row:opacity-100 transition-opacity"></div>
+                                ledger.map((record) => {
+                                    const statusConfig = getStatusConfig(record.status);
+                                    return (
+                                        <tr key={record.id} className="border-t border-[#f7f9ff] hover:bg-[#f7f9ff] transition-colors duration-150">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-xl bg-[#f1f3f9] flex items-center justify-center shrink-0">
+                                                        <CreditCard className="w-4 h-4 text-[#424655]" />
+                                                    </div>
+                                                    <span className="text-sm font-semibold text-[#181c20]">{record.feeHeadName}</span>
                                                 </div>
-                                                <div>
-                                                    <p className="text-[7px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1.5 italic">Operational Module</p>
-                                                    <span className="text-sm lg:text-base font-black text-slate-900 uppercase tracking-tight italic">{record.feeHeadName}</span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="px-12 py-8">
-                                            <div className="space-y-1">
-                                                <p className="text-xs font-black text-slate-700 uppercase tracking-tight italic">{format(new Date(record.dueDate), 'MMM dd, yyyy')}</p>
-                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none italic opacity-50">Log point 8229</p>
-                                            </div>
-                                        </td>
-                                        <td className="px-12 py-8">
-                                            <span className="font-black text-slate-900 text-base italic tracking-tighter uppercase leading-none">₹{record.amountDue?.toLocaleString() ?? '0'}</span>
-                                        </td>
-                                        <td className="px-12 py-8">
-                                            <span className="text-emerald-600 font-black text-base italic tracking-tighter uppercase leading-none">₹{record.amountPaid?.toLocaleString() ?? '0'}</span>
-                                        </td>
-                                        <td className="px-12 py-8">
-                                            <span className="text-rose-500 font-black text-base italic tracking-tighter uppercase leading-none">₹{record.balance?.toLocaleString() ?? '0'}</span>
-                                        </td>
-                                        <td className="px-12 py-8 text-center">
-                                            <span className={`px-6 py-2.5 rounded-full text-[9px] font-black uppercase tracking-[0.2em] italic border-2 transition-all duration-500 shadow-sm ${getStatusColor(record.status)} group-hover/row:scale-105`}>
-                                                {record.status}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm text-[#424655]">{format(new Date(record.dueDate), 'MMM dd, yyyy')}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm font-semibold text-[#181c20]">₹{record.amountDue?.toLocaleString() ?? '0'}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm font-semibold text-[#0054d1]">₹{record.amountPaid?.toLocaleString() ?? '0'}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`text-sm font-semibold ${(record.balance ?? 0) > 0 ? 'text-[#ba1a1a]' : 'text-[#0054d1]'}`}>
+                                                    ₹{record.balance?.toLocaleString() ?? '0'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-center">
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${statusConfig.bg} ${statusConfig.text}`}>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`} />
+                                                    {record.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    );
+                                })
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="px-12 py-32 text-center">
-                                        <div className="flex flex-col items-center opacity-30 grayscale group hover:opacity-60 transition-all duration-700">
-                                            <div className="p-12 bg-slate-50 rounded-full mb-8 border border-slate-100 group-hover:rotate-12 transition-transform">
-                                                <AlertCircle className="w-14 h-14 text-slate-200" />
+                                    <td colSpan={6} className="px-6 py-20 text-center">
+                                        <div className="flex flex-col items-center gap-3">
+                                            <div className="w-14 h-14 bg-[#f1f3f9] rounded-2xl flex items-center justify-center">
+                                                <AlertCircle className="w-7 h-7 text-[#c2c6d7]" />
                                             </div>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Inventory baseline empty • System Ready</p>
+                                            <p className="text-sm text-[#424655]">No fee records found</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -242,68 +217,67 @@ const MyFinancePage: React.FC = () => {
                 </div>
             </div>
 
-            {/* Transactions Log - Premium Audit Feed */}
-            <div className="bg-white rounded-[4rem] border border-slate-50 shadow-sm overflow-hidden group/tx hover:shadow-2xl transition-all duration-700">
-                <div className="p-10 lg:p-12 border-b border-slate-50 flex items-center justify-between bg-white">
-                    <div className="space-y-2">
-                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">System Audit Trail</h3>
-                        <p className="text-2xl font-black text-slate-900 tracking-tighter uppercase italic">Transaction Feed</p>
+            {/* ── Transaction History ── */}
+            <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                <div className="px-6 py-5 border-b border-[#f1f3f9] flex items-center justify-between">
+                    <div>
+                        <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest mb-1">Payment History</p>
+                        <h3 className="text-base font-bold text-[#181c20]">Transaction Feed</h3>
                     </div>
-                    <History className="w-8 h-8 text-slate-100 group-hover/tx:rotate-12 transition-transform duration-700" />
+                    <History className="w-5 h-5 text-[#c2c6d7]" />
                 </div>
+
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-slate-50/30 text-slate-400 text-[10px] uppercase font-black tracking-[0.2em]">
-                            <tr>
-                                <th className="px-12 py-8 font-black italic">Temporal Marker</th>
-                                <th className="px-12 py-8 font-black italic">Acquisition Channel</th>
-                                <th className="px-12 py-8 font-black italic">Internal identifier</th>
-                                <th className="px-12 py-8 font-black text-right italic">Settlement Allocation</th>
-                                <th className="px-12 py-8 font-black text-center italic">Protocol Export</th>
+                        <thead>
+                            <tr className="bg-[#f7f9ff] text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">
+                                <th className="px-6 py-4 font-semibold">Date</th>
+                                <th className="px-6 py-4 font-semibold">Payment Mode</th>
+                                <th className="px-6 py-4 font-semibold">Reference</th>
+                                <th className="px-6 py-4 font-semibold text-right">Amount</th>
+                                <th className="px-6 py-4 font-semibold text-center">Receipt</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-50/50">
+                        <tbody>
                             {transactions.length > 0 ? (
                                 transactions.map((tx) => (
-                                    <tr key={tx.id} className="group/txrow hover:bg-slate-50 transition-all duration-500">
-                                        <td className="px-12 py-8">
-                                            <div className="space-y-1 group-hover/txrow:translate-x-2 transition-transform duration-500">
-                                                <p className="text-xs font-black text-slate-700 uppercase tracking-tight italic">{format(new Date(tx.transactionDate), 'MMM dd, yyyy')}</p>
-                                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest italic opacity-50">{format(new Date(tx.transactionDate), 'HH:mm:ss')}</p>
-                                            </div>
+                                    <tr key={tx.id} className="border-t border-[#f7f9ff] hover:bg-[#f7f9ff] transition-colors duration-150">
+                                        <td className="px-6 py-4">
+                                            <p className="text-sm font-medium text-[#181c20]">{format(new Date(tx.transactionDate), 'MMM dd, yyyy')}</p>
+                                            <p className="text-[10px] text-[#64748b]">{format(new Date(tx.transactionDate), 'HH:mm')}</p>
                                         </td>
-                                        <td className="px-12 py-8">
-                                            <span className="px-5 py-2.5 bg-white text-slate-600 rounded-full text-[9px] font-black uppercase tracking-[0.2em] italic border border-slate-100 group-hover/txrow:bg-slate-900 group-hover/txrow:text-white transition-all duration-500 shadow-sm border-2">
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center px-3 py-1.5 bg-[#f1f3f9] text-[#424655] rounded-xl text-xs font-semibold">
                                                 {tx.paymentMode}
                                             </span>
                                         </td>
-                                        <td className="px-12 py-8">
-                                            <code className="text-[10px] font-mono text-slate-300 group-hover/txrow:text-slate-500 transition-colors uppercase tracking-widest bg-slate-50/50 px-3 py-1 rounded-lg">
-                                                {tx.referenceNumber || 'INTERNAL-TXN-G8'}
+                                        <td className="px-6 py-4">
+                                            <code className="text-[10px] font-mono text-[#424655] bg-[#f1f3f9] px-2 py-1 rounded-lg">
+                                                {tx.referenceNumber || 'INTERNAL-TXN'}
                                             </code>
                                         </td>
-                                        <td className="px-12 py-8 text-right">
-                                            <span className="font-black text-emerald-600 italic text-lg tracking-tighter uppercase leading-none group-hover/txrow:scale-110 transition-transform inline-block">₹{tx.amount?.toLocaleString() ?? '0'}</span>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className="text-sm font-bold text-[#0054d1]">₹{tx.amount?.toLocaleString() ?? '0'}</span>
                                         </td>
-                                        <td className="px-12 py-8 text-center">
+                                        <td className="px-6 py-4 text-center">
                                             <button
                                                 onClick={() => handleDownloadReceipt(tx.id)}
-                                                className="w-14 h-14 bg-white text-indigo-600 rounded-2xl border border-slate-100 flex items-center justify-center hover:bg-slate-900 hover:text-white hover:rotate-12 transition-all duration-500 mx-auto active:scale-90 shadow-sm group-hover/txrow:shadow-xl"
-                                                title="Fetch Manifest"
+                                                className="w-9 h-9 bg-[#f1f3f9] text-[#424655] rounded-xl flex items-center justify-center hover:bg-[#dae2ff] hover:text-[#0054d1] transition-all mx-auto"
+                                                title="Download Receipt"
                                             >
-                                                <Download className="w-5 h-5" />
+                                                <Download className="w-4 h-4" />
                                             </button>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-12 py-32 text-center">
-                                        <div className="flex flex-col items-center opacity-30 grayscale group hover:opacity-60 transition-all duration-700">
-                                            <div className="p-12 bg-slate-50 rounded-full mb-8 border border-slate-100 group-hover:rotate-12 transition-transform">
-                                                <History className="w-14 h-14 text-slate-200" />
+                                    <td colSpan={5} className="px-6 py-20 text-center">
+                                        <div className="flex flex-col items-center gap-3">
+                                            <div className="w-14 h-14 bg-[#f1f3f9] rounded-2xl flex items-center justify-center">
+                                                <History className="w-7 h-7 text-[#c2c6d7]" />
                                             </div>
-                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 italic">Zero activity baseline detected</p>
+                                            <p className="text-sm text-[#424655]">No transactions found</p>
                                         </div>
                                     </td>
                                 </tr>

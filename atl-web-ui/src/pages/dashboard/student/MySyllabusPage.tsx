@@ -2,9 +2,17 @@ import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { type RootState } from '../../../store/store';
 import {
-    BookOpen, CheckCircle, Circle,
-    ChevronDown, ChevronRight, GraduationCap,
-    Loader2, Target, Layers, Info
+    BookOpen, 
+    CheckCircle, 
+    Circle,
+    ChevronDown, 
+    ChevronRight, 
+    Loader2, 
+    Layers, 
+    Info,
+    GraduationCap,
+    BookMarked,
+    Target
 } from 'lucide-react';
 import { academicService } from '../../../api/academicService';
 import { studentDashboardService } from '../../../api/studentDashboardService';
@@ -120,7 +128,7 @@ const MySyllabusPage: React.FC = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-96">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#0054d1]" />
             </div>
         );
     }
@@ -130,211 +138,189 @@ const MySyllabusPage: React.FC = () => {
         : 0;
 
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-12 animate-fade-in px-4 lg:px-0">
-            {/* Page Header - Professional & Airy */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-4">
-                <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Curriculum Index</span>
+        <div className="max-w-7xl mx-auto pb-12 animate-in fade-in duration-700 px-4 lg:px-0">
+             {/* Page Header Block - Academic Curator Pattern */}
+             <div className="bg-[#f1f3f9] rounded-2xl p-8 md:p-10 relative overflow-hidden mb-10">
+                <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
+                    <div>
+                        <span className="text-[10px] font-semibold text-[#3c5ba9] uppercase tracking-widest mb-2 block">Curriculum & Syllabus Index</span>
+                        <h1 className="text-3xl md:text-4xl font-bold text-[#1a3d8a] tracking-tight">The Syllabus</h1>
+                        <p className="text-sm text-[#424655] mt-1 max-w-md">Live Academic Blueprint & Progression Matrix</p>
                     </div>
-                    <h1 className="text-5xl lg:text-6xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">The Syllabus</h1>
-                    <p className="text-slate-500 font-bold uppercase tracking-[0.1em] text-[10px] flex items-center gap-2 opacity-70">
-                        Live Academic Blueprint & Progression Matrix
-                    </p>
+                    {selectedOS && (
+                        <div className="flex bg-white px-6 py-4 rounded-xl shadow-sm border border-slate-100 items-center gap-4">
+                            <div className="relative w-12 h-12 flex items-center justify-center">
+                                <svg className="w-full h-full transform -rotate-90">
+                                    <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-50" />
+                                    <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray={126} strokeDashoffset={126 - (126 * percentage) / 100} className="text-[#0054d1] transition-all duration-1000" strokeLinecap="round" />
+                                </svg>
+                                <span className="absolute text-[10px] font-bold text-[#0054d1]">{percentage}%</span>
+                            </div>
+                            <div>
+                                <p className="text-[9px] font-bold text-[#64748b] uppercase tracking-wider mb-0.5">Syllabus Coverage</p>
+                                <p className="text-xs font-bold text-[#181c20] truncate max-w-[120px]">{selectedOS.subjectName}</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
-                {selectedOS && (
-                    <div className="flex bg-white px-8 py-5 rounded-[2.5rem] border border-slate-100 shadow-sm items-center gap-5 group hover:shadow-xl transition-all duration-500">
-                        <div className="relative w-12 h-12 flex items-center justify-center">
-                            <svg className="w-full h-full transform -rotate-90">
-                                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-50" />
-                                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" strokeDasharray={126} strokeDashoffset={126 - (126 * percentage) / 100} className="text-indigo-600 transition-all duration-1000" strokeLinecap="round" />
-                            </svg>
-                            <span className="absolute text-[10px] font-black text-indigo-600 italic tracking-tighter">{percentage}%</span>
-                        </div>
-                        <div>
-                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Domain Saturation</p>
-                             <p className="text-xs font-black text-slate-900 uppercase italic tracking-tight">{selectedOS.subjectName}</p>
-                        </div>
-                    </div>
-                )}
+                <div className="absolute -top-8 -right-8 w-40 h-40 bg-[#2a6df4]/5 rounded-full blur-3xl"></div>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-12">
-                {/* Subject Navigation - Premium Sidebar */}
-                <div className="lg:w-96 shrink-0">
-                    <div className="bg-white rounded-[3.5rem] p-10 border border-slate-50 shadow-sm sticky top-32 group/nav hover:shadow-2xl transition-all duration-700">
-                        <div className="flex items-center justify-between mb-10 px-2">
-                            <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic leading-none">Knowledge Domains</h3>
-                            <Layers className="w-4 h-4 text-slate-200" />
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                {/* Subject Selection Sidebar */}
+                <div className="lg:col-span-4 space-y-6">
+                    <div className="bg-white rounded-2xl p-8 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] sticky top-32">
+                        <div className="flex items-center gap-3 mb-8 px-2">
+                            <Layers className="w-4 h-4 text-[#2a6df4]" />
+                            <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Knowledge Domains</h3>
                         </div>
-                        <div className="space-y-4">
+                        
+                        <div className="space-y-3">
                             {offeringSubjects.map(os => (
                                 <button
                                     key={os.id}
                                     onClick={() => setSelectedOS(os)}
-                                    className={`w-full text-left p-6 rounded-[2rem] transition-all duration-500 group flex items-center justify-between relative overflow-hidden ${selectedOS?.id === os.id
-                                        ? 'bg-slate-900 text-white shadow-2xl scale-[1.02] italic'
-                                        : 'text-slate-600 hover:bg-slate-50 font-black'
-                                        }`}
+                                    className={`w-full text-left p-4 rounded-xl transition-all flex items-center justify-between group ${
+                                        selectedOS?.id === os.id
+                                        ? 'bg-[#f1f3f9] border border-[#dae2ff] shadow-sm'
+                                        : 'hover:bg-[#f7f9ff] text-[#424655]'
+                                    }`}
                                 >
-                                    <div className="flex items-center gap-5 truncate relative z-10">
-                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black transition-all duration-500 shadow-sm border ${selectedOS?.id === os.id ? 'bg-indigo-600 text-white border-indigo-500 rotate-6' : 'bg-white text-indigo-600 border-slate-100'
-                                            }`}>
+                                    <div className="flex items-center gap-4 truncate">
+                                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 transition-all ${
+                                            selectedOS?.id === os.id 
+                                            ? 'bg-gradient-to-br from-[#0054d1] to-[#2a6df4] text-white shadow-md' 
+                                            : 'bg-[#f7f9ff] text-[#3c5ba9]'
+                                        }`}>
                                             {os.subjectName?.[0] || 'S'}
                                         </div>
-                                        <div>
-                                            <p className={`text-[8px] font-black uppercase tracking-widest leading-none mb-1.5 transition-opacity ${selectedOS?.id === os.id ? 'text-indigo-300 opacity-60' : 'text-slate-400 opacity-40'}`}>Faculty Block</p>
-                                            <span className="truncate text-sm font-black uppercase tracking-tight italic leading-none">{os.subjectName}</span>
+                                        <div className="truncate">
+                                            <p className={`text-[8px] font-bold uppercase tracking-wider mb-0.5 ${selectedOS?.id === os.id ? 'text-[#3c5ba9]' : 'text-slate-400'}`}>Subject</p>
+                                            <span className={`text-sm font-bold truncate block ${selectedOS?.id === os.id ? 'text-[#1a3d8a]' : 'text-[#64748b]'}`}>{os.subjectName}</span>
                                         </div>
                                     </div>
                                     {selectedOS?.id === os.id && (
-                                        <div className="relative z-10">
-                                            <ChevronRight className="w-5 h-5 text-indigo-400 animate-pulse" />
-                                        </div>
-                                    )}
-                                    {/* Abstract background highlight */}
-                                    {selectedOS?.id === os.id && (
-                                        <div className="absolute top-0 right-0 w-32 h-full bg-indigo-500/5 rotate-12 blur-2xl"></div>
+                                        <ChevronRight className="w-4 h-4 text-[#2a6df4]" />
                                     )}
                                 </button>
                             ))}
                             {offeringSubjects.length === 0 && (
-                                <div className="p-16 text-center opacity-30 grayscale rounded-[2.5rem] bg-slate-50/50 border border-dashed border-slate-100">
-                                    <Layers className="w-14 h-14 mx-auto mb-6 text-slate-200" />
-                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] italic text-slate-400">No Domains Detected</p>
+                                <div className="p-10 text-center bg-[#f7f9ff] rounded-xl border border-dashed border-[#dae2ff]">
+                                    <BookMarked className="w-10 h-10 mx-auto mb-4 text-slate-200" />
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">No Domains Detected</p>
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
 
-                {/* Content Area - Premium Curriculum Feed */}
-                <div className="flex-1 space-y-12">
+                {/* Main Syllabus Content Area */}
+                <div className="lg:col-span-8 space-y-8">
                     {selectedOS ? (
-                        <>
-                            {/* Detailed Tree */}
-                            <div className="bg-white rounded-[4rem] p-12 lg:p-16 border border-slate-50 shadow-sm relative overflow-hidden group/content hover:shadow-2xl transition-all duration-700">
-                                <div className="flex items-center justify-between mb-16 relative z-10">
-                                    <div className="space-y-2">
-                                        <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] flex items-center gap-4 italic">
-                                            <BookOpen className="w-5 h-5 text-indigo-600" /> Subject Infrastructure
-                                        </h3>
-                                        <p className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">{selectedOS.subjectName}</p>
+                        <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                            <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
+                                 <div className="flex items-center gap-4">
+                                    <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
+                                        <BookOpen className="w-5 h-5 text-[#2a6df4]" />
                                     </div>
-                                    <div className="flex items-center gap-6">
-                                         <div className="px-6 py-2.5 bg-emerald-50 rounded-full border border-emerald-100 flex items-center gap-3 shadow-sm shadow-emerald-50">
-                                              <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_emerald-500] animate-pulse"></div>
-                                              <span className="text-[10px] font-black text-emerald-700 uppercase tracking-widest italic">Encrypted Sync</span>
-                                         </div>
+                                    <div>
+                                        <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Syllabus Breakdown</h3>
+                                        <p className="text-xs text-slate-400 font-medium">{selectedOS.subjectName}</p>
                                     </div>
                                 </div>
-
-                                <div className="space-y-8 relative z-10">
-                                    {chapters.map((chapter) => (
-                                        <div key={chapter.id} className="group/chapter">
-                                            <div
-                                                className={`flex items-center justify-between p-8 rounded-[2.5rem] border transition-all duration-500 cursor-pointer shadow-sm ${
-                                                    chapter.isExpanded ? 'bg-slate-900 text-white shadow-2xl scale-[1.01] border-slate-800' : 'bg-slate-50/30 border-slate-50 hover:bg-white hover:border-slate-100 hover:shadow-xl'
-                                                }`}
-                                                onClick={() => toggleChapter(chapter.id)}
-                                            >
-                                                <div className="flex items-center gap-8">
-                                                    <div className={`w-16 h-16 rounded-[1.5rem] flex items-center justify-center text-xl font-black italic shadow-lg transition-all duration-500 transform ${
-                                                        chapter.isExpanded ? 'bg-indigo-600 text-white rotate-6' : 'bg-white text-indigo-600 border border-slate-50'
-                                                    }`}>
-                                                        {chapter.orderIndex < 10 ? `0${chapter.orderIndex}` : chapter.orderIndex}
-                                                    </div>
-                                                    <div>
-                                                        <h4 className="text-xl font-black uppercase tracking-tight italic leading-none mb-2">
-                                                            {chapter.title}
-                                                        </h4>
-                                                        <div className="flex items-center gap-3">
-                                                            <p className={`text-[10px] font-black uppercase tracking-widest ${chapter.isExpanded ? 'text-indigo-400 opacity-80' : 'text-slate-400 opacity-60'}`}>
-                                                                {chapter.topics.length} Operational Nodes
-                                                            </p>
-                                                            <div className={`w-1 h-1 rounded-full ${chapter.isExpanded ? 'bg-indigo-400 opacity-40' : 'bg-slate-200'}`}></div>
-                                                            <p className={`text-[9px] font-black uppercase tracking-widest ${chapter.isExpanded ? 'text-indigo-400 opacity-80' : 'text-slate-400 opacity-60 italic'}`}>
-                                                                Block 0{chapter.orderIndex}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                {chapter.isExpanded ? <ChevronDown className="w-6 h-6 text-indigo-400" /> : <ChevronRight className="w-6 h-6 text-slate-300 group-hover/chapter:text-indigo-400 transition-colors" />}
-                                            </div>
-
-                                            {chapter.isExpanded && (
-                                                <div className="mt-6 ml-10 pl-14 border-l-2 border-slate-100/50 space-y-4 py-4 animate-premium-slide">
-                                                    {chapter.topics.map((topic) => (
-                                                        <div
-                                                            key={topic.id}
-                                                            className={`flex items-center justify-between p-6 lg:p-8 rounded-[2rem] border transition-all duration-500 relative overflow-hidden group/topic cursor-default ${topic.status === 'COMPLETED'
-                                                                ? 'bg-emerald-50/50 border-emerald-100 shadow-sm shadow-emerald-50'
-                                                                : 'bg-white border-slate-100 hover:shadow-xl hover:border-slate-200'
-                                                                }`}
-                                                        >
-                                                            <div className="flex items-center gap-6 relative z-10">
-                                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-sm border ${
-                                                                    topic.status === 'COMPLETED' ? 'bg-emerald-500 text-white border-emerald-400' : 'bg-slate-50 text-slate-200 border-slate-100 group-hover/topic:text-indigo-400'
-                                                                }`}>
-                                                                    {topic.status === 'COMPLETED' ? <CheckCircle className="w-6 h-6" /> : <Circle className="w-6 h-6" />}
-                                                                </div>
-                                                                <div>
-                                                                    <p className={`text-base font-black uppercase tracking-tight italic transition-all duration-500 ${topic.status === 'COMPLETED' ? 'text-slate-900 translate-x-1' : 'text-slate-400 group-hover/topic:text-slate-600'}`}>
-                                                                        {topic.title}
-                                                                    </p>
-                                                                    <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest italic opacity-60">System Topic Marker: TP-0{topic.orderIndex}</p>
-                                                                </div>
-                                                            </div>
-                                                            {topic.status === 'COMPLETED' && (
-                                                                <div className="flex items-center gap-3 bg-white px-5 py-2.5 rounded-full border border-emerald-100 shadow-sm shadow-emerald-50 relative z-10 group-hover:scale-105 transition-transform">
-                                                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                                                                    <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest italic">Faculty Verified</span>
-                                                                </div>
-                                                            )}
-                                                            
-                                                            {/* Topic background visual flair */}
-                                                            {topic.status === 'COMPLETED' && (
-                                                                <div className="absolute top-0 right-0 w-48 h-full bg-gradient-to-l from-emerald-500/10 to-transparent pointer-events-none opacity-50"></div>
-                                                            )}
-                                                        </div>
-                                                    ))}
-                                                    {chapter.topics.length === 0 && (
-                                                        <div className="py-12 bg-slate-50/30 rounded-[2.5rem] border border-dashed border-slate-100 flex flex-col items-center justify-center grayscale opacity-40 group hover:opacity-60 transition-all">
-                                                            <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm">
-                                                                <Info className="w-6 h-6 text-slate-300 group-hover:rotate-12 transition-transform" />
-                                                            </div>
-                                                            <p className="text-[10px] font-black uppercase tracking-[0.3em] italic text-slate-400">Structural Node Empty • No Topics Mapped</p>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-                                    {chapters.length === 0 && (
-                                        <div className="py-32 text-center grayscale opacity-30 group hover:opacity-50 transition-all duration-700">
-                                            <div className="w-32 h-32 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-10 border border-slate-100 shadow-inner group-hover:rotate-12 transition-transform duration-700">
-                                                <Layers className="w-16 h-16 text-slate-200" />
-                                            </div>
-                                            <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tighter italic">Structural Pending</h3>
-                                            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-400 mt-4 italic">No Curriculum blueprint detected for this domain</p>
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Background decoration */}
-                                <div className="absolute -right-20 -bottom-20 text-[200px] font-black text-slate-50 italic leading-none pointer-events-none uppercase transition-transform group-hover/content:scale-110 duration-700 opacity-40">
-                                    CORE
+                                <div className="flex items-center gap-3">
+                                     <div className="px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-100 flex items-center gap-1.5 shadow-sm">
+                                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                                          <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest">Live Progress</span>
+                                     </div>
                                 </div>
                             </div>
-                        </>
+
+                            <div className="p-8 space-y-10">
+                                {chapters.map((chapter) => (
+                                    <div key={chapter.id} className="space-y-4">
+                                        {/* Chapter Header */}
+                                        <button 
+                                            onClick={() => toggleChapter(chapter.id)}
+                                            className={`w-full flex items-center justify-between p-6 rounded-2xl border transition-all ${
+                                                chapter.isExpanded 
+                                                ? 'bg-[#f7f9ff] border-[#dae2ff] shadow-sm' 
+                                                : 'bg-white border-[#f1f3f9] hover:border-[#dae2ff] hover:bg-[#f7f9ff]'
+                                            }`}
+                                        >
+                                            <div className="flex items-center gap-6">
+                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold transition-all ${
+                                                    chapter.isExpanded ? 'bg-gradient-to-br from-[#0054d1] to-[#2a6df4] text-white' : 'bg-white text-[#0054d1] border border-[#dae2ff]'
+                                                }`}>
+                                                    {chapter.orderIndex < 10 ? `0${chapter.orderIndex}` : chapter.orderIndex}
+                                                </div>
+                                                <div className="text-left">
+                                                    <h4 className="text-base font-bold text-[#181c20] tracking-tight">{chapter.title}</h4>
+                                                    <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest mt-1">
+                                                        {chapter.topics.length} Structural Nodes
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {chapter.isExpanded ? <ChevronDown className="w-5 h-5 text-[#2a6df4]" /> : <ChevronRight className="w-5 h-5 text-slate-300" />}
+                                        </button>
+
+                                        {/* Topics List */}
+                                        {chapter.isExpanded && (
+                                            <div className="ml-10 pl-10 border-l border-[#f1f3f9] space-y-3 animate-in slide-in-from-left-4 duration-500">
+                                                {chapter.topics.map((topic) => (
+                                                    <div
+                                                        key={topic.id}
+                                                        className={`flex items-center justify-between p-5 rounded-xl border transition-all ${
+                                                            topic.status === 'COMPLETED'
+                                                            ? 'bg-emerald-50/30 border-emerald-100/50'
+                                                            : 'bg-white border-[#f1f3f9] hover:shadow-md'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-4">
+                                                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${
+                                                                topic.status === 'COMPLETED' ? 'bg-emerald-500 text-white' : 'bg-[#f7f9ff] text-slate-200'
+                                                            }`}>
+                                                                {topic.status === 'COMPLETED' ? <CheckCircle className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
+                                                            </div>
+                                                            <div>
+                                                                <p className={`text-sm font-bold tracking-tight ${topic.status === 'COMPLETED' ? 'text-[#1a3d8a]' : 'text-[#64748b]'}`}>
+                                                                    {topic.title}
+                                                                </p>
+                                                                <p className="text-[8px] font-bold text-slate-300 uppercase tracking-widest">Topic TP-0{topic.orderIndex}</p>
+                                                            </div>
+                                                        </div>
+                                                        {topic.status === 'COMPLETED' && (
+                                                            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold text-emerald-600 bg-white border border-emerald-100 shadow-sm">
+                                                                <Target className="w-3 h-3" />
+                                                                Verified
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                                {chapter.topics.length === 0 && (
+                                                    <div className="p-8 text-center bg-[#f7f9ff] rounded-xl border border-dashed border-[#dae2ff]">
+                                                        <Info className="w-6 h-6 mx-auto mb-2 text-slate-300" />
+                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No Topics Indexed</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                                {chapters.length === 0 && (
+                                    <div className="py-20 text-center">
+                                        <BookMarked className="w-16 h-16 text-slate-100 mx-auto mb-6" />
+                                        <h3 className="text-xl font-bold text-[#1a3d8a]">Structural Pending</h3>
+                                        <p className="text-xs font-medium text-slate-400 mt-2 uppercase tracking-widest">No curriculum nodes detected for this domain</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     ) : (
-                        <div className="bg-white rounded-[4rem] p-40 text-center border-2 border-dashed border-slate-50 shadow-sm grayscale opacity-30 hover:opacity-50 hover:bg-slate-50 transition-all duration-700 cursor-default group">
-                            <div className="w-32 h-32 bg-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-12 shadow-2xl border border-slate-50 group-hover:rotate-12 transition-transform duration-700">
-                                <BookOpen className="w-16 h-16 text-slate-200" />
-                            </div>
-                            <h3 className="text-3xl font-black text-slate-300 uppercase tracking-tighter italic">Operational Silence</h3>
-                            <p className="text-[11px] font-black uppercase tracking-[0.3em] text-slate-300 mt-6 italic">Initialize a Knowledge Domain to reveal curriculum nodes</p>
+                        <div className="bg-white rounded-2xl p-40 text-center border-2 border-dashed border-[#f1f3f9] flex flex-col items-center">
+                            <BookOpen className="w-20 h-20 text-slate-100 mb-8" />
+                            <h3 className="text-xl font-bold text-slate-300 uppercase tracking-tight">Select a Domain</h3>
+                            <p className="text-xs font-medium text-slate-300 mt-4 uppercase tracking-widest">Select a Knowledge block from the sidebar to reveal nodes</p>
                         </div>
                     )}
                 </div>

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Calendar, Clock, MapPin, User,
-    AlertCircle, Loader2, Download,
-    LayoutDashboard, Info, GraduationCap
+    Calendar, MapPin, User,
+    AlertCircle, Loader2, Download, ChevronRight
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import { type RootState } from '../../../store/store';
@@ -13,6 +12,16 @@ import { instructorService } from '../../../api/instructorService';
 import toast from 'react-hot-toast';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+// Unique accent colors per subject slot (cycles)
+const SLOT_ACCENTS = [
+    { bar: '#2a6df4', bg: '#eef2ff', text: '#0054d1' },
+    { bar: '#9e3f00', bg: '#fff3ec', text: '#9e3f00' },
+    { bar: '#3c5ba9', bg: '#e8edff', text: '#3c5ba9' },
+    { bar: '#0054d1', bg: '#dae2ff', text: '#0054d1' },
+    { bar: '#c65100', bg: '#fff0e6', text: '#c65100' },
+    { bar: '#1a3d8a', bg: '#e6ecff', text: '#1a3d8a' },
+];
 
 interface EnrichedEntry extends TimetableEntry {
     subjectName?: string;
@@ -29,7 +38,7 @@ const MyTimetablePage: React.FC = () => {
     const [timetable, setTimetable] = useState<TimetableMaster | null>(null);
     const [subjectsMap, setSubjectsMap] = useState<Record<string, string>>({});
     const [instructorsMap, setInstructorsMap] = useState<Record<string, string>>({});
-    const [activeDayIdx, setActiveDayIdx] = useState(new Date().getDay() === 0 ? 0 : new Date().getDay() - 1); // Default to current day Mon=0
+    const [activeDayIdx, setActiveDayIdx] = useState(new Date().getDay() === 0 ? 0 : new Date().getDay() - 1);
 
     useEffect(() => {
         if (user?.email && user?.tenantId) {
@@ -41,41 +50,29 @@ const MyTimetablePage: React.FC = () => {
         setLoading(true);
         try {
             const { enrollment } = await studentDashboardService.getStudentContext(user!.email!, user!.tenantId!);
-            if (!enrollment?.offeringId) {
-                setLoading(false);
-                return;
-            }
+            if (!enrollment?.offeringId) { setLoading(false); return; }
 
             const offeringId = enrollment.offeringId;
 
-            // Fetch Subjects for Mapping Names
             const subjectsRes = await academicService.getOfferingSubjects(offeringId);
             const map: Record<string, string> = {};
             if (subjectsRes.status === 'SUCCESS') {
-                subjectsRes.apiData.forEach((sub: any) => {
-                    map[sub.subjectId] = sub.subjectName;
-                });
+                subjectsRes.apiData.forEach((sub: any) => { map[sub.subjectId] = sub.subjectName; });
             }
             setSubjectsMap(map);
 
-            // Fetch Instructors for Mapping Names
             const instructorsRes = await instructorService.getInstructorsByTenant(user!.tenantId!);
             const iMap: Record<string, string> = {};
             if (instructorsRes) {
-                instructorsRes.forEach((inst: any) => {
-                    iMap[inst.id] = `${inst.firstName} ${inst.lastName}`;
-                });
+                instructorsRes.forEach((inst: any) => { iMap[inst.id] = `${inst.firstName} ${inst.lastName}`; });
             }
             setInstructorsMap(iMap);
 
-            // Fetch Timetable Master
             const masters = await timetableService.getByOfferingId(offeringId);
-            if (masters && masters.length > 0) {
-                setTimetable(masters[0]);
-            }
+            if (masters && masters.length > 0) setTimetable(masters[0]);
         } catch (error) {
-            console.error("Timetable load failed", error);
-            toast.error("Failed to load your schedule");
+            console.error('Timetable load failed', error);
+            toast.error('Failed to load your schedule');
         } finally {
             setLoading(false);
         }
@@ -83,8 +80,7 @@ const MyTimetablePage: React.FC = () => {
 
     const getSlotsForDay = (dayIndex: number): EnrichedSlot[] => {
         if (!timetable?.slots) return [];
-        const targetBackendDay = dayIndex + 1; // Backend: 1=Mon
-
+        const targetBackendDay = dayIndex + 1;
         return timetable.slots
             .filter(slot => slot.dayOfWeek === targetBackendDay)
             .sort((a, b) => a.startTime.localeCompare(b.startTime))
@@ -92,8 +88,8 @@ const MyTimetablePage: React.FC = () => {
                 ...slot,
                 entries: (slot.entries || []).map(entry => ({
                     ...entry,
-                    subjectName: subjectsMap[entry.subjectId] || 'Subject Managed',
-                    instructorName: entry.instructorId ? (instructorsMap[entry.instructorId] || 'Primary Faculty') : 'Primary Faculty'
+                    subjectName: subjectsMap[entry.subjectId] || 'Subject',
+                    instructorName: entry.instructorId ? (instructorsMap[entry.instructorId] || 'Faculty') : 'Faculty'
                 }))
             }));
     };
@@ -101,168 +97,174 @@ const MyTimetablePage: React.FC = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-96">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#2a6df4]" />
             </div>
         );
     }
 
     if (!timetable) {
         return (
-            <div className="bg-white rounded-[3rem] p-16 text-center border border-slate-100 shadow-sm mt-10">
-                <Calendar className="w-20 h-20 text-slate-100 mx-auto mb-6" />
-                <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight italic">Schedule Pending</h2>
-                <p className="text-slate-500 max-w-sm mx-auto mt-2 font-medium">
-                    Your class schedule has not been published yet. Please check back later.
-                </p>
+            <div className="max-w-7xl mx-auto space-y-8 pb-12 animate-fade-in">
+                <div className="rounded-2xl bg-[#f1f3f9] p-8 md:p-10">
+                    <span className="text-[10px] font-semibold text-[#3c5ba9] uppercase tracking-widest">Class Schedule</span>
+                    <h1 className="mt-2 text-3xl font-bold text-[#1a3d8a]">My Timetable</h1>
+                </div>
+                <div className="bg-white rounded-2xl p-16 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)]">
+                    <Calendar className="w-14 h-14 text-[#e0e2e8] mx-auto mb-4" />
+                    <h2 className="text-lg font-bold text-[#181c20]">Schedule Not Published</h2>
+                    <p className="text-sm text-[#424655] max-w-sm mx-auto mt-2">
+                        Your class schedule has not been published yet. Please check back later.
+                    </p>
+                </div>
             </div>
         );
     }
 
+    const activeSlots = getSlotsForDay(activeDayIdx);
+
     return (
-        <div className="max-w-7xl mx-auto space-y-12 pb-12 animate-fade-in px-4 lg:px-0">
-            {/* Page Header - Professional & Airy */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-4">
-                <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                        <div className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></div>
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Operational Pulse</span>
+        <div className="max-w-7xl mx-auto space-y-8 pb-12 animate-fade-in">
+
+            {/* ── Page Header ── */}
+            <div className="rounded-2xl bg-[#f1f3f9] p-8 md:p-10 relative overflow-hidden">
+                <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <span className="text-[10px] font-semibold text-[#3c5ba9] uppercase tracking-widest">Class Schedule</span>
+                        <h1 className="mt-2 text-3xl font-bold text-[#1a3d8a]">My Timetable</h1>
+                        <p className="text-sm text-[#424655] mt-1">
+                            {timetable.name ?? 'Academic semester schedule'}
+                        </p>
                     </div>
-                    <h1 className="text-5xl lg:text-6xl font-black text-slate-900 tracking-tighter italic uppercase leading-none">Schedule</h1>
-                    <p className="text-slate-500 font-bold uppercase tracking-[0.1em] text-[10px] flex items-center gap-2 opacity-70">
-                        Institutional Grade Academic Timing & Resource Mapping
-                    </p>
-                </div>
-                <div className="flex items-center gap-4">
                     <button
-                        onClick={() => toast.success("PDF Export processing...")}
-                        className="group bg-white px-8 py-5 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-5 hover:shadow-xl hover:bg-slate-900 hover:text-white transition-all active:scale-95 duration-500"
+                        onClick={() => toast.success('PDF export processing...')}
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-xl text-sm font-semibold text-[#0054d1] shadow-[0_2px_8px_-2px_rgba(26,61,138,0.12)] hover:shadow-[0_4px_16px_-4px_rgba(26,61,138,0.16)] hover:-translate-y-0.5 transition-all duration-200 border border-[#dae2ff] self-start sm:self-auto"
                     >
-                        <Download className="w-5 h-5 text-indigo-600 group-hover:text-indigo-400 group-hover:scale-110 transition-all" />
-                        <span className="text-[10px] font-black uppercase tracking-widest italic group-hover:tracking-[0.15em] transition-all">Export Protocol</span>
+                        <Download className="w-4 h-4" />
+                        Export PDF
                     </button>
                 </div>
+                <div className="absolute -top-8 -right-8 w-40 h-40 bg-[#2a6df4]/8 rounded-full blur-3xl pointer-events-none" />
             </div>
 
-            {/* Timetable Weekly Interaction Zone */}
-            <div className="space-y-12">
-                {/* Day Selectors - High End Tab System */}
-                <div className="flex items-center gap-5 p-5 bg-white rounded-[3.5rem] border border-slate-50 shadow-sm overflow-x-auto no-scrollbar scroll-smooth">
-                    {DAYS.map((day, idx) => (
+            {/* ── Day Selector Tabs ── */}
+            <div className="bg-white rounded-2xl p-3 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex items-center gap-2 overflow-x-auto no-scrollbar">
+                {DAYS.map((day, idx) => {
+                    const slotCount = getSlotsForDay(idx).length;
+                    const isActive = activeDayIdx === idx;
+                    return (
                         <button
                             key={day}
                             onClick={() => setActiveDayIdx(idx)}
-                            className={`relative px-12 py-6 rounded-[2.5rem] transition-all duration-500 flex flex-col items-center gap-2 min-w-[160px] group ${activeDayIdx === idx
-                                ? 'bg-slate-900 text-white shadow-2xl scale-[1.02] active-day'
-                                : 'text-slate-400 font-black hover:bg-slate-50 hover:text-slate-600'
-                                }`}
+                            className={`relative flex flex-col items-center gap-1 px-5 py-3 rounded-xl transition-all duration-200 min-w-[80px] group ${
+                                isActive
+                                    ? 'bg-gradient-to-br from-[#0054d1] to-[#2a6df4] text-white shadow-md'
+                                    : 'text-[#424655] hover:bg-[#f1f3f9]'
+                            }`}
                         >
-                            <span className={`text-[7px] uppercase tracking-[0.3em] font-black transition-opacity duration-500 ${activeDayIdx === idx ? 'opacity-40' : 'opacity-20 group-hover:opacity-40'}`}>Block {idx + 1}</span>
-                            <span className="text-[11px] uppercase tracking-[0.2em] font-black italic">{day}</span>
-                            {activeDayIdx === idx && (
-                                <div className="absolute -bottom-1 w-1/3 h-1 bg-indigo-500 rounded-full blur-sm"></div>
+                            <span className={`text-[10px] font-semibold uppercase tracking-widest ${isActive ? 'text-white/70' : 'text-[#64748b]'}`}>
+                                {day.slice(0, 3)}
+                            </span>
+                            <span className={`text-xs font-bold ${isActive ? 'text-white' : 'text-[#181c20]'}`}>
+                                {day.slice(0, 3)}
+                            </span>
+                            {slotCount > 0 && (
+                                <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${
+                                    isActive ? 'bg-white/20 text-white' : 'bg-[#dae2ff] text-[#0054d1]'
+                                }`}>
+                                    {slotCount}
+                                </span>
                             )}
                         </button>
-                    ))}
-                </div>
-
-                {/* Slots Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    {getSlotsForDay(activeDayIdx).map((slot, sIdx) => (
-                        <div key={slot.id} className="group relative">
-                            <div className="bg-white p-10 rounded-[3.5rem] border border-slate-50 shadow-sm hover:shadow-2xl transition-all duration-700 h-full flex flex-col relative overflow-hidden">
-                                {/* Abstract Background ID */}
-                                <div className="absolute -right-6 -top-6 text-[100px] font-black text-slate-50 opacity-0 group-hover:opacity-100 transition-all italic leading-none pointer-events-none uppercase">
-                                    0{sIdx + 1}
-                                </div>
-
-                                <div className="flex items-center justify-between mb-10 relative z-10">
-                                    <div className="bg-slate-50 px-5 py-3 rounded-2xl border border-slate-100/50 flex items-center gap-4 group-hover:bg-indigo-600 group-hover:border-indigo-500 transition-all duration-500">
-                                        <div className="w-2 h-2 rounded-full bg-indigo-500 group-hover:bg-white animate-pulse"></div>
-                                        <span className="text-[10px] font-black text-slate-900 group-hover:text-white uppercase tracking-[0.2em] italic transition-colors">
-                                            {slot.startTime.substring(0, 5)} — {slot.endTime.substring(0, 5)}
-                                        </span>
-                                    </div>
-                                    <span className="text-[9px] font-black text-slate-300 uppercase italic tracking-[0.3em] group-hover:text-indigo-400 transition-colors">PHASE 0{sIdx + 1}</span>
-                                </div>
-
-                                <div className="space-y-10 flex-1 relative z-10">
-                                    {slot.entries.map((entry, eIdx) => (
-                                        <div key={eIdx} className="space-y-8">
-                                            <div>
-                                                <h3 className="text-3xl font-black text-slate-900 tracking-tighter leading-none group-hover:text-indigo-600 transition-colors uppercase italic mb-3">
-                                                    {entry.subjectName}
-                                                </h3>
-                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest opacity-60">Academic Core Component</p>
-                                            </div>
-
-                                            <div className="space-y-5">
-                                                <div className="flex items-center gap-5 p-4 bg-slate-50/50 rounded-[1.5rem] border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-all duration-300">
-                                                    <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center border border-slate-100 shadow-sm group-hover:scale-110 transition-transform">
-                                                        <User className="w-5 h-5 text-slate-400" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5 italic">Lead Faculty</p>
-                                                        <p className="text-[11px] font-black text-slate-800 uppercase tracking-tight italic">{entry.instructorName}</p>
-                                                    </div>
-                                                </div>
-                                                
-                                                {entry.room && (
-                                                    <div className="flex items-center gap-5 p-4 bg-slate-50/50 rounded-[1.5rem] border border-transparent hover:border-slate-100 hover:bg-slate-50 transition-all duration-300">
-                                                        <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center border border-slate-100 shadow-sm group-hover:scale-110 transition-transform">
-                                                            <MapPin className="w-5 h-5 text-slate-400" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5 italic">Resource Venue</p>
-                                                            <p className="text-[11px] font-black text-slate-800 uppercase tracking-tight italic">{entry.room}</p>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    ))}
-                                    {slot.entries.length === 0 && (
-                                        <div className="flex flex-col items-center justify-center py-16 opacity-30 grayscale group-hover:grayscale-0 transition-all duration-500 scale-90">
-                                            <div className="p-10 bg-slate-50 rounded-[2.5rem] mb-6 border border-slate-100">
-                                                <LayoutDashboard className="w-12 h-12 text-slate-200" />
-                                            </div>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Operational Silence</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                    {getSlotsForDay(activeDayIdx).length === 0 && (
-                        <div className="col-span-full py-32 text-center bg-white rounded-[4rem] border-2 border-dashed border-slate-50 shadow-sm flex flex-col items-center justify-center group hover:bg-slate-50 transition-all duration-700">
-                            <div className="p-12 bg-white w-28 h-28 rounded-full border border-slate-100 shadow-xl flex items-center justify-center mb-10 group-hover:rotate-12 transition-transform duration-700">
-                                <Info className="w-12 h-12 text-slate-200" />
-                            </div>
-                            <h3 className="text-3xl font-black text-slate-900 uppercase tracking-tight italic mb-3">Academic Rest</h3>
-                            <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px] italic opacity-60">No institutional operations detected for this temporal cycle</p>
-                        </div>
-                    )}
-                </div>
+                    );
+                })}
             </div>
 
-            {/* Institutional Protocol Notice */}
-            <div className="bg-[#0A0C10] rounded-[4rem] p-16 text-white shadow-2xl relative overflow-hidden group hover:shadow-indigo-500/10 transition-shadow duration-700">
-                <div className="relative z-10 flex flex-col md:flex-row items-center gap-14">
-                    <div className="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center backdrop-blur-xl border border-white/10 shrink-0 group-hover:rotate-6 transition-transform duration-500">
-                        <AlertCircle className="w-10 h-10 text-indigo-400" />
+            {/* ── Class Slots ── */}
+            {activeSlots.length === 0 ? (
+                <div className="bg-white rounded-2xl py-20 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex flex-col items-center">
+                    <div className="w-14 h-14 bg-[#f1f3f9] rounded-2xl flex items-center justify-center mb-4">
+                        <Calendar className="w-7 h-7 text-[#c2c6d7]" />
                     </div>
-                    <div className="text-center md:text-left space-y-4">
-                        <div className="flex items-center gap-4 justify-center md:justify-start">
-                            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-                            <h4 className="text-2xl font-black uppercase tracking-tight italic">Institutional Logistics Protocol</h4>
-                        </div>
-                        <p className="text-sm text-slate-400 font-bold uppercase tracking-widest leading-relaxed max-w-3xl italic opacity-70">
-                            All scheduled temporal blocks represent final institutional allocation. Real-time deviations are restricted to emergency nodes and will be broadcasted via the encrypted notification gateway.
-                        </p>
-                    </div>
+                    <h3 className="text-base font-bold text-[#181c20]">Free Day</h3>
+                    <p className="text-sm text-[#64748b] mt-1">No classes scheduled for {DAYS[activeDayIdx]}</p>
                 </div>
-                {/* Visual Flair */}
-                <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-indigo-600/10 rounded-full blur-[100px] transition-all duration-700 group-hover:scale-150"></div>
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_30%_50%,rgba(79,70,229,0.05),transparent_50%)]"></div>
+            ) : (
+                <div className="space-y-3">
+                    {activeSlots.map((slot, sIdx) => {
+                        const accent = SLOT_ACCENTS[sIdx % SLOT_ACCENTS.length];
+                        return (
+                            <div
+                                key={slot.id}
+                                className="group bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex"
+                            >
+                                {/* Left accent bar */}
+                                <div className="w-1.5 shrink-0 rounded-l-2xl" style={{ backgroundColor: accent.bar }} />
+
+                                <div className="flex-1 p-5 flex items-start gap-5">
+                                    {/* Time */}
+                                    <div className="flex flex-col items-center text-center min-w-[64px] shrink-0">
+                                        <span className="text-sm font-bold" style={{ color: accent.text }}>
+                                            {slot.startTime.substring(0, 5)}
+                                        </span>
+                                        <div className="my-1 w-px h-4 bg-[#e6e8ee]" />
+                                        <span className="text-xs text-[#64748b]">{slot.endTime.substring(0, 5)}</span>
+                                    </div>
+
+                                    {/* Divider */}
+                                    <div className="self-stretch w-px bg-[#f1f3f9] shrink-0" />
+
+                                    {/* Entries */}
+                                    <div className="flex-1 min-w-0">
+                                        {slot.entries.length > 0 ? (
+                                            slot.entries.map((entry, eIdx) => (
+                                                <div key={eIdx} className="flex items-center justify-between gap-4 flex-wrap">
+                                                    <div className="min-w-0">
+                                                        <h3 className="text-base font-bold text-[#181c20] group-hover:text-[#0054d1] transition-colors truncate">
+                                                            {entry.subjectName}
+                                                        </h3>
+                                                        <div className="flex items-center gap-4 mt-2 flex-wrap">
+                                                            <span className="flex items-center gap-1.5 text-xs text-[#424655]">
+                                                                <User className="w-3.5 h-3.5 text-[#c2c6d7]" />
+                                                                {entry.instructorName}
+                                                            </span>
+                                                            {entry.room && (
+                                                                <span className="flex items-center gap-1.5 text-xs text-[#424655]">
+                                                                    <MapPin className="w-3.5 h-3.5 text-[#c2c6d7]" />
+                                                                    Room {entry.room}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <span
+                                                        className="shrink-0 text-[10px] font-semibold px-3 py-1 rounded-full"
+                                                        style={{ backgroundColor: accent.bg, color: accent.text }}
+                                                    >
+                                                        Slot {sIdx + 1}
+                                                    </span>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-sm text-[#64748b]">No entries for this slot</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* ── Notice Banner ── */}
+            <div className="bg-[#f1f3f9] rounded-2xl p-6 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-[#dae2ff] flex items-center justify-center shrink-0">
+                    <AlertCircle className="w-5 h-5 text-[#0054d1]" />
+                </div>
+                <div>
+                    <h4 className="text-sm font-semibold text-[#1a3d8a]">Schedule Notice</h4>
+                    <p className="text-xs text-[#424655] mt-1 leading-relaxed">
+                        All scheduled time blocks represent final institutional allocation. Any real-time changes will be communicated via the announcement feed.
+                    </p>
+                </div>
             </div>
         </div>
     );
