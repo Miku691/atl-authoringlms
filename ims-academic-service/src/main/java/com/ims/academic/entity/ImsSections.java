@@ -6,7 +6,7 @@ import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Table(name = "IMS_SECTIONS", uniqueConstraints = {
-                @UniqueConstraint(name = "uk_section_name_class", columnNames = { "class_id", "name" })
+                @UniqueConstraint(name = "uk_section_name_class_offering", columnNames = { "class_id", "offering_id", "name" })
 }, indexes = {
                 @Index(name = "idx_section_tenant", columnList = "tenant_id"),
                 @Index(name = "idx_section_class", columnList = "class_id")

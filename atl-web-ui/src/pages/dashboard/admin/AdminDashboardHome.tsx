@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { financeService } from '../../../api/financeService';
+import SubscriptionStatusBanner from './components/SubscriptionStatusBanner';
 
 const AdminDashboardHome: React.FC = () => {
     const navigate = useNavigate();
@@ -138,6 +139,9 @@ const AdminDashboardHome: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Subscription Status Banner (Full Width) */}
+            <SubscriptionStatusBanner />
 
             {/* Quick Actions Panel */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

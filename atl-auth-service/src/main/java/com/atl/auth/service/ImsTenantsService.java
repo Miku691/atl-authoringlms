@@ -27,6 +27,7 @@ public class ImsTenantsService {
     private final AtlUserService userService;
     private final AtlUserRepo userRepo;
     private final com.atl.auth.client.AcademicClient academicClient;
+    private final com.atl.auth.client.PlatformClient platformClient;
 
     private ImsTenantsDto convertToDto(ImsTenants entity) {
         return modelMapper.map(entity, ImsTenantsDto.class);
@@ -48,6 +49,15 @@ public class ImsTenantsService {
         if (saved.getId() != null) {
             userService.updateUserStatusOrTenantId(new AtlUpdateAtlUserDto(user.getUsername(), user.getEmail(),
                     ApplicationConstant.USER_ACTIVE, saved));
+
+            // Provision the subscription plan selected during onboarding
+            String selectedPlan = user.getPlanName() != null ? user.getPlanName() : "Starter (FREE)";
+            try {
+                platformClient.provisionPlan(saved.getId(), selectedPlan);
+            } catch (Exception e) {
+                // Log error but don't fail tenant creation - fallback will handle it in dashboard
+                System.err.println("Failed to provision initial plan for tenant: " + saved.getId() + ". Error: " + e.getMessage());
+            }
         }
 
         return ApiResponse.<ImsTenantsDto>builder()

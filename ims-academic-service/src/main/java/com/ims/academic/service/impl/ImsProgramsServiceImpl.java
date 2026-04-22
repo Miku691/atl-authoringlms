@@ -32,8 +32,9 @@ public class ImsProgramsServiceImpl implements ImsProgramsService {
     public ImsProgramsDto create(ImsProgramsDto dto) {
 
         if (repo.existsByTenantIdAndCode(dto.getTenantId(), dto.getCode())) {
-            throw new ResourceAlreadyExistException(
-                    dto.getCode(), "PROGRAM", "Code");
+            return repo.findByTenantIdAndCode(dto.getTenantId(), dto.getCode())
+                    .map(this::toDto)
+                    .orElseThrow(() -> new ResourceAlreadyExistException(dto.getCode(), "PROGRAM", "Code"));
         }
 
         return toDto(repo.save(toEntity(dto)));
@@ -53,6 +54,10 @@ public class ImsProgramsServiceImpl implements ImsProgramsService {
             existing.setBoard(dto.getBoard());
         if (dto.getDescription() != null)
             existing.setDescription(dto.getDescription());
+        if (dto.getCollegeCategory() != null)
+            existing.setCollegeCategory(dto.getCollegeCategory());
+        if (dto.getAffiliation() != null)
+            existing.setAffiliation(dto.getAffiliation());
 
         return toDto(repo.save(existing));
     }

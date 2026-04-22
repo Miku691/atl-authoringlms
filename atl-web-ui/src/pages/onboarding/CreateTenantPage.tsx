@@ -284,7 +284,8 @@ const CreateTenantPage: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Section 3: Geo Coordinates */}
+                        {/* Section 3: Geo Coordinates - Hidden temporarily due to errors */}
+                        {/* 
                         <div className="space-y-4 bg-white p-6 rounded-2xl border-2 border-slate-100 shadow-sm">
                             <div className="flex items-center justify-between mb-2">
                                 <h3 className="text-xs font-black text-indigo-600 uppercase tracking-widest">Establishment Coordinates</h3>
@@ -320,17 +321,19 @@ const CreateTenantPage: React.FC = () => {
                             </div>
                             <p className="text-[10px] text-slate-400 italic">Enter manually or use 'Auto Pick' for precise geo-location mapping.</p>
                         </div>
+                        */}
 
                         {/* Section 4: Contact & Phone */}
                         <div className="space-y-4">
                             <h3 className="text-xs font-black text-indigo-600 uppercase tracking-widest px-1">Institutional Contact</h3>
-                            <div className="flex gap-4">
+                            <div className="flex items-start gap-4">
                                 <div className="w-[100px]">
-                                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Prefix</label>
-                                    <input
-                                        disabled
+                                    <FloatingLabelInput
+                                        label="Prefix"
+                                        readOnly
                                         value={formData.countryPhoneCode}
-                                        className="w-full px-3 py-4 border-2 border-slate-100 rounded-xl bg-slate-50 text-slate-400 font-bold text-sm text-center"
+                                        className="mb-0 h-[58px]"
+                                        inputClassName="text-center font-bold text-slate-400"
                                     />
                                 </div>
                                 <div className="flex-1">

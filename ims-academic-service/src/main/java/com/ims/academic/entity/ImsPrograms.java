@@ -59,6 +59,12 @@ public class ImsPrograms {
         @Column(name = "description", columnDefinition = "TEXT")
         private String description;
 
+        @Column(name = "college_category", length = 100)
+        private String collegeCategory;
+
+        @Column(name = "affiliation", length = 255)
+        private String affiliation;
+
         @CreationTimestamp
         @Column(name = "created_at", updatable = false)
         private Instant createdAt;

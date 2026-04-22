@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 import AuthLayout from '../../layouts/AuthLayout';
 import FloatingLabelInput from '../../components/common/FloatingLabelInput';
@@ -104,6 +104,9 @@ const RegisterInstitutePage: React.FC = () => {
         }
     };
 
+    const { search } = useLocation();
+    const planName = new URLSearchParams(search).get('plan');
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -118,7 +121,8 @@ const RegisterInstitutePage: React.FC = () => {
             adminName: formData.adminName,
             email: formData.email,
             phone: `${formData.countryCode}${formData.phone}`,
-            password: formData.password
+            password: formData.password,
+            planName: planName || 'Starter (FREE)' // Default to Starer (FREE) if none selected
         };
 
         try {

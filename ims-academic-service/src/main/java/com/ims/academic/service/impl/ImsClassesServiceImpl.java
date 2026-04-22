@@ -35,22 +35,33 @@ public class ImsClassesServiceImpl implements ImsClassesService {
     public ImsClassesDto create(ImsClassesDto dto) {
 
         if (repo.existsByTenantIdAndName(dto.getTenantId(), dto.getName())) {
-            throw new ResourceAlreadyExistException(
-                    dto.getName(), "CLASS", "Name");
+            return repo.findByTenantIdAndName(dto.getTenantId(), dto.getName())
+                    .map(this::toDto)
+                    .orElseThrow(() -> new ResourceAlreadyExistException(dto.getName(), "CLASS", "Name"));
         }
 
         ImsClasses savedEntity = repo.save(toEntity(dto));
 
-        // Create Default Section if programId is provided (manual dashboard creation)
+        // Create Sections/Offerings if programId is provided (manual dashboard creation)
         if (dto.getProgramId() != null) {
-            ImsSectionsDto sectionDto = ImsSectionsDto.builder()
-                    .tenantId(dto.getTenantId())
-                    .classId(savedEntity.getId())
-                    .name("A")
-                    .capacity(dto.getCapacity())
-                    .programId(dto.getProgramId())
-                    .build();
-            sectionsService.create(sectionDto);
+            int count = (dto.getSemesterCount() != null && dto.getSemesterCount() > 0) ? dto.getSemesterCount() : 1;
+            
+            for (int i = 1; i <= count; i++) {
+                String offName = null;
+                if (dto.getSemesterCount() != null && dto.getSemesterCount() > 1) {
+                    offName = "Semester " + i;
+                }
+                
+                ImsSectionsDto sectionDto = ImsSectionsDto.builder()
+                        .tenantId(dto.getTenantId())
+                        .classId(savedEntity.getId())
+                        .name("A")
+                        .capacity(dto.getCapacity())
+                        .programId(dto.getProgramId())
+                        .offeringName(offName)
+                        .build();
+                sectionsService.create(sectionDto);
+            }
         }
 
         return toDto(savedEntity);

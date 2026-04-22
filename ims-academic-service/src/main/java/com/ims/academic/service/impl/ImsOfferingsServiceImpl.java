@@ -77,17 +77,32 @@ public class ImsOfferingsServiceImpl implements ImsOfferingsService {
 
     @Override
     public ImsOfferingsDto create(ImsOfferingsDto dto) {
+        com.ims.academic.entity.AcademicSession session;
         if (dto.getSessionId() == null) {
-            throw new IllegalArgumentException("Session ID is required");
+            session = academicSessionRepo.findFirstByTenantIdAndIsCurrentTrue(dto.getTenantId())
+                .orElseThrow(() -> new IllegalArgumentException("No active session found for tenant"));
+            dto.setSessionId(session.getId());
+        } else {
+            session = academicSessionRepo.findById(dto.getSessionId())
+                .orElseThrow(() -> new ResourceNotFoundException("Session ID", dto.getSessionId()));
         }
 
-        com.ims.academic.entity.AcademicSession session = academicSessionRepo.findById(dto.getSessionId())
-                .orElseThrow(() -> new ResourceNotFoundException("Session ID", dto.getSessionId()));
+        // Idempotency: Return existing if matches name and session
+        repo.findByNameAndSessionId(dto.getName(), dto.getSessionId())
+                .ifPresent(existing -> dto.setId(existing.getId()));
+
+        if (dto.getId() != null) {
+            log.info("Offering {} already exists, returning existing.", dto.getName());
+            return getById(dto.getId());
+        }
 
         ImsOfferings offering = modelMapper.map(dto, ImsOfferings.class);
         offering.setSession(session);
 
-        return toDto(repo.save(offering));
+        ImsOfferings saved = repo.save(offering);
+        ImsOfferingsDto result = toDto(saved);
+        result.setId(saved.getId()); // Explicit assurance that ID is propagated
+        return result;
     }
 
     @Override

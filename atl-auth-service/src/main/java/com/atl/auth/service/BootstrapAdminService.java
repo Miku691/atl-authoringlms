@@ -40,9 +40,8 @@ public class BootstrapAdminService {
 
                 admin.setTenant(null);
 
-                admin.setStatus(ApplicationConstant.USER_INACTIVE);
-                // admin.getRoles().add(superAdmin);
                 admin.setRoles(roleService.setDefaultRole(ApplicationConstant.TENANT_ADMIN_ROLE));
+                admin.setPlanName(dto.getPlanName());
 
                 AtlUser saved = userRepo.save(admin);
 

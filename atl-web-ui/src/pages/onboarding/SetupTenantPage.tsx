@@ -33,10 +33,13 @@ interface BootstrapPayload {
     };
 
     collegeConfig?: {
+        collegeCategory: string;
+        affiliation: string;
         programs: ProgramReq[];
     };
 
     coachingConfig?: {
+        affiliation: string;
         programs: ProgramReq[];
     };
 }
@@ -61,6 +64,17 @@ const InitialSetupPage: React.FC = () => {
         startClass: 1,
         endClass: 2,
         sectionsPerClass: 1
+    });
+
+    // College Specific State
+    const [collegeDetails, setCollegeDetails] = useState({
+        collegeCategory: 'Engineering',
+        affiliation: ''
+    });
+
+    // Coaching Specific State
+    const [coachingDetails, setCoachingDetails] = useState({
+        affiliation: ''
     });
 
     // College/Coaching State
@@ -96,9 +110,15 @@ const InitialSetupPage: React.FC = () => {
             if (type === 'SCHOOL') {
                 payload.schoolConfig = schoolDetails;
             } else if (type === 'COLLEGE') {
-                payload.collegeConfig = { programs: programs.filter(p => p.name.trim() !== '') };
+                payload.collegeConfig = { 
+                    ...collegeDetails,
+                    programs: programs.filter(p => p.name.trim() !== '') 
+                };
             } else if (type === 'COACHING') {
-                payload.coachingConfig = { programs: programs.filter(p => p.name.trim() !== '') };
+                payload.coachingConfig = { 
+                    ...coachingDetails,
+                    programs: programs.filter(p => p.name.trim() !== '') 
+                };
             }
 
             const response = await api.post('/ims-academic-service/bootstrap', payload);
@@ -252,10 +272,61 @@ const InitialSetupPage: React.FC = () => {
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
                     <h3 className="font-semibold text-gray-900 flex items-center gap-2">
                         {type === 'COLLEGE' ? <GraduationCap className="w-5 h-5 text-purple-600" /> : <Users className="w-5 h-5 text-orange-600" />}
-                        {type === 'COLLEGE' ? 'Degree Programs' : 'Courses & Batches'}
+                        Institutional Details
                     </h3>
 
-                    <div className="space-y-3">
+                    {type === 'COLLEGE' && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                            <div className="relative h-[58px]">
+                                <label className="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-indigo-600 uppercase tracking-widest z-10">
+                                    College Category
+                                </label>
+                                <select
+                                    value={collegeDetails.collegeCategory}
+                                    onChange={(e) => setCollegeDetails({ ...collegeDetails, collegeCategory: e.target.value })}
+                                    className="w-full h-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 text-sm transition-all bg-white appearance-none cursor-pointer"
+                                >
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Management">Management</option>
+                                    <option value="Diploma / Polytechnic">Diploma / Polytechnic</option>
+                                    <option value="General Degree (Arts/Science/Commerce)">General Degree (Arts/Science/Commerce)</option>
+                                    <option value="Law">Law</option>
+                                    <option value="Nursing">Nursing</option>
+                                    <option value="Vocational">Vocational</option>
+                                </select>
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                    <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <FloatingLabelInput
+                                label="Affiliating University"
+                                value={collegeDetails.affiliation}
+                                onChange={(e) => setCollegeDetails({ ...collegeDetails, affiliation: e.target.value })}
+                                placeholder="e.g. University of Mumbai"
+                                className="mb-0 h-[58px]"
+                            />
+                        </div>
+                    )}
+
+                    {type === 'COACHING' && (
+                        <div>
+                            <FloatingLabelInput
+                                label="Board / Regulatory Affiliation"
+                                value={coachingDetails.affiliation}
+                                onChange={(e) => setCoachingDetails({ ...coachingDetails, affiliation: e.target.value })}
+                                placeholder="e.g. State Board, NEP Guidelines"
+                            />
+                        </div>
+                    )}
+
+                    <div className="pt-4 border-t border-gray-100 mt-4">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-4">
+                            {type === 'COLLEGE' ? 'Degree Programs' : 'Courses & Batches'}
+                        </h4>
+                        <div className="space-y-3">
                         {programs.map((prog, idx) => (
                             <div key={idx} className="p-4 bg-gray-50 rounded-lg border border-gray-200 relative group">
                                 <button
@@ -315,9 +386,10 @@ const InitialSetupPage: React.FC = () => {
                         </button>
                     </div>
                 </div>
-            )}
+            </div>
+        )}
 
-            <div className="flex justify-between pt-6">
+        <div className="flex justify-between pt-6">
                 <button
                     onClick={() => setStep(1)}
                     className="px-6 py-2 text-gray-600 hover:text-gray-900 flex items-center gap-2"

@@ -26,6 +26,7 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
     private final ImsInstructorsRepo repo;
     private final ModelMapper modelMapper;
     private final AuthClient authClient;
+    private final com.ims.instructor.client.PlatformClient platformClient;
 
     private ImsInstructorsDto toDto(ImsInstructors ins) {
         return modelMapper.map(ins, ImsInstructorsDto.class);
@@ -37,6 +38,16 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
 
     @Override
     public ImsInstructorsDto create(ImsInstructorsDto dto) {
+        // SaaS Limit Enforcement
+        com.ims.instructor.dto.SubscriptionLimitsDto limits = platformClient.getTenantLimits(dto.getTenantId());
+        long currentCount = repo.countByTenantId(dto.getTenantId());
+
+        if (limits.getMaxTeachers() != null && currentCount >= limits.getMaxTeachers()) {
+            throw new com.ims.instructor.exception.LimitExceededException(
+                    String.format("Current plan '%s' allows only %d teachers. Please upgrade to add more.",
+                            limits.getPlanName(), limits.getMaxTeachers())
+            );
+        }
 
         if (dto.getEmployeeId() == null || dto.getEmployeeId().isEmpty()) {
             dto.setEmployeeId(generateUniqueEmployeeId());

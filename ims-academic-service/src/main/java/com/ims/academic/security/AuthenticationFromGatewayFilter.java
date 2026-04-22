@@ -28,15 +28,18 @@ public class AuthenticationFromGatewayFilter extends OncePerRequestFilter {
         String rolesStr = request.getHeader(SecurityConstant.ROLES_HEADER);
         String tenantId = request.getHeader(SecurityConstant.TENANT_ID_HEADER);
 
-        if (userId != null && !userId.isEmpty() && rolesStr != null && !rolesStr.isEmpty()) {
-
-            List<GrantedAuthority> authorities = Arrays.stream(rolesStr.split(","))
-                    .map(role -> {
-                        String r = role.trim().toUpperCase();
-                        String prefix = SecurityConstant.ROLE_PREFIX;
-                        return new SimpleGrantedAuthority(r.startsWith(prefix) ? r : prefix + r);
-                    })
-                    .collect(Collectors.toList());
+        if (userId != null && !userId.isEmpty()) {
+            List<GrantedAuthority> authorities = List.of();
+            if (rolesStr != null && !rolesStr.isEmpty()) {
+                authorities = Arrays.stream(rolesStr.split(","))
+                        .filter(role -> role != null && !role.trim().isEmpty())
+                        .map(role -> {
+                            String r = role.trim().toUpperCase();
+                            String prefix = SecurityConstant.ROLE_PREFIX;
+                            return new SimpleGrantedAuthority(r.startsWith(prefix) ? r : prefix + r);
+                        })
+                        .collect(Collectors.toList());
+            }
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId,
                     null, authorities);

@@ -64,6 +64,7 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             subItems: [
                 { path: '/dashboard', label: 'Overview', icon: LayoutDashboard },
                 { path: '/platform/leads', label: 'Demo Leads', icon: Users },
+                { path: '/system/subscription-plans', label: 'Subscription Plans', icon: Tag },
                 { path: '/system/settings', label: 'Global Settings', icon: Settings },
             ]
         },
@@ -299,6 +300,16 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
         //         { path: '/system/templates/invoice', label: 'Invoice Template', icon: FileText, roles: ['TENANT_ADMIN'] },
         //     ]
         // },
+        {
+            path: '/billing',
+            label: 'Subscription & Payment',
+            icon: DollarSign,
+            roles: ['TENANT_ADMIN'],
+            subItems: [
+                { path: '/billing/subscription', label: 'My Plan', icon: ShieldCheck },
+                { path: '/billing/history', label: 'Billing History', icon: FileText },
+            ]
+        },
         {
             path: '/system',
             label: 'System',

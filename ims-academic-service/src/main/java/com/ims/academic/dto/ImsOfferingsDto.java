@@ -21,6 +21,7 @@ public class ImsOfferingsDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer capacity;
+    private String classId;
     private String metadata;
     private OfferingStatus status;
 }

@@ -14,4 +14,5 @@ public class ImsClassesDto {
     private String code;
     private Integer capacity;
     private String programId;
+    private Integer semesterCount;
 }

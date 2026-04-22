@@ -4,6 +4,8 @@
       <env name="PLATFORM_MYSQL_PASS" value="my-secret-atl" />
       <env name="PLATFORM_MYSQL_URI" value="jdbc:mysql://localhost:3306/ims-platform-db?allowPublicKeyRetrieval=true&amp;useSSL=false" />
       <env name="PLATFORM_MYSQL_USER" value="root" />
+      <env name="RAZORPAY_KEY_ID" value="rzp_test_SgX82BxSZJmwra" />
+      <env name="RAZORPAY_KEY_SECRET" value="KTt7lJRv2UXG1J7VaPNtX49T" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.ims.platform.ImsPlatformServiceApplication" />
     <module name="ims-platform-service" />

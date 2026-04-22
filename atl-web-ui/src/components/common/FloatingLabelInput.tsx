@@ -5,12 +5,14 @@ interface FloatingLabelInputProps extends React.InputHTMLAttributes<HTMLInputEle
     label: string;
     icon?: React.ReactNode;
     error?: string;
+    inputClassName?: string;
 }
 
 const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
     label,
     icon,
     error,
+    inputClassName = '',
     type = 'text',
     className = '',
     value,
@@ -26,7 +28,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
         <div className={`relative mb-1 ${className}`}>
             <div
                 className={`
-                    relative rounded-lg border transition-all duration-200
+                    relative rounded-lg border transition-all duration-200 h-full
                     ${error
                         ? 'border-red-500 ring-4 ring-red-50 focus-within:ring-red-100 focus-within:border-red-600 shadow-sm shadow-red-200/20'
                         : 'border-gray-200 focus-within:ring-4 focus-within:ring-indigo-50 focus-within:border-indigo-500'
@@ -53,6 +55,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
                         ${icon ? 'pl-10' : 'pl-4'} 
                         pr-10 py-3.5 
                         text-gray-900 placeholder-transparent focus:ring-0
+                        ${inputClassName}
                     `}
                     placeholder={label} // Required for :placeholder-shown trick if we used CSS-only, but here using JS state
                     onFocus={(e) => {

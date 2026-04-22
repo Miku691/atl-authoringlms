@@ -62,4 +62,8 @@ public class ImsOfferings {
     // Flexible config (semester_no, section, shift, etc.)
     @Column(name = "metadata", columnDefinition = "TEXT")
     private String metadata;
+
+    // Link to Class (especially for College/Coaching where Semesters directly link to Years)
+    @Column(name = "class_id")
+    private String classId;
 }

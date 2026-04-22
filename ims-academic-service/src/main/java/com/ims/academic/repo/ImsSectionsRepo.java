@@ -7,7 +7,9 @@ import java.util.List;
 
 public interface ImsSectionsRepo extends JpaRepository<ImsSections, String> {
 
-    boolean existsByImsClassIdAndName(String classId, String name);
+    boolean existsByImsClassIdAndNameAndOfferingId(String classId, String name, String offeringId);
+
+    java.util.Optional<ImsSections> findByImsClassIdAndNameAndOfferingId(String classId, String name, String offeringId);
 
     List<ImsSections> findByTenantId(String tenantId);
 

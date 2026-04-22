@@ -23,6 +23,7 @@ interface Offering {
     id: string;
     programId: string;
     sessionId: string;
+    classId?: string;
     name: string;
     type: string;
     capacity: number;
@@ -33,6 +34,7 @@ interface ImsClass {
     tenantId: string;
     name: string;
     code: string;
+    programId?: string;
 }
 
 interface ImsSection {
@@ -67,12 +69,30 @@ const AcademicStructurePage: React.FC = () => {
     // Add Class Form
     const [newClassName, setNewClassName] = useState('');
     const [defaultCapacity, setDefaultCapacity] = useState(40);
+    const [semesterCount, setSemesterCount] = useState(8);
+
+    // Terminology Helper
+    const getTerm = (level: string, type: 'BRANCH' | 'SEMESTER' | 'SECTION' | 'ADD_BRANCH' | 'TOTAL_BRANCHES' = 'BRANCH') => {
+        const isCollege = ['UNDERGRAD', 'POSTGRAD'].includes(level);
+        const isCoaching = level === 'COACHING';
+
+        switch (type) {
+            case 'ADD_BRANCH': return isCollege ? 'Add Branch' : isCoaching ? 'Add Course' : 'Add Class';
+            case 'BRANCH': return isCollege ? 'Branch' : isCoaching ? 'Course' : 'Class';
+            case 'SEMESTER': return isCollege ? 'Semester' : isCoaching ? 'Batch' : 'Offering';
+            case 'TOTAL_BRANCHES': return isCollege ? 'Total Semesters' : isCoaching ? 'Total Batches' : 'Total Offerings';
+            case 'SECTION': return 'Section';
+            default: return '';
+        }
+    };
 
     // Add Section Form
     const [isSectionModalOpen, setIsSectionModalOpen] = useState(false);
     const [selectedClassId, setSelectedClassId] = useState<string>('');
     const [selectedClassName, setSelectedClassName] = useState<string>('');
     const [newSectionName, setNewSectionName] = useState('');
+    const [newSectionOfferingId, setNewSectionOfferingId] = useState('');
+    const [sectionError, setSectionError] = useState('');
 
     const [editedClass, setEditedClass] = useState<{
         id: string;
@@ -98,6 +118,9 @@ const AcademicStructurePage: React.FC = () => {
     const [isInstructorModalOpen, setIsInstructorModalOpen] = useState(false);
     const [selectedOfferingIdForInstructor, setSelectedOfferingIdForInstructor] = useState('');
     const [selectedClassNameForInstructor, setSelectedClassNameForInstructor] = useState('');
+
+    // Layout Expansion State
+    const [expandedBranches, setExpandedBranches] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
         if (tenantId) {
@@ -151,20 +174,47 @@ const AcademicStructurePage: React.FC = () => {
                 name: newClassName,
                 code: newClassName.toUpperCase().replace(/\s+/g, '-'),
                 programId: selectedProgramId,
-                capacity: defaultCapacity
+                capacity: defaultCapacity,
+                semesterCount: semesterCount
             });
 
-            toast.success("Class Added");
+            toast.success("Success");
             setIsAddClassOpen(false);
             setNewClassName('');
             fetchData();
         } catch (e: any) {
             console.error(e);
-            toast.error(e.response?.data?.message || "Failed to add class");
+            toast.error(e.response?.data?.message || "Failed");
         } finally {
             setIsSubmitting(false);
         }
     };
+
+    const handleAddSemester = async (clsId: string, progId: string, currentOffCount: number) => {
+        setIsSubmitting(true);
+        try {
+            const level = programs.find(p => p.id === progId)?.level || 'COLLEGE';
+            const offName = getTerm(level, 'SEMESTER') + " " + (currentOffCount + 1);
+            const offeringType = level === 'SCHOOL' ? 'SCHOOL_CLASS' : level === 'COLLEGE' ? 'COLLEGE_PROGRAM' : 'COACHING_BATCH';
+            
+            await api.post('/ims-academic-service/offerings', {
+                tenantId,
+                programId: progId,
+                classId: clsId,
+                name: offName,
+                type: offeringType,
+                capacity: defaultCapacity
+            });
+
+            toast.success(`${getTerm(level, 'SEMESTER')} Added`);
+            fetchData();
+        } catch (e: any) {
+            toast.error("Failed to add " + getTerm('', 'SEMESTER'));
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
 
     const handleAddSection = async () => {
         if (!newSectionName || !selectedClassId || !selectedProgramId) return;
@@ -175,12 +225,14 @@ const AcademicStructurePage: React.FC = () => {
                 classId: selectedClassId,
                 name: newSectionName,
                 programId: selectedProgramId,
-                capacity: defaultCapacity
+                capacity: defaultCapacity,
+                offeringId: newSectionOfferingId || undefined
             });
 
             toast.success("Section Added");
             setIsSectionModalOpen(false);
             setNewSectionName('');
+            setNewSectionOfferingId('');
             fetchData();
         } catch (e: any) {
             console.error(e);
@@ -285,18 +337,23 @@ const AcademicStructurePage: React.FC = () => {
     };
 
     const getClassesForProgram = (progId: string) => {
-        const progOfferingIds = offerings.filter(o => o.programId === progId).map(o => o.id);
-        const progSectionClassIds = sections
-            .filter(s => s.offeringId && progOfferingIds.includes(s.offeringId))
-            .map(s => s.classId);
-
         return classes
-            .filter(c => progSectionClassIds.includes(c.id))
+            .filter(c => c.programId === progId)
             .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
     };
 
-    const getSectionsForClass = (classId: string) => {
-        return sections.filter(s => s.classId === classId);
+    const getOfferingsForClass = (classId: string) => {
+        // Fallback: If offerings don't have classId directly (legacy school data), we use sections as bridge
+        const directOfferings = offerings.filter(o => o.classId === classId);
+        if (directOfferings.length > 0) return directOfferings;
+        
+        // Legacy bridge
+        const secOfferingIds = sections.filter(s => s.classId === classId && s.offeringId).map(s => s.offeringId!);
+        return offerings.filter(o => secOfferingIds.includes(o.id));
+    };
+
+    const getSectionsForClassAndOffering = (classId: string, offeringId: string) => {
+        return sections.filter(s => s.classId === classId && s.offeringId === offeringId);
     };
 
     const getOfferingForSection = (sectionId: string) => {
@@ -316,13 +373,18 @@ const AcademicStructurePage: React.FC = () => {
         <div className="space-y-6">
             <PageHeader
                 title="Academic Structure"
-                description="Manage your classes and sections."
+                description={`Manage your ${getTerm(programs[0]?.level || '').toLowerCase()}es and sections.`}
                 actions={isAdmin && programs.length > 0 && (
                     <button
-                        onClick={() => { setSelectedProgramId(programs[0].id); setIsAddClassOpen(true); }}
+                        onClick={() => { 
+                            const level = programs[0]?.level || '';
+                            setSelectedProgramId(programs[0].id); 
+                            setSemesterCount(['UNDERGRAD', 'POSTGRAD'].includes(level) ? 8 : 1);
+                            setIsAddClassOpen(true); 
+                        }}
                         className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-indigo-700 transition-colors"
                     >
-                        <Plus className="w-4 h-4" /> Add Class
+                        <Plus className="w-4 h-4" /> {getTerm(programs[0]?.level || '', 'ADD_BRANCH')}
                     </button>
                 )}
             />
@@ -333,6 +395,7 @@ const AcademicStructurePage: React.FC = () => {
 
                     return (
                         <div key={program.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-fadeIn">
+                            {/* ... header ... */}
                             <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-indigo-100 rounded-lg">
@@ -343,18 +406,34 @@ const AcademicStructurePage: React.FC = () => {
                                         <p className="text-xs text-gray-500">{program.code} • {program.level}</p>
                                     </div>
                                 </div>
+                                {isAdmin && (
+                                    <button
+                                        onClick={() => {
+                                            setSelectedProgramId(program.id);
+                                            setSemesterCount(['UNDERGRAD', 'POSTGRAD'].includes(program.level) ? 8 : 1);
+                                            setIsAddClassOpen(true);
+                                        }}
+                                        className="text-indigo-600 hover:text-indigo-700 text-sm font-medium flex items-center gap-1"
+                                    >
+                                        <Plus className="w-4 h-4" /> {getTerm(program.level, 'ADD_BRANCH')}
+                                    </button>
+                                )}
                             </div>
 
                             <div className="p-4">
                                 {programClasses.length === 0 ? (
                                     <div className="text-center py-8 text-gray-500">
                                         <Layers className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                                        <p>No classes found. Add one to get started.</p>
+                                        <p>No {getTerm(program.level).toLowerCase()}es found. Add one to get started.</p>
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div className={`grid gap-4 ${
+                                        program.level === 'UNDERGRAD' || program.level === 'POSTGRAD' || program.level === 'COACHING' 
+                                        ? 'grid-cols-1' 
+                                        : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                                    }`}>
                                         {programClasses.map(cls => {
-                                            const clsSections = getSectionsForClass(cls.id);
+                                            const classOfferingsCount = getOfferingsForClass(cls.id).length;
 
                                             return (
                                                 <div key={cls.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative group">
@@ -363,9 +442,16 @@ const AcademicStructurePage: React.FC = () => {
                                                             <h4 className="font-bold text-gray-800 text-lg">{cls.name}</h4>
                                                             <p className="text-xs text-gray-400 capitalize">{program.level.toLowerCase()}</p>
                                                         </div>
-                                                        <div className="flex gap-1">
+                                                        <div className="flex gap-2">
                                                             {isAdmin && (
                                                                 <>
+                                                                    <button
+                                                                        onClick={() => handleAddSemester(cls.id, program.id, classOfferingsCount)}
+                                                                        className="flex items-center gap-1 text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded hover:bg-indigo-100 transition-colors"
+                                                                        title={`Add ${getTerm(program.level, 'SEMESTER')}`}
+                                                                    >
+                                                                        <Plus className="w-3 h-3" /> Add {getTerm(program.level, 'SEMESTER')}
+                                                                    </button>
                                                                     <button
                                                                         onClick={() => setEditedClass({
                                                                             id: cls.id,
@@ -375,14 +461,14 @@ const AcademicStructurePage: React.FC = () => {
                                                                             type: 'SCHOOL_CLASS'
                                                                         })}
                                                                         className="text-gray-300 hover:text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                                                                        title="Edit Class"
+                                                                        title={`Edit ${getTerm(program.level)}`}
                                                                     >
                                                                         <Edit2 className="w-4 h-4" />
                                                                     </button>
                                                                     <button
                                                                         onClick={() => handleDeleteClass(cls.id, '')}
                                                                         className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                                                                        title="Delete Class"
+                                                                        title={`Delete ${getTerm(program.level)}`}
                                                                     >
                                                                         <Trash2 className="w-4 h-4" />
                                                                     </button>
@@ -393,82 +479,120 @@ const AcademicStructurePage: React.FC = () => {
 
                                                     <div className="space-y-3">
                                                         <div className="flex justify-between items-center">
-                                                            <p className="text-xs font-semibold text-gray-500 uppercase">Sections & Offerings</p>
-                                                            {isAdmin && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setSelectedClassId(cls.id);
-                                                                        setSelectedClassName(cls.name);
-                                                                        setSelectedProgramId(program.id);
-                                                                        setIsSectionModalOpen(true);
-                                                                    }}
-                                                                    className="text-indigo-600 hover:text-indigo-700 text-xs flex items-center gap-1 font-medium"
-                                                                >
-                                                                    <Plus className="w-3 h-3" /> Add Section
-                                                                </button>
-                                                            )}
+                                                            <p className="text-xs font-semibold text-gray-500 uppercase">Semesters & Sections</p>
                                                         </div>
 
-                                                        <div className="grid grid-cols-1 gap-2">
-                                                            {clsSections.map(sec => {
-                                                                const secOffering = getOfferingForSection(sec.id);
-                                                                return (
-                                                                    <div key={sec.id} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg border border-gray-100 group/sec">
-                                                                        <div className="flex items-center gap-2">
-                                                                            <span className="w-8 h-8 flex items-center justify-center bg-white rounded border border-gray-200 text-sm font-bold text-gray-700">
-                                                                                {sec.name}
-                                                                            </span>
-                                                                            <div>
-                                                                                <p className="text-xs text-gray-400">Cap: {secOffering?.capacity || '-'}</p>
+                                                        <div className="space-y-4">
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                                                {(() => {
+                                                                    const classOfferings = getOfferingsForClass(cls.id);
+                                                                    const isExpanded = expandedBranches[cls.id];
+                                                                    const displayedOfferings = isExpanded ? classOfferings : classOfferings.slice(0, 3);
+
+                                                                    return displayedOfferings.map((offering) => {
+                                                                        const groupSections = getSectionsForClassAndOffering(cls.id, offering.id);
+                                                                        return (
+                                                                            <div key={offering.id} className="flex flex-col bg-gray-50/50 rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+                                                                                <div className="px-4 py-2 bg-gray-100/50 border-b border-gray-100 flex justify-between items-center">
+                                                                                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                                                                        {offering.name}
+                                                                                    </span>
+                                                                                    <div className="flex items-center gap-1">
+                                                                                        <button
+                                                                                            onClick={() => openSubjectMapping(`${cls.name} (${offering.name})`, offering.id)}
+                                                                                            className="p-1 px-2 text-indigo-600 hover:bg-indigo-100 rounded-md transition-colors text-[10px] font-bold flex gap-1 items-center"
+                                                                                            title="Manage Subjects"
+                                                                                        >
+                                                                                            <BookOpen className="w-3 h-3" /> Subjects
+                                                                                        </button>
+                                                                                        {isAdmin && (
+                                                                                            <>
+                                                                                                <button
+                                                                                                    onClick={() => openInstructorAssignment(`${cls.name} (${offering.name})`, offering.id)}
+                                                                                                    className="p-1 px-2 text-amber-600 hover:bg-amber-100 rounded-md transition-colors text-[10px] font-bold flex gap-1 items-center"
+                                                                                                    title="Assign Faculty"
+                                                                                                >
+                                                                                                    <UserCheck className="w-3 h-3" /> Faculty
+                                                                                                </button>
+                                                                                                <button
+                                                                                                    onClick={() => {
+                                                                                                        setSelectedClassId(cls.id);
+                                                                                                        setSelectedClassName(cls.name);
+                                                                                                        setSelectedProgramId(program.id);
+                                                                                                        setNewSectionOfferingId(offering.id);
+                                                                                                        setIsSectionModalOpen(true);
+                                                                                                    }}
+                                                                                                    className="text-indigo-600 hover:bg-indigo-100 p-1 px-2 rounded-md transition-colors text-[10px] flex items-center gap-1 font-bold"
+                                                                                                    title="Add Section"
+                                                                                                >
+                                                                                                    <Plus className="w-3 h-3" /> Section
+                                                                                                </button>
+                                                                                            </>
+                                                                                        )}
+                                                                                    </div>
+                                                                                </div>
+                                                                                
+                                                                                {(groupSections.length > 0) && (
+                                                                                    <div className="p-3 space-y-2">
+                                                                                        {groupSections.map(sec => (
+                                                                                            <div key={sec.id} className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-gray-200/60 group/sec transition-all hover:border-indigo-200 hover:shadow-sm">
+                                                                                                <div className="flex items-center gap-3">
+                                                                                                    <span className="w-8 h-8 flex items-center justify-center bg-indigo-50 rounded-lg text-sm font-bold text-indigo-700">
+                                                                                                        {sec.name}
+                                                                                                    </span>
+                                                                                                    <div>
+                                                                                                        <p className="text-[10px] text-gray-400">Section Cap: {offering.capacity || 40}</p>
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                                {isAdmin && (
+                                                                                                    <div className="flex items-center gap-1">
+                                                                                                        <button
+                                                                                                            onClick={() => {
+                                                                                                                setEditedSection({
+                                                                                                                    id: sec.id,
+                                                                                                                    name: sec.name,
+                                                                                                                    capacity: offering.capacity || 40,
+                                                                                                                    offeringId: sec.offeringId || ''
+                                                                                                                });
+                                                                                                                setSelectedClassName(cls.name);
+                                                                                                            }}
+                                                                                                            className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                                                                                                            title="Edit Section"
+                                                                                                        >
+                                                                                                            <Edit2 className="w-3.5 h-3.5" />
+                                                                                                        </button>
+                                                                                                        <button
+                                                                                                            onClick={() => handleDeleteSection(sec.id)}
+                                                                                                            className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                                                                                            title="Delete Section"
+                                                                                                        >
+                                                                                                            <X className="w-3.5 h-3.5" />
+                                                                                                        </button>
+                                                                                                    </div>
+                                                                                                )}
+                                                                                            </div>
+                                                                                        ))}
+                                                                                    </div>
+                                                                                )}
                                                                             </div>
-                                                                        </div>
-                                                                        <div className="flex items-center gap-1">
-                                                                            <button
-                                                                                onClick={() => openSubjectMapping(`${cls.name} - ${sec.name}`, sec.offeringId || '')}
-                                                                                className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-white rounded transition-colors"
-                                                                                title="Manage Subjects"
-                                                                                disabled={!sec.offeringId}
-                                                                            >
-                                                                                <BookOpen className="w-3.5 h-3.5" />
-                                                                            </button>
-                                                                            {isAdmin && (
-                                                                                <>
-                                                                                    <button
-                                                                                        onClick={() => openInstructorAssignment(`${cls.name} - ${sec.name}`, sec.offeringId || '')}
-                                                                                        className="p-1 text-gray-400 hover:text-amber-600 hover:bg-white rounded transition-colors"
-                                                                                        title="Assign Faculty"
-                                                                                        disabled={!sec.offeringId}
-                                                                                    >
-                                                                                        <UserCheck className="w-3.5 h-3.5" />
-                                                                                    </button>
-                                                                                    <button
-                                                                                        onClick={() => {
-                                                                                            setEditedSection({
-                                                                                                id: sec.id,
-                                                                                                name: sec.name,
-                                                                                                capacity: secOffering?.capacity || 40,
-                                                                                                offeringId: sec.offeringId || ''
-                                                                                            });
-                                                                                            setSelectedClassName(cls.name);
-                                                                                        }}
-                                                                                        className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-white rounded transition-colors"
-                                                                                        title="Edit Section"
-                                                                                    >
-                                                                                        <Edit2 className="w-3.5 h-3.5" />
-                                                                                    </button>
-                                                                                    <button
-                                                                                        onClick={() => handleDeleteSection(sec.id)}
-                                                                                        className="p-1 text-gray-400 hover:text-red-500 hover:bg-white rounded transition-colors"
-                                                                                        title="Delete Section"
-                                                                                    >
-                                                                                        <X className="w-3.5 h-3.5" />
-                                                                                    </button>
-                                                                                </>
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            })}
+                                                                        );
+                                                                    });
+                                                                })()}
+                                                            </div>
+                                                            {(() => {
+                                                                const groupsCount = getOfferingsForClass(cls.id).length;
+                                                                if (groupsCount > 3) {
+                                                                    return (
+                                                                        <button 
+                                                                            onClick={() => setExpandedBranches(prev => ({...prev, [cls.id]: !prev[cls.id]}))}
+                                                                            className="w-full py-2 bg-white border border-dashed border-gray-200 rounded-xl text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all text-xs font-bold uppercase tracking-widest"
+                                                                        >
+                                                                            {expandedBranches[cls.id] ? 'Show Less' : `View All ${groupsCount} Semesters`}
+                                                                        </button>
+                                                                    );
+                                                                }
+                                                                return null;
+                                                            })()}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -486,24 +610,44 @@ const AcademicStructurePage: React.FC = () => {
             {isAddClassOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-scaleIn">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">Add New Class</h3>
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">
+                            {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'ADD_BRANCH')}
+                        </h3>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700">Class Name</label>
+                                <label className="block text-sm font-medium text-gray-700">
+                                    {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'BRANCH')} Name
+                                </label>
                                 <input
                                     value={newClassName}
                                     onChange={(e) => setNewClassName(e.target.value)}
-                                    placeholder="e.g. Class 5"
+                                    placeholder={`e.g. ${getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'BRANCH')} 5`}
                                     className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
+                            {/* Semester Count field for non-school programs */}
+                            {!['SCHOOL'].includes(programs.find(p => p.id === selectedProgramId)?.level || '') && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'TOTAL_BRANCHES')}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max="20"
+                                        value={semesterCount}
+                                        onChange={(e) => setSemesterCount(Number(e.target.value))}
+                                        className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                                    />
+                                </div>
+                            )}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700">Total Capacity</label>
                                 <input
                                     type="number"
                                     value={defaultCapacity}
                                     onChange={(e) => setDefaultCapacity(Number(e.target.value))}
-                                    className="w-full mt-1 p-2 border rounded-lg"
+                                    className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
                             <div className="flex justify-end gap-3 mt-6">
@@ -560,6 +704,32 @@ const AcademicStructurePage: React.FC = () => {
                                     className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
                                 />
                             </div>
+
+                            {/* Semester selection for College/Coaching */}
+                            {!['SCHOOL'].includes(programs.find(p => p.id === selectedProgramId)?.level || '') && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700">
+                                        Select {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'SEMESTER')}
+                                    </label>
+                                    <select
+                                        value={newSectionOfferingId}
+                                        onChange={(e) => setNewSectionOfferingId(e.target.value)}
+                                        className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
+                                    >
+                                        <option value="">-- Auto-Assign or Select --</option>
+                                        {offerings
+                                            .filter(o => o.programId === selectedProgramId)
+                                            .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                                            .map(offt => (
+                                                <option key={offt.id} value={offt.id}>
+                                                    {offt.name}
+                                                </option>
+                                            ))
+                                        }
+                                    </select>
+                                </div>
+                            )}
+
                             <div className="flex justify-end gap-3 mt-6">
                                 <button onClick={() => setIsSectionModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg" disabled={isSubmitting}>Cancel</button>
                                 <button onClick={handleAddSection} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">

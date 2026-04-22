@@ -12,6 +12,8 @@ import type { RootState } from '../../store/store';
 import { getSidebarConfig } from '../../config/SidebarConfig';
 import api from '../../utils/api';
 import SidebarMenuItem from './SidebarMenuItem';
+import UpgradePlanModal from '../common/UpgradePlanModal';
+import { CreditCard, Zap } from 'lucide-react';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -39,6 +41,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
 
     const [readiness, setReadiness] = useState<any>(null);
     const [hasActiveOfferings, setHasActiveOfferings] = useState<boolean>(false);
+    const [subscription, setSubscription] = useState<any>(null);
+    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
 
     // Fetch Operational State
     React.useEffect(() => {
@@ -57,6 +61,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 if (a.data?.status === 'SUCCESS') {
                     setHasActiveOfferings(a.data.apiData);
                 }
+
+                // Subscription Status
+                if (user.roles.includes('TENANT_ADMIN')) {
+                    const s = await api.get(`/ims-platform-service/api/v1/platform/tenant/${user.tenantId}/subscription`);
+                    setSubscription(s.data.apiData || s.data);
+                }
             } catch (e) {
                 console.error("Failed to sync sidebar state", e);
                 // Fail graceful - assume accessible if error? Or block?
@@ -64,7 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
             }
         };
         fetchState();
-    }, [user?.tenantId]);
+    }, [user?.tenantId, user?.roles]);
 
     // Import config
     const rawMenuItems = React.useMemo(() => {
@@ -181,6 +191,30 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 ))}
             </nav>
 
+            {/* Subscription Plan Card */}
+            {isOpen && user?.roles.includes('TENANT_ADMIN') && subscription && (
+                <div className="mx-4 mb-4 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+                    <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Current Plan</span>
+                        <Zap className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                    </div>
+                    <h4 className="text-sm font-bold text-white mb-1">{subscription.planName}</h4>
+                    <div className="space-y-1 mb-3">
+                        <div className="flex justify-between text-[10px]">
+                            <span className="text-slate-400">Students:</span>
+                            <span className="text-slate-200 font-medium">{subscription.maxStudents}</span>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setIsUpgradeModalOpen(true)}
+                        className="w-full py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-900/20"
+                    >
+                        <CreditCard className="w-3 h-3" />
+                        Upgrade / Manage
+                    </button>
+                </div>
+            )}
+
             {/* Logout Section */}
             <div className="p-4 border-t border-slate-800 bg-slate-950/30">
                 <button
@@ -191,6 +225,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                     {isOpen && <span className="font-medium text-sm">Sign Out</span>}
                 </button>
             </div>
+
+            {isUpgradeModalOpen && (
+                <UpgradePlanModal 
+                    isOpen={isUpgradeModalOpen} 
+                    onClose={() => setIsUpgradeModalOpen(false)} 
+                    currentPlanId={subscription?.planId}
+                />
+            )}
         </aside>
     );
 };

@@ -15,6 +15,8 @@ public interface ImsOfferingsRepo extends JpaRepository<ImsOfferings, String> {
 
     List<ImsOfferings> findBySessionId(String sessionId);
 
+    java.util.Optional<ImsOfferings> findByNameAndSessionId(String name, String sessionId);
+
     @Query("SELECT o FROM ImsOfferings o WHERE o.id IN (SELECT oi.offeringId FROM ImsOfferingInstructors oi WHERE oi.instructorId = :instructorId)")
     List<ImsOfferings> findByInstructorId(@Param("instructorId") String instructorId);
 

@@ -18,6 +18,8 @@ import com.ims.academic.service.ImsSectionsService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
+@Slf4j
 public class ImsSectionsServiceImpl implements ImsSectionsService {
 
     private final ImsSectionsRepo repo;
@@ -32,6 +36,7 @@ public class ImsSectionsServiceImpl implements ImsSectionsService {
     private final AcademicSessionRepo sessionRepo;
     private final ImsOfferingsService offeringsService;
     private final ImsOfferingsRepo offeringsRepo;
+    private final com.ims.academic.repo.ImsProgramsRepo programsRepo;
     private final ModelMapper modelMapper;
 
     private ImsSectionsDto toDto(ImsSections entity) {
@@ -50,22 +55,55 @@ public class ImsSectionsServiceImpl implements ImsSectionsService {
         ImsClasses imsClass = classesRepo.findById(dto.getClassId())
                 .orElseThrow(() -> new ResourceNotFoundException("Class ID", dto.getClassId()));
 
-        if (repo.existsByImsClassIdAndName(dto.getClassId(), dto.getName())) {
-            throw new ResourceAlreadyExistException(
-                    dto.getName(), "SECTION", "Name");
+        // Check for duplicate section in the same offering
+        ImsSections existingSection = repo.findByImsClassIdAndNameAndOfferingId(dto.getClassId(), dto.getName(), dto.getOfferingId())
+                .orElse(null);
+        
+        if (existingSection != null) {
+            log.info("Section {} already exists for offering {}, returning existing.", dto.getName(), dto.getOfferingId());
+            return toDto(existingSection);
         }
 
-        // Automatic Orchestration: Create Offering for this section
+        // Determine OfferingType based on ProgramLevel
+        OfferingType type = OfferingType.SCHOOL_CLASS;
+        if (dto.getProgramId() != null) {
+            com.ims.academic.entity.ImsPrograms program = programsRepo.findById(dto.getProgramId()).orElse(null);
+            if (program != null) {
+                com.ims.academic.enums.ProgramLevel level = program.getLevel();
+                if (level == com.ims.academic.enums.ProgramLevel.UNDERGRAD
+                        || level == com.ims.academic.enums.ProgramLevel.POSTGRAD) {
+                    type = OfferingType.COLLEGE_PROGRAM;
+                } else if (level == com.ims.academic.enums.ProgramLevel.COACHING) {
+                    type = OfferingType.COACHING_BATCH;
+                } else if (level == com.ims.academic.enums.ProgramLevel.SCHOOL) {
+                    type = OfferingType.SCHOOL_CLASS;
+                }
+            }
+        }
+
+        // Automatic Orchestration: Create Offering only if missing and programId is provided.
+        // This is strictly for SCHOOL model where Class + Section = Offering
         if (dto.getOfferingId() == null && dto.getProgramId() != null) {
+            
+            if (type != OfferingType.SCHOOL_CLASS) {
+                throw new IllegalArgumentException("Offering ID (Semester/Batch) is mandatory when adding sections for College/Coaching institutions.");
+            }
+
             AcademicSession currentSession = sessionRepo.findFirstByTenantIdAndIsCurrentTrue(dto.getTenantId())
                     .orElseThrow(() -> new ResourceNotFoundException("Active Academic Session", dto.getTenantId()));
 
-            String offeringName = imsClass.getName() + " - " + dto.getName();
+            String offeringName = dto.getOfferingName();
+            if (offeringName == null) {
+                // Default for SCHOOL_CLASS
+                offeringName = imsClass.getName() + " - " + dto.getName();
+            }
+
             ImsOfferingsDto sectionOffering = ImsOfferingsDto.builder()
                     .tenantId(dto.getTenantId())
                     .programId(dto.getProgramId())
                     .sessionId(currentSession.getId())
-                    .type(OfferingType.SCHOOL_CLASS)
+                    .classId(imsClass.getId()) // Optional backward link
+                    .type(type)
                     .name(offeringName)
                     .startDate(LocalDate.now())
                     .endDate(currentSession.getEndDate())
@@ -75,17 +113,26 @@ public class ImsSectionsServiceImpl implements ImsSectionsService {
             dto.setOfferingId(savedOffering.getId());
         }
 
+        log.info("Creating Section: name={}, class={}, offering={}, type={}", 
+            dto.getName(), dto.getClassId(), dto.getOfferingId(), type);
+
+        // Final Validation: Every section MUST be linked to an offering
+        if (dto.getOfferingId() == null) {
+            String errorMsg = (type == OfferingType.SCHOOL_CLASS)
+                    ? "Offering ID is required (Or Program ID for auto-creation)"
+                    : "Offering ID (Semester/Batch) is mandatory for College/Coaching institutions";
+            throw new IllegalArgumentException(errorMsg);
+        }
+
+        ImsOfferings offering = offeringsRepo.findById(dto.getOfferingId())
+                .orElseThrow(() -> new ResourceNotFoundException("Offering", dto.getOfferingId()));
+
         ImsSections section = ImsSections.builder()
                 .tenantId(dto.getTenantId())
                 .imsClass(imsClass)
                 .name(dto.getName())
+                .offering(offering)
                 .build();
-
-        if (dto.getOfferingId() != null) {
-            ImsOfferings offering = offeringsRepo.findById(dto.getOfferingId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Offering", dto.getOfferingId()));
-            section.setOffering(offering);
-        }
 
         return toDto(repo.save(section));
     }

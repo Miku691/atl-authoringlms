@@ -29,6 +29,7 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
     private final ModelMapper modelMapper;
     private final AuthClient authClient;
     private final AcademicClient academicClient;
+    private final com.ims.student.client.PlatformClient platformClient;
     private final com.ims.student.service.ImsStudentSeqConfigService seqConfigService;
 
     private ImsStudentsDto toDto(ImsStudents e) {
@@ -42,7 +43,16 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
     @Override
     @Transactional
     public ImsStudentsDto create(ImsStudentsDto dto) {
-        // Validation: Identity Only
+        // SaaS Limit Enforcement
+        com.ims.student.dto.SubscriptionLimitsDto limits = platformClient.getTenantLimits(dto.getTenantId());
+        long currentCount = repo.countByTenantId(dto.getTenantId());
+
+        if (limits.getMaxStudents() != null && currentCount >= limits.getMaxStudents()) {
+            throw new com.ims.student.exception.LimitExceededException(
+                String.format("Current plan '%s' allows only %d students. Please upgrade to add more.", 
+                limits.getPlanName(), limits.getMaxStudents())
+            );
+        }
 
         // Global uniqueness checks
         if (dto.getEmail() != null && repo.existsByEmail(dto.getEmail())) {

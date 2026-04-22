@@ -20,7 +20,7 @@ public class AcademicReadinessController {
 
     @GetMapping("/status")
     public ResponseEntity<ApiResponse<AcademicReadinessDto>> getReadinessStatus(
-            @RequestHeader("X-Tenant-Id") String tenantId) {
+            @RequestHeader(value = "X-Tenant-Id", required = false) String tenantId) {
         AcademicReadinessDto status = readinessService.checkReadiness(tenantId);
         return ResponseEntity.ok(
                 ApiResponse.<AcademicReadinessDto>builder()

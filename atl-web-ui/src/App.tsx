@@ -80,6 +80,10 @@ import ExamManagementPage from './pages/dashboard/teacher/ExamManagementPage';
 import InstructorGradebook from './pages/dashboard/teacher/InstructorGradebook';
 import MyResultsPage from './pages/dashboard/student/MyResultsPage';
 import LeaveRequestPage from './pages/dashboard/student/LeaveRequestPage';
+import SubscriptionPlansManagement from './pages/dashboard/platform/SubscriptionPlansManagement';
+import SubscriptionBillingPage from './pages/dashboard/admin/billing/SubscriptionBillingPage';
+import BillingHistoryPage from './pages/dashboard/admin/billing/BillingHistoryPage';
+import UpgradePlanPage from './pages/dashboard/admin/billing/UpgradePlanPage';
 
 // Protected Route Wrapper
 import { useSelector } from 'react-redux';
@@ -250,6 +254,11 @@ const App: React.FC = () => {
               <Route path="/communication/announcements" element={<AnnouncementManagementPage />} />
               <Route path="/communication/*" element={<ComingSoonPage />} />
 
+              {/* Billing */}
+              <Route path="/billing/subscription" element={<SubscriptionBillingPage />} />
+              <Route path="/billing/history" element={<BillingHistoryPage />} />
+              <Route path="/billing/upgrade" element={<UpgradePlanPage />} />
+
               {/* Reports */}
               <Route path="/reports/*" element={<ReportsDashboardPage />} />
 
@@ -258,6 +267,7 @@ const App: React.FC = () => {
               <Route path="/lms/*" element={<ComingSoonPage />} />
 
               {/* System */}
+              <Route path="/system/subscription-plans" element={<SubscriptionPlansManagement />} />
               <Route path="/platform/leads" element={<DemoLeadsPage />} />
               <Route path="/system/templates/invoice" element={<InvoiceTemplatePage />} />
               <Route path="/system/setup-master" element={<SetupMasterPage />} />

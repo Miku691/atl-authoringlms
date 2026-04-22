@@ -71,6 +71,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                             .filter(entry -> path.startsWith(entry.getKey()))
                             .allMatch(entry -> {
                                 if (method.equals("GET")) return true;
+                                if (roles == null) return false;
                                 return roles.stream().anyMatch(entry.getValue()::contains);
                             });
 
@@ -79,12 +80,21 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
                         exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
                         return exchange.getResponse().setComplete();
                     }
+                    log.debug("Authorized: Path {} allowed for roles {} [{}]", path, roles, method);
                 }
 
                 // Inject headers and proceed
+                List<String> rolesList = (List<String>) claims.get("roles", List.class);
+                String rolesStr = (rolesList != null) ? String.join(",", rolesList) : "";
+                String userIdClaim = claims.get("userId", String.class);
+                
+                if (userIdClaim == null) {
+                    userIdClaim = claims.getSubject(); // Fallback if userId claim is missing
+                }
+
                 ServerHttpRequest.Builder builder = exchange.getRequest().mutate()
-                        .header("X-User-Id", claims.getSubject())
-                        .header("X-Roles", String.join(",", (List<String>) claims.get("roles", List.class)));
+                        .header("X-User-Id", userIdClaim)
+                        .header("X-Roles", rolesStr);
 
                 Object tenantIdObj = claims.get("tenantId");
                 if (tenantIdObj != null) {

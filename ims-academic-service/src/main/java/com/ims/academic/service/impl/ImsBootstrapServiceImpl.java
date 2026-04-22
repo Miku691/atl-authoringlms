@@ -233,19 +233,28 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
             throw new IllegalArgumentException("College config/programs missing");
         }
 
+        String categoryPrefix = config.getCollegeCategory() != null ? config.getCollegeCategory().trim() + " " : "";
+
+        // Loop through requested programs (branches) and map them natively to ImsPrograms
         for (BootstrapReqDto.ProgramReq progReq : config.getPrograms()) {
-            // Create Program
-            ImsProgramsDto program = ImsProgramsDto.builder()
+            
+            // 1. Create Program (Branch)
+            String programTitle = categoryPrefix + progReq.getName();
+            String programCode = progReq.getCode() != null ? progReq.getCode() : progReq.getName().toUpperCase().replace(" ", "-");
+
+            ImsProgramsDto programDto = ImsProgramsDto.builder()
                     .tenantId(req.getTenantId())
-                    .code(progReq.getCode() != null ? progReq.getCode() : "PROG-" + System.currentTimeMillis())
-                    .title(progReq.getName())
-                    .level(ProgramLevel.UNDERGRAD) // Default
-                    .description("College Degree Program")
+                    .code(programCode)
+                    .title(programTitle)
+                    .level(ProgramLevel.UNDERGRAD)
+                    .collegeCategory(config.getCollegeCategory())
+                    .affiliation(config.getAffiliation())
+                    .description(programTitle)
                     .build();
 
-            ImsProgramsDto savedProgram = programsService.create(program);
+            ImsProgramsDto savedProgram = programsService.create(programDto);
 
-            // Create Session for this Program
+            // 2. Create Session for this Program
             com.ims.academic.dto.AcademicSessionDto session = com.ims.academic.dto.AcademicSessionDto.builder()
                     .tenantId(req.getTenantId())
                     .programId(savedProgram.getId())
@@ -256,22 +265,41 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
                     .build();
             com.ims.academic.dto.AcademicSessionDto savedSession = sessionService.create(session);
 
-            // Create Terms (Semesters)
+            // 3. Create Classes (Years) and Offerings (Semesters)
             int terms = progReq.getNumberOfTerms() > 0 ? progReq.getNumberOfTerms() : 8;
-            String label = progReq.getTermLabel() != null ? progReq.getTermLabel() : "Semester";
-
-            for (int i = 1; i <= terms; i++) {
-                ImsOfferingsDto offering = ImsOfferingsDto.builder()
+            int years = (int) Math.ceil((double) terms / 2);
+            String label = progReq.getTermLabel() != null && !progReq.getTermLabel().isEmpty() ? progReq.getTermLabel() : "Semester";
+            
+            int termCounter = 1;
+            for (int y = 1; y <= years; y++) {
+                
+                // 3.1 Create Year (Class)
+                String suffix = (y == 1) ? "st" : (y == 2) ? "nd" : (y == 3) ? "rd" : "th";
+                ImsClassesDto yearClassDto = ImsClassesDto.builder()
                         .tenantId(req.getTenantId())
-                        .programId(savedProgram.getId())
-                        .sessionId(savedSession.getId())
-                        .type(OfferingType.COLLEGE_PROGRAM)
-                        .name(label + " " + i)
-                        .startDate(LocalDate.now())
-                        .endDate(LocalDate.now().plusMonths(6))
+                        .name(y + suffix + " Year")
+                        .code(programCode + "-Y" + y)
                         .capacity(60)
+                        .programId(savedProgram.getId())
                         .build();
-                offeringsService.create(offering);
+                ImsClassesDto savedYearClass = classesService.create(yearClassDto);
+
+                // 3.2 Create Semesters (Offerings) natively linked to the Year Class
+                for (int s = 1; s <= 2 && termCounter <= terms; s++) {
+                    ImsOfferingsDto offering = ImsOfferingsDto.builder()
+                            .tenantId(req.getTenantId())
+                            .programId(savedProgram.getId())
+                            .sessionId(savedSession.getId())
+                            .classId(savedYearClass.getId()) // LINK TO YEAR
+                            .type(OfferingType.COLLEGE_PROGRAM)
+                            .name(label + " " + termCounter)
+                            .startDate(LocalDate.now())
+                            .endDate(LocalDate.now().plusMonths(6))
+                            .capacity(60)
+                            .build();
+                    offeringsService.create(offering);
+                    termCounter++;
+                }
             }
         }
     }
@@ -282,19 +310,22 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
             throw new IllegalArgumentException("Coaching config/programs missing");
         }
 
+        // Loop through requested programs (courses)
         for (BootstrapReqDto.ProgramReq progReq : config.getPrograms()) {
-            // Create Program
-            ImsProgramsDto program = ImsProgramsDto.builder()
+            
+            // 1. Create Course as Program
+            ImsProgramsDto programDto = ImsProgramsDto.builder()
                     .tenantId(req.getTenantId())
-                    .code(progReq.getCode() != null ? progReq.getCode() : "COACH-" + System.currentTimeMillis())
+                    .code(progReq.getCode() != null ? progReq.getCode() : progReq.getName().toUpperCase().replace(" ", "-"))
                     .title(progReq.getName())
                     .level(ProgramLevel.COACHING)
-                    .description("Coaching Program")
+                    .affiliation(config.getAffiliation())
+                    .description("Competitive Coaching Course")
                     .build();
 
-            ImsProgramsDto savedProgram = programsService.create(program);
+            ImsProgramsDto savedProgram = programsService.create(programDto);
 
-            // Create Session for this Program
+            // 2. Create Session
             com.ims.academic.dto.AcademicSessionDto session = com.ims.academic.dto.AcademicSessionDto.builder()
                     .tenantId(req.getTenantId())
                     .programId(savedProgram.getId())
@@ -305,17 +336,30 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
                     .build();
             com.ims.academic.dto.AcademicSessionDto savedSession = sessionService.create(session);
 
-            // Create Batches
+            // 3. Create General Phase (Class)
+            ImsClassesDto phaseClassDto = ImsClassesDto.builder()
+                    .tenantId(req.getTenantId())
+                    .name("Phase 1")
+                    .code(savedProgram.getCode() + "-PH1")
+                    .capacity(40)
+                    .programId(savedProgram.getId())
+                    .build();
+            ImsClassesDto savedPhaseClass = classesService.create(phaseClassDto);
+
+            // 4. Create Batches (Offerings) natively linked to Phase Class
             int batches = progReq.getNumberOfTerms() > 0 ? progReq.getNumberOfTerms() : 2;
-            String label = progReq.getTermLabel() != null ? progReq.getTermLabel() : "Batch";
+            String label = progReq.getTermLabel() != null && !progReq.getTermLabel().isEmpty() ? progReq.getTermLabel() : "Batch";
 
             for (int i = 1; i <= batches; i++) {
+                String subBatchLabel = String.valueOf((char) ('A' + i - 1));
+                
                 ImsOfferingsDto offering = ImsOfferingsDto.builder()
                         .tenantId(req.getTenantId())
                         .programId(savedProgram.getId())
                         .sessionId(savedSession.getId())
+                        .classId(savedPhaseClass.getId()) // LINK TO CLASS
                         .type(OfferingType.COACHING_BATCH)
-                        .name(label + " " + ((char) ('A' + i - 1))) // Batch A, Batch B...
+                        .name(label + " " + subBatchLabel)
                         .startDate(LocalDate.now())
                         .endDate(LocalDate.now().plusYears(1))
                         .capacity(40)

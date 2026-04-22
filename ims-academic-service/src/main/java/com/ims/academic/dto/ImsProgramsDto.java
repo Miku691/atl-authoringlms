@@ -22,5 +22,7 @@ public class ImsProgramsDto {
     private ProgramLevel level;
     private AcademicBoard board;
     private String description;
+    private String collegeCategory;
+    private String affiliation;
     private Instant createdAt;
 }

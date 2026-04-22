@@ -36,7 +36,8 @@ public class BootstrapReqDto {
     @AllArgsConstructor
     @Builder
     public static class CollegeConfig {
-        // e.g. B.Tech, B.Sc
+        private String collegeCategory; // Engineering, Medical, etc.
+        private String affiliation; // Affiliating University
         private java.util.List<ProgramReq> programs;
     }
 
@@ -45,7 +46,7 @@ public class BootstrapReqDto {
     @AllArgsConstructor
     @Builder
     public static class CoachingConfig {
-        // e.g. JEE-Mains, NEET
+        private String affiliation; // Board/Regulatory body
         private java.util.List<ProgramReq> programs;
     }
 
