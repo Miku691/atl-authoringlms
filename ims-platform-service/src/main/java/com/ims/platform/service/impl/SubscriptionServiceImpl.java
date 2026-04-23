@@ -25,9 +25,10 @@ public class SubscriptionServiceImpl implements TenantSubscriptionsService {
         return tenantSubsRepo.findByTenantId(tenantId)
                 .map(sub -> mapToDto(sub))
                 .orElseGet(() -> {
-                    // Fallback to FREE plan if no sub found (for existing or missing entries)
-                    // We look for 'Starter (FREE)' which is our seeded free plan name
-                    return plansRepo.findByName("Starter (FREE)")
+                    // Fallback to Starter (FREE) plan if no sub found
+                    return plansRepo.findAll().stream()
+                            .filter(p -> p.getName().equalsIgnoreCase("Starter (FREE)"))
+                            .findFirst()
                             .map(freePlan -> createDefaultFreeDto(tenantId, freePlan))
                             .orElseThrow(() -> new RuntimeException("Default 'Starter (FREE)' plan not configured in system seeding. Please ensure the system is properly initialized."));
                 });

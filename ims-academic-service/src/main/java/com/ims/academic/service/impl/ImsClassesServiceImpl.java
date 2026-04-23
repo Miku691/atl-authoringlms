@@ -77,6 +77,8 @@ public class ImsClassesServiceImpl implements ImsClassesService {
             existing.setName(dto.getName());
         if (dto.getCode() != null)
             existing.setCode(dto.getCode());
+        if (dto.getProgramId() != null)
+            existing.setProgramId(dto.getProgramId());
 
         return toDto(repo.save(existing));
     }

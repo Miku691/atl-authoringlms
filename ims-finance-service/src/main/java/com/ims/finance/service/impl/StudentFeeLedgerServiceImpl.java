@@ -56,12 +56,12 @@ public class StudentFeeLedgerServiceImpl implements StudentFeeLedgerService {
 
     @Override
     public List<StudentFeeRecordDTO> getMyLedger() {
-        String email = SecurityUtils.getCurrentUserId(); // Gateway sends email
+        String userId = SecurityUtils.getCurrentUserId(); 
         String tenantId = SecurityUtils.getCurrentTenantId();
-        StudentServiceClient.StudentResponse student = studentServiceClient.getStudentByEmail(email, tenantId)
+        StudentServiceClient.StudentResponse student = studentServiceClient.getStudentByUserId(userId)
                 .getApiData();
         if (student == null) {
-            throw new ResourceNotFoundException("Student Profile", email);
+            throw new ResourceNotFoundException("Student Profile", userId);
         }
         return getStudentLedger(student.getId());
     }

@@ -462,11 +462,11 @@ public class FinanceServiceImpl implements FinanceService {
 
     @Override
     public List<TransactionDTO> getMyTransactions() {
-        String email = SecurityUtils.getCurrentUserId(); // Gateway sends email
+        String userId = SecurityUtils.getCurrentUserId(); 
         String tenantId = SecurityUtils.getCurrentTenantId();
 
         try {
-            StudentServiceClient.StudentResponse student = studentServiceClient.getStudentByEmail(email, tenantId)
+            StudentServiceClient.StudentResponse student = studentServiceClient.getStudentByUserId(userId)
                     .getApiData();
             if (student == null) {
                 return Collections.emptyList();

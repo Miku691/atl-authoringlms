@@ -1,19 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import {
-    ChevronLeft,
-    ChevronRight,
-    GraduationCap,
-    LogOut
-} from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout } from '../../store/authSlice';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { CreditCard, Zap, ChevronLeft, ChevronRight, GraduationCap } from 'lucide-react';
+import { useSelector } from 'react-redux';
 import type { RootState } from '../../store/store';
 import { getSidebarConfig } from '../../config/SidebarConfig';
 import api from '../../utils/api';
 import SidebarMenuItem from './SidebarMenuItem';
-import UpgradePlanModal from '../common/UpgradePlanModal';
-import { CreditCard, Zap } from 'lucide-react';
 
 interface SidebarProps {
     isOpen: boolean;
@@ -21,16 +13,15 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
     const location = useLocation();
+    const navigate = useNavigate();
     const [expandedMenus, setExpandedMenus] = useState<string[]>(['/admin/users']);
     const { user } = useSelector((state: RootState) => state.auth);
 
-    const handleLogout = () => {
-        dispatch(logout());
-        navigate('/login');
-    };
+    const [readiness, setReadiness] = useState<any>(null);
+    const [hasActiveOfferings, setHasActiveOfferings] = useState<boolean>(false);
+    const [subscription, setSubscription] = useState<any>(null);
+    const [stats, setStats] = useState<any>({ studentCount: 0, instructorCount: 0 });
 
     const toggleSubMenu = (path: string) => {
         if (!isOpen) setIsOpen(true);
@@ -39,16 +30,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         );
     };
 
-    const [readiness, setReadiness] = useState<any>(null);
-    const [hasActiveOfferings, setHasActiveOfferings] = useState<boolean>(false);
-    const [subscription, setSubscription] = useState<any>(null);
-    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
-
     // Fetch Operational State
-    React.useEffect(() => {
-        if (!user?.tenantId) return;
-
+    useEffect(() => {
         const fetchState = async () => {
+            if (!user?.tenantId) return;
             try {
                 // Readiness
                 const r = await api.get('/ims-academic-service/readiness/status');
@@ -62,27 +47,29 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                     setHasActiveOfferings(a.data.apiData);
                 }
 
-                // Subscription Status
+                // Subscription & Stats
                 if (user.roles.includes('TENANT_ADMIN')) {
-                    const s = await api.get(`/ims-platform-service/api/v1/platform/tenant/${user.tenantId}/subscription`);
-                    setSubscription(s.data.apiData || s.data);
+                    const [sRes, statsRes] = await Promise.all([
+                        api.get(`/ims-platform-service/api/v1/platform/tenant/${user.tenantId}/subscription`),
+                        api.get(`/ims-platform-service/api/v1/platform/tenant/stats/${user.tenantId}`)
+                    ]);
+                    setSubscription(sRes.data.apiData || sRes.data);
+                    setStats(statsRes.data.apiData || statsRes.data);
                 }
             } catch (e) {
                 console.error("Failed to sync sidebar state", e);
-                // Fail graceful - assume accessible if error? Or block?
-                // Logic rule says "Visible ONLY if...", so default should be false (which is initial state)
             }
         };
         fetchState();
     }, [user?.tenantId, user?.roles]);
 
     // Import config
-    const rawMenuItems = React.useMemo(() => {
+    const rawMenuItems = useMemo(() => {
         return getSidebarConfig(user?.tenantType, { readiness, hasActiveOfferings });
     }, [user?.tenantType, readiness, hasActiveOfferings]);
 
     // Filtering Logic
-    const menuItems = React.useMemo(() => {
+    const menuItems = useMemo(() => {
         if (!user) return [];
 
         const hasRole = (allowedRoles?: string[]) => {
@@ -159,22 +146,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 </div>
             )}
 
-            {/* User Profile Mini - Only shown when expanded */}
-            {isOpen && (
-                <div className="px-4 py-6 border-b border-slate-800 bg-gradient-to-b from-slate-900 to-slate-800/50">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 text-indigo-400 font-semibold text-lg">
-                            {user?.username?.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="overflow-hidden">
-                            <h3 className="text-sm font-medium text-white truncate">{user?.username}</h3>
-                            <p className="text-xs text-slate-400 truncate">
-                                {user?.roles?.[0]?.replace('_', ' ') || 'User'}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* Navigation */}
             <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1 custom-scrollbar">
@@ -191,47 +162,39 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
                 ))}
             </nav>
 
-            {/* Subscription Plan Card */}
-            {isOpen && user?.roles.includes('TENANT_ADMIN') && subscription && (
-                <div className="mx-4 mb-4 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
-                    <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Current Plan</span>
-                        <Zap className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                    </div>
-                    <h4 className="text-sm font-bold text-white mb-1">{subscription.planName}</h4>
-                    <div className="space-y-1 mb-3">
-                        <div className="flex justify-between text-[10px]">
-                            <span className="text-slate-400">Students:</span>
-                            <span className="text-slate-200 font-medium">{subscription.maxStudents}</span>
+            {/* Footer Section - Subscription Plan or Empty space */}
+            {user?.roles.includes('TENANT_ADMIN') && subscription && (
+                <div className={`px-4 py-2 border-t border-slate-800 bg-slate-950/30 ${!isOpen && 'flex justify-center'}`}>
+                    {isOpen ? (
+                        <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 shadow-lg shadow-indigo-900/10">
+                            <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-[9px] font-bold uppercase tracking-wider text-indigo-400">Current Plan</span>
+                                <Zap className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                            </div>
+                            <div className="flex items-baseline justify-between mb-2">
+                                <h4 className="text-sm font-bold text-white truncate mr-2">{subscription.planName}</h4>
+                                <p className="text-[9px] font-bold text-slate-400 mt-0.5">
+                                    {stats.studentCount} / {subscription.maxStudents}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => navigate('/billing/upgrade')}
+                                className="w-full py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-900/20"
+                            >
+                                <CreditCard className="w-3 h-3" />
+                                Upgrade / Manage
+                            </button>
                         </div>
-                    </div>
-                    <button
-                        onClick={() => setIsUpgradeModalOpen(true)}
-                        className="w-full py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-900/20"
-                    >
-                        <CreditCard className="w-3 h-3" />
-                        Upgrade / Manage
-                    </button>
+                    ) : (
+                        <button
+                            onClick={() => navigate('/billing/upgrade')}
+                            className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20 transition-all shadow-lg"
+                            title="Upgrade / Manage Plan"
+                        >
+                            <Zap className="w-5 h-5 fill-indigo-400" />
+                        </button>
+                    )}
                 </div>
-            )}
-
-            {/* Logout Section */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950/30">
-                <button
-                    onClick={handleLogout}
-                    className={`flex items-center gap-3 w-full px-3 py-3 rounded-xl text-slate-400 hover:text-red-400 hover:bg-slate-800/50 transition-all duration-200 group ${!isOpen && 'justify-center'}`}
-                >
-                    <LogOut className="w-5 h-5 flex-shrink-0 group-hover:stroke-red-400" />
-                    {isOpen && <span className="font-medium text-sm">Sign Out</span>}
-                </button>
-            </div>
-
-            {isUpgradeModalOpen && (
-                <UpgradePlanModal 
-                    isOpen={isUpgradeModalOpen} 
-                    onClose={() => setIsUpgradeModalOpen(false)} 
-                    currentPlanId={subscription?.planId}
-                />
             )}
         </aside>
     );

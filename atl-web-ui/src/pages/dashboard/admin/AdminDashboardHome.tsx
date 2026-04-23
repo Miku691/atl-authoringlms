@@ -5,6 +5,8 @@ import { type RootState } from '../../../store/store';
 import { announcementService, type Announcement } from '../../../api/announcementService';
 import { dashboardService, type DashboardStats, type GenderStat, type OfferingStat } from '../../../api/dashboardService';
 import DashboardChart from './components/DashboardChart';
+import api from '../../../utils/api';
+import SubscriptionLockedOverlay from './components/SubscriptionLockedOverlay';
 import {
     Users, BookOpen, GraduationCap, TrendingUp, Bell,
     PlusCircle, Calendar, ShieldCheck, ArrowUpRight, Clock, MapPin,
@@ -19,6 +21,7 @@ const AdminDashboardHome: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.auth);
     const [announcements, setAnnouncements] = useState<Announcement[]>([]);
     const [stats, setStats] = useState<DashboardStats | null>(null);
+    const [subscription, setSubscription] = useState<any>(null);
     const [genderStats, setGenderStats] = useState<GenderStat[]>([]);
     const [offeringStats, setOfferingStats] = useState<OfferingStat[]>([]);
     const [financeSummary, setFinanceSummary] = useState<any>(null);
@@ -40,18 +43,20 @@ const AdminDashboardHome: React.FC = () => {
         if (!user?.tenantId) return;
         setLoading(true);
         try {
-            const [announcRes, statsData, gStats, oStats, fSummary] = await Promise.all([
+            const [announcRes, statsData, gStats, oStats, fSummary, subRes] = await Promise.all([
                 announcementService.getAnnouncementsByTenant(user.tenantId),
                 dashboardService.getStats(user.tenantId),
                 dashboardService.getGenderStats(user.tenantId),
                 dashboardService.getOfferingStats(user.tenantId),
-                financeService.getCollectionSummary().catch(() => null)
+                financeService.getCollectionSummary().catch(() => null),
+                api.get(`/ims-platform-service/api/v1/platform/tenant/${user.tenantId}/subscription`).catch(() => null)
             ]);
             setAnnouncements(announcRes.apiData || []);
             setStats(statsData);
             setGenderStats(gStats);
             setOfferingStats(oStats);
             setFinanceSummary(fSummary);
+            setSubscription(subRes?.data?.apiData || subRes?.data || null);
         } catch (error) {
             console.error("Dashboard data fetch failed", error);
             toast.error("Failed to load some dashboard metrics");
@@ -59,6 +64,9 @@ const AdminDashboardHome: React.FC = () => {
             setLoading(false);
         }
     };
+
+    const isStudentBreached = stats && subscription && stats.totalStudents > subscription.maxStudents;
+    const isTeacherBreached = stats && subscription && stats.totalInstructors > subscription.maxTeachers;
 
     const statCards = [
         {
@@ -312,6 +320,24 @@ const AdminDashboardHome: React.FC = () => {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/10 rounded-full blur-[100px]"></div>
                 </div>
             </div>
+
+            {/* Breach Overlay */}
+            {isStudentBreached && (
+                <SubscriptionLockedOverlay 
+                    planName={subscription.planName}
+                    reason="STUDENT_LIMIT"
+                    currentCount={stats.totalStudents}
+                    maxLimit={subscription.maxStudents}
+                />
+            )}
+            {isTeacherBreached && !isStudentBreached && (
+                <SubscriptionLockedOverlay 
+                    planName={subscription.planName}
+                    reason="TEACHER_LIMIT"
+                    currentCount={stats.totalInstructors}
+                    maxLimit={subscription.maxTeachers}
+                />
+            )}
         </div>
     );
 };

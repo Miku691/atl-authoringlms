@@ -4,15 +4,19 @@ import com.ims.platform.client.InstructorClient;
 import com.ims.platform.client.StudentClient;
 import com.ims.platform.dto.ImsPlatformStatsDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/v1/platform/tenant")
 @RequiredArgsConstructor
+@Slf4j
 public class TenantStatsController {
 
     private final StudentClient studentClient;
@@ -24,15 +28,27 @@ public class TenantStatsController {
         Long instructorCount = 0L;
         
         try {
-            studentCount = studentClient.getStudentCount(tenantId);
+            Map<String, Object> res = studentClient.getStudentCount(tenantId);
+            if (res != null && "SUCCESS".equalsIgnoreCase((String) res.get("status"))) {
+                Object data = res.get("apiData");
+                if (data instanceof Number) {
+                    studentCount = ((Number) data).longValue();
+                }
+            }
         } catch (Exception e) {
-            // Log or handle fallback
+            log.error("Failed to fetch student count for tenant {}", tenantId, e);
         }
         
         try {
-            instructorCount = instructorClient.getInstructorCount(tenantId);
+            Map<String, Object> res = instructorClient.getInstructorCount(tenantId);
+            if (res != null && "SUCCESS".equalsIgnoreCase((String) res.get("status"))) {
+                Object data = res.get("apiData");
+                if (data instanceof Number) {
+                    instructorCount = ((Number) data).longValue();
+                }
+            }
         } catch (Exception e) {
-            // Log or handle fallback
+            log.error("Failed to fetch instructor count for tenant {}", tenantId, e);
         }
 
         return ResponseEntity.ok(new ImsPlatformStatsDto(

@@ -75,12 +75,13 @@ const AcademicStructurePage: React.FC = () => {
     const getTerm = (level: string, type: 'BRANCH' | 'SEMESTER' | 'SECTION' | 'ADD_BRANCH' | 'TOTAL_BRANCHES' = 'BRANCH') => {
         const isCollege = ['UNDERGRAD', 'POSTGRAD'].includes(level);
         const isCoaching = level === 'COACHING';
+        const isSchool = level === 'SCHOOL';
 
         switch (type) {
             case 'ADD_BRANCH': return isCollege ? 'Add Branch' : isCoaching ? 'Add Course' : 'Add Class';
             case 'BRANCH': return isCollege ? 'Branch' : isCoaching ? 'Course' : 'Class';
-            case 'SEMESTER': return isCollege ? 'Semester' : isCoaching ? 'Batch' : 'Offering';
-            case 'TOTAL_BRANCHES': return isCollege ? 'Total Semesters' : isCoaching ? 'Total Batches' : 'Total Offerings';
+            case 'SEMESTER': return isCollege ? 'Semester' : isCoaching ? 'Batch' : isSchool ? 'Section' : 'Offering';
+            case 'TOTAL_BRANCHES': return isCollege ? 'Total Semesters' : isCoaching ? 'Total Batches' : 'Total Sections';
             case 'SECTION': return 'Section';
             default: return '';
         }
@@ -194,10 +195,13 @@ const AcademicStructurePage: React.FC = () => {
         setIsSubmitting(true);
         try {
             const level = programs.find(p => p.id === progId)?.level || 'COLLEGE';
-            const offName = getTerm(level, 'SEMESTER') + " " + (currentOffCount + 1);
+            const clsName = classes.find(c => c.id === clsId)?.name || '';
+            const offName = level === 'SCHOOL' 
+                ? `${clsName} - ${String.fromCharCode(65 + currentOffCount)}` 
+                : getTerm(level, 'SEMESTER') + " " + (currentOffCount + 1);
             const offeringType = level === 'SCHOOL' ? 'SCHOOL_CLASS' : level === 'COLLEGE' ? 'COLLEGE_PROGRAM' : 'COACHING_BATCH';
             
-            await api.post('/ims-academic-service/offerings', {
+            const response = await api.post('/ims-academic-service/offerings', {
                 tenantId,
                 programId: progId,
                 classId: clsId,
@@ -205,6 +209,17 @@ const AcademicStructurePage: React.FC = () => {
                 type: offeringType,
                 capacity: defaultCapacity
             });
+
+            if (level === 'SCHOOL') {
+                await api.post('/ims-academic-service/sections', {
+                    tenantId,
+                    classId: clsId,
+                    name: String.fromCharCode(65 + currentOffCount),
+                    programId: progId,
+                    capacity: defaultCapacity,
+                    offeringId: response.data.id
+                });
+            }
 
             toast.success(`${getTerm(level, 'SEMESTER')} Added`);
             fetchData();
@@ -281,7 +296,7 @@ const AcademicStructurePage: React.FC = () => {
     // Delete Modal State
     const [deleteModal, setDeleteModal] = useState({
         isOpen: false,
-        type: 'CLASS' as 'CLASS' | 'SECTION',
+        type: 'CLASS' as 'CLASS' | 'SECTION' | 'OFFERING',
         id: '',
         offeringId: ''
     });
@@ -311,6 +326,10 @@ const AcademicStructurePage: React.FC = () => {
                 await api.delete(`/ims-academic-service/classes/${deleteModal.id}`);
                 await api.delete(`/ims-academic-service/offerings/${deleteModal.offeringId}`);
                 toast.success("Class Deleted");
+            } else if (deleteModal.type === 'OFFERING') {
+                // Delete offering and its sections
+                await api.delete(`/ims-academic-service/offerings/${deleteModal.offeringId}`);
+                toast.success("Section Group Deleted");
             } else {
                 await api.delete(`/ims-academic-service/sections/${deleteModal.id}`);
                 toast.success("Section Deleted");
@@ -338,7 +357,7 @@ const AcademicStructurePage: React.FC = () => {
 
     const getClassesForProgram = (progId: string) => {
         return classes
-            .filter(c => c.programId === progId)
+            .filter(c => c.programId === progId || (!c.programId && programs.length > 0 && programs[0].id === progId))
             .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
     };
 
@@ -392,6 +411,7 @@ const AcademicStructurePage: React.FC = () => {
             <div className="space-y-8">
                 {programs.filter(p => isAdmin || getClassesForProgram(p.id).length > 0).map((program) => {
                     const programClasses = getClassesForProgram(program.id);
+                    const isSchool = program.level === 'SCHOOL';
 
                     return (
                         <div key={program.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-fadeIn">
@@ -427,10 +447,10 @@ const AcademicStructurePage: React.FC = () => {
                                         <p>No {getTerm(program.level).toLowerCase()}es found. Add one to get started.</p>
                                     </div>
                                 ) : (
-                                    <div className={`grid gap-4 ${
-                                        program.level === 'UNDERGRAD' || program.level === 'POSTGRAD' || program.level === 'COACHING' 
+                                    <div className={`grid gap-6 ${
+                                        program.level === 'UNDERGRAD' || program.level === 'POSTGRAD' || program.level === 'COACHING' || program.level === 'SCHOOL'
                                         ? 'grid-cols-1' 
-                                        : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                                        : 'grid-cols-1 md:grid-cols-2'
                                     }`}>
                                         {programClasses.map(cls => {
                                             const classOfferingsCount = getOfferingsForClass(cls.id).length;
@@ -447,10 +467,10 @@ const AcademicStructurePage: React.FC = () => {
                                                                 <>
                                                                     <button
                                                                         onClick={() => handleAddSemester(cls.id, program.id, classOfferingsCount)}
-                                                                        className="flex items-center gap-1 text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded hover:bg-indigo-100 transition-colors"
+                                                                        className="flex items-center gap-1 text-[11px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-all border border-indigo-100 hover:border-indigo-200"
                                                                         title={`Add ${getTerm(program.level, 'SEMESTER')}`}
                                                                     >
-                                                                        <Plus className="w-3 h-3" /> Add {getTerm(program.level, 'SEMESTER')}
+                                                                        <Plus className="w-3.5 h-3.5" /> {getTerm(program.level, 'SEMESTER')}
                                                                     </button>
                                                                     <button
                                                                         onClick={() => setEditedClass({
@@ -478,9 +498,9 @@ const AcademicStructurePage: React.FC = () => {
                                                     </div>
 
                                                     <div className="space-y-3">
-                                                        <div className="flex justify-between items-center">
-                                                            <p className="text-xs font-semibold text-gray-500 uppercase">Semesters & Sections</p>
-                                                        </div>
+                                                            <p className="text-xs font-semibold text-gray-500 uppercase">
+                                                                {isSchool ? `${getTerm(program.level, 'SECTION')}s` : `${getTerm(program.level, 'SEMESTER')}s & ${getTerm(program.level, 'SECTION')}s`}
+                                                            </p>
 
                                                         <div className="space-y-4">
                                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -493,23 +513,23 @@ const AcademicStructurePage: React.FC = () => {
                                                                         const groupSections = getSectionsForClassAndOffering(cls.id, offering.id);
                                                                         return (
                                                                             <div key={offering.id} className="flex flex-col bg-gray-50/50 rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
-                                                                                <div className="px-4 py-2 bg-gray-100/50 border-b border-gray-100 flex justify-between items-center">
-                                                                                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+                                                                                <div className="px-4 py-2 bg-gray-100/50 border-b border-gray-100 flex flex-wrap justify-between items-center gap-2">
+                                                                                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate max-w-[120px]">
                                                                                         {offering.name}
                                                                                     </span>
-                                                                                    <div className="flex items-center gap-1">
+                                                                                    <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
                                                                                         <button
                                                                                             onClick={() => openSubjectMapping(`${cls.name} (${offering.name})`, offering.id)}
-                                                                                            className="p-1 px-2 text-indigo-600 hover:bg-indigo-100 rounded-md transition-colors text-[10px] font-bold flex gap-1 items-center"
+                                                                                            className="p-1.5 px-2 text-indigo-600 hover:bg-indigo-100 rounded-md transition-all text-[10px] font-bold flex gap-1 items-center bg-white/50 border border-indigo-50 shadow-sm shrink-0"
                                                                                             title="Manage Subjects"
                                                                                         >
                                                                                             <BookOpen className="w-3 h-3" /> Subjects
                                                                                         </button>
-                                                                                        {isAdmin && (
+                                                                                        {isAdmin && !isSchool && (
                                                                                             <>
                                                                                                 <button
                                                                                                     onClick={() => openInstructorAssignment(`${cls.name} (${offering.name})`, offering.id)}
-                                                                                                    className="p-1 px-2 text-amber-600 hover:bg-amber-100 rounded-md transition-colors text-[10px] font-bold flex gap-1 items-center"
+                                                                                                    className="p-1.5 px-2 text-amber-600 hover:bg-amber-100 rounded-md transition-all text-[10px] font-bold flex gap-1 items-center bg-white/50 border border-amber-50 shadow-sm shrink-0"
                                                                                                     title="Assign Faculty"
                                                                                                 >
                                                                                                     <UserCheck className="w-3 h-3" /> Faculty
@@ -522,26 +542,35 @@ const AcademicStructurePage: React.FC = () => {
                                                                                                         setNewSectionOfferingId(offering.id);
                                                                                                         setIsSectionModalOpen(true);
                                                                                                     }}
-                                                                                                    className="text-indigo-600 hover:bg-indigo-100 p-1 px-2 rounded-md transition-colors text-[10px] flex items-center gap-1 font-bold"
+                                                                                                    className="p-1.5 px-2 text-indigo-600 hover:bg-indigo-100 rounded-md transition-all text-[10px] flex items-center gap-1 font-bold bg-white/50 border border-indigo-50 shadow-sm shrink-0"
                                                                                                     title="Add Section"
                                                                                                 >
                                                                                                     <Plus className="w-3 h-3" /> Section
                                                                                                 </button>
                                                                                             </>
                                                                                         )}
+                                                                                        {isAdmin && isSchool && (
+                                                                                            <button
+                                                                                                onClick={() => openInstructorAssignment(`${cls.name} (${offering.name})`, offering.id)}
+                                                                                                className="p-1.5 px-2 text-amber-600 hover:bg-amber-100 rounded-md transition-all text-[10px] font-bold flex gap-1 items-center bg-white/50 border border-amber-50 shadow-sm shrink-0"
+                                                                                                title="Assign Faculty"
+                                                                                            >
+                                                                                                <UserCheck className="w-3 h-3" /> Assign Faculty
+                                                                                            </button>
+                                                                                        )}
                                                                                     </div>
                                                                                 </div>
                                                                                 
                                                                                 {(groupSections.length > 0) && (
                                                                                     <div className="p-3 space-y-2">
-                                                                                        {groupSections.map(sec => (
-                                                                                            <div key={sec.id} className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-gray-200/60 group/sec transition-all hover:border-indigo-200 hover:shadow-sm">
+                                                                                        {isSchool && groupSections.length === 1 ? (
+                                                                                            <div className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-gray-200/60 transition-all hover:border-indigo-200 hover:shadow-sm">
                                                                                                 <div className="flex items-center gap-3">
-                                                                                                    <span className="w-8 h-8 flex items-center justify-center bg-indigo-50 rounded-lg text-sm font-bold text-indigo-700">
-                                                                                                        {sec.name}
-                                                                                                    </span>
+                                                                                                    <div className="w-8 h-8 flex items-center justify-center bg-indigo-50 rounded-lg text-sm font-bold text-indigo-700">
+                                                                                                        {groupSections[0].name}
+                                                                                                    </div>
                                                                                                     <div>
-                                                                                                        <p className="text-[10px] text-gray-400">Section Cap: {offering.capacity || 40}</p>
+                                                                                                        <p className="text-[10px] text-gray-400">Class Capacity: {offering.capacity || 40}</p>
                                                                                                     </div>
                                                                                                 </div>
                                                                                                 {isAdmin && (
@@ -549,20 +578,20 @@ const AcademicStructurePage: React.FC = () => {
                                                                                                         <button
                                                                                                             onClick={() => {
                                                                                                                 setEditedSection({
-                                                                                                                    id: sec.id,
-                                                                                                                    name: sec.name,
+                                                                                                                    id: groupSections[0].id,
+                                                                                                                    name: groupSections[0].name,
                                                                                                                     capacity: offering.capacity || 40,
-                                                                                                                    offeringId: sec.offeringId || ''
+                                                                                                                    offeringId: offering.id
                                                                                                                 });
                                                                                                                 setSelectedClassName(cls.name);
                                                                                                             }}
                                                                                                             className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
-                                                                                                            title="Edit Section"
+                                                                                                            title="Edit Capacity"
                                                                                                         >
                                                                                                             <Edit2 className="w-3.5 h-3.5" />
                                                                                                         </button>
                                                                                                         <button
-                                                                                                            onClick={() => handleDeleteSection(sec.id)}
+                                                                                                            onClick={() => setDeleteModal({ isOpen: true, type: 'OFFERING', id: '', offeringId: offering.id })}
                                                                                                             className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                                                                                                             title="Delete Section"
                                                                                                         >
@@ -571,7 +600,46 @@ const AcademicStructurePage: React.FC = () => {
                                                                                                     </div>
                                                                                                 )}
                                                                                             </div>
-                                                                                        ))}
+                                                                                        ) : (
+                                                                                            groupSections.map(sec => (
+                                                                                                <div key={sec.id} className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-gray-200/60 group/sec transition-all hover:border-indigo-200 hover:shadow-sm">
+                                                                                                    <div className="flex items-center gap-3">
+                                                                                                        <span className="w-8 h-8 flex items-center justify-center bg-indigo-50 rounded-lg text-sm font-bold text-indigo-700">
+                                                                                                            {sec.name}
+                                                                                                        </span>
+                                                                                                        <div>
+                                                                                                            <p className="text-[10px] text-gray-400">Section Cap: {offering.capacity || 40}</p>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                    {isAdmin && (
+                                                                                                        <div className="flex items-center gap-1">
+                                                                                                            <button
+                                                                                                                onClick={() => {
+                                                                                                                    setEditedSection({
+                                                                                                                        id: sec.id,
+                                                                                                                        name: sec.name,
+                                                                                                                        capacity: offering.capacity || 40,
+                                                                                                                        offeringId: sec.offeringId || ''
+                                                                                                                    });
+                                                                                                                    setSelectedClassName(cls.name);
+                                                                                                                }}
+                                                                                                                className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                                                                                                                title="Edit Section"
+                                                                                                            >
+                                                                                                                <Edit2 className="w-3.5 h-3.5" />
+                                                                                                            </button>
+                                                                                                            <button
+                                                                                                                onClick={() => handleDeleteSection(sec.id)}
+                                                                                                                className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                                                                                                title="Delete Section"
+                                                                                                            >
+                                                                                                                <X className="w-3.5 h-3.5" />
+                                                                                                            </button>
+                                                                                                        </div>
+                                                                                                    )}
+                                                                                                </div>
+                                                                                            ))
+                                                                                        )}
                                                                                     </div>
                                                                                 )}
                                                                             </div>
@@ -587,7 +655,7 @@ const AcademicStructurePage: React.FC = () => {
                                                                             onClick={() => setExpandedBranches(prev => ({...prev, [cls.id]: !prev[cls.id]}))}
                                                                             className="w-full py-2 bg-white border border-dashed border-gray-200 rounded-xl text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all text-xs font-bold uppercase tracking-widest"
                                                                         >
-                                                                            {expandedBranches[cls.id] ? 'Show Less' : `View All ${groupsCount} Semesters`}
+                                                                            {expandedBranches[cls.id] ? 'Show Less' : `View All ${groupsCount} ${getTerm(program.level, 'SEMESTER')}s`}
                                                                         </button>
                                                                     );
                                                                 }

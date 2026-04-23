@@ -8,7 +8,10 @@ import java.util.List;
 public interface ImsClassesRepo extends JpaRepository<ImsClasses, String> {
 
     boolean existsByTenantIdAndName(String tenantId, String name);
+
     java.util.Optional<ImsClasses> findByTenantIdAndName(String tenantId, String name);
 
     List<ImsClasses> findByTenantId(String tenantId);
+
+    List<ImsClasses> findByProgramId(String programId);
 }

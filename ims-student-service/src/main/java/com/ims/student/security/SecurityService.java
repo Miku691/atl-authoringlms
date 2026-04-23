@@ -12,12 +12,13 @@ public class SecurityService {
     private final ImsStudentsRepo studentRepo;
 
     public boolean isSelf(String studentId) {
-        String currentUserEmail = SecurityUtils.getCurrentUserId(); // Gateway sends email
-        if (currentUserEmail == null)
+        String currentPrincipal = SecurityUtils.getCurrentUserId(); 
+        if (currentPrincipal == null)
             return false;
 
         return studentRepo.findById(studentId)
-                .map(student -> currentUserEmail.equalsIgnoreCase(student.getEmail()))
+                .map(student -> currentPrincipal.equalsIgnoreCase(student.getEmail()) || 
+                               currentPrincipal.equals(student.getUserId()))
                 .orElse(false);
     }
 

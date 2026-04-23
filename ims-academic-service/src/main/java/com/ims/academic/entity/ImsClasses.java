@@ -39,4 +39,8 @@ public class ImsClasses {
         // Optional internal code
         @Column(name = "code", length = 32)
         private String code;
+
+        // Program reference (added for hierarchy support)
+        @Column(name = "program_id")
+        private String programId;
 }
