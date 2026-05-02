@@ -107,19 +107,19 @@ const ForgotPasswordPage: React.FC = () => {
             {step === 1 && (
                 <form className="space-y-6" onSubmit={handleEmailSubmit}>
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="email" className="block text-sm font-medium text-content-primary">
                             Email Address
                         </label>
                         <div className="mt-1 relative rounded-lg shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Mail className="h-5 w-5 text-gray-400" />
+                                <Mail className="h-5 w-5 text-content-muted" />
                             </div>
                             <input
                                 type="email"
                                 name="email"
                                 id="email"
                                 required
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-shadow"
+                                className="block w-full pl-10 pr-3 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-shadow"
                                 placeholder="Enter your registered email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -156,19 +156,19 @@ const ForgotPasswordPage: React.FC = () => {
             {step === 2 && (
                 <form className="space-y-6" onSubmit={handleOtpSubmit}>
                     <div>
-                        <label htmlFor="otp" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="otp" className="block text-sm font-medium text-content-primary">
                             Verification Code (OTP)
                         </label>
                         <div className="mt-1 relative rounded-lg shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <KeyRound className="h-5 w-5 text-gray-400" />
+                                <KeyRound className="h-5 w-5 text-content-muted" />
                             </div>
                             <input
                                 type="text"
                                 name="otp"
                                 id="otp"
                                 required
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-shadow tracking-widest text-lg"
+                                className="block w-full pl-10 pr-3 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-shadow tracking-widest text-lg"
                                 placeholder="123456"
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
@@ -198,7 +198,7 @@ const ForgotPasswordPage: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => setStep(1)}
-                            className="font-medium text-gray-500 hover:text-gray-900"
+                            className="font-medium text-content-secondary hover:text-content-primary"
                         >
                             Change Email
                         </button>
@@ -210,26 +210,26 @@ const ForgotPasswordPage: React.FC = () => {
                 <form className="space-y-6" onSubmit={handleResetSubmit}>
                     {/* New Password */}
                     <div>
-                        <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="newPassword" className="block text-sm font-medium text-content-primary">
                             New Password
                         </label>
                         <div className="mt-1 relative rounded-lg shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-gray-400" />
+                                <Lock className="h-5 w-5 text-content-muted" />
                             </div>
                             <input
                                 type={showNewPassword ? "text" : "password"}
                                 name="newPassword"
                                 id="newPassword"
                                 required
-                                className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-shadow"
+                                className="block w-full pl-10 pr-10 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-shadow"
                                 placeholder="Min 8 characters"
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                             />
                             <button
                                 type="button"
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-content-muted hover:text-content-secondary focus:outline-none"
                                 onClick={() => setShowNewPassword(!showNewPassword)}
                             >
                                 {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -239,26 +239,26 @@ const ForgotPasswordPage: React.FC = () => {
 
                     {/* Confirm Password */}
                     <div>
-                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-content-primary">
                             Confirm Password
                         </label>
                         <div className="mt-1 relative rounded-lg shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-gray-400" />
+                                <Lock className="h-5 w-5 text-content-muted" />
                             </div>
                             <input
                                 type={showConfirmPassword ? "text" : "password"}
                                 name="confirmPassword"
                                 id="confirmPassword"
                                 required
-                                className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-shadow"
+                                className="block w-full pl-10 pr-10 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-shadow"
                                 placeholder="Re-enter password"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                             />
                             <button
                                 type="button"
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-content-muted hover:text-content-secondary focus:outline-none"
                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                             >
                                 {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}

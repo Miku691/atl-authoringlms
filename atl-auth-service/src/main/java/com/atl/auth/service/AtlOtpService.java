@@ -17,6 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.atl.auth.entity.RefreshToken;
+import com.atl.auth.entity.ImsTenants;
+import com.atl.auth.repo.ImsTenantsRepo;
+import com.atl.auth.client.AcademicClient;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +30,9 @@ public class AtlOtpService {
     private final AuthUtil authUtil;
     private final ExternalNotificationClient notificationClient;
     private final AtlRedisService atlRedisService;
-    private final com.atl.auth.client.AcademicClient academicClient;
-    private final com.atl.auth.repo.ImsTenantsRepo tenantsRepo;
+    private final AcademicClient academicClient;
+    private final RefreshTokenService refreshTokenService;
+    private final ImsTenantsRepo tenantsRepo;
 
     public AtlSendOtpResponseDto generateOtp(AtlSendOtpRequestDto sendOtpDto) {
         AtlUser userObj = userRepo.findByUsername(sendOtpDto.getUsername())
@@ -80,12 +85,13 @@ public class AtlOtpService {
 
         if (isOtpValid) {
             String token = authUtil.generateAccessToken(userObj);
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userObj.getId());
 
             boolean tenantSetupCompleted = false;
             TenantType tenantType = null;
 
             if (userObj.getTenant() != null) {
-                com.atl.auth.entity.ImsTenants tenant = userObj.getTenant();
+                ImsTenants tenant = userObj.getTenant();
                 tenantSetupCompleted = Boolean.TRUE.equals(tenant.getSetupCompleted());
                 tenantType = tenant.getType();
 
@@ -115,6 +121,7 @@ public class AtlOtpService {
                             .id(String.valueOf(userObj.getId()))
                             .username(userObj.getUsername())
                             .jwt(token)
+                            .refreshToken(refreshToken.getToken())
                             .roles(userObj.getRoles().stream()
                                     .map(AtlRole::getRoleName)
                                     .collect(Collectors.toSet()))

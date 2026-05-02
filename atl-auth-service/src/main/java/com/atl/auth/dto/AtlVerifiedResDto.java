@@ -14,6 +14,7 @@ public class AtlVerifiedResDto {
     private String id;
     private String username;
     private String jwt;
+    private String refreshToken;
     private Set<String> roles;
     private String tenantId;
     private String email;

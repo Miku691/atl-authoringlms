@@ -135,7 +135,7 @@ const StudentDetailsPage: React.FC = () => {
     if (!student) {
         return (
             <div className="text-center mt-20">
-                <h2 className="text-xl font-semibold text-gray-900">Student not found</h2>
+                <h2 className="text-xl font-semibold text-content-primary">Student not found</h2>
                 <button onClick={() => navigate('/people/students')} className="mt-4 text-indigo-600 hover:underline">
                     Back to Students
                 </button>
@@ -156,7 +156,7 @@ const StudentDetailsPage: React.FC = () => {
             <div className="mb-8">
                 <button
                     onClick={() => navigate('/people/students')}
-                    className="flex items-center text-sm text-gray-500 hover:text-gray-700 mb-4 transition-colors"
+                    className="flex items-center text-sm text-content-secondary hover:text-content-primary mb-4 transition-colors"
                 >
                     <ArrowLeft className="w-4 h-4 mr-1" /> Back to Students
                 </button>
@@ -172,18 +172,18 @@ const StudentDetailsPage: React.FC = () => {
                     </div>
 
                     <div className="flex-1">
-                        <h1 className="text-3xl font-bold text-gray-900">{student.firstName} {student.lastName}</h1>
-                        <div className="mt-2 flex flex-wrap gap-4 text-sm text-gray-600">
+                        <h1 className="text-3xl font-bold text-content-primary">{student.firstName} {student.lastName}</h1>
+                        <div className="mt-2 flex flex-wrap gap-4 text-sm text-content-secondary">
                             <span className="flex items-center gap-1">
-                                <Shield className="w-4 h-4 text-gray-400" />
-                                Admission No: <span className="font-medium text-gray-900">{student.admissionNo}</span>
+                                <Shield className="w-4 h-4 text-content-muted" />
+                                Admission No: <span className="font-medium text-content-primary">{student.admissionNo}</span>
                             </span>
                             <span className="flex items-center gap-1">
-                                <Mail className="w-4 h-4 text-gray-400" />
+                                <Mail className="w-4 h-4 text-content-muted" />
                                 {student.email}
                             </span>
                             <span className="flex items-center gap-1">
-                                <Phone className="w-4 h-4 text-gray-400" />
+                                <Phone className="w-4 h-4 text-content-muted" />
                                 {student.phone}
                             </span>
                         </div>
@@ -191,7 +191,7 @@ const StudentDetailsPage: React.FC = () => {
 
                     <div className="mt-4 md:mt-0">
                         <span className={`px-4 py-1.5 rounded-full text-sm font-semibold 
-                            ${student.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                            ${student.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-chrome text-content-primary'}`}>
                             {student.status}
                         </span>
                     </div>
@@ -199,7 +199,7 @@ const StudentDetailsPage: React.FC = () => {
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-gray-200 mb-6">
+            <div className="border-b border-border mb-6">
                 <nav className="-mb-px flex space-x-8 overflow-x-auto">
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
@@ -211,7 +211,7 @@ const StudentDetailsPage: React.FC = () => {
                                     whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 transition-colors
                                     ${activeTab === tab.id
                                         ? 'border-indigo-500 text-indigo-600'
-                                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}
+                                        : 'border-transparent text-content-secondary hover:text-content-primary hover:border-border'}
                                 `}
                             >
                                 <Icon className="w-4 h-4" />
@@ -227,39 +227,39 @@ const StudentDetailsPage: React.FC = () => {
 
                 {/* 1. Profile Tab */}
                 {activeTab === 'profile' && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
-                            <h3 className="text-lg font-medium leading-6 text-gray-900">Personal Information</h3>
+                    <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
+                        <div className="px-6 py-5 border-b border-border bg-chrome">
+                            <h3 className="text-lg font-medium leading-6 text-content-primary">Personal Information</h3>
                         </div>
                         <div className="px-6 py-5">
                             <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-6">
                                 <div className="sm:col-span-1">
-                                    <dt className="text-sm font-medium text-gray-500">Full Name</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">{student.firstName} {student.lastName}</dd>
+                                    <dt className="text-sm font-medium text-content-secondary">Full Name</dt>
+                                    <dd className="mt-1 text-sm text-content-primary">{student.firstName} {student.lastName}</dd>
                                 </div>
                                 <div className="sm:col-span-1">
-                                    <dt className="text-sm font-medium text-gray-500">Date of Birth</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">{student.dob || 'N/A'}</dd>
+                                    <dt className="text-sm font-medium text-content-secondary">Date of Birth</dt>
+                                    <dd className="mt-1 text-sm text-content-primary">{student.dob || 'N/A'}</dd>
                                 </div>
                                 <div className="sm:col-span-1">
-                                    <dt className="text-sm font-medium text-gray-500">Gender</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">{student.gender || 'N/A'}</dd>
+                                    <dt className="text-sm font-medium text-content-secondary">Gender</dt>
+                                    <dd className="mt-1 text-sm text-content-primary">{student.gender || 'N/A'}</dd>
                                 </div>
                                 <div className="sm:col-span-1">
-                                    <dt className="text-sm font-medium text-gray-500">Blood Group</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">{student.bloodGroup || 'N/A'}</dd>
+                                    <dt className="text-sm font-medium text-content-secondary">Blood Group</dt>
+                                    <dd className="mt-1 text-sm text-content-primary">{student.bloodGroup || 'N/A'}</dd>
                                 </div>
                                 <div className="sm:col-span-1">
-                                    <dt className="text-sm font-medium text-gray-500">Religion</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">{student.religion || 'N/A'}</dd>
+                                    <dt className="text-sm font-medium text-content-secondary">Religion</dt>
+                                    <dd className="mt-1 text-sm text-content-primary">{student.religion || 'N/A'}</dd>
                                 </div>
                                 <div className="sm:col-span-1">
-                                    <dt className="text-sm font-medium text-gray-500">Category</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">{student.category || 'N/A'}</dd>
+                                    <dt className="text-sm font-medium text-content-secondary">Category</dt>
+                                    <dd className="mt-1 text-sm text-content-primary">{student.category || 'N/A'}</dd>
                                 </div>
                                 <div className="sm:col-span-2">
-                                    <dt className="text-sm font-medium text-gray-500">Address</dt>
-                                    <dd className="mt-1 text-sm text-gray-900">{student.address || 'N/A'}</dd>
+                                    <dt className="text-sm font-medium text-content-secondary">Address</dt>
+                                    <dd className="mt-1 text-sm text-content-primary">{student.address || 'N/A'}</dd>
                                 </div>
                             </dl>
                         </div>
@@ -268,39 +268,39 @@ const StudentDetailsPage: React.FC = () => {
 
                 {/* 2. Academic History Tab */}
                 {activeTab === 'academic' && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="px-6 py-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                            <h3 className="text-lg font-medium leading-6 text-gray-900">Enrollment History</h3>
+                    <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
+                        <div className="px-6 py-5 border-b border-border bg-chrome flex justify-between items-center">
+                            <h3 className="text-lg font-medium leading-6 text-content-primary">Enrollment History</h3>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                                <thead className="bg-chrome">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Academic Year</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Offering (Class)</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enrolled Date</th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Academic Year</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Offering (Class)</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Enrolled Date</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Status</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-surface divide-y divide-gray-200">
                                     {enrollments.length === 0 ? (
                                         <tr>
-                                            <td colSpan={4} className="px-6 py-8 text-center text-gray-500 italic">
+                                            <td colSpan={4} className="px-6 py-8 text-center text-content-secondary italic">
                                                 No enrollment history found.
                                             </td>
                                         </tr>
                                     ) : (
                                         enrollments.map((enrollment) => (
                                             <tr key={enrollment.id}>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{enrollment.academicYear}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{enrollment.offeringName}</td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-content-primary">{enrollment.academicYear}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-content-primary font-medium">{enrollment.offeringName}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">
                                                     {enrollment.enrolledAt ? new Date(enrollment.enrolledAt).toLocaleDateString() : 'N/A'}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
                                                         ${enrollment.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                                                            enrollment.status === 'WITHDRAWN' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>
+                                                            enrollment.status === 'WITHDRAWN' ? 'bg-red-100 text-red-800' : 'bg-chrome text-content-primary'}`}>
                                                         {enrollment.status}
                                                     </span>
                                                 </td>
@@ -315,26 +315,26 @@ const StudentDetailsPage: React.FC = () => {
 
                 {/* 3. Guardians Tab */}
                 {activeTab === 'guardians' && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="px-6 py-5 border-b border-gray-200 bg-gray-50 flex justify-between items-center">
-                            <h3 className="text-lg font-medium leading-6 text-gray-900">Guardians</h3>
+                    <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
+                        <div className="px-6 py-5 border-b border-border bg-chrome flex justify-between items-center">
+                            <h3 className="text-lg font-medium leading-6 text-content-primary">Guardians</h3>
                             {/* TODO: Add 'Add Guardian' button here logic */}
                         </div>
                         {guardians.length === 0 ? (
                             <div className="px-6 py-12 text-center">
-                                <p className="text-gray-500 italic">No guardians linked to this student.</p>
+                                <p className="text-content-secondary italic">No guardians linked to this student.</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 gap-6 p-6">
                                 {guardians.map(guardian => (
-                                    <div key={guardian.id} className="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50">
+                                    <div key={guardian.id} className="border border-border rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center bg-chrome">
                                         <div>
-                                            <h4 className="text-base font-semibold text-gray-900">{guardian.guardianName} <span className="text-sm font-normal text-gray-500">({guardian.relation})</span></h4>
-                                            <div className="mt-1 flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-gray-600">
+                                            <h4 className="text-base font-semibold text-content-primary">{guardian.guardianName} <span className="text-sm font-normal text-content-secondary">({guardian.relation})</span></h4>
+                                            <div className="mt-1 flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm text-content-secondary">
                                                 <span className="flex items-center gap-1"><Phone className="w-3 h-3" /> {guardian.phone}</span>
                                                 <span className="flex items-center gap-1"><Mail className="w-3 h-3" /> {guardian.email}</span>
                                             </div>
-                                            <p className="mt-2 text-sm text-gray-500"><span className="font-medium">Address:</span> {guardian.address}</p>
+                                            <p className="mt-2 text-sm text-content-secondary"><span className="font-medium">Address:</span> {guardian.address}</p>
                                         </div>
                                         <div className="mt-4 md:mt-0">
                                             {/* Edit/Delete Actions would go here */}
@@ -348,11 +348,11 @@ const StudentDetailsPage: React.FC = () => {
 
                 {/* 4. Documents Tab */}
                 {activeTab === 'documents' && (
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden p-6">
+                    <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden p-6">
                         <div className="text-center">
-                            <FileText className="mx-auto h-12 w-12 text-gray-400" />
-                            <h3 className="mt-2 text-sm font-medium text-gray-900">Manage Documents</h3>
-                            <p className="mt-1 text-sm text-gray-500">Upload and view student certificates and ID proofs.</p>
+                            <FileText className="mx-auto h-12 w-12 text-content-muted" />
+                            <h3 className="mt-2 text-sm font-medium text-content-primary">Manage Documents</h3>
+                            <p className="mt-1 text-sm text-content-secondary">Upload and view student certificates and ID proofs.</p>
                             <div className="mt-6">
                                 <button
                                     onClick={() => setIsDocsModalOpen(true)}

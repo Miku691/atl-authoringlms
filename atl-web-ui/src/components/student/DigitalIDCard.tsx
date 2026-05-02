@@ -23,7 +23,7 @@ const DigitalIDCard: React.FC<DigitalIDCardProps> = ({ student, enrollment, tena
                 {/* Header */}
                 <div className="flex justify-between items-start">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-white/10 backdrop-blur-md rounded-lg flex items-center justify-center border border-white/20">
+                        <div className="w-8 h-8 bg-surface/10 backdrop-blur-md rounded-lg flex items-center justify-center border border-white/20">
                             <GraduationCap className="w-5 h-5 text-indigo-400" />
                         </div>
                         <div>
@@ -41,7 +41,7 @@ const DigitalIDCard: React.FC<DigitalIDCardProps> = ({ student, enrollment, tena
                 {/* Body */}
                 <div className="flex items-center gap-6 py-4">
                     <div className="relative">
-                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-white/10 p-1 bg-white/5">
+                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-white/10 p-1 bg-surface/5">
                             <AuthenticatedAvatar
                                 imageUrl={student.profileImageUrl}
                                 fallbackInitial={student.firstName?.[0]}
@@ -59,14 +59,14 @@ const DigitalIDCard: React.FC<DigitalIDCardProps> = ({ student, enrollment, tena
                             <h3 className="text-lg font-black text-white tracking-tight uppercase leading-none">
                                 {student.firstName} {student.lastName}
                             </h3>
-                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-widest mt-1">
+                            <p className="text-[9px] font-black text-content-secondary uppercase tracking-widest mt-1">
                                 {enrollment?.offeringName || 'General Student'}
                             </p>
                         </div>
 
                         <div className="grid grid-cols-1 gap-2">
                             <div className="space-y-0.5">
-                                <p className="text-[7px] font-black text-slate-600 uppercase tracking-widest">Student ID</p>
+                                <p className="text-[7px] font-black text-content-secondary uppercase tracking-widest">Student ID</p>
                                 <p className="text-xs font-black text-indigo-400 tracking-tighter">#{student.admissionNo}</p>
                             </div>
                         </div>
@@ -77,16 +77,16 @@ const DigitalIDCard: React.FC<DigitalIDCardProps> = ({ student, enrollment, tena
                 <div className="pt-4 border-t border-white/5 flex items-end justify-between gap-4">
                     <div className="flex gap-4">
                         <div className="space-y-0.5 text-left">
-                            <p className="text-[6px] font-black text-slate-600 uppercase tracking-widest">Ph.</p>
+                            <p className="text-[6px] font-black text-content-secondary uppercase tracking-widest">Ph.</p>
                             <p className="text-[8px] font-bold text-slate-300">{student.phone || 'N/A'}</p>
                         </div>
                         <div className="space-y-0.5 text-left">
-                            <p className="text-[6px] font-black text-slate-600 uppercase tracking-widest">Valid Until</p>
+                            <p className="text-[6px] font-black text-content-secondary uppercase tracking-widest">Valid Until</p>
                             <p className="text-[8px] font-bold text-slate-300">July 2026</p>
                         </div>
                     </div>
-                    <div className="p-1.5 bg-white rounded-lg">
-                        <QrCode className="w-8 h-8 text-slate-900" />
+                    <div className="p-1.5 bg-surface rounded-lg">
+                        <QrCode className="w-8 h-8 text-content-primary" />
                     </div>
                 </div>
             </div>

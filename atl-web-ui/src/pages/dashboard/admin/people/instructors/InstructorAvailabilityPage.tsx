@@ -56,18 +56,18 @@ const InstructorAvailabilityPage: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500 italic">Loading availability...</div>;
+    if (loading) return <div className="p-8 text-center text-content-secondary italic">Loading availability...</div>;
 
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-gray-900">Weekly Availability</h1>
+            <h1 className="text-2xl font-bold text-content-primary">Weekly Availability</h1>
 
             {/* Add Slot */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-wrap items-end gap-4">
+            <div className="bg-surface p-4 rounded-xl shadow-sm border border-border flex flex-wrap items-end gap-4">
                 <div>
                     <label className="block text-sm font-medium mb-1">Day</label>
                     <select
-                        className="border border-gray-300 rounded-lg p-2 bg-gray-50 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="border border-border rounded-lg p-2 bg-chrome focus:ring-indigo-500 focus:border-indigo-500"
                         value={newSlot.dayOfWeek}
                         onChange={e => setNewSlot({ ...newSlot, dayOfWeek: e.target.value })}
                     >
@@ -78,7 +78,7 @@ const InstructorAvailabilityPage: React.FC = () => {
                     <label className="block text-sm font-medium mb-1">Start</label>
                     <input
                         type="time"
-                        className="border border-gray-300 rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="border border-border rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500"
                         value={newSlot.startTime}
                         onChange={e => setNewSlot({ ...newSlot, startTime: e.target.value })}
                     />
@@ -87,7 +87,7 @@ const InstructorAvailabilityPage: React.FC = () => {
                     <label className="block text-sm font-medium mb-1">End</label>
                     <input
                         type="time"
-                        className="border border-gray-300 rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="border border-border rounded-lg p-2 focus:ring-indigo-500 focus:border-indigo-500"
                         value={newSlot.endTime}
                         onChange={e => setNewSlot({ ...newSlot, endTime: e.target.value })}
                     />
@@ -105,13 +105,13 @@ const InstructorAvailabilityPage: React.FC = () => {
                 {days.map(day => {
                     const slots = availability.filter(a => a.dayOfWeek === day);
                     return (
-                        <div key={day} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 flex flex-col h-full">
-                            <h3 className="font-bold text-gray-900 mb-3 border-b pb-2 flex items-center justify-between">
+                        <div key={day} className="bg-surface p-4 rounded-xl shadow-sm border border-border flex flex-col h-full">
+                            <h3 className="font-bold text-content-primary mb-3 border-b pb-2 flex items-center justify-between">
                                 {day}
-                                <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded uppercase">{slots.length} Slots</span>
+                                <span className="text-[10px] bg-chrome text-content-secondary px-1.5 py-0.5 rounded uppercase">{slots.length} Slots</span>
                             </h3>
                             {slots.length === 0 ? (
-                                <p className="text-sm text-gray-400 italic my-auto py-4 text-center">No slots defined</p>
+                                <p className="text-sm text-content-muted italic my-auto py-4 text-center">No slots defined</p>
                             ) : (
                                 <div className="space-y-2">
                                     {slots.map(slot => (

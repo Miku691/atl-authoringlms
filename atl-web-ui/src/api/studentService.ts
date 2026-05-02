@@ -27,6 +27,7 @@ export interface Student {
     nationality?: string;
     maritalStatus?: string;
     enrollmentType?: string;
+    enrollmentStatus?: string;
 }
 
 export interface BulkAdmissionRequest {

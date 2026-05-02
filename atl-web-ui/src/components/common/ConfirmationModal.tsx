@@ -1,5 +1,6 @@
 import React from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, AlertTriangle, CheckCircle2, Info, AlertCircle } from 'lucide-react';
 
 interface ConfirmationModalProps {
     isOpen: boolean;
@@ -13,6 +14,32 @@ interface ConfirmationModalProps {
     variant?: 'danger' | 'warning' | 'info' | 'success';
 }
 
+/** Maps variant → icon component and colour token for the icon */
+const VARIANT_META = {
+    danger: {
+        Icon: AlertTriangle,
+        iconColor: '#DC2626',
+    },
+    warning: {
+        Icon: AlertCircle,
+        iconColor: '#D97706',
+    },
+    info: {
+        Icon: Info,
+        iconColor: '#2A6DF4',
+    },
+    success: {
+        Icon: CheckCircle2,
+        iconColor: '#16A34A',
+    },
+} as const;
+
+/**
+ * ConfirmationModal
+ *
+ * Uses the canonical IMS modal design system (BookDemo-style).
+ * Apply variant prop to control icon colour and confirm button colour.
+ */
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     isOpen,
     onClose,
@@ -22,89 +49,86 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     confirmText = 'Confirm',
     cancelText = 'Cancel',
     isLoading = false,
-    variant = 'danger'
+    variant = 'danger',
 }) => {
-    if (!isOpen) return null;
-
-    const colors = {
-        danger: {
-            iconBg: 'bg-red-100',
-            iconColor: 'text-red-600',
-            buttonBg: 'bg-red-600',
-            buttonHover: 'hover:bg-red-700',
-            focusRing: 'focus:ring-red-500'
-        },
-        warning: {
-            iconBg: 'bg-yellow-100',
-            iconColor: 'text-yellow-600',
-            buttonBg: 'bg-yellow-600',
-            buttonHover: 'hover:bg-yellow-700',
-            focusRing: 'focus:ring-yellow-500'
-        },
-        info: {
-            iconBg: 'bg-blue-100',
-            iconColor: 'text-blue-600',
-            buttonBg: 'bg-blue-600',
-            buttonHover: 'hover:bg-blue-700',
-            focusRing: 'focus:ring-blue-500'
-        },
-        success: {
-            iconBg: 'bg-green-100',
-            iconColor: 'text-green-600',
-            buttonBg: 'bg-green-600',
-            buttonHover: 'hover:bg-green-700',
-            focusRing: 'focus:ring-green-500'
-        }
-    };
-
-    const currentVariant = colors[variant];
+    const { Icon, iconColor } = VARIANT_META[variant];
 
     return (
-        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-            <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onClick={onClose}></div>
+        <AnimatePresence>
+            {isOpen && (
+                /* ── Backdrop ── */
+                <motion.div
+                    className="modal-overlay"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    onClick={onClose}
+                    aria-modal="true"
+                    role="dialog"
+                    aria-labelledby="confirm-modal-title"
+                >
+                    {/* ── Card ── */}
+                    <motion.div
+                        className="modal-card modal-card-sm"
+                        initial={{ opacity: 0, scale: 0.93, y: 20 }}
+                        animate={{ opacity: 1, scale: 1,    y: 0  }}
+                        exit={{   opacity: 0, scale: 0.93, y: 20 }}
+                        transition={{ duration: 0.22, ease: 'easeOut' }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
 
-                <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-                <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                        <div className="sm:flex sm:items-start">
-                            <div className={`mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full ${currentVariant.iconBg} sm:mx-0 sm:h-10 sm:w-10`}>
-                                <AlertTriangle className={`h-6 w-6 ${currentVariant.iconColor}`} aria-hidden="true" />
-                            </div>
-                            <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                                <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                    {title}
-                                </h3>
-                                <div className="mt-2">
-                                    <p className="text-sm text-gray-500">
-                                        {message}
+                        {/* ── Header ── */}
+                        <div className="modal-header">
+                            <div className="flex items-center gap-3">
+                                <div className={`modal-icon-box ${variant}`}>
+                                    <Icon size={20} style={{ color: iconColor }} />
+                                </div>
+                                <div>
+                                    <p className="modal-title" id="confirm-modal-title">
+                                        {title}
                                     </p>
                                 </div>
                             </div>
+                            <button
+                                className="modal-close-btn"
+                                onClick={onClose}
+                                aria-label="Close"
+                            >
+                                <X size={18} />
+                            </button>
                         </div>
-                    </div>
-                    <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                        <button
-                            type="button"
-                            disabled={isLoading}
-                            className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 ${currentVariant.buttonBg} text-base font-medium text-white ${currentVariant.buttonHover} focus:outline-none focus:ring-2 focus:ring-offset-2 ${currentVariant.focusRing} sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed`}
-                            onClick={onConfirm}
-                        >
-                            {isLoading ? 'Processing...' : confirmText}
-                        </button>
-                        <button
-                            type="button"
-                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                            onClick={onClose}
-                        >
-                            {cancelText}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+                        {/* ── Body ── */}
+                        <div className="modal-body">
+                            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+                                {message}
+                            </p>
+                        </div>
+
+                        {/* ── Footer ── */}
+                        <div className="modal-footer">
+                            <button
+                                className="modal-btn-secondary"
+                                onClick={onClose}
+                                disabled={isLoading}
+                            >
+                                {cancelText}
+                            </button>
+                            <button
+                                className={`modal-btn-primary ${variant}`}
+                                onClick={onConfirm}
+                                disabled={isLoading}
+                            >
+                                {isLoading ? 'Processing…' : confirmText}
+                            </button>
+                        </div>
+
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
     );
 };
 
 export default ConfirmationModal;
+

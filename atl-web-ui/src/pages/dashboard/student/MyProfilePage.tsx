@@ -47,10 +47,10 @@ const MyProfilePage: React.FC = () => {
 
     if (!profile) {
         return (
-            <div className="bg-white rounded-2xl p-12 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] mt-10">
+            <div className="bg-surface rounded-2xl p-12 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] mt-10">
                 <User className="w-16 h-16 text-slate-200 mx-auto mb-4" />
                 <h2 className="text-xl font-bold text-[#1a3d8a]">Access Restricted</h2>
-                <p className="text-slate-500 mt-2">No student profile linked to your account was found.</p>
+                <p className="text-content-secondary mt-2">No student profile linked to your account was found.</p>
             </div>
         );
     }
@@ -125,7 +125,7 @@ const MyProfilePage: React.FC = () => {
                 {/* Left Column - Main Info Cards */}
                 <div className="lg:col-span-8 space-y-8">
                     {/* Header Avatar & Identity Card */}
-                    <div className="bg-white rounded-2xl p-8 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex flex-col md:flex-row items-center gap-8">
+                    <div className="bg-surface rounded-2xl p-8 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex flex-col md:flex-row items-center gap-8">
                         <div className="shrink-0">
                             <div className="w-32 h-32 rounded-2xl overflow-hidden bg-[#dae2ff] relative group">
                                 <AuthenticatedAvatar
@@ -161,7 +161,7 @@ const MyProfilePage: React.FC = () => {
 
                     {/* Section Cards */}
                     {sections.map((section, sIdx) => (
-                        <div key={sIdx} className="bg-white rounded-2xl shadow-[0_2px_16px_-4_rgba(26,61,138,0.06)] overflow-hidden">
+                        <div key={sIdx} className="bg-surface rounded-2xl shadow-[0_2px_16px_-4_rgba(26,61,138,0.06)] overflow-hidden">
                             {/* Section Header */}
                             <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
                                 <div className="flex items-center gap-4">
@@ -170,7 +170,7 @@ const MyProfilePage: React.FC = () => {
                                     </div>
                                     <div>
                                         <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">{section.title}</h3>
-                                        <p className="text-xs text-slate-400 font-medium">{section.subtitle}</p>
+                                        <p className="text-xs text-content-muted font-medium">{section.subtitle}</p>
                                     </div>
                                 </div>
                             </div>
@@ -218,14 +218,14 @@ const MyProfilePage: React.FC = () => {
                             <div className="space-y-5">
                                 <div className="flex items-center justify-between">
                                     <span className="text-[10px] font-medium text-white/50 uppercase tracking-wider">Institution Hash</span>
-                                    <span className="text-[10px] font-mono text-white bg-white/5 px-2 py-1 rounded">{profile.tenantId?.substring(0, 12)}</span>
+                                    <span className="text-[10px] font-mono text-white bg-surface/5 px-2 py-1 rounded">{profile.tenantId?.substring(0, 12)}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <span className="text-[10px] font-medium text-white/50 uppercase tracking-wider">Category</span>
                                     <span className="text-[10px] font-bold text-[#2a6df4] uppercase">{profile.category || 'Standard'}</span>
                                 </div>
                                 
-                                <div className="h-px bg-white/5 w-full my-1"></div>
+                                <div className="h-px bg-surface/5 w-full my-1"></div>
                                 
                                 <div className="flex gap-4">
                                     <Heart className="w-8 h-8 text-[#ba1a1a] opacity-40 shrink-0" />

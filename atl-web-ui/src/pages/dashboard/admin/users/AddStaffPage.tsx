@@ -151,7 +151,7 @@ const AddStaffPage: React.FC = () => {
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => navigate(-1)}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500"
+                    className="p-2 hover:bg-chrome rounded-lg transition-colors text-content-secondary"
                 >
                     <ArrowLeft className="w-5 h-5" />
                 </button>
@@ -163,10 +163,10 @@ const AddStaffPage: React.FC = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+                <div className="bg-surface p-8 rounded-3xl shadow-sm border border-border">
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div className="col-span-full pb-2 border-b border-gray-50">
-                            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <div className="col-span-full pb-2 border-b border-border">
+                            <h2 className="text-lg font-bold text-content-primary flex items-center gap-2">
                                 <User className="w-5 h-5 text-indigo-500" />
                                 Personal Details
                             </h2>
@@ -235,8 +235,8 @@ const AddStaffPage: React.FC = () => {
                             ]}
                         />
 
-                        <div className="col-span-full mt-4 pb-2 border-b border-gray-50">
-                            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <div className="col-span-full mt-4 pb-2 border-b border-border">
+                            <h2 className="text-lg font-bold text-content-primary flex items-center gap-2">
                                 <Briefcase className="w-5 h-5 text-emerald-500" />
                                 Professional Details
                             </h2>
@@ -285,8 +285,8 @@ const AddStaffPage: React.FC = () => {
                             ]}
                         />
 
-                        <div className="col-span-full mt-4 pb-2 border-b border-gray-50">
-                            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                        <div className="col-span-full mt-4 pb-2 border-b border-border">
+                            <h2 className="text-lg font-bold text-content-primary flex items-center gap-2">
                                 <GraduationCap className="w-5 h-5 text-amber-500" />
                                 Background & Finance
                             </h2>
@@ -321,9 +321,9 @@ const AddStaffPage: React.FC = () => {
                         />
 
                         <div className="col-span-full">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">Residential Address <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-bold text-content-primary mb-2">Residential Address <span className="text-red-500">*</span></label>
                             <div className="relative group">
-                                <div className="absolute top-3 left-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors">
+                                <div className="absolute top-3 left-4 text-content-muted group-focus-within:text-indigo-500 transition-colors">
                                     <MapPin className="w-5 h-5" />
                                 </div>
                                 <textarea
@@ -331,7 +331,7 @@ const AddStaffPage: React.FC = () => {
                                     rows={3}
                                     value={formData.address}
                                     onChange={handleInputChange}
-                                    className={`w-full pl-12 pr-4 py-3 bg-gray-50 border rounded-2xl focus:outline-none focus:ring-2 transition-all resize-none ${errors.address ? 'border-red-300 focus:ring-red-500' : 'border-gray-100 focus:ring-indigo-500 focus:bg-white'}`}
+                                    className={`w-full pl-12 pr-4 py-3 bg-chrome border rounded-2xl focus:outline-none focus:ring-2 transition-all resize-none ${errors.address ? 'border-red-300 focus:ring-red-500' : 'border-border focus:ring-indigo-500 focus:bg-surface'}`}
                                     placeholder="Enter complete residential address..."
                                 />
                             </div>
@@ -339,18 +339,18 @@ const AddStaffPage: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="mt-10 flex justify-end gap-4 border-t border-gray-50 pt-8">
+                    <div className="mt-10 flex justify-end gap-4 border-t border-border pt-8">
                         <button
                             type="button"
                             onClick={() => navigate(-1)}
-                            className="px-8 py-4 bg-gray-50 text-gray-600 rounded-2xl font-bold hover:bg-gray-100 transition-all border border-gray-100"
+                            className="px-8 py-4 bg-chrome text-content-secondary rounded-2xl font-bold hover:bg-chrome transition-all border border-border"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-10 py-4 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isSubmitting ? (
                                 <>

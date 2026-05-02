@@ -55,7 +55,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
 
   return (
     <div 
-      className="bg-white shadow-2xl rounded-sm p-12 mx-auto w-full max-w-[210mm] min-h-[297mm] transition-all duration-300 transform scale-[0.95] origin-top"
+      className="bg-surface shadow-2xl rounded-sm p-12 mx-auto w-full max-w-[210mm] min-h-[297mm] transition-all duration-300 transform scale-[0.95] origin-top"
       style={{ fontFamily: config.fontFamily }}
     >
       
@@ -65,7 +65,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
         {/* Left Side: Institution Details */}
         <div className="flex gap-6 max-w-2/3">
           {config.showLogo && (
-            <div className="w-24 h-24 bg-gray-50 rounded-xl overflow-hidden flex items-center justify-center border border-gray-100 flex-shrink-0">
+            <div className="w-24 h-24 bg-chrome rounded-xl overflow-hidden flex items-center justify-center border border-border flex-shrink-0">
                {config.logoUrl ? (
                  <img src={config.logoUrl} alt="logo" className="w-full h-full object-contain" />
                ) : (
@@ -78,18 +78,18 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
                 {config.institutionName}
              </h1>
              <div className="space-y-1">
-                <p className="flex items-start gap-2 text-xs text-gray-600">
+                <p className="flex items-start gap-2 text-xs text-content-secondary">
                    <MapPin className="w-3 h-3 mt-0.5" style={primaryStyle} /> {config.address}
                 </p>
                 <div className="flex gap-4">
-                   <p className="flex items-center gap-1.5 text-xs text-gray-600">
+                   <p className="flex items-center gap-1.5 text-xs text-content-secondary">
                       <Smartphone className="w-3 h-3" style={primaryStyle} /> {config.contact}
                    </p>
-                   <p className="flex items-center gap-1.5 text-xs text-gray-600">
+                   <p className="flex items-center gap-1.5 text-xs text-content-secondary">
                       <Mail className="w-3 h-3" style={primaryStyle} /> {config.email}
                    </p>
                 </div>
-                <p className="flex items-center gap-1.5 text-xs text-gray-600">
+                <p className="flex items-center gap-1.5 text-xs text-content-secondary">
                    <Globe className="w-3 h-3" style={primaryStyle} /> {config.website}
                 </p>
              </div>
@@ -105,8 +105,8 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
               Fee Receipt
            </div>
            <div className="space-y-0.5">
-              <p className="text-[10px] text-gray-400 font-bold uppercase">Academic Session</p>
-              <p className="text-sm font-bold text-gray-800">{sampleStudent.session}</p>
+              <p className="text-[10px] text-content-muted font-bold uppercase">Academic Session</p>
+              <p className="text-sm font-bold text-content-primary">{sampleStudent.session}</p>
            </div>
         </div>
       </div>
@@ -116,42 +116,42 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
          
          {/* Receipt Context */}
          <div className="space-y-3">
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-               <span className="text-[10px] text-gray-400 font-black uppercase flex items-center gap-2">
+            <div className="flex justify-between items-center py-2 border-b border-border">
+               <span className="text-[10px] text-content-muted font-black uppercase flex items-center gap-2">
                   <Receipt className="w-3 h-3" /> Receipt Number
                </span>
-               <span className="text-sm font-bold text-gray-800">{sampleStudent.receiptNo}</span>
+               <span className="text-sm font-bold text-content-primary">{sampleStudent.receiptNo}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-               <span className="text-[10px] text-gray-400 font-black uppercase flex items-center gap-2">
+            <div className="flex justify-between items-center py-2 border-b border-border">
+               <span className="text-[10px] text-content-muted font-black uppercase flex items-center gap-2">
                   <Calendar className="w-3 h-3" /> Payment Date
                </span>
-               <span className="text-sm font-bold text-gray-800">{sampleStudent.date}</span>
+               <span className="text-sm font-bold text-content-primary">{sampleStudent.date}</span>
             </div>
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-               <span className="text-[10px] text-gray-400 font-black uppercase flex items-center gap-2">
+            <div className="flex justify-between items-center py-2 border-b border-border">
+               <span className="text-[10px] text-content-muted font-black uppercase flex items-center gap-2">
                   <CreditCard className="w-3 h-3" /> Payment Mode
                </span>
-               <span className="text-sm font-bold text-gray-800">ONLINE (UPI Transfer)</span>
+               <span className="text-sm font-bold text-content-primary">ONLINE (UPI Transfer)</span>
             </div>
          </div>
 
          {/* Student Details */}
-         <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+         <div className="p-4 bg-chrome rounded-2xl border border-border shadow-sm relative overflow-hidden">
             <div className="absolute top-0 right-0 w-16 h-16 opacity-5 pointer-events-none" style={primaryStyle}>
                <User className="w-full h-full" />
             </div>
             
             <div className="flex gap-4">
                {config.showStudentPhoto && (
-                  <div className="w-16 h-16 bg-white rounded-xl border border-gray-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-16 h-16 bg-surface rounded-xl border border-border flex items-center justify-center flex-shrink-0">
                      <User className="w-8 h-8 text-gray-200" />
                   </div>
                )}
                <div className="flex-1">
-                  <p className="text-[10px] text-gray-400 font-black uppercase mb-1">Student Details</p>
-                  <h3 className="text-lg font-black text-gray-900 leading-none mb-1">{sampleStudent.name}</h3>
-                  <p className="text-xs text-gray-600 font-medium">ID: {sampleStudent.id}</p>
+                  <p className="text-[10px] text-content-muted font-black uppercase mb-1">Student Details</p>
+                  <h3 className="text-lg font-black text-content-primary leading-none mb-1">{sampleStudent.name}</h3>
+                  <p className="text-xs text-content-secondary font-medium">ID: {sampleStudent.id}</p>
                   <p className="text-xs font-bold mt-2" style={primaryStyle}>{sampleStudent.class}</p>
                </div>
             </div>
@@ -170,10 +170,10 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
             </thead>
             <tbody>
                {sampleFees.map((fee, idx) => (
-                  <tr key={idx} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
-                     <td className="px-6 py-4 text-xs text-gray-400 font-bold">{idx + 1}</td>
-                     <td className="px-6 py-4 text-sm text-gray-800 font-medium">{fee.head}</td>
-                     <td className="px-6 py-4 text-sm text-gray-900 font-bold text-right">{fee.amount.toLocaleString()}</td>
+                  <tr key={idx} className="border-b border-border hover:bg-chrome/50 transition-colors">
+                     <td className="px-6 py-4 text-xs text-content-muted font-bold">{idx + 1}</td>
+                     <td className="px-6 py-4 text-sm text-content-primary font-medium">{fee.head}</td>
+                     <td className="px-6 py-4 text-sm text-content-primary font-bold text-right">{fee.amount.toLocaleString()}</td>
                   </tr>
                ))}
             </tbody>
@@ -185,7 +185,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
          
          <div className="w-1/3 border-t-2 pt-6" style={primaryBorderStyle}>
             <div className="space-y-2">
-               <div className="flex justify-between items-center text-xs text-gray-500 font-medium">
+               <div className="flex justify-between items-center text-xs text-content-secondary font-medium">
                   <span>Gross Subtotal</span>
                   <span>₹{subTotal.toLocaleString()}</span>
                </div>
@@ -194,9 +194,9 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
                   <span>₹{discount.toLocaleString()}</span>
                </div>
                
-               <div className="my-3 py-3 border-y border-dashed border-gray-200">
+               <div className="my-3 py-3 border-y border-dashed border-border">
                   <div className="flex justify-between items-center">
-                     <span className="text-xs font-black uppercase tracking-wider text-gray-800">Current Paid</span>
+                     <span className="text-xs font-black uppercase tracking-wider text-content-primary">Current Paid</span>
                      <span className="text-lg font-black" style={primaryStyle}>₹{netTotal.toLocaleString()}</span>
                   </div>
                </div>
@@ -204,7 +204,7 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
                {config.showBalanceDue && (
                   <div className="space-y-2">
                       {config.showPreviousDues && (
-                         <div className="flex justify-between items-center text-xs text-gray-500">
+                         <div className="flex justify-between items-center text-xs text-content-secondary">
                             <span>Arrears/Carry Forward (+)</span>
                             <span>₹{previousBalance.toLocaleString()}</span>
                          </div>
@@ -220,20 +220,20 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
       </div>
 
       {/* 5. Amount in Words */}
-      <div className="mb-12 p-5 bg-gray-50 rounded-2xl border border-gray-100 italic text-xs text-gray-600">
-         <span className="font-bold not-italic uppercase text-[10px] text-gray-400 mr-2">Amount in Words:</span>
+      <div className="mb-12 p-5 bg-chrome rounded-2xl border border-border italic text-xs text-content-secondary">
+         <span className="font-bold not-italic uppercase text-[10px] text-content-muted mr-2">Amount in Words:</span>
          Sixteen Thousand Two Hundred Only
       </div>
 
       {/* 6. Footer & Certification */}
-      <div className="flex justify-between items-end pt-12 border-t border-gray-100 mt-auto">
+      <div className="flex justify-between items-end pt-12 border-t border-border mt-auto">
          
          <div className="max-w-[60%]">
             <div className="space-y-3">
-               <div className="flex items-center gap-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+               <div className="flex items-center gap-2 text-[10px] font-black text-content-muted uppercase tracking-widest">
                   <CheckCircle className="w-3 h-3 text-emerald-500" /> Terms & Conditions
                </div>
-               <p className="text-[10px] text-gray-500 leading-relaxed whitespace-pre-line">
+               <p className="text-[10px] text-content-secondary leading-relaxed whitespace-pre-line">
                   {config.termsAndConditions}
                </p>
             </div>
@@ -246,10 +246,10 @@ const InvoicePreview: React.FC<InvoicePreviewProps> = ({ config }) => {
          <div className="text-center w-48">
             <div className="h-16 mb-4 flex items-center justify-center opacity-40">
                {/* Placeholder for Signature/Stamp */}
-               <div className="w-32 border-b border-gray-300"></div>
+               <div className="w-32 border-b border-border"></div>
             </div>
-            <p className="text-[10px] font-black text-gray-800 uppercase tracking-wider mb-0.5">Authorized Signatory</p>
-            <p className="text-[9px] text-gray-400 uppercase">Accounts Department</p>
+            <p className="text-[10px] font-black text-content-primary uppercase tracking-wider mb-0.5">Authorized Signatory</p>
+            <p className="text-[9px] text-content-muted uppercase">Accounts Department</p>
          </div>
       </div>
 

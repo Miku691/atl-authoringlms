@@ -14,14 +14,14 @@ const Breadcrumbs: React.FC = () => {
     };
 
     return (
-        <nav className="hidden sm:flex items-center text-sm text-gray-500">
+        <nav className="hidden sm:flex items-center text-sm text-content-secondary">
             <Link to="/dashboard" className="hover:text-indigo-600 cursor-pointer transition-colors flex items-center">
                 <Home className="w-4 h-4 mr-1" />
                 <span className="sr-only">Dashboard</span>
             </Link>
 
             {pathnames.length > 0 && (
-                <span className="mx-2 text-gray-400">
+                <span className="mx-2 text-content-muted">
                     <ChevronRight className="w-4 h-4" />
                 </span>
             )}
@@ -33,14 +33,14 @@ const Breadcrumbs: React.FC = () => {
                 return (
                     <React.Fragment key={to}>
                         {isLast ? (
-                            <span className="font-medium text-gray-900">{getName(value)}</span>
+                            <span className="font-medium text-content-primary">{getName(value)}</span>
                         ) : (
                             <Link to={to} className="hover:text-indigo-600 cursor-pointer transition-colors">
                                 {getName(value)}
                             </Link>
                         )}
                         {!isLast && (
-                            <span className="mx-2 text-gray-400">
+                            <span className="mx-2 text-content-muted">
                                 <ChevronRight className="w-4 h-4" />
                             </span>
                         )}

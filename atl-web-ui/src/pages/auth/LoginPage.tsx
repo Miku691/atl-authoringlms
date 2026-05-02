@@ -121,7 +121,7 @@ const LoginPage: React.FC = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className={`w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl shadow-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all duration-300 transform active:scale-95 ${isLoading ? 'opacity-70 cursor-not-allowed shadow-none' : 'hover:shadow-indigo-200'}`}
+                        className={`w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl shadow-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 transform active:scale-95 ${isLoading ? 'opacity-70 cursor-not-allowed shadow-none' : 'hover:shadow-indigo-500/30'}`}
                     >
                         {isLoading ? (
                             <>
@@ -139,10 +139,10 @@ const LoginPage: React.FC = () => {
 
                 <div className="relative my-8">
                     <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-200" />
+                        <div className="w-full border-t border-border" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="px-4 bg-white text-gray-500 font-medium">
+                        <span className="px-4 bg-surface text-content-secondary font-medium">
                             New here?
                         </span>
                     </div>
@@ -151,7 +151,7 @@ const LoginPage: React.FC = () => {
                 <div>
                     <Link
                         to="/register-institute"
-                        className="w-full flex justify-center py-4 px-4 border-2 border-gray-100 rounded-2xl shadow-sm bg-white text-sm font-bold text-gray-700 hover:bg-gray-50 hover:border-indigo-100 hover:text-indigo-600 transition-all duration-300 text-center"
+                        className="w-full flex justify-center py-4 px-4 border-2 border-border rounded-2xl shadow-sm bg-surface text-sm font-bold text-content-primary hover:bg-chrome hover:border-indigo-500/30 hover:text-indigo-600 transition-all duration-300 text-center"
                     >
                         Register details of your Institute
                     </Link>

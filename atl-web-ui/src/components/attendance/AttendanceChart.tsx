@@ -22,11 +22,11 @@ const AttendanceChart: React.FC<AttendanceChartProps> = ({ stats, personName }) 
     const offset = circumference - (stats.attendancePercentage / 100) * circumference;
 
     return (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <div className="bg-surface rounded-2xl shadow-sm border border-border p-6">
             <div className="flex justify-between items-start mb-6">
                 <div>
-                    <h3 className="text-lg font-bold text-gray-900">{personName}'s Attendance</h3>
-                    <p className="text-sm text-gray-500">Monthly Performance Overview</p>
+                    <h3 className="text-lg font-bold text-content-primary">{personName}'s Attendance</h3>
+                    <p className="text-sm text-content-secondary">Monthly Performance Overview</p>
                 </div>
                 <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold flex items-center gap-1.5">
                     <Calendar className="w-4 h-4" />
@@ -61,8 +61,8 @@ const AttendanceChart: React.FC<AttendanceChartProps> = ({ stats, personName }) 
                         />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-3xl font-black text-gray-900">{Math.round(stats.attendancePercentage)}%</span>
-                        <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Attendance</span>
+                        <span className="text-3xl font-black text-content-primary">{Math.round(stats.attendancePercentage)}%</span>
+                        <span className="text-[10px] text-content-secondary uppercase font-bold tracking-widest">Attendance</span>
                     </div>
                 </div>
 
@@ -74,7 +74,7 @@ const AttendanceChart: React.FC<AttendanceChartProps> = ({ stats, personName }) 
                                 <CheckCircle2 className="w-4 h-4" />
                                 <span className="text-[10px] font-bold uppercase">Present</span>
                             </div>
-                            <span className="text-xl font-bold text-gray-900">{stats.presentDays}</span>
+                            <span className="text-xl font-bold text-content-primary">{stats.presentDays}</span>
                         </div>
 
                         <div className="p-3 rounded-xl bg-red-50 border border-red-100">
@@ -82,7 +82,7 @@ const AttendanceChart: React.FC<AttendanceChartProps> = ({ stats, personName }) 
                                 <XCircle className="w-4 h-4" />
                                 <span className="text-[10px] font-bold uppercase">Absent</span>
                             </div>
-                            <span className="text-xl font-bold text-gray-900">{stats.absentDays}</span>
+                            <span className="text-xl font-bold text-content-primary">{stats.absentDays}</span>
                         </div>
 
                         <div className="p-3 rounded-xl bg-yellow-50 border border-yellow-100">
@@ -90,7 +90,7 @@ const AttendanceChart: React.FC<AttendanceChartProps> = ({ stats, personName }) 
                                 <Clock className="w-4 h-4" />
                                 <span className="text-[10px] font-bold uppercase">Late</span>
                             </div>
-                            <span className="text-xl font-bold text-gray-900">{stats.lateDays}</span>
+                            <span className="text-xl font-bold text-content-primary">{stats.lateDays}</span>
                         </div>
 
                         <div className="p-3 rounded-xl bg-blue-50 border border-blue-100">
@@ -98,16 +98,16 @@ const AttendanceChart: React.FC<AttendanceChartProps> = ({ stats, personName }) 
                                 <AlertCircle className="w-4 h-4" />
                                 <span className="text-[10px] font-bold uppercase">Leave</span>
                             </div>
-                            <span className="text-xl font-bold text-gray-900">{stats.leaveDays}</span>
+                            <span className="text-xl font-bold text-content-primary">{stats.leaveDays}</span>
                         </div>
                     </div>
 
-                    <div className="pt-4 border-t border-gray-100">
-                        <div className="flex justify-between items-center text-xs text-gray-500">
+                    <div className="pt-4 border-t border-border">
+                        <div className="flex justify-between items-center text-xs text-content-secondary">
                             <span>Total Working Days</span>
-                            <span className="font-bold text-gray-900">{stats.totalDays}</span>
+                            <span className="font-bold text-content-primary">{stats.totalDays}</span>
                         </div>
-                        <div className="w-full h-1.5 bg-gray-100 rounded-full mt-2 overflow-hidden">
+                        <div className="w-full h-1.5 bg-chrome rounded-full mt-2 overflow-hidden">
                             <div
                                 className="h-full bg-indigo-600 rounded-full"
                                 style={{ width: `${stats.attendancePercentage}%` }}

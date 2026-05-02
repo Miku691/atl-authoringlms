@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    Plus, Trash2, Edit2, Save, X
+    Plus, Trash2, Edit2, Save
 } from 'lucide-react';
 import { financeService } from '../../../../api/financeService';
 import type { ExpenseCategory } from '../../../../types/finance';
 import toast from 'react-hot-toast';
+import Modal from '../../../../components/common/Modal';
 
 export const ExpenseCategoryPage: React.FC = () => {
     const [categories, setCategories] = useState<ExpenseCategory[]>([]);
@@ -62,8 +63,8 @@ export const ExpenseCategoryPage: React.FC = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Expense Categories</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage categories for institutional spending</p>
+                    <h1 className="text-2xl font-bold text-content-primary">Expense Categories</h1>
+                    <p className="text-sm text-content-secondary mt-1">Manage categories for institutional spending</p>
                 </div>
                 <button
                     onClick={() => {
@@ -78,29 +79,29 @@ export const ExpenseCategoryPage: React.FC = () => {
                 </button>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-chrome">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Category Name</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Description</th>
+                            <th className="px-6 py-3 text-right text-xs font-medium text-content-secondary uppercase">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 bg-white">
+                    <tbody className="divide-y divide-gray-200 bg-surface">
                         {isLoading ? (
                             <tr>
-                                <td colSpan={3} className="px-6 py-10 text-center text-gray-500">Loading...</td>
+                                <td colSpan={3} className="px-6 py-10 text-center text-content-secondary">Loading...</td>
                             </tr>
                         ) : categories.length === 0 ? (
                             <tr>
-                                <td colSpan={3} className="px-6 py-10 text-center text-gray-500">No categories found</td>
+                                <td colSpan={3} className="px-6 py-10 text-center text-content-secondary">No categories found</td>
                             </tr>
                         ) : (
                             categories.map((cat) => (
-                                <tr key={cat.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{cat.name}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">{cat.description || '-'}</td>
+                                <tr key={cat.id} className="hover:bg-chrome">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-content-primary">{cat.name}</td>
+                                    <td className="px-6 py-4 text-sm text-content-secondary">{cat.description || '-'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                         <button 
                                             onClick={() => {
@@ -127,57 +128,58 @@ export const ExpenseCategoryPage: React.FC = () => {
             </div>
 
             {/* Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <h3 className="text-lg font-bold text-gray-900">{editingCategory ? 'Edit Category' : 'New Category'}</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                                <X className="h-5 w-5" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Category Name *</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                    placeholder="e.g. Utilities, Salary, Maintenance"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                                    rows={3}
-                                    placeholder="Brief description of the category"
-                                />
-                            </div>
-                            <div className="flex justify-end space-x-3 pt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-                                >
-                                    <Save className="h-4 w-4 mr-2" />
-                                    {editingCategory ? 'Update' : 'Create'}
-                                </button>
-                            </div>
-                        </form>
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={editingCategory ? 'Edit Category' : 'New Category'}
+                icon={<Plus size={18} />}
+                size="sm"
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            className="modal-btn-secondary"
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            form="exp-cat-form"
+                            className="modal-btn-primary"
+                        >
+                            <Save className="h-4 w-4" />
+                            {editingCategory ? 'Update' : 'Create'}
+                        </button>
+                    </>
+                }
+            >
+                <form id="exp-cat-form" onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Category Name *</label>
+                        <input
+                            type="text"
+                            required
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2"
+                            style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                            placeholder="e.g. Utilities, Salary, Maintenance"
+                        />
                     </div>
-                </div>
-            )}
+                    <div>
+                        <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Description</label>
+                        <textarea
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2 resize-none"
+                            style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                            rows={3}
+                            placeholder="Brief description of the category"
+                        />
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 };

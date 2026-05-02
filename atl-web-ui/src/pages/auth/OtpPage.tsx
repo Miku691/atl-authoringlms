@@ -52,7 +52,7 @@ const OtpPage: React.FC = () => {
             const response = await api.post('/atl-auth-service/auth/otp/verifyOtp', { username, otp });
 
             if (response.data.status === 'SUCCESS') {
-                const { jwt, roles, tenantId, tenantSetupCompleted, tenantType, id, email, passwordResetRequired } = response.data.apiData;
+                const { jwt, refreshToken, roles, tenantId, tenantSetupCompleted, tenantType, id, email, passwordResetRequired } = response.data.apiData;
 
                 dispatch(loginSuccess({
                     user: {
@@ -64,7 +64,8 @@ const OtpPage: React.FC = () => {
                         tenantSetupCompleted,
                         tenantType
                     },
-                    token: jwt
+                    token: jwt,
+                    refreshToken: refreshToken
                 }));
 
                 // Check if password reset is required
@@ -111,27 +112,27 @@ const OtpPage: React.FC = () => {
         >
             <form className="space-y-6" onSubmit={handleSubmit}>
                 {error && (
-                    <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md flex items-start">
-                        <AlertCircle className="h-5 w-5 text-red-400 mr-3 mt-0.5" />
+                    <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 dark:border-red-500/50 p-4 rounded-md flex items-start">
+                        <AlertCircle className="h-5 w-5 text-red-400 dark:text-red-500 mr-3 mt-0.5" />
                         <div>
-                            <p className="text-sm text-red-700 font-medium">Verification Failed</p>
-                            <p className="text-sm text-red-600 mt-1">{error}</p>
+                            <p className="text-sm text-red-700 dark:text-red-400 font-medium">Verification Failed</p>
+                            <p className="text-sm text-red-600 dark:text-red-300 mt-1">{error}</p>
                         </div>
                     </div>
                 )}
 
                 {infoMessage && (
-                    <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-md flex items-start">
-                        <CheckCircle className="h-5 w-5 text-green-400 mr-3 mt-0.5" />
+                    <div className="bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500 dark:border-green-500/50 p-4 rounded-md flex items-start">
+                        <CheckCircle className="h-5 w-5 text-green-400 dark:text-green-500 mr-3 mt-0.5" />
                         <div>
-                            <p className="text-sm text-green-700 font-medium">OTP Sent</p>
-                            <p className="text-sm text-green-600 mt-1">{infoMessage}</p>
+                            <p className="text-sm text-green-700 dark:text-green-400 font-medium">OTP Sent</p>
+                            <p className="text-sm text-green-600 dark:text-green-300 mt-1">{infoMessage}</p>
                         </div>
                     </div>
                 )}
 
                 <div>
-                    <label htmlFor="otp" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="otp" className="block text-sm font-medium text-content-primary mb-2">
                         Enter 6-Digit Code
                     </label>
                     <div className="relative">
@@ -140,7 +141,7 @@ const OtpPage: React.FC = () => {
                             name="otp"
                             type="text"
                             required
-                            className="block w-full px-4 py-4 border border-gray-300 rounded-xl shadow-sm placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-center text-3xl font-bold tracking-[0.5em] text-gray-900 transition-all duration-200"
+                            className="block w-full px-4 py-4 border border-border rounded-xl bg-transparent shadow-sm placeholder-slate-300 dark:placeholder-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 text-center text-3xl font-bold tracking-[0.5em] text-content-primary transition-all duration-200"
                             placeholder="000000"
                             value={otp}
                             onChange={(e) => {
@@ -154,9 +155,9 @@ const OtpPage: React.FC = () => {
                             autoComplete="one-time-code"
                         />
                     </div>
-                    <p className="mt-4 text-center text-sm text-gray-500">
+                    <p className="mt-4 text-center text-sm text-content-secondary">
                         Didn't receive the code?{' '}
-                        <button type="button" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                        <button type="button" className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors">
                             Resend
                         </button>
                     </p>

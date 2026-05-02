@@ -27,8 +27,8 @@ interface Instructor {
 }
 
 const OverviewTab = ({ instructor }: { instructor: Instructor }) => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 animate-fade-in">
-        <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
+    <div className="bg-surface rounded-xl shadow-sm border border-border p-6 animate-fade-in">
+        <h3 className="text-lg font-bold text-content-primary mb-6 flex items-center gap-2">
             <User className="w-5 h-5 text-indigo-500" /> Professional Profile
         </h3>
 
@@ -39,10 +39,10 @@ const OverviewTab = ({ instructor }: { instructor: Instructor }) => (
                         <Briefcase className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="text-xs text-gray-500 uppercase font-semibold">Employee Details</p>
-                        <p className="font-medium text-gray-900 mt-1">{instructor.firstName} {instructor.lastName}</p>
-                        <p className="text-sm text-gray-600">ID: {instructor.employeeId}</p>
-                        <p className="text-sm text-gray-600">Joined: {instructor.joinDate || 'N/A'}</p>
+                        <p className="text-xs text-content-secondary uppercase font-semibold">Employee Details</p>
+                        <p className="font-medium text-content-primary mt-1">{instructor.firstName} {instructor.lastName}</p>
+                        <p className="text-sm text-content-secondary">ID: {instructor.employeeId}</p>
+                        <p className="text-sm text-content-secondary">Joined: {instructor.joinDate || 'N/A'}</p>
                     </div>
                 </div>
 
@@ -51,8 +51,8 @@ const OverviewTab = ({ instructor }: { instructor: Instructor }) => (
                         <Award className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="text-xs text-gray-500 uppercase font-semibold">Specialization</p>
-                        <p className="font-medium text-gray-900 mt-1">{instructor.specialization}</p>
+                        <p className="text-xs text-content-secondary uppercase font-semibold">Specialization</p>
+                        <p className="font-medium text-content-primary mt-1">{instructor.specialization}</p>
                     </div>
                 </div>
 
@@ -61,32 +61,32 @@ const OverviewTab = ({ instructor }: { instructor: Instructor }) => (
                         <GraduationCap className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="text-xs text-gray-500 uppercase font-semibold">Qualification</p>
-                        <p className="font-medium text-gray-900 mt-1">{instructor.qualification}</p>
-                        <p className="text-sm text-gray-600">Experience: {instructor.experienceYears || 0} Years</p>
+                        <p className="text-xs text-content-secondary uppercase font-semibold">Qualification</p>
+                        <p className="font-medium text-content-primary mt-1">{instructor.qualification}</p>
+                        <p className="text-sm text-content-secondary">Experience: {instructor.experienceYears || 0} Years</p>
                     </div>
                 </div>
             </div>
 
             <div className="space-y-5">
                 <div className="flex items-start gap-4">
-                    <div className="p-2 bg-gray-50 rounded-lg text-gray-600">
+                    <div className="p-2 bg-chrome rounded-lg text-content-secondary">
                         <Mail className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="text-xs text-gray-500 uppercase font-semibold">Contact Info</p>
-                        <p className="font-medium text-gray-900 mt-1">{instructor.email}</p>
-                        <p className="text-sm text-gray-600">{instructor.phone}</p>
+                        <p className="text-xs text-content-secondary uppercase font-semibold">Contact Info</p>
+                        <p className="font-medium text-content-primary mt-1">{instructor.email}</p>
+                        <p className="text-sm text-content-secondary">{instructor.phone}</p>
                     </div>
                 </div>
 
                 <div className="flex items-start gap-4">
-                    <div className="p-2 bg-gray-50 rounded-lg text-gray-600">
+                    <div className="p-2 bg-chrome rounded-lg text-content-secondary">
                         <MapPin className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="text-xs text-gray-500 uppercase font-semibold">Address</p>
-                        <p className="font-medium text-gray-900 mt-1">{instructor.address || 'N/A'}</p>
+                        <p className="text-xs text-content-secondary uppercase font-semibold">Address</p>
+                        <p className="font-medium text-content-primary mt-1">{instructor.address || 'N/A'}</p>
                     </div>
                 </div>
             </div>
@@ -118,7 +118,7 @@ const InstructorProfilePage: React.FC = () => {
         }
     };
 
-    if (loading) return <div className="p-8 text-center text-gray-500">Loading profile...</div>;
+    if (loading) return <div className="p-8 text-center text-content-secondary">Loading profile...</div>;
     if (!instructor) return <div className="p-8 text-center text-red-500">Instructor not found</div>;
 
     const tabs = [
@@ -130,12 +130,12 @@ const InstructorProfilePage: React.FC = () => {
 
     return (
         <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
                 <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700"></div>
                 <div className="px-8 pb-6">
                     <div className="relative flex justify-between items-end -mt-12 mb-6">
                         <div className="flex items-end gap-6">
-                            <div className="bg-white p-1 rounded-full shadow-lg">
+                            <div className="bg-surface p-1 rounded-full shadow-lg">
                                 <AuthenticatedAvatar
                                     imageUrl={instructor.profileImageUrl}
                                     fallbackInitial={instructor.firstName[0]}
@@ -144,14 +144,14 @@ const InstructorProfilePage: React.FC = () => {
                                 />
                             </div>
                             <div className="mb-2">
-                                <h1 className="text-3xl font-bold text-gray-900">{instructor.firstName} {instructor.lastName}</h1>
-                                <p className="text-gray-500">{instructor.specialization} • <span className="text-green-600 font-medium">{instructor.status}</span></p>
+                                <h1 className="text-3xl font-bold text-content-primary">{instructor.firstName} {instructor.lastName}</h1>
+                                <p className="text-content-secondary">{instructor.specialization} • <span className="text-green-600 font-medium">{instructor.status}</span></p>
                             </div>
                         </div>
                         <div className="mb-2 flex gap-2">
                             <button
                                 onClick={() => navigate('/people/instructors')}
-                                className="flex items-center gap-2 text-gray-600 hover:text-gray-900 bg-gray-50 px-4 py-2 rounded-lg border hover:bg-gray-100 transition"
+                                className="flex items-center gap-2 text-content-secondary hover:text-content-primary bg-chrome px-4 py-2 rounded-lg border hover:bg-chrome transition"
                             >
                                 <ArrowLeft className="w-4 h-4" /> Back to List
                             </button>
@@ -165,7 +165,7 @@ const InstructorProfilePage: React.FC = () => {
                                 onClick={() => setActiveTab(tab.id as any)}
                                 className={`flex items-center gap-2 px-6 py-3 font-medium text-sm border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id
                                     ? 'border-indigo-600 text-indigo-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                    : 'border-transparent text-content-secondary hover:text-content-primary hover:border-border'
                                     }`}
                             >
                                 <tab.icon className="w-4 h-4" />
@@ -182,9 +182,9 @@ const InstructorProfilePage: React.FC = () => {
                 {activeTab === 'subjects' && id && <InstructorSubjectsTab instructorId={id} />}
 
                 {activeTab === 'docs' && (
-                    <div className="bg-white p-12 rounded-xl shadow-sm text-center text-gray-500 border border-gray-100">
+                    <div className="bg-surface p-12 rounded-xl shadow-sm text-center text-content-secondary border border-border">
                         <FileText className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                        <h3 className="text-lg font-bold text-gray-700 uppercase tracking-tight">Personnel Vault</h3>
+                        <h3 className="text-lg font-bold text-content-primary uppercase tracking-tight">Personnel Vault</h3>
                         <p className="text-sm mt-1">Institutional records and identity documents are managed here.</p>
                         <button className="mt-6 bg-gray-900 text-white px-6 py-2.5 rounded-xl font-black text-xs hover:bg-black transition-all">
                             Configure Documents
@@ -195,5 +195,6 @@ const InstructorProfilePage: React.FC = () => {
         </div>
     );
 };
+
 
 export default InstructorProfilePage;

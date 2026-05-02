@@ -20,10 +20,10 @@ const InstallmentPlansPage: React.FC = () => {
     const [academicYear, setAcademicYear] = useState<string>(new Date().getFullYear().toString());
     const [plans, setPlans] = useState<FeeInstallmentPlan[]>([]);
     const [feeHeads, setFeeHeads] = useState<FeeHead[]>([]);
-    
+
     const [isCreatingParam, setIsCreatingParam] = useState(false);
     const [newPlan, setNewPlan] = useState<Partial<FeeInstallmentPlan>>({});
-    
+
     const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
     const [schedules, setSchedules] = useState<Partial<FeeInstallmentSchedule>[]>([]);
 
@@ -107,7 +107,7 @@ const InstallmentPlansPage: React.FC = () => {
     };
 
     const handleAddScheduleRow = () => {
-        setSchedules([...schedules, { 
+        setSchedules([...schedules, {
             installmentNumber: schedules.length + 1,
             feeHeadId: feeHeads.length > 0 ? feeHeads[0].id : '',
             amount: 0,
@@ -145,24 +145,24 @@ const InstallmentPlansPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 p-6">
+        <div className="min-h-screen bg-chrome p-6">
             <div className="max-w-7xl mx-auto space-y-6">
-                
+
                 {/* Header */}
-                <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+                <div className="bg-surface rounded-2xl p-6 border border-border shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                        <h1 className="text-2xl font-bold text-content-primary flex items-center gap-2">
                             <Calendar className="w-6 h-6 text-indigo-600" />
                             Installment Plans
                         </h1>
-                        <p className="text-slate-500 mt-1">Configure automated fee installments for academic offerings</p>
+                        <p className="text-content-secondary mt-1">Configure automated fee installments for academic offerings</p>
                     </div>
 
                     <div className="flex gap-4">
                         <select
                             value={selectedOffering}
                             onChange={(e) => setSelectedOffering(e.target.value)}
-                            className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-64 p-2.5 outline-none"
+                            className="bg-chrome border border-border text-content-primary text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-64 p-2.5 outline-none"
                         >
                             <option value="">Select Class / Offering</option>
                             {offerings.map((o) => (
@@ -172,7 +172,7 @@ const InstallmentPlansPage: React.FC = () => {
                         <select
                             value={academicYear}
                             onChange={(e) => setAcademicYear(e.target.value)}
-                            className="bg-slate-50 border border-slate-200 text-slate-700 text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-32 p-2.5 outline-none"
+                            className="bg-chrome border border-border text-content-primary text-sm rounded-xl focus:ring-indigo-500 focus:border-indigo-500 block w-32 p-2.5 outline-none"
                         >
                             <option value="2025">2025</option>
                             <option value="2026">2026</option>
@@ -183,12 +183,12 @@ const InstallmentPlansPage: React.FC = () => {
 
                 {selectedOffering && (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        
+
                         {/* Plans List Column */}
-                        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-                            <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                                <h2 className="font-semibold text-slate-800 flex items-center gap-2">
-                                    <ListPlus className="w-4 h-4 text-slate-500" />
+                        <div className="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden flex flex-col">
+                            <div className="p-4 border-b border-border flex items-center justify-between bg-chrome/50">
+                                <h2 className="font-semibold text-content-primary flex items-center gap-2">
+                                    <ListPlus className="w-4 h-4 text-content-secondary" />
                                     Available Plans
                                 </h2>
                                 <button
@@ -201,45 +201,45 @@ const InstallmentPlansPage: React.FC = () => {
 
                             <div className="flex-1 overflow-y-auto p-4 space-y-3">
                                 {isCreatingParam && (
-                                    <form onSubmit={handleCreatePlan} className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4 shadow-inner">
+                                    <form onSubmit={handleCreatePlan} className="bg-chrome p-4 rounded-xl border border-border space-y-4 shadow-inner">
                                         <FloatingLabelInput
                                             id="planName"
                                             label="Plan Name (e.g., Quarterly)"
                                             value={newPlan.name || ''}
-                                            onChange={(e) => setNewPlan({...newPlan, name: e.target.value})}
+                                            onChange={(e) => setNewPlan({ ...newPlan, name: e.target.value })}
                                             required
                                         />
                                         <FloatingLabelInput
                                             id="planDesc"
                                             label="Description (Optional)"
                                             value={newPlan.description || ''}
-                                            onChange={(e) => setNewPlan({...newPlan, description: e.target.value})}
+                                            onChange={(e) => setNewPlan({ ...newPlan, description: e.target.value })}
                                         />
                                         <div className="flex justify-end gap-2">
-                                            <button type="button" onClick={() => setIsCreatingParam(false)} className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-200 rounded-lg">Cancel</button>
+                                            <button type="button" onClick={() => setIsCreatingParam(false)} className="px-3 py-1.5 text-xs text-content-secondary hover:bg-chrome rounded-lg">Cancel</button>
                                             <button type="submit" className="px-3 py-1.5 text-xs bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg shadow-sm">Create Plan</button>
                                         </div>
                                     </form>
                                 )}
 
                                 {plans.map((plan) => (
-                                    <div 
+                                    <div
                                         key={plan.id}
                                         onClick={() => handleSelectPlan(plan)}
-                                        className={`p-4 rounded-xl cursor-pointer transition-all border ${selectedPlanId === plan.id ? 'border-indigo-300 bg-indigo-50 shadow-sm' : 'border-slate-100 bg-white hover:border-slate-300 hover:shadow-sm'}`}
+                                        className={`p-4 rounded-xl cursor-pointer transition-all border ${selectedPlanId === plan.id ? 'border-indigo-300 bg-indigo-50 shadow-sm' : 'border-border bg-surface hover:border-border hover:shadow-sm'}`}
                                     >
                                         <div className="flex justify-between items-start">
                                             <div>
-                                                <h3 className={`font-medium ${selectedPlanId === plan.id ? 'text-indigo-900' : 'text-slate-800'}`}>{plan.name}</h3>
-                                                {plan.description && <p className="text-xs text-slate-500 mt-1">{plan.description}</p>}
-                                                <div className="mt-3 text-xs font-medium text-slate-500 flex items-center gap-1.5">
+                                                <h3 className={`font-medium ${selectedPlanId === plan.id ? 'text-indigo-900' : 'text-content-primary'}`}>{plan.name}</h3>
+                                                {plan.description && <p className="text-xs text-content-secondary mt-1">{plan.description}</p>}
+                                                <div className="mt-3 text-xs font-medium text-content-secondary flex items-center gap-1.5">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
                                                     {plan.schedules?.length || 0} Installment(s) mapped
                                                 </div>
                                             </div>
-                                            <button 
+                                            <button
                                                 onClick={(e) => { e.stopPropagation(); handleDeletePlan(plan.id!); }}
-                                                className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                className="p-1.5 text-content-muted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
@@ -249,24 +249,24 @@ const InstallmentPlansPage: React.FC = () => {
 
                                 {plans.length === 0 && !isCreatingParam && (
                                     <div className="text-center py-10 px-4">
-                                        <div className="bg-slate-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                                            <FileText className="w-5 h-5 text-slate-400" />
+                                        <div className="bg-chrome w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                                            <FileText className="w-5 h-5 text-content-muted" />
                                         </div>
-                                        <h3 className="text-sm font-medium text-slate-700">No Plans Configured</h3>
-                                        <p className="text-xs text-slate-500 mt-1">Create an installment plan to split fees into multiple schedules.</p>
+                                        <h3 className="text-sm font-medium text-content-primary">No Plans Configured</h3>
+                                        <p className="text-xs text-content-secondary mt-1">Create an installment plan to split fees into multiple schedules.</p>
                                     </div>
                                 )}
                             </div>
                         </div>
 
                         {/* Schedules Configuration Column */}
-                        <div className="lg:col-span-2 bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[600px]">
+                        <div className="lg:col-span-2 bg-surface rounded-2xl border border-border shadow-sm flex flex-col h-[600px]">
                             {selectedPlanId ? (
                                 <>
-                                    <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                                    <div className="p-5 border-b border-border flex items-center justify-between">
                                         <div>
-                                            <h2 className="font-semibold text-slate-800 text-lg">Define Installment Schedule</h2>
-                                            <p className="text-sm text-slate-500">Map fee heads to specific due dates and amounts</p>
+                                            <h2 className="font-semibold text-content-primary text-lg">Define Installment Schedule</h2>
+                                            <p className="text-sm text-content-secondary">Map fee heads to specific due dates and amounts</p>
                                         </div>
                                         <button
                                             onClick={handleSaveSchedules}
@@ -280,34 +280,34 @@ const InstallmentPlansPage: React.FC = () => {
                                     <div className="flex-1 overflow-y-auto p-5 custom-scrollbar">
                                         <div className="space-y-4">
                                             {schedules.map((schedule, index) => (
-                                                <div key={index} className="flex gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-100 group hover:border-indigo-100 hover:bg-indigo-50/10 transition-colors">
-                                                    <div className="w-10 h-10 rounded-lg bg-white border border-slate-200 shadow-sm flex items-center justify-center font-bold text-slate-700 flex-shrink-0">
+                                                <div key={index} className="flex gap-4 items-center bg-chrome p-4 rounded-xl border border-border group hover:border-indigo-100 hover:bg-indigo-50/10 transition-colors">
+                                                    <div className="w-10 h-10 rounded-lg bg-surface border border-border shadow-sm flex items-center justify-center font-bold text-content-primary flex-shrink-0">
                                                         #{index + 1}
                                                     </div>
-                                                    
+
                                                     <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
                                                         <div className="relative">
                                                             <select
                                                                 value={schedule.feeHeadId || ''}
                                                                 onChange={(e) => handleScheduleChange(index, 'feeHeadId', e.target.value)}
-                                                                className="w-full bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 outline-none appearance-none"
+                                                                className="w-full bg-surface border border-border text-content-primary text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 outline-none appearance-none"
                                                             >
                                                                 <option value="">Select Fee Head</option>
                                                                 {feeHeads.map(fh => (
                                                                     <option key={fh.id} value={fh.id}>{fh.name}</option>
                                                                 ))}
                                                             </select>
-                                                            <ChevronDown className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                                                            <ChevronDown className="w-4 h-4 text-content-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                                                         </div>
 
                                                         <div className="relative">
-                                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">{getCurrencySymbol(currencyCode)}</span>
+                                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-content-muted text-sm">{getCurrencySymbol(currencyCode)}</span>
                                                             <input
                                                                 type="number"
                                                                 placeholder="Amount"
                                                                 value={schedule.amount || ''}
                                                                 onChange={(e) => handleScheduleChange(index, 'amount', Number(e.target.value))}
-                                                                className="w-full bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block pl-8 p-2.5 outline-none"
+                                                                className="w-full bg-surface border border-border text-content-primary text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block pl-8 p-2.5 outline-none"
                                                             />
                                                         </div>
 
@@ -316,7 +316,7 @@ const InstallmentPlansPage: React.FC = () => {
                                                                 type="date"
                                                                 value={schedule.dueDate ? new Date(schedule.dueDate).toISOString().split('T')[0] : ''}
                                                                 onChange={(e) => handleScheduleChange(index, 'dueDate', e.target.value)}
-                                                                className="w-full bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 outline-none"
+                                                                className="w-full bg-surface border border-border text-content-primary text-sm rounded-lg focus:ring-indigo-500 focus:border-indigo-500 block p-2.5 outline-none"
                                                             />
                                                         </div>
                                                     </div>
@@ -332,7 +332,7 @@ const InstallmentPlansPage: React.FC = () => {
 
                                             <button
                                                 onClick={handleAddScheduleRow}
-                                                className="w-full py-4 border-2 border-dashed border-slate-200 rounded-xl text-slate-500 hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all font-medium text-sm flex items-center justify-center gap-2"
+                                                className="w-full py-4 border-2 border-dashed border-border rounded-xl text-content-secondary hover:text-indigo-600 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all font-medium text-sm flex items-center justify-center gap-2"
                                             >
                                                 <Plus className="w-4 h-4" />
                                                 Add Installment
@@ -342,11 +342,11 @@ const InstallmentPlansPage: React.FC = () => {
                                 </>
                             ) : (
                                 <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                                    <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mb-4 border border-slate-100">
+                                    <div className="w-16 h-16 rounded-2xl bg-chrome flex items-center justify-center mb-4 border border-border">
                                         <Calendar className="w-8 h-8 text-slate-300" />
                                     </div>
-                                    <h3 className="text-lg font-medium text-slate-800">Select a Plan</h3>
-                                    <p className="text-slate-500 mt-2 max-w-sm">
+                                    <h3 className="text-lg font-medium text-content-primary">Select a Plan</h3>
+                                    <p className="text-content-secondary mt-2 max-w-sm">
                                         Choose an installment plan from the left panel to configure its payment schedule and fee heads.
                                     </p>
                                 </div>
@@ -357,12 +357,12 @@ const InstallmentPlansPage: React.FC = () => {
                 )}
 
                 {!selectedOffering && (
-                    <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-                        <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                            <ListPlus className="w-6 h-6 text-slate-400" />
+                    <div className="bg-surface rounded-2xl border border-border p-12 text-center">
+                        <div className="w-16 h-16 bg-chrome rounded-full flex items-center justify-center mx-auto mb-4 border border-border">
+                            <ListPlus className="w-6 h-6 text-content-muted" />
                         </div>
-                        <h3 className="text-lg font-medium text-slate-800">No Class Selected</h3>
-                        <p className="text-slate-500 mt-2">Please select a class/offering above to view and manage installment plans.</p>
+                        <h3 className="text-lg font-medium text-content-primary">No Class Selected</h3>
+                        <p className="text-content-secondary mt-2">Please select a class/offering above to view and manage installment plans.</p>
                     </div>
                 )}
             </div>

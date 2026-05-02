@@ -40,7 +40,9 @@ public class SecurityConfig {
                         .requestMatchers("/auth/signin", "/atl-auth-service/auth/signin",
                                 "/auth/otp/**", "/atl-auth-service/auth/otp/**",
                                 "/auth/onboard-admin", "/atl-auth-service/auth/onboard-admin",
-                                "/auth/forgot-password/**", "/atl-auth-service/auth/forgot-password/**")
+                                "/auth/forgot-password/**", "/atl-auth-service/auth/forgot-password/**",
+                                "/auth/refresh-token", "/atl-auth-service/auth/refresh-token",
+                                "/auth/logout", "/atl-auth-service/auth/logout")
                         .permitAll()
                         .requestMatchers("/auth/signup", "/atl-auth-service/auth/signup").hasRole("TENANT_ADMIN")
 

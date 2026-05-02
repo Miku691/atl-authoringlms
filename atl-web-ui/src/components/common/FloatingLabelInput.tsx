@@ -30,16 +30,16 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
                 className={`
                     relative rounded-lg border transition-all duration-200 h-full
                     ${error
-                        ? 'border-red-500 ring-4 ring-red-50 focus-within:ring-red-100 focus-within:border-red-600 shadow-sm shadow-red-200/20'
-                        : 'border-gray-200 focus-within:ring-4 focus-within:ring-indigo-50 focus-within:border-indigo-500'
+                        ? 'border-red-500 ring-4 ring-red-50 dark:ring-red-500/10 focus-within:ring-red-100 dark:focus-within:ring-red-500/20 focus-within:border-red-600 shadow-sm shadow-red-200/20'
+                        : 'border-border focus-within:ring-4 focus-within:ring-indigo-50 dark:focus-within:ring-indigo-500/10 focus-within:border-indigo-500'
                     }
-                    bg-white
+                    bg-surface
                 `}
             >
                 {/* Icon */}
                 {icon && (
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <div className={`transition-colors duration-200 ${isFocused || hasValue ? (error ? 'text-red-500' : 'text-indigo-500') : 'text-gray-400'}`}>
+                        <div className={`transition-colors duration-200 ${isFocused || hasValue ? (error ? 'text-red-500' : 'text-indigo-500') : 'text-content-muted'}`}>
                             {icon}
                         </div>
                     </div>
@@ -54,7 +54,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
                         block w-full rounded-lg bg-transparent border-none
                         ${icon ? 'pl-10' : 'pl-4'} 
                         pr-10 py-3.5 
-                        text-gray-900 placeholder-transparent focus:ring-0
+                        text-content-primary placeholder-transparent focus:ring-0
                         ${inputClassName}
                     `}
                     placeholder={label} // Required for :placeholder-shown trick if we used CSS-only, but here using JS state
@@ -74,8 +74,8 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
                         absolute left-0 transition-all duration-200 pointer-events-none
                         ${icon ? 'left-10' : 'left-4'}
                         ${isFocused || hasValue
-                            ? '-top-2 text-xs bg-white px-1 text-indigo-600 font-medium'
-                            : 'top-3.5 text-gray-500'
+                            ? '-top-2 text-xs bg-surface px-1 text-indigo-600 dark:text-indigo-400 font-medium'
+                            : 'top-3.5 text-content-secondary'
                         }
                     `}
                 >
@@ -88,7 +88,7 @@ const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+                            className="text-content-muted hover:text-content-secondary focus:outline-none transition-colors"
                         >
                             {showPassword ? (
                                 <EyeOff className="h-5 w-5" />

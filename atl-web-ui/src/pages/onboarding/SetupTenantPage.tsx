@@ -156,7 +156,7 @@ const InitialSetupPage: React.FC = () => {
 
     const renderTypeSelection = () => (
         <div className="space-y-6 animate-fadeIn">
-            <h2 className="text-2xl font-bold text-center text-gray-800">What type of institution is this?</h2>
+            <h2 className="text-2xl font-bold text-center text-content-primary">What type of institution is this?</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
                     { id: 'SCHOOL', icon: School, label: 'School', desc: 'K-12, Classes, Sections', color: 'blue' },
@@ -176,14 +176,14 @@ const InitialSetupPage: React.FC = () => {
                             setStep(2);
                         }}
                         className={`cursor-pointer p-6 border-2 rounded-xl transition-all hover:shadow-lg flex flex-col items-center
-                            ${type === item.id ? `border-indigo-500 bg-indigo-50` : 'border-gray-200 hover:border-gray-300'}
+                            ${type === item.id ? `border-indigo-500 bg-indigo-50` : 'border-border hover:border-border'}
                         `}
                     >
-                        <div className={`p-4 rounded-full mb-4 ${type === item.id ? 'bg-indigo-100' : 'bg-gray-100'}`}>
+                        <div className={`p-4 rounded-full mb-4 ${type === item.id ? 'bg-indigo-100' : 'bg-chrome'}`}>
                             <item.icon className="w-8 h-8 text-indigo-600" />
                         </div>
-                        <h3 className="font-semibold text-lg text-gray-800">{item.label}</h3>
-                        <p className="text-sm text-gray-500 text-center mt-2">{item.desc}</p>
+                        <h3 className="font-semibold text-lg text-content-primary">{item.label}</h3>
+                        <p className="text-sm text-content-secondary text-center mt-2">{item.desc}</p>
                     </div>
                 ))}
             </div>
@@ -192,10 +192,10 @@ const InitialSetupPage: React.FC = () => {
 
     const renderConfig = () => (
         <div className="space-y-6 animate-fadeIn max-w-2xl mx-auto">
-            <h2 className="text-2xl font-bold text-center text-gray-800">Configure {type}</h2>
+            <h2 className="text-2xl font-bold text-center text-content-primary">Configure {type}</h2>
 
             {/* Global Settings */}
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <div className="bg-surface p-6 rounded-xl border border-border shadow-sm">
                 <FloatingLabelInput
                     label="Academic Year Label"
                     value={academicYear}
@@ -207,19 +207,19 @@ const InitialSetupPage: React.FC = () => {
 
             {/* School Specific */}
             {type === 'SCHOOL' && (
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
-                    <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                <div className="bg-surface p-6 rounded-xl border border-border shadow-sm space-y-6">
+                    <h3 className="font-semibold text-content-primary flex items-center gap-2">
                         <School className="w-5 h-5 text-indigo-600" /> School Structure
                     </h3>
 
                     <div>
-                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-1">
+                        <label className="block text-xs font-semibold text-content-secondary uppercase tracking-wider mb-2 px-1">
                             Education Board
                         </label>
                         <select
                             value={schoolDetails.board}
                             onChange={(e) => setSchoolDetails({ ...schoolDetails, board: e.target.value })}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 sm:text-sm transition-all bg-white"
+                            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 sm:text-sm transition-all bg-surface"
                         >
                             <option value="CBSE">CBSE</option>
                             <option value="ICSE">ICSE</option>
@@ -249,7 +249,7 @@ const InitialSetupPage: React.FC = () => {
                         />
                     </div>
 
-                    <div className="pt-2 border-t border-gray-100">
+                    <div className="pt-2 border-t border-border">
                         <FloatingLabelInput
                             label="Default Sections per Class"
                             type="number"
@@ -260,7 +260,7 @@ const InitialSetupPage: React.FC = () => {
                             onChange={() => { }}
                             className="mb-0"
                         />
-                        <p className="text-[10px] text-gray-400 mt-1 px-1 italic">
+                        <p className="text-[10px] text-content-muted mt-1 px-1 italic">
                             * We will create sections A, B, C... automatically. Default configuration is non-editable during initial setup.
                         </p>
                     </div>
@@ -269,8 +269,8 @@ const InitialSetupPage: React.FC = () => {
 
             {/* College/Coaching Specific */}
             {(type === 'COLLEGE' || type === 'COACHING') && (
-                <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                    <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                <div className="bg-surface p-6 rounded-xl border border-border shadow-sm space-y-4">
+                    <h3 className="font-semibold text-content-primary flex items-center gap-2">
                         {type === 'COLLEGE' ? <GraduationCap className="w-5 h-5 text-purple-600" /> : <Users className="w-5 h-5 text-orange-600" />}
                         Institutional Details
                     </h3>
@@ -278,13 +278,13 @@ const InitialSetupPage: React.FC = () => {
                     {type === 'COLLEGE' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                             <div className="relative h-[58px]">
-                                <label className="absolute -top-2 left-3 bg-white px-1 text-[10px] font-bold text-indigo-600 uppercase tracking-widest z-10">
+                                <label className="absolute -top-2 left-3 bg-surface px-1 text-[10px] font-bold text-indigo-600 uppercase tracking-widest z-10">
                                     College Category
                                 </label>
                                 <select
                                     value={collegeDetails.collegeCategory}
                                     onChange={(e) => setCollegeDetails({ ...collegeDetails, collegeCategory: e.target.value })}
-                                    className="w-full h-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 text-sm transition-all bg-white appearance-none cursor-pointer"
+                                    className="w-full h-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 text-sm transition-all bg-surface appearance-none cursor-pointer"
                                 >
                                     <option value="Engineering">Engineering</option>
                                     <option value="Medical">Medical</option>
@@ -296,7 +296,7 @@ const InitialSetupPage: React.FC = () => {
                                     <option value="Vocational">Vocational</option>
                                 </select>
                                 <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                                    <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg className="h-4 w-4 text-content-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </div>
@@ -322,56 +322,56 @@ const InitialSetupPage: React.FC = () => {
                         </div>
                     )}
 
-                    <div className="pt-4 border-t border-gray-100 mt-4">
-                        <h4 className="text-sm font-semibold text-gray-700 mb-4">
+                    <div className="pt-4 border-t border-border mt-4">
+                        <h4 className="text-sm font-semibold text-content-primary mb-4">
                             {type === 'COLLEGE' ? 'Degree Programs' : 'Courses & Batches'}
                         </h4>
                         <div className="space-y-3">
                         {programs.map((prog, idx) => (
-                            <div key={idx} className="p-4 bg-gray-50 rounded-lg border border-gray-200 relative group">
+                            <div key={idx} className="p-4 bg-chrome rounded-lg border border-border relative group">
                                 <button
                                     onClick={() => removeProgram(idx)}
-                                    className="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="absolute top-2 right-2 text-content-muted hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Name</label>
+                                        <label className="text-xs font-semibold text-content-secondary uppercase">Name</label>
                                         <input
                                             value={prog.name}
                                             onChange={(e) => updateProgram(idx, 'name', e.target.value)}
                                             placeholder={type === 'COLLEGE' ? "e.g. B.Tech CSE" : "e.g. JEE Mains 2025"}
-                                            className="w-full p-2 bg-white border rounded text-sm"
+                                            className="w-full p-2 bg-surface border rounded text-sm"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Code</label>
+                                        <label className="text-xs font-semibold text-content-secondary uppercase">Code</label>
                                         <input
                                             value={prog.code}
                                             onChange={(e) => updateProgram(idx, 'code', e.target.value)}
                                             placeholder="e.g. CSE"
-                                            className="w-full p-2 bg-white border rounded text-sm"
+                                            className="w-full p-2 bg-surface border rounded text-sm"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">
+                                        <label className="text-xs font-semibold text-content-secondary uppercase">
                                             {type === 'COLLEGE' ? 'No. of Semesters' : 'No. of Batches'}
                                         </label>
                                         <input
                                             type="number"
                                             value={prog.numberOfTerms}
                                             onChange={(e) => updateProgram(idx, 'numberOfTerms', parseInt(e.target.value))}
-                                            className="w-full p-2 bg-white border rounded text-sm"
+                                            className="w-full p-2 bg-surface border rounded text-sm"
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs font-semibold text-gray-500 uppercase">Unit Label</label>
+                                        <label className="text-xs font-semibold text-content-secondary uppercase">Unit Label</label>
                                         <input
                                             value={prog.termLabel}
                                             onChange={(e) => updateProgram(idx, 'termLabel', e.target.value)}
-                                            className="w-full p-2 bg-white border rounded text-sm"
+                                            className="w-full p-2 bg-surface border rounded text-sm"
                                         />
                                     </div>
                                 </div>
@@ -392,7 +392,7 @@ const InitialSetupPage: React.FC = () => {
         <div className="flex justify-between pt-6">
                 <button
                     onClick={() => setStep(1)}
-                    className="px-6 py-2 text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                    className="px-6 py-2 text-content-secondary hover:text-content-primary flex items-center gap-2"
                 >
                     <ArrowLeft className="w-4 h-4" /> Back
                 </button>
@@ -409,12 +409,12 @@ const InitialSetupPage: React.FC = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-4xl bg-white rounded-2xl shadow-xl overflow-hidden p-8 animate-slideUp">
+        <div className="min-h-screen bg-chrome flex flex-col items-center justify-center p-4">
+            <div className="w-full max-w-4xl bg-surface rounded-2xl shadow-xl overflow-hidden p-8 animate-slideUp">
                 {/* Progress */}
                 <div className="mb-8 flex justify-center gap-2">
-                    <div className={`h-1.5 w-12 rounded-full transition-colors ${step >= 1 ? 'bg-indigo-600' : 'bg-gray-200'}`} />
-                    <div className={`h-1.5 w-12 rounded-full transition-colors ${step >= 2 ? 'bg-indigo-600' : 'bg-gray-200'}`} />
+                    <div className={`h-1.5 w-12 rounded-full transition-colors ${step >= 1 ? 'bg-indigo-600' : 'bg-chrome'}`} />
+                    <div className={`h-1.5 w-12 rounded-full transition-colors ${step >= 2 ? 'bg-indigo-600' : 'bg-chrome'}`} />
                 </div>
 
                 {step === 1 ? renderTypeSelection() : renderConfig()}

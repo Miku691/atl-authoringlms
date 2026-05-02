@@ -12,10 +12,10 @@ import {
     Percent,
     Award,
     Save,
-    X,
     Loader2
 } from 'lucide-react';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
+import Modal from '../../../../components/common/Modal';
 
 
 const GradingConfigPage: React.FC = () => {
@@ -129,65 +129,65 @@ const GradingConfigPage: React.FC = () => {
                 }
             />
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-gray-50 border-b border-gray-100">
+                        <thead className="bg-chrome border-b border-border">
                             <tr>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Grade Label</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Percentage Range</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Grade Points</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Description</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase tracking-wider">Grade Label</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase tracking-wider">Percentage Range</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase tracking-wider text-center">Grade Points</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase tracking-wider">Description</th>
+                                <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase tracking-wider text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-50">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-content-muted">
                                         <Loader2 className="w-8 h-8 animate-spin mx-auto mb-2 text-indigo-600" />
                                         Loading configurations...
                                     </td>
                                 </tr>
                             ) : scales.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-400">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-content-muted">
                                         <Award className="w-12 h-12 mx-auto mb-4 opacity-10" />
                                         <p>No grading scales defined yet. Define them to start evaluating students.</p>
                                     </td>
                                 </tr>
                             ) : (
                                 [...scales].sort((a, b) => b.minPercentage - a.minPercentage).map((scale) => (
-                                    <tr key={scale.id} className="hover:bg-gray-50/50 transition-colors">
-                                        <td className="px-6 py-4 font-bold text-gray-900 text-lg">
-                                            <span className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg">
+                                    <tr key={scale.id} className="hover:bg-chrome/50 transition-colors">
+                                        <td className="px-6 py-4 font-bold text-content-primary text-lg">
+                                            <span className="bg-brand-subtle text-brand px-3 py-1 rounded-lg">
                                                 {scale.gradeLabel}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
-                                                <Percent className="w-4 h-4 text-gray-400" />
-                                                <span className="font-medium text-gray-700">{scale.minPercentage}% - {scale.maxPercentage}%</span>
+                                                <Percent className="w-4 h-4 text-content-muted" />
+                                                <span className="font-medium text-content-primary">{scale.minPercentage}% - {scale.maxPercentage}%</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className="text-gray-900 font-bold text-lg">{scale.gradePoint.toFixed(1)}</span>
+                                            <span className="text-content-primary font-bold text-lg">{scale.gradePoint.toFixed(1)}</span>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                                        <td className="px-6 py-4 text-sm text-content-secondary max-w-xs truncate">
                                             {scale.description || "-"}
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2">
                                                 <button
                                                     onClick={() => handleOpenEdit(scale)}
-                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-colors"
                                                     title="Edit"
                                                 >
                                                     <Edit2 className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => confirmDelete(scale)}
-                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
                                                     title="Delete"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -203,97 +203,101 @@ const GradingConfigPage: React.FC = () => {
             </div>
 
             {/* Edit/Add Modal */}
-            {isModalOpen && editingScale && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-                        <div className="px-6 py-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
-                            <h2 className="text-xl font-bold text-gray-900">
-                                {editingScale.id ? 'Edit Grade Level' : 'Add New Grade Level'}
-                            </h2>
-                            <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                                <X className="w-6 h-6" />
-                            </button>
+            <Modal
+                isOpen={isModalOpen && !!editingScale}
+                onClose={() => setIsModalOpen(false)}
+                title={editingScale?.id ? 'Edit Grade Level' : 'Add New Grade Level'}
+                icon={<Award size={18} />}
+                size="md"
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            className="modal-btn-secondary"
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            form="grade-form"
+                            disabled={isSaving}
+                            className="modal-btn-primary"
+                        >
+                            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            Save Config
+                        </button>
+                    </>
+                }
+            >
+                {editingScale && (
+                    <form id="grade-form" onSubmit={handleSave} className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="col-span-2">
+                                <label className="block text-sm font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>Grade Label (e.g. A+, Excellent)</label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2"
+                                    style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                                    placeholder="e.g. A+"
+                                    value={editingScale.gradeLabel || ''}
+                                    onChange={(e) => setEditingScale({ ...editingScale, gradeLabel: e.target.value })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>Min Percentage (%)</label>
+                                <input
+                                    type="number"
+                                    required
+                                    min="0"
+                                    max="100"
+                                    className="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2"
+                                    style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                                    value={editingScale.minPercentage || 0}
+                                    onChange={(e) => setEditingScale({ ...editingScale, minPercentage: Number(e.target.value) })}
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>Max Percentage (%)</label>
+                                <input
+                                    type="number"
+                                    required
+                                    min="0"
+                                    max="100"
+                                    className="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2"
+                                    style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                                    value={editingScale.maxPercentage || 100}
+                                    onChange={(e) => setEditingScale({ ...editingScale, maxPercentage: Number(e.target.value) })}
+                                />
+                            </div>
+                            <div className="col-span-2">
+                                <label className="block text-sm font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>Grade Points (e.g. 4.0)</label>
+                                <input
+                                    type="number"
+                                    step="0.1"
+                                    required
+                                    className="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2"
+                                    style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                                    value={editingScale.gradePoint || 0}
+                                    onChange={(e) => setEditingScale({ ...editingScale, gradePoint: Number(e.target.value) })}
+                                />
+                            </div>
+                            <div className="col-span-2">
+                                <label className="block text-sm font-semibold mb-1" style={{ color: 'var(--text-secondary)' }}>Description (Optional)</label>
+                                <textarea
+                                    className="w-full px-4 py-2.5 border rounded-xl outline-none focus:ring-2 resize-none"
+                                    style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                                    rows={3}
+                                    placeholder="Brief description for this grade level..."
+                                    value={editingScale.description || ''}
+                                    onChange={(e) => setEditingScale({ ...editingScale, description: e.target.value })}
+                                />
+                            </div>
                         </div>
-                        <form onSubmit={handleSave} className="p-6 space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="col-span-2">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Grade Label (e.g. A+, Excellent)</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                                        placeholder="e.g. A+"
-                                        value={editingScale.gradeLabel || ''}
-                                        onChange={(e) => setEditingScale({ ...editingScale, gradeLabel: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Min Percentage (%)</label>
-                                    <input
-                                        type="number"
-                                        required
-                                        min="0"
-                                        max="100"
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                                        value={editingScale.minPercentage || 0}
-                                        onChange={(e) => setEditingScale({ ...editingScale, minPercentage: Number(e.target.value) })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Max Percentage (%)</label>
-                                    <input
-                                        type="number"
-                                        required
-                                        min="0"
-                                        max="100"
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                                        value={editingScale.maxPercentage || 100}
-                                        onChange={(e) => setEditingScale({ ...editingScale, maxPercentage: Number(e.target.value) })}
-                                    />
-                                </div>
-                                <div className="col-span-2">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Grade Points (e.g. 4.0)</label>
-                                    <input
-                                        type="number"
-                                        step="0.1"
-                                        required
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                                        value={editingScale.gradePoint || 0}
-                                        onChange={(e) => setEditingScale({ ...editingScale, gradePoint: Number(e.target.value) })}
-                                    />
-                                </div>
-                                <div className="col-span-2">
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Description (Optional)</label>
-                                    <textarea
-                                        className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all resize-none"
-                                        rows={3}
-                                        placeholder="Brief description for this grade level..."
-                                        value={editingScale.description || ''}
-                                        onChange={(e) => setEditingScale({ ...editingScale, description: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex justify-end gap-3 mt-6 pt-6 border-t border-gray-50">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-xl transition-colors font-semibold"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isSaving}
-                                    className="flex items-center gap-2 px-8 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-50 shadow-md font-semibold"
-                                >
-                                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                    Save Config
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
+                    </form>
+                )}
+            </Modal>
 
             {/* Delete Confirmation */}
             <ConfirmationModal

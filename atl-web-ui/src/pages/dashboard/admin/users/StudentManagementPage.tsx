@@ -4,6 +4,7 @@ import { type RootState } from '../../../../store/store';
 import api from '../../../../utils/api';
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
+import Modal from '../../../../components/common/Modal';
 import CustomDatePicker from '../../../../components/common/CustomDatePicker';
 import CustomSelect from '../../../../components/common/CustomSelect';
 import PageHeader from '../../../../components/common/PageHeader';
@@ -22,7 +23,7 @@ import {
     Filter,
     Plus,
     Layout
-} from 'lucide-react'; 
+} from 'lucide-react';
 import StudentDocumentsModal from './StudentDocumentsModal';
 import AuthenticatedAvatar from '../../../../components/common/AuthenticatedAvatar';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -419,14 +420,14 @@ const StudentManagementPage: React.FC = () => {
             />
 
             {/* Filters row */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row gap-4 items-center">
+            <div className="bg-surface p-4 rounded-xl shadow-sm border border-border flex flex-col md:flex-row gap-4 items-center">
                 <div className="relative flex-1">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-4 w-4 text-gray-400" />
+                        <Search className="h-4 w-4 text-content-muted" />
                     </div>
                     <input
                         type="text"
-                        className="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
+                        className="block w-full pl-9 pr-3 py-2 border border-border rounded-lg bg-chrome placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
                         placeholder="Search by name, email or admission no..."
                         value={searchTerm}
                         onChange={(e) => {
@@ -438,9 +439,9 @@ const StudentManagementPage: React.FC = () => {
 
                 <div className="flex items-center gap-3 w-full md:w-auto">
                     <div className="relative flex-1 md:w-40">
-                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                         <select
-                            className="pl-9 pr-8 py-2 block w-full border border-gray-200 rounded-lg bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none cursor-pointer translate-y-0"
+                            className="pl-9 pr-8 py-2 block w-full border border-border rounded-lg bg-chrome text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none cursor-pointer translate-y-0"
                             value={genderFilter}
                             onChange={(e) => {
                                 setGenderFilter(e.target.value);
@@ -455,9 +456,9 @@ const StudentManagementPage: React.FC = () => {
                     </div>
 
                     <div className="relative flex-1 md:w-48">
-                        <Layout className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Layout className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                         <select
-                            className="pl-9 pr-8 py-2 block w-full border border-gray-200 rounded-lg bg-gray-50 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none cursor-pointer"
+                            className="pl-9 pr-8 py-2 block w-full border border-border rounded-lg bg-chrome text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none cursor-pointer"
                             value={offeringFilter}
                             onChange={(e) => {
                                 setOfferingFilter(e.target.value);
@@ -474,18 +475,18 @@ const StudentManagementPage: React.FC = () => {
             </div>
 
             {/* Content Area */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-border">
+                        <thead className="bg-chrome">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Name / Admission No
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Contact
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Status
                                 </th>
                                 <th scope="col" className="relative px-6 py-3">
@@ -493,27 +494,27 @@ const StudentManagementPage: React.FC = () => {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-surface divide-y divide-border">
                             {isLoading ? (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-12 text-center">
                                         <Loader2 className="h-8 w-8 animate-spin mx-auto text-indigo-500" />
-                                        <p className="mt-2 text-sm text-gray-500">Loading students...</p>
+                                        <p className="mt-2 text-sm text-content-secondary">Loading students...</p>
                                     </td>
                                 </tr>
                             ) : students.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-12 text-center">
-                                        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
-                                            <GraduationCap className="h-6 w-6 text-gray-400" />
+                                        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-chrome">
+                                            <GraduationCap className="h-6 w-6 text-content-muted" />
                                         </div>
-                                        <p className="mt-2 text-sm font-medium text-gray-900">No students found</p>
-                                        <p className="mt-1 text-sm text-gray-500">Try adjusting your filters or search term.</p>
+                                        <p className="mt-2 text-sm font-medium text-content-primary">No students found</p>
+                                        <p className="mt-1 text-sm text-content-secondary">Try adjusting your filters or search term.</p>
                                     </td>
                                 </tr>
                             ) : (
                                 students.map((student) => (
-                                    <tr key={student.id} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={student.id} className="hover:bg-chrome transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap cursor-pointer" onClick={() => navigate(`/people/students/${student.id}`)}>
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 h-10 w-10">
@@ -527,18 +528,18 @@ const StudentManagementPage: React.FC = () => {
                                                     <div className="text-sm font-medium text-indigo-600 hover:text-indigo-900 hover:underline">
                                                         {student.firstName} {student.lastName}
                                                     </div>
-                                                    <div className="text-sm text-gray-500">
+                                                    <div className="text-sm text-content-secondary">
                                                         #{student.admissionNo}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">{student.email}</div>
-                                            <div className="text-sm text-gray-500">{student.phone}</div>
+                                            <div className="text-sm text-content-primary">{student.email}</div>
+                                            <div className="text-sm text-content-secondary">{student.phone}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${student.status === 'ACTIVE' || student.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${student.status === 'ACTIVE' || student.status === 'Active' ? 'bg-green-500/10 text-green-600' : 'bg-chrome text-content-primary'
                                                 }`}>
                                                 {student.status || 'Active'}
                                             </span>
@@ -547,27 +548,27 @@ const StudentManagementPage: React.FC = () => {
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
                                                     onClick={() => handleGrantAccessClick(student)}
-                                                    className="text-yellow-600 hover:text-yellow-900 p-1 rounded hover:bg-yellow-50 transition-colors"
+                                                    className="text-yellow-600 hover:text-yellow-700 p-1 rounded hover:bg-yellow-500/10 transition-colors"
                                                     title="Grant Login Access"
                                                 >
                                                     <Key className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDocsClick(student)}
-                                                    className="text-gray-600 hover:text-gray-900 p-1 rounded hover:bg-gray-100 transition-colors"
+                                                    className="text-content-secondary hover:text-content-primary p-1 rounded hover:bg-chrome transition-colors"
                                                     title="Manage Documents"
                                                 >
                                                     <FileText className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleEditClick(student)}
-                                                    className="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50 transition-colors"
+                                                    className="text-indigo-600 hover:text-indigo-700 p-1 rounded hover:bg-indigo-500/10 transition-colors"
                                                 >
                                                     <Edit className="w-4 h-4" />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteClick(student.id)}
-                                                    className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 transition-colors"
+                                                    className="text-red-600 hover:text-red-700 p-1 rounded hover:bg-red-500/10 transition-colors"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                 </button>
@@ -581,26 +582,26 @@ const StudentManagementPage: React.FC = () => {
                 </div>
 
                 {/* Pagination Controls */}
-                <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div className="bg-chrome px-4 py-3 flex items-center justify-between border-t border-border sm:px-6">
                     <div className="flex-1 flex justify-between sm:hidden">
                         <button
                             onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                             disabled={currentPage === 0}
-                            className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                            className="relative inline-flex items-center px-4 py-2 border border-border text-sm font-medium rounded-md text-content-primary bg-surface hover:bg-chrome disabled:opacity-50"
                         >
                             Previous
                         </button>
                         <button
                             onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
                             disabled={currentPage === totalPages - 1}
-                            className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                            className="ml-3 relative inline-flex items-center px-4 py-2 border border-border text-sm font-medium rounded-md text-content-primary bg-surface hover:bg-chrome disabled:opacity-50"
                         >
                             Next
                         </button>
                     </div>
                     <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                         <div>
-                            <p className="text-xs text-gray-700">
+                            <p className="text-xs text-content-primary">
                                 Showing <span className="font-medium">{totalElements === 0 ? 0 : currentPage * pageSize + 1}</span> to <span className="font-medium">{Math.min((currentPage + 1) * pageSize, totalElements)}</span> of{' '}
                                 <span className="font-medium">{totalElements}</span> results
                             </p>
@@ -610,18 +611,18 @@ const StudentManagementPage: React.FC = () => {
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                                     disabled={currentPage === 0}
-                                    className="relative inline-flex items-center px-2 py-1 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                                    className="relative inline-flex items-center px-2 py-1 rounded-l-md border border-border bg-surface text-sm font-medium text-content-secondary hover:bg-chrome disabled:opacity-50"
                                 >
                                     <span className="sr-only">Previous</span>
                                     <ChevronLeft className="h-4 w-4" />
                                 </button>
-                                <span className="relative inline-flex items-center px-3 py-1 border border-gray-300 bg-white text-xs font-medium text-gray-700">
+                                <span className="relative inline-flex items-center px-3 py-1 border border-border bg-surface text-xs font-medium text-content-primary">
                                     Page {currentPage + 1} of {totalPages}
                                 </span>
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.min(totalPages - 1, prev + 1))}
                                     disabled={currentPage === totalPages - 1}
-                                    className="relative inline-flex items-center px-2 py-1 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                                    className="relative inline-flex items-center px-2 py-1 rounded-r-md border border-border bg-surface text-sm font-medium text-content-secondary hover:bg-chrome disabled:opacity-50"
                                 >
                                     <span className="sr-only">Next</span>
                                     <ChevronRight className="h-4 w-4" />
@@ -633,262 +634,240 @@ const StudentManagementPage: React.FC = () => {
             </div>
 
             {/* Add Student Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 overflow-y-auto">
-                    <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-                            <div className="absolute inset-0 bg-gray-500 opacity-75" onClick={() => setIsModalOpen(false)}></div>
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={selectedStudentId ? 'Edit Student' : 'Add New Student'}
+                maxWidth="4xl"
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => setIsModalOpen(false)}
+                            className="mt-3 w-full inline-flex justify-center rounded-md border border-border shadow-sm px-4 py-2 bg-surface text-base font-medium text-content-primary hover:bg-chrome focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:w-auto sm:text-sm"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            form="student-form"
+                            disabled={isSubmitting}
+                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isSubmitting ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Saving...
+                                </>
+                            ) : (
+                                <>
+                                    <Save className="w-4 h-4 mr-2" />
+                                    {selectedStudentId ? 'Update Student' : 'Save Student'}
+                                </>
+                            )}
+                        </button>
+                    </>
+                }
+            >
+                <form id="student-form" onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+                        {/* Personal Details */}
+                        <div className="col-span-full">
+                            <h4 className="text-sm font-semibold text-content-secondary uppercase tracking-wider mb-3">Personal Details</h4>
                         </div>
 
-                        <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">First Name <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                name="firstName"
+                                value={formData.firstName}
+                                onChange={handleInputChange}
+                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 bg-chrome text-content-primary ${errors.firstName ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-border focus:ring-indigo-500 focus:border-indigo-500'}`}
+                            />
+                            {errors.firstName && <p className="mt-1 text-xs text-red-600">{errors.firstName}</p>}
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">Last Name <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                name="lastName"
+                                value={formData.lastName}
+                                onChange={handleInputChange}
+                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 bg-chrome text-content-primary ${errors.lastName ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-border focus:ring-indigo-500 focus:border-indigo-500'}`}
+                            />
+                            {errors.lastName && <p className="mt-1 text-xs text-red-600">{errors.lastName}</p>}
+                        </div>
+                        <div>
+                            <CustomDatePicker
+                                label="Date of Birth"
+                                selectedDate={formData.dob || null}
+                                onChange={(date) => handleDateChange(date, 'dob')}
+                                error={errors.dob}
+                                required
+                                maxDate={new Date()}
+                            />
+                        </div>
 
-                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-                            <form onSubmit={handleSubmit}>
-                                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                                    <div className="flex justify-between items-center mb-5 border-b pb-3">
-                                        <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-                                            {selectedStudentId ? 'Edit Student' : 'Add New Student'}
-                                        </h3>
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsModalOpen(false)}
-                                            className="text-gray-400 hover:text-gray-500 focus:outline-none"
-                                        >
-                                            <X className="h-6 w-6" />
-                                        </button>
-                                    </div>
+                        <div>
+                            <CustomSelect
+                                label="Gender"
+                                name="gender"
+                                value={formData.gender || 'Male'}
+                                onChange={handleInputChange}
+                                options={[
+                                    { value: 'Male', label: 'Male' },
+                                    { value: 'Female', label: 'Female' },
+                                    { value: 'Other', label: 'Other' }
+                                ]}
+                            />
+                        </div>
+                        <div>
+                            <CustomSelect
+                                label="Blood Group"
+                                name="bloodGroup"
+                                value={formData.bloodGroup || ''}
+                                onChange={handleInputChange}
+                                placeholder="Select..."
+                                options={[
+                                    { value: 'A+', label: 'A+' },
+                                    { value: 'A-', label: 'A-' },
+                                    { value: 'B+', label: 'B+' },
+                                    { value: 'B-', label: 'B-' },
+                                    { value: 'AB+', label: 'AB+' },
+                                    { value: 'AB-', label: 'AB-' },
+                                    { value: 'O+', label: 'O+' },
+                                    { value: 'O-', label: 'O-' }
+                                ]}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">Religion <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                name="religion"
+                                value={formData.religion}
+                                onChange={handleInputChange}
+                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 bg-chrome text-content-primary ${errors.religion ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-border focus:ring-indigo-500 focus:border-indigo-500'}`}
+                                placeholder="e.g. Hindu, Christian, Muslim"
+                            />
+                            {errors.religion && <p className="mt-1 text-xs text-red-600">{errors.religion}</p>}
+                        </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {/* Personal Details */}
-                                        <div className="col-span-full">
-                                            <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Personal Details</h4>
-                                        </div>
+                        {/* Contact Details */}
+                        <div className="col-span-full mt-4">
+                            <h4 className="text-sm font-semibold text-content-secondary uppercase tracking-wider mb-3">Contact Information</h4>
+                        </div>
 
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">First Name <span className="text-red-500">*</span></label>
-                                            <input
-                                                type="text"
-                                                name="firstName"
-                                                value={formData.firstName}
-                                                onChange={handleInputChange}
-                                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 ${errors.firstName ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
-                                            />
-                                            {errors.firstName && <p className="mt-1 text-xs text-red-600">{errors.firstName}</p>}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Last Name <span className="text-red-500">*</span></label>
-                                            <input
-                                                type="text"
-                                                name="lastName"
-                                                value={formData.lastName}
-                                                onChange={handleInputChange}
-                                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 ${errors.lastName ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
-                                            />
-                                            {errors.lastName && <p className="mt-1 text-xs text-red-600">{errors.lastName}</p>}
-                                        </div>
-                                        <div>
-                                            <CustomDatePicker
-                                                label="Date of Birth"
-                                                selectedDate={formData.dob || null}
-                                                onChange={(date) => handleDateChange(date, 'dob')}
-                                                error={errors.dob}
-                                                required
-                                                maxDate={new Date()}
-                                                showMonthDropdown
-                                                showYearDropdown
-                                                dropdownMode="select"
-                                            />
-                                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">Email <span className="text-red-500">*</span></label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 bg-chrome text-content-primary ${errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-border focus:ring-indigo-500 focus:border-indigo-500'}`}
+                            />
+                            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">Phone <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                name="phone"
+                                value={formData.phone}
+                                onChange={handleInputChange}
+                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 bg-chrome text-content-primary ${errors.phone ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-border focus:ring-indigo-500 focus:border-indigo-500'}`}
+                                placeholder="10 digit number"
+                            />
+                            {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
+                        </div>
+                        <div className="col-span-1 md:col-span-2 lg:col-span-3">
+                            <label className="block text-sm font-medium text-content-primary">Address <span className="text-red-500">*</span></label>
+                            <textarea
+                                name="address"
+                                rows={2}
+                                value={formData.address}
+                                onChange={handleInputChange}
+                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 bg-chrome text-content-primary ${errors.address ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-border focus:ring-indigo-500 focus:border-indigo-500'}`}
+                            />
+                            {errors.address && <p className="mt-1 text-xs text-red-600">{errors.address}</p>}
+                        </div>
 
-                                        <div>
-                                            <CustomSelect
-                                                label="Gender"
-                                                name="gender"
-                                                value={formData.gender || 'Male'}
-                                                onChange={handleInputChange}
-                                                options={[
-                                                    { value: 'Male', label: 'Male' },
-                                                    { value: 'Female', label: 'Female' },
-                                                    { value: 'Other', label: 'Other' }
-                                                ]}
-                                            />
-                                        </div>
-                                        <div>
-                                            <CustomSelect
-                                                label="Blood Group"
-                                                name="bloodGroup"
-                                                value={formData.bloodGroup || ''}
-                                                onChange={handleInputChange}
-                                                placeholder="Select..."
-                                                options={[
-                                                    { value: 'A+', label: 'A+' },
-                                                    { value: 'A-', label: 'A-' },
-                                                    { value: 'B+', label: 'B+' },
-                                                    { value: 'B-', label: 'B-' },
-                                                    { value: 'AB+', label: 'AB+' },
-                                                    { value: 'AB-', label: 'AB-' },
-                                                    { value: 'O+', label: 'O+' },
-                                                    { value: 'O-', label: 'O-' }
-                                                ]}
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Religion <span className="text-red-500">*</span></label>
-                                            <input
-                                                type="text"
-                                                name="religion"
-                                                value={formData.religion}
-                                                onChange={handleInputChange}
-                                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 ${errors.religion ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
-                                                placeholder="e.g. Hindu, Christian, Muslim"
-                                            />
-                                            {errors.religion && <p className="mt-1 text-xs text-red-600">{errors.religion}</p>}
-                                        </div>
+                        {/* Academic Details */}
+                        <div className="col-span-full mt-4">
+                            <h4 className="text-sm font-semibold text-content-secondary uppercase tracking-wider mb-3">Academic Details</h4>
+                        </div>
 
-                                        {/* Contact Details */}
-                                        <div className="col-span-full mt-4">
-                                            <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Contact Information</h4>
-                                        </div>
+                        <div className="col-span-1 md:col-span-2">
+                            <label className="block text-sm font-medium text-content-primary">Academic Offering (Class) <span className="text-red-500">*</span></label>
+                            <select
+                                name="currentOfferingId"
+                                value={formData.currentOfferingId || ''}
+                                onChange={handleInputChange}
+                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 bg-chrome text-content-primary ${errors.currentOfferingId ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-border focus:ring-indigo-500 focus:border-indigo-500'}`}
+                            >
+                                <option value="">Select Offering...</option>
+                                {offerings.map((offering) => (
+                                    <option key={offering.id} value={offering.id}>
+                                        {offering.name}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.currentOfferingId && <p className="mt-1 text-xs text-red-600">{errors.currentOfferingId}</p>}
+                        </div>
 
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Email <span className="text-red-500">*</span></label>
-                                            <input
-                                                type="email"
-                                                name="email"
-                                                value={formData.email}
-                                                onChange={handleInputChange}
-                                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 ${errors.email ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
-                                            />
-                                            {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Phone <span className="text-red-500">*</span></label>
-                                            <input
-                                                type="text"
-                                                name="phone"
-                                                value={formData.phone}
-                                                onChange={handleInputChange}
-                                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 ${errors.phone ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
-                                                placeholder="10 digit number"
-                                            />
-                                            {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
-                                        </div>
-                                        <div className="col-span-1 md:col-span-2 lg:col-span-3">
-                                            <label className="block text-sm font-medium text-gray-700">Address <span className="text-red-500">*</span></label>
-                                            <textarea
-                                                name="address"
-                                                rows={2}
-                                                value={formData.address}
-                                                onChange={handleInputChange}
-                                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 ${errors.address ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
-                                            />
-                                            {errors.address && <p className="mt-1 text-xs text-red-600">{errors.address}</p>}
-                                        </div>
-
-                                        {/* Academic Details */}
-                                        <div className="col-span-full mt-4">
-                                            <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Academic Details</h4>
-                                        </div>
-
-                                        <div className="col-span-1 md:col-span-2">
-                                            <label className="block text-sm font-medium text-gray-700">Academic Offering (Class) <span className="text-red-500">*</span></label>
-                                            <select
-                                                name="currentOfferingId"
-                                                value={formData.currentOfferingId || ''}
-                                                onChange={handleInputChange}
-                                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 ${errors.currentOfferingId ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
-                                            >
-                                                <option value="">Select Offering...</option>
-                                                {offerings.map((offering) => (
-                                                    <option key={offering.id} value={offering.id}>
-                                                        {offering.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            {errors.currentOfferingId && <p className="mt-1 text-xs text-red-600">{errors.currentOfferingId}</p>}
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700">Admission No <span className="text-red-500">*</span></label>
-                                            <input
-                                                type="text"
-                                                name="admissionNo"
-                                                value={formData.admissionNo}
-                                                onChange={handleInputChange}
-                                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 ${errors.admissionNo ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-gray-300 focus:ring-indigo-500 focus:border-indigo-500'}`}
-                                            />
-                                            {errors.admissionNo && <p className="mt-1 text-xs text-red-600">{errors.admissionNo}</p>}
-                                        </div>
-                                        <div>
-                                            <CustomDatePicker
-                                                label="Admission Date"
-                                                selectedDate={formData.admissionDate || null}
-                                                onChange={(date) => handleDateChange(date, 'admissionDate')}
-                                                error={errors.admissionDate}
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <CustomSelect
-                                                label="Category"
-                                                name="category"
-                                                value={formData.category || 'General'}
-                                                onChange={handleInputChange}
-                                                options={[
-                                                    { value: 'General', label: 'General' },
-                                                    { value: 'OBC', label: 'OBC' },
-                                                    { value: 'SC', label: 'SC' },
-                                                    { value: 'ST', label: 'ST' },
-                                                    { value: 'Others', label: 'Others' }
-                                                ]}
-                                            />
-                                        </div>
-                                        <div>
-                                            <CustomSelect
-                                                label="Status"
-                                                name="status"
-                                                value={formData.status || 'Active'}
-                                                onChange={handleInputChange}
-                                                options={[
-                                                    { value: 'Active', label: 'Active' },
-                                                    { value: 'Inactive', label: 'Inactive' },
-                                                    { value: 'Suspended', label: 'Suspended' }
-                                                ]}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t">
-                                    <button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {isSubmitting ? (
-                                            <>
-                                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                                Saving...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Save className="w-4 h-4 mr-2" />
-                                                {selectedStudentId ? 'Update Student' : 'Save Student'}
-                                            </>
-                                        )}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setIsModalOpen(false)}
-                                        className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </form>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">Admission No <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                name="admissionNo"
+                                value={formData.admissionNo}
+                                onChange={handleInputChange}
+                                className={`mt-1 block w-full shadow-sm sm:text-sm border rounded-md p-2 bg-chrome text-content-primary ${errors.admissionNo ? 'border-red-300 focus:ring-red-500 focus:border-red-500' : 'border-border focus:ring-indigo-500 focus:border-indigo-500'}`}
+                            />
+                            {errors.admissionNo && <p className="mt-1 text-xs text-red-600">{errors.admissionNo}</p>}
+                        </div>
+                        <div>
+                            <CustomDatePicker
+                                label="Admission Date"
+                                selectedDate={formData.admissionDate || null}
+                                onChange={(date) => handleDateChange(date, 'admissionDate')}
+                                error={errors.admissionDate}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <CustomSelect
+                                label="Category"
+                                name="category"
+                                value={formData.category || 'General'}
+                                onChange={handleInputChange}
+                                options={[
+                                    { value: 'General', label: 'General' },
+                                    { value: 'OBC', label: 'OBC' },
+                                    { value: 'SC', label: 'SC' },
+                                    { value: 'ST', label: 'ST' },
+                                    { value: 'Others', label: 'Others' }
+                                ]}
+                            />
+                        </div>
+                        <div>
+                            <CustomSelect
+                                label="Status"
+                                name="status"
+                                value={formData.status || 'Active'}
+                                onChange={handleInputChange}
+                                options={[
+                                    { value: 'Active', label: 'Active' },
+                                    { value: 'Inactive', label: 'Inactive' },
+                                    { value: 'Suspended', label: 'Suspended' }
+                                ]}
+                            />
                         </div>
                     </div>
-                </div>
-            )}
+                </form>
+            </Modal>
 
             {/* Confirmation Modal */}
             <ConfirmationModal

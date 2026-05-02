@@ -37,9 +37,10 @@ const StudentDashboardHome: React.FC = () => {
                 instructorService.getInstructorsByTenant(user.tenantId)
             ]);
 
-            if (dashboardData.todayClasses && instructorsRes) {
+            if (dashboardData.todayClasses && instructorsRes.status === 'SUCCESS' && instructorsRes.apiData) {
                 const instructorMap: Record<string, string> = {};
-                instructorsRes.forEach((inst: any) => {
+                const instList = Array.isArray(instructorsRes.apiData) ? instructorsRes.apiData : (instructorsRes.apiData.content || []);
+                instList.forEach((inst: any) => {
                     instructorMap[inst.id] = `${inst.firstName} ${inst.lastName}`;
                 });
                 dashboardData.todayClasses = dashboardData.todayClasses.map(cls => ({
@@ -72,7 +73,7 @@ const StudentDashboardHome: React.FC = () => {
     if (!data?.student) {
         return (
             <div className="min-h-[70vh] flex items-center justify-center p-6">
-                <div className="max-w-md w-full bg-white rounded-2xl p-10 shadow-[0_8px_32px_-4px_rgba(26,61,138,0.08)] text-center space-y-6">
+                <div className="max-w-md w-full bg-surface rounded-2xl p-10 shadow-[0_8px_32px_-4px_rgba(26,61,138,0.08)] text-center space-y-6">
                     <div className="w-16 h-16 bg-amber-50 rounded-2xl flex items-center justify-center mx-auto border border-amber-100">
                         <Shield className="w-8 h-8 text-amber-500" />
                     </div>
@@ -126,7 +127,7 @@ const StudentDashboardHome: React.FC = () => {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
-                        <div className="px-6 py-4 bg-white rounded-xl shadow-[0_4px_16px_-4px_rgba(26,61,138,0.08)] text-center min-w-[120px]">
+                        <div className="px-6 py-4 bg-surface rounded-xl shadow-[0_4px_16px_-4px_rgba(26,61,138,0.08)] text-center min-w-[120px]">
                             <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest mb-1">Attendance</p>
                             <p className={`text-2xl font-bold ${attendancePct >= 75 ? 'text-[#0054d1]' : 'text-[#ba1a1a]'}`}>
                                 {attendancePct.toFixed(0)}%
@@ -142,7 +143,7 @@ const StudentDashboardHome: React.FC = () => {
             {/* ── 4 KPI Stat Cards ── */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Attendance */}
-                <div className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                <div className="bg-surface rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Overall Attendance</p>
                         <div className="w-8 h-8 rounded-xl bg-[#eef2ff] flex items-center justify-center">
@@ -161,7 +162,7 @@ const StudentDashboardHome: React.FC = () => {
                 </div>
 
                 {/* Next Class */}
-                <div className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                <div className="bg-surface rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Next Class</p>
                         <div className="w-8 h-8 rounded-xl bg-[#f0f4ff] flex items-center justify-center">
@@ -179,7 +180,7 @@ const StudentDashboardHome: React.FC = () => {
                 </div>
 
                 {/* Pending Assignments */}
-                <div className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                <div className="bg-surface rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Pending</p>
                         <div className="w-8 h-8 rounded-xl bg-[#fff3ec] flex items-center justify-center">
@@ -191,7 +192,7 @@ const StudentDashboardHome: React.FC = () => {
                 </div>
 
                 {/* Fees Status */}
-                <div className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                <div className="bg-surface rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
                     <div className="flex items-center justify-between mb-4">
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Fees Status</p>
                         <div className="w-8 h-8 rounded-xl bg-[#eef2ff] flex items-center justify-center">
@@ -213,7 +214,7 @@ const StudentDashboardHome: React.FC = () => {
                     <button
                         key={idx}
                         onClick={() => navigate(link.path)}
-                        className="group flex flex-col items-start gap-4 p-5 bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.12)] hover:-translate-y-0.5 transition-all duration-300"
+                        className="group flex flex-col items-start gap-4 p-5 bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.12)] hover:-translate-y-0.5 transition-all duration-300"
                     >
                         <div
                             className="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
@@ -233,7 +234,7 @@ const StudentDashboardHome: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                 {/* Today's Schedule */}
-                <div className="lg:col-span-2 bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                <div className="lg:col-span-2 bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
                     <div className="px-6 py-5 border-b border-[#f1f3f9] flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <Clock className="w-4 h-4 text-[#2a6df4]" />
@@ -294,7 +295,7 @@ const StudentDashboardHome: React.FC = () => {
                     <div className="bg-gradient-to-br from-[#0054d1] to-[#2a6df4] rounded-2xl p-6 text-white shadow-lg">
                         <div className="flex items-center justify-between mb-5">
                             <h3 className="text-xs font-semibold text-white/80 uppercase tracking-widest">Academic Pulse</h3>
-                            <div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center">
+                            <div className="w-8 h-8 rounded-xl bg-surface/10 flex items-center justify-center">
                                 <Zap className="w-4 h-4 text-white" />
                             </div>
                         </div>
@@ -304,9 +305,9 @@ const StudentDashboardHome: React.FC = () => {
                                     <span className="text-xs text-white/70">Attendance Rate</span>
                                     <span className="text-2xl font-bold">{attendancePct.toFixed(0)}%</span>
                                 </div>
-                                <div className="h-1.5 w-full bg-white/20 rounded-full overflow-hidden">
+                                <div className="h-1.5 w-full bg-surface/20 rounded-full overflow-hidden">
                                     <div
-                                        className="h-full bg-white rounded-full transition-all duration-700"
+                                        className="h-full bg-surface rounded-full transition-all duration-700"
                                         style={{ width: `${Math.min(attendancePct, 100)}%` }}
                                     />
                                 </div>
@@ -324,14 +325,14 @@ const StudentDashboardHome: React.FC = () => {
                         </div>
                         <button
                             onClick={() => navigate('/student/academics')}
-                            className="w-full mt-5 py-2.5 bg-white text-[#0054d1] text-xs font-bold rounded-xl hover:bg-[#f0f4ff] transition-colors flex items-center justify-center gap-2"
+                            className="w-full mt-5 py-2.5 bg-surface text-[#0054d1] text-xs font-bold rounded-xl hover:bg-[#f0f4ff] transition-colors flex items-center justify-center gap-2"
                         >
                             View Academics <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                     </div>
 
                     {/* Announcements Feed */}
-                    <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                    <div className="bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
                         <div className="px-5 py-4 border-b border-[#f1f3f9] flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Bell className="w-4 h-4 text-[#ba1a1a]" />

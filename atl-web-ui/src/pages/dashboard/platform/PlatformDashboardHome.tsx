@@ -52,15 +52,15 @@ const PlatformDashboardHome: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-8 p-6 lg:p-10 bg-gray-50/50 min-h-screen">
+    <div className="space-y-8 p-6 lg:p-10 bg-chrome/50 min-h-screen">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-display font-black tracking-tight text-gray-900 italic">Platform <span className="text-primary">Command Center</span></h1>
-          <p className="text-gray-500 font-medium">Welcome back, Super Admin. Here's what's happening across the ecosystem.</p>
+          <h1 className="text-3xl font-display font-black tracking-tight text-content-primary italic">Platform <span className="text-primary">Command Center</span></h1>
+          <p className="text-content-secondary font-medium">Welcome back, Super Admin. Here's what's happening across the ecosystem.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="px-5 py-2.5 bg-white border border-gray-200 rounded-xl font-bold text-sm text-gray-600 hover:bg-gray-50 transition-all shadow-sm">
+          <button className="px-5 py-2.5 bg-surface border border-border rounded-xl font-bold text-sm text-content-secondary hover:bg-chrome transition-all shadow-sm">
             Export Reports
           </button>
           <button className="px-5 py-2.5 bg-primary text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all">
@@ -77,15 +77,15 @@ const PlatformDashboardHome: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-100 relative overflow-hidden group hover:shadow-xl hover:shadow-primary/5 transition-all duration-500"
+            className="bg-surface p-6 rounded-[32px] shadow-sm border border-border relative overflow-hidden group hover:shadow-xl hover:shadow-primary/5 transition-all duration-500"
           >
             <div className={`w-12 h-12 rounded-2xl bg-${card.color}-50 flex items-center justify-center mb-4 transition-transform group-hover:scale-110 duration-500`}>
               <card.icon className={`w-6 h-6 text-${card.color}-600`} />
             </div>
             <div>
-              <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">{card.label}</p>
+              <p className="text-sm font-bold text-content-muted uppercase tracking-wider mb-1">{card.label}</p>
               <div className="flex items-end gap-3">
-                <h3 className="text-3xl font-display font-black tracking-tight text-gray-900">{card.value}</h3>
+                <h3 className="text-3xl font-display font-black tracking-tight text-content-primary">{card.value}</h3>
                 <span className={`flex items-center text-xs font-black ${card.isUp ? 'text-emerald-500' : 'text-rose-500'} mb-1`}>
                   {card.isUp ? <ArrowUpRight className="w-3 h-3 mr-1" /> : <ArrowDownRight className="w-3 h-3 mr-1" />}
                   {card.trend}
@@ -101,41 +101,41 @@ const PlatformDashboardHome: React.FC = () => {
         {/* Recent Demo Requests */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between px-2">
-            <h3 className="text-xl font-display font-black tracking-tight text-gray-900">Recent Demo Requests</h3>
+            <h3 className="text-xl font-display font-black tracking-tight text-content-primary">Recent Demo Requests</h3>
             <button className="text-sm font-bold text-primary hover:underline">View All Leads</button>
           </div>
           
-          <div className="bg-white rounded-[40px] shadow-sm border border-gray-100 overflow-hidden">
+          <div className="bg-surface rounded-[40px] shadow-sm border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-gray-50/50 border-b border-gray-100">
-                    <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Requester</th>
-                    <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Institute</th>
-                    <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Preferred Timing</th>
-                    <th className="px-8 py-5 text-xs font-black text-gray-400 uppercase tracking-widest">Status</th>
+                  <tr className="bg-chrome/50 border-b border-border">
+                    <th className="px-8 py-5 text-xs font-black text-content-muted uppercase tracking-widest">Requester</th>
+                    <th className="px-8 py-5 text-xs font-black text-content-muted uppercase tracking-widest">Institute</th>
+                    <th className="px-8 py-5 text-xs font-black text-content-muted uppercase tracking-widest">Preferred Timing</th>
+                    <th className="px-8 py-5 text-xs font-black text-content-muted uppercase tracking-widest">Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {recentLeads.map((lead: any) => (
-                    <tr key={lead.id} className="hover:bg-gray-50/50 transition-colors">
+                    <tr key={lead.id} className="hover:bg-chrome/50 transition-colors">
                       <td className="px-8 py-6">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-primary/5 rounded-full flex items-center justify-center text-primary font-bold text-sm">
                             {lead.fullName.charAt(0)}
                           </div>
                           <div>
-                            <p className="font-bold text-gray-900">{lead.fullName}</p>
-                            <p className="text-xs text-gray-500">{lead.email}</p>
+                            <p className="font-bold text-content-primary">{lead.fullName}</p>
+                            <p className="text-xs text-content-secondary">{lead.email}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="font-bold text-gray-700">{lead.instituteName || '—'}</p>
-                        <p className="text-xs text-gray-500 italic">{lead.estimatedStudents} students (est.)</p>
+                        <p className="font-bold text-content-primary">{lead.instituteName || '—'}</p>
+                        <p className="text-xs text-content-secondary italic">{lead.estimatedStudents} students (est.)</p>
                       </td>
                       <td className="px-8 py-6">
-                        <p className="font-bold text-gray-800 text-sm">{lead.preferredDate}</p>
+                        <p className="font-bold text-content-primary text-sm">{lead.preferredDate}</p>
                         <p className="text-xs text-primary font-bold">{lead.preferredTime}</p>
                       </td>
                       <td className="px-8 py-6">
@@ -151,7 +151,7 @@ const PlatformDashboardHome: React.FC = () => {
                   ))}
                   {recentLeads.length === 0 && (
                     <tr>
-                      <td colSpan={4} className="px-8 py-20 text-center text-gray-400 font-bold italic">
+                      <td colSpan={4} className="px-8 py-20 text-center text-content-muted font-bold italic">
                         No recent demo requests found.
                       </td>
                     </tr>
@@ -164,8 +164,8 @@ const PlatformDashboardHome: React.FC = () => {
 
         {/* System Activity & Trends */}
         <div className="space-y-4">
-          <h3 className="text-xl font-display font-black tracking-tight text-gray-900 px-2">System Health</h3>
-          <div className="bg-white p-8 rounded-[40px] shadow-sm border border-gray-100 space-y-8">
+          <h3 className="text-xl font-display font-black tracking-tight text-content-primary px-2">System Health</h3>
+          <div className="bg-surface p-8 rounded-[40px] shadow-sm border border-border space-y-8">
             <div className="space-y-6">
               {[
                 { label: 'Auth Service', status: 'Online', load: '12%' },
@@ -176,21 +176,21 @@ const PlatformDashboardHome: React.FC = () => {
                 <div key={svc.label} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={`w-2.5 h-2.5 rounded-full ${svc.status === 'Online' ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
-                    <span className="text-sm font-bold text-gray-700">{svc.label}</span>
+                    <span className="text-sm font-bold text-content-primary">{svc.label}</span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="w-24 h-1.5 bg-chrome rounded-full overflow-hidden">
                       <div className="h-full bg-primary" style={{ width: svc.load }} />
                     </div>
-                    <span className="text-[10px] font-black text-gray-400 w-8">{svc.load}</span>
+                    <span className="text-[10px] font-black text-content-muted w-8">{svc.load}</span>
                   </div>
                 </div>
               ))}
             </div>
             
-            <div className="pt-6 border-t border-gray-50">
+            <div className="pt-6 border-t border-border">
               <div className="bg-gray-900 rounded-3xl p-6 text-white text-center">
-                <p className="text-gray-400 text-xs font-black uppercase tracking-widest mb-2">Total System Uptime</p>
+                <p className="text-content-muted text-xs font-black uppercase tracking-widest mb-2">Total System Uptime</p>
                 <h4 className="text-2xl font-display font-bold">99.98%</h4>
                 <div className="mt-4 flex gap-1 h-8 items-end justify-center">
                   {[4, 6, 5, 8, 9, 8, 10, 9, 10, 10].map((h, i) => (

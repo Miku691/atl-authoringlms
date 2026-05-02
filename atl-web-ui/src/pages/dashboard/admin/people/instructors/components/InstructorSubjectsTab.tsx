@@ -28,7 +28,7 @@ const InstructorSubjectsTab: React.FC<Props> = ({ instructorId }) => {
     };
 
     if (loading) return (
-        <div className="p-12 text-center bg-white rounded-xl border border-gray-100 italic text-gray-400">
+        <div className="p-12 text-center bg-surface rounded-xl border border-border italic text-content-muted">
             <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500" />
             Analyzing assignment matrix...
         </div>
@@ -38,13 +38,13 @@ const InstructorSubjectsTab: React.FC<Props> = ({ instructorId }) => {
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {assignments.length === 0 ? (
-                    <div className="col-span-full bg-white p-12 rounded-2xl border border-dashed border-gray-200 text-center">
+                    <div className="col-span-full bg-surface p-12 rounded-2xl border border-dashed border-border text-center">
                         <Book className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                        <h4 className="text-gray-900 font-bold uppercase tracking-tight">No Active Assignments</h4>
-                        <p className="text-gray-400 text-sm mt-1">This instructor is currently not linked to any academic offerings.</p>
+                        <h4 className="text-content-primary font-bold uppercase tracking-tight">No Active Assignments</h4>
+                        <p className="text-content-muted text-sm mt-1">This instructor is currently not linked to any academic offerings.</p>
                     </div>
                 ) : assignments.map((mapping, idx) => (
-                    <div key={mapping.id} className="bg-white rounded-2xl p-6 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all group relative overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 100}ms` }}>
+                    <div key={mapping.id} className="bg-surface rounded-2xl p-6 border border-border hover:border-indigo-200 hover:shadow-xl transition-all group relative overflow-hidden animate-fade-in-up" style={{ animationDelay: `${idx * 100}ms` }}>
                         <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                             <Book className="w-24 h-24" />
                         </div>
@@ -59,12 +59,12 @@ const InstructorSubjectsTab: React.FC<Props> = ({ instructorId }) => {
                         </div>
 
                         <div>
-                            <h4 className="text-lg font-black text-gray-900 font-outfit uppercase leading-tight">{mapping.subjectName || 'All Subjects'}</h4>
+                            <h4 className="text-lg font-black text-content-primary font-outfit uppercase leading-tight">{mapping.subjectName || 'All Subjects'}</h4>
                             <p className="text-[10px] font-black text-indigo-500 uppercase tracking-widest mt-1 mb-4">{mapping.offeringName}</p>
                         </div>
 
-                        <div className="pt-4 border-t border-gray-50 flex items-center justify-between">
-                            <div className="flex items-center gap-2 text-gray-400">
+                        <div className="pt-4 border-t border-border flex items-center justify-between">
+                            <div className="flex items-center gap-2 text-content-muted">
                                 <Clock className="w-3.5 h-3.5" />
                                 <span className="text-[10px] font-bold uppercase">{mapping.startDate || 'Permanent'}</span>
                             </div>
@@ -80,11 +80,11 @@ const InstructorSubjectsTab: React.FC<Props> = ({ instructorId }) => {
                 <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
                         <h3 className="text-2xl font-black font-outfit uppercase tracking-tight mb-2">Academic Roadmap</h3>
-                        <p className="text-gray-400 text-sm max-w-xl font-medium leading-relaxed">
+                        <p className="text-content-muted text-sm max-w-xl font-medium leading-relaxed">
                             These subjects are derived from the core mapping engine. Instructors have access to all syllabus materials and student progress reports for the subjects listed above.
                         </p>
                     </div>
-                    <button className="bg-white text-gray-900 px-8 py-4 rounded-2xl font-black text-sm hover:bg-indigo-400 hover:text-white transition-all shadow-xl active:scale-95 whitespace-nowrap">
+                    <button className="bg-surface text-content-primary px-8 py-4 rounded-2xl font-black text-sm hover:bg-indigo-400 hover:text-white transition-all shadow-xl active:scale-95 whitespace-nowrap">
                         Access Syllabus
                     </button>
                 </div>

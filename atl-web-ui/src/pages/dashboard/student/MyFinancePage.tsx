@@ -91,7 +91,7 @@ const MyFinancePage: React.FC = () => {
             {/* ── 3 Summary KPI Cards ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Total Fees */}
-                <div className="group bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                <div className="group bg-surface rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
                     <div className="flex items-center justify-between mb-5">
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Total Fees</p>
                         <div className="w-9 h-9 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
@@ -103,7 +103,7 @@ const MyFinancePage: React.FC = () => {
                 </div>
 
                 {/* Amount Paid */}
-                <div className="group bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                <div className="group bg-surface rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
                     <div className="flex items-center justify-between mb-5">
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Amount Paid</p>
                         <div className="w-9 h-9 rounded-xl bg-[#dae2ff] flex items-center justify-center">
@@ -116,13 +116,13 @@ const MyFinancePage: React.FC = () => {
 
                 {/* Outstanding Balance */}
                 <div className={`group rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300 ${
-                    (summary?.balance ?? 0) > 0 ? 'bg-gradient-to-br from-[#9e3f00] to-[#c65100] text-white' : 'bg-white'
+                    (summary?.balance ?? 0) > 0 ? 'bg-gradient-to-br from-[#9e3f00] to-[#c65100] text-white' : 'bg-surface'
                 }`}>
                     <div className="flex items-center justify-between mb-5">
                         <p className={`text-[10px] font-semibold uppercase tracking-widest ${(summary?.balance ?? 0) > 0 ? 'text-white/70' : 'text-[#64748b]'}`}>
                             Outstanding
                         </p>
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${(summary?.balance ?? 0) > 0 ? 'bg-white/20' : 'bg-[#ffdad6]'}`}>
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${(summary?.balance ?? 0) > 0 ? 'bg-surface/20' : 'bg-[#ffdad6]'}`}>
                             {(summary?.balance ?? 0) > 0
                                 ? <TrendingDown className="w-4 h-4 text-white" />
                                 : <CheckCircle2 className="w-4 h-4 text-[#0054d1]" />
@@ -139,7 +139,7 @@ const MyFinancePage: React.FC = () => {
             </div>
 
             {/* ── Fee Ledger Table ── */}
-            <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+            <div className="bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
                 <div className="px-6 py-5 border-b border-[#f1f3f9] flex items-center justify-between">
                     <div>
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest mb-1">Fee Structure</p>
@@ -218,7 +218,7 @@ const MyFinancePage: React.FC = () => {
             </div>
 
             {/* ── Transaction History ── */}
-            <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+            <div className="bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
                 <div className="px-6 py-5 border-b border-[#f1f3f9] flex items-center justify-between">
                     <div>
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest mb-1">Payment History</p>

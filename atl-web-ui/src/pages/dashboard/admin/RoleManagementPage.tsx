@@ -56,19 +56,19 @@ const RoleManagementPage: React.FC = () => {
                     <Shield className="w-8 h-8 text-indigo-600" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Role Management</h1>
-                    <p className="text-sm text-gray-500">Manage system roles and user assignments</p>
+                    <h1 className="text-2xl font-bold text-content-primary">Role Management</h1>
+                    <p className="text-sm text-content-secondary">Manage system roles and user assignments</p>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="flex border-b border-gray-200">
+            <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
+                <div className="flex border-b border-border">
                     <button
                         onClick={() => setActiveTab('import')}
                         className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors ${activeTab === 'import'
                             ? 'bg-indigo-50 text-indigo-700 border-b-2 border-indigo-600'
-                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                            : 'text-content-secondary hover:text-content-primary hover:bg-chrome'
                             }`}
                     >
                         <Import className="w-4 h-4" />
@@ -78,7 +78,7 @@ const RoleManagementPage: React.FC = () => {
                         onClick={() => setActiveTab('assign')}
                         className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-colors ${activeTab === 'assign'
                             ? 'bg-indigo-50 text-indigo-700 border-b-2 border-indigo-600'
-                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                            : 'text-content-secondary hover:text-content-primary hover:bg-chrome'
                             }`}
                     >
                         <UserPlus className="w-4 h-4" />
@@ -89,27 +89,27 @@ const RoleManagementPage: React.FC = () => {
                 <div className="p-6 md:p-8">
                     {activeTab === 'import' && (
                         <div className="max-w-xl">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <Import className="w-5 h-5 text-gray-400" />
+                            <h3 className="text-lg font-semibold text-content-primary mb-4 flex items-center gap-2">
+                                <Import className="w-5 h-5 text-content-muted" />
                                 Add New Role
                             </h3>
-                            <p className="text-sm text-gray-500 mb-6">
+                            <p className="text-sm text-content-secondary mb-6">
                                 Register a new role in the system. The Role Code should be unique and descriptive (e.g., LIBRARIAN, ACCOUNTANT).
                             </p>
 
                             <form onSubmit={handleImportSubmit} className="space-y-4">
                                 <div>
-                                    <label htmlFor="roleCode" className="block text-sm font-medium text-gray-700">Role Code</label>
+                                    <label htmlFor="roleCode" className="block text-sm font-medium text-content-primary">Role Code</label>
                                     <input
                                         type="text"
                                         id="roleCode"
                                         required
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border"
+                                        className="mt-1 block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border"
                                         placeholder="e.g. LIBRARIAN"
                                         value={importRoleData.roleCode}
                                         onChange={(e) => setImportRoleData({ roleCode: e.target.value.toUpperCase() })}
                                     />
-                                    <p className="mt-1 text-xs text-gray-400">Role codes are typically uppercase.</p>
+                                    <p className="mt-1 text-xs text-content-muted">Role codes are typically uppercase.</p>
                                 </div>
                                 <button
                                     type="submit"
@@ -124,34 +124,34 @@ const RoleManagementPage: React.FC = () => {
 
                     {activeTab === 'assign' && (
                         <div className="max-w-xl">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <UserPlus className="w-5 h-5 text-gray-400" />
+                            <h3 className="text-lg font-semibold text-content-primary mb-4 flex items-center gap-2">
+                                <UserPlus className="w-5 h-5 text-content-muted" />
                                 Assign Role to User
                             </h3>
-                            <p className="text-sm text-gray-500 mb-6">
+                            <p className="text-sm text-content-secondary mb-6">
                                 Grant specific privileges to a user by mapping a role code to their username.
                             </p>
 
                             <form onSubmit={handleAssignSubmit} className="space-y-4">
                                 <div>
-                                    <label htmlFor="assignUsername" className="block text-sm font-medium text-gray-700">Username / Email</label>
+                                    <label htmlFor="assignUsername" className="block text-sm font-medium text-content-primary">Username / Email</label>
                                     <input
                                         type="text"
                                         id="assignUsername"
                                         required
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border"
+                                        className="mt-1 block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border"
                                         placeholder="Enter user's email or username"
                                         value={assignRoleData.username}
                                         onChange={(e) => setAssignRoleData({ ...assignRoleData, username: e.target.value })}
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="assignRoleCode" className="block text-sm font-medium text-gray-700">Role Code</label>
+                                    <label htmlFor="assignRoleCode" className="block text-sm font-medium text-content-primary">Role Code</label>
                                     <input
                                         type="text"
                                         id="assignRoleCode"
                                         required
-                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border"
+                                        className="mt-1 block w-full rounded-md border-border shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm px-4 py-2 border"
                                         placeholder="e.g. LIBRARIAN"
                                         value={assignRoleData.roleCode}
                                         onChange={(e) => setAssignRoleData({ ...assignRoleData, roleCode: e.target.value.toUpperCase() })}

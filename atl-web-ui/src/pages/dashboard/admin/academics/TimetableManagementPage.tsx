@@ -8,6 +8,7 @@ import { Calendar, Plus, Trash2, X, Clock, BookOpen, User as UserIcon, Edit2, Lo
 import toast from 'react-hot-toast';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 import PageHeader from '../../../../components/common/PageHeader';
+import Modal from '../../../../components/common/Modal';
 
 export default function TimetableManagementPage() {
     const user = useSelector((state: RootState) => state.auth.user);
@@ -356,10 +357,10 @@ export default function TimetableManagementPage() {
             />
 
             {/* Selection Area */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6">
-                <label className="block text-sm font-medium text-slate-700 mb-2">Select Class/Offering</label>
+            <div className="bg-surface p-4 rounded-xl shadow-sm border border-border mb-6">
+                <label className="block text-sm font-medium text-content-primary mb-2">Select Class/Offering</label>
                 <select
-                    className="w-full md:w-1/3 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full md:w-1/3 p-2 border border-border bg-chrome text-content-primary rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                     value={selectedOfferingId}
                     onChange={(e) => setSelectedOfferingId(e.target.value)}
                 >
@@ -373,10 +374,10 @@ export default function TimetableManagementPage() {
             </div>
 
             {selectedOfferingId && !timetableMaster && !loading && (
-                <div className="bg-white p-12 rounded-xl shadow-sm border border-slate-200 text-center">
+                <div className="bg-surface p-12 rounded-xl shadow-sm border border-border text-center">
                     <Calendar className="w-16 h-16 text-indigo-200 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-slate-800 mb-2">No Timetable Found</h3>
-                    <p className="text-slate-500 mb-6">There is no timetable configured for this offering yet.</p>
+                    <h3 className="text-xl font-semibold text-content-primary mb-2">No Timetable Found</h3>
+                    <p className="text-content-secondary mb-6">There is no timetable configured for this offering yet.</p>
                     <button
                         onClick={handleCreateMaster}
                         disabled={isSubmitting}
@@ -391,16 +392,16 @@ export default function TimetableManagementPage() {
             {loading && <div className="text-center py-12">Loading...</div>}
 
             {timetableMaster && (
-                <div className="bg-white rounded-xl shadow-sm border border-slate-200 min-h-[600px]">
+                <div className="bg-surface rounded-xl shadow-sm border border-border min-h-[600px]">
                     {/* Day Tabs */}
-                    <div className="flex border-b overflow-x-auto">
+                    <div className="flex border-b border-border overflow-x-auto">
                         {days.map(day => (
                             <button
                                 key={day.id}
                                 onClick={() => setActiveDay(day.id)}
                                 className={`px-6 py-4 font-medium transition whitespace-nowrap ${activeDay === day.id
-                                    ? 'border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50'
-                                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+                                    ? 'border-b-2 border-indigo-600 text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-400'
+                                    : 'text-content-secondary hover:text-content-primary hover:bg-chrome'
                                     }`}
                             >
                                 {day.name}
@@ -411,13 +412,13 @@ export default function TimetableManagementPage() {
                     {/* Slots Area */}
                     <div className="p-6">
                         <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-lg font-semibold text-slate-800">
+                            <h3 className="text-lg font-semibold text-content-primary">
                                 {days.find(d => d.id === activeDay)?.name} Schedule
                             </h3>
                             {isAdmin && (
                                 <button
                                     onClick={openSlotModal}
-                                    className="flex items-center gap-2 text-indigo-600 hover:bg-indigo-50 px-4 py-2 rounded-lg transition font-medium"
+                                    className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 px-4 py-2 rounded-lg transition font-medium"
                                 >
                                     <Plus className="w-4 h-4" />
                                     Add Time Slot
@@ -426,20 +427,20 @@ export default function TimetableManagementPage() {
                         </div>
 
                         {activeSlots.length === 0 ? (
-                            <div className="text-center py-12 bg-slate-50 rounded-lg border border-dashed border-slate-300 text-slate-400">
+                            <div className="text-center py-12 bg-chrome rounded-lg border border-dashed border-border text-content-muted">
                                 No slots configured for this day.
                             </div>
                         ) : (
                             <div className="space-y-4">
                                 {activeSlots.map(slot => (
-                                    <div key={slot.id} className="border rounded-lg p-4 hover:shadow-md transition bg-white group">
+                                    <div key={slot.id} className="border border-border rounded-lg p-4 hover:shadow-md transition bg-surface group">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex items-center gap-4">
-                                                <div className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded text-sm font-medium flex items-center gap-2">
+                                                <div className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 px-3 py-1 rounded text-sm font-medium flex items-center gap-2">
                                                     <Clock className="w-3 h-3" />
                                                     {slot.startTime.substring(0, 5)} - {slot.endTime.substring(0, 5)}
                                                 </div>
-                                                <h4 className="font-semibold text-slate-800">{slot.slotLabel}</h4>
+                                                <h4 className="font-semibold text-content-primary">{slot.slotLabel}</h4>
                                             </div>
                                             {isAdmin && (
                                                 <button
@@ -452,21 +453,21 @@ export default function TimetableManagementPage() {
                                         </div>
 
                                         {/* Entries */}
-                                        <div className="pl-4 border-l-2 border-indigo-100 space-y-2">
+                                        <div className="pl-4 border-l-2 border-indigo-500/20 space-y-2">
                                             {slot.entries && slot.entries.length > 0 ? (
                                                 slot.entries.map(entry => (
-                                                    <div key={entry.id} className="flex justify-between items-center bg-slate-50 p-2 rounded text-sm group/entry">
+                                                    <div key={entry.id} className="flex justify-between items-center bg-chrome p-2 rounded text-sm group/entry">
                                                         <div className="flex items-center gap-4">
-                                                            <div className="flex items-center gap-2 text-slate-700 font-medium">
+                                                            <div className="flex items-center gap-2 text-content-primary font-medium">
                                                                 <BookOpen className="w-3 h-3" />
                                                                 {getSubjectName(entry.subjectId)}
                                                             </div>
-                                                            <div className="flex items-center gap-2 text-slate-500">
+                                                            <div className="flex items-center gap-2 text-content-secondary">
                                                                 <UserIcon className="w-3 h-3" />
                                                                 {getInstructorName(entry.instructorId)}
                                                             </div>
                                                             {entry.room && (
-                                                                <span className="text-xs bg-slate-200 px-2 py-0.5 rounded text-slate-600">
+                                                                <span className="text-xs bg-chrome px-2 py-0.5 rounded text-content-secondary">
                                                                     Room: {entry.room}
                                                                 </span>
                                                             )}
@@ -476,7 +477,7 @@ export default function TimetableManagementPage() {
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => openEntryModal(slot, entry)}
-                                                                    className="text-slate-400 hover:text-indigo-600 opacity-0 group-hover/entry:opacity-100 transition"
+                                                                    className="text-content-muted hover:text-indigo-600 opacity-0 group-hover/entry:opacity-100 transition"
                                                                     title="Edit Assignment"
                                                                 >
                                                                     <Edit2 className="w-3.5 h-3.5" />
@@ -484,7 +485,7 @@ export default function TimetableManagementPage() {
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => handleDeleteEntry(entry.id)}
-                                                                    className="text-slate-400 hover:text-red-500"
+                                                                    className="text-content-muted hover:text-red-500"
                                                                 >
                                                                     <X className="w-3 h-3" />
                                                                 </button>
@@ -494,7 +495,7 @@ export default function TimetableManagementPage() {
                                                 ))
                                             ) : (
                                                 <>
-                                                    <div className="text-sm text-slate-400 italic">No subject assigned</div>
+                                                    <div className="text-sm text-content-muted italic">No subject assigned</div>
                                                     {isAdmin && (
                                                         <button
                                                             type="button"
@@ -516,122 +517,118 @@ export default function TimetableManagementPage() {
             )}
 
             {/* Add Slot Modal */}
-            {isAddSlotModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-semibold">Add Time Slot</h3>
-                            <button type="button" onClick={() => setIsAddSlotModalOpen(false)} className="text-slate-400 hover:text-slate-600"><X /></button>
+            <Modal
+                isOpen={isAddSlotModalOpen}
+                onClose={() => setIsAddSlotModalOpen(false)}
+                title="Add Time Slot"
+                footer={
+                    <>
+                        <button type="button" onClick={() => setIsAddSlotModalOpen(false)} className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-lg" disabled={isSubmitting}>Cancel</button>
+                        <button type="button" onClick={handleAddSlot} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Add Slot
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Label (e.g. Period 1)</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border border-border rounded-lg bg-chrome text-content-primary outline-none focus:ring-2 focus:ring-indigo-500"
+                            value={newSlot.slotLabel}
+                            onChange={e => setNewSlot({ ...newSlot, slotLabel: e.target.value })}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Period Number (for ordering)</label>
+                        <input
+                            type="number"
+                            className="w-full p-2 border border-border rounded-lg bg-chrome text-content-primary outline-none focus:ring-2 focus:ring-indigo-500"
+                            value={newSlot.periodNumber}
+                            onChange={e => setNewSlot({ ...newSlot, periodNumber: parseInt(e.target.value) })}
+                        />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary mb-1">Start Time</label>
+                            <input
+                                type="time"
+                                className="w-full p-2 border border-border rounded-lg bg-chrome text-content-primary outline-none focus:ring-2 focus:ring-indigo-500 [color-scheme:dark]"
+                                value={newSlot.startTime}
+                                onChange={e => setNewSlot({ ...newSlot, startTime: e.target.value })}
+                            />
                         </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Label (e.g. Period 1)</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border rounded-lg"
-                                    value={newSlot.slotLabel}
-                                    onChange={e => setNewSlot({ ...newSlot, slotLabel: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Period Number (for ordering)</label>
-                                <input
-                                    type="number"
-                                    className="w-full p-2 border rounded-lg"
-                                    value={newSlot.periodNumber}
-                                    onChange={e => setNewSlot({ ...newSlot, periodNumber: parseInt(e.target.value) })}
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Start Time</label>
-                                    <input
-                                        type="time"
-                                        className="w-full p-2 border rounded-lg"
-                                        value={newSlot.startTime}
-                                        onChange={e => setNewSlot({ ...newSlot, startTime: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">End Time</label>
-                                    <input
-                                        type="time"
-                                        className="w-full p-2 border rounded-lg"
-                                        value={newSlot.endTime}
-                                        onChange={e => setNewSlot({ ...newSlot, endTime: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-6">
-                            <button type="button" onClick={() => setIsAddSlotModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg" disabled={isSubmitting}>Cancel</button>
-                            <button type="button" onClick={handleAddSlot} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                Add Slot
-                            </button>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary mb-1">End Time</label>
+                            <input
+                                type="time"
+                                className="w-full p-2 border border-border rounded-lg bg-chrome text-content-primary outline-none focus:ring-2 focus:ring-indigo-500 [color-scheme:dark]"
+                                value={newSlot.endTime}
+                                onChange={e => setNewSlot({ ...newSlot, endTime: e.target.value })}
+                            />
                         </div>
                     </div>
                 </div>
-            )}
+            </Modal>
 
             {/* Add Entry Modal */}
-            {isAddEntryModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-semibold">{editingEntryId ? 'Edit Assignment' : 'Assign Subject & Instructor'}</h3>
-                            <button type="button" onClick={() => setIsAddEntryModalOpen(false)} className="text-slate-400 hover:text-slate-600"><X /></button>
-                        </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Subject</label>
-                                <select
-                                    className="w-full p-2 border rounded-lg"
-                                    value={newEntry.subjectId}
-                                    onChange={e => setNewEntry({ ...newEntry, subjectId: e.target.value })}
-                                >
-                                    <option value="">-- Select Subject --</option>
-                                    {subjects.filter(s => s != null).map(sub => (
-                                        <option key={sub.id} value={sub.id}>{sub.name || sub.title}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Instructor</label>
-                                <select
-                                    className="w-full p-2 border rounded-lg"
-                                    value={newEntry.instructorId}
-                                    onChange={e => setNewEntry({ ...newEntry, instructorId: e.target.value })}
-                                >
-                                    <option value="">-- Select Instructor --</option>
-                                    {instructors.filter(i => i != null).map(inst => (
-                                        <option key={inst.id} value={inst.id}>
-                                            {inst.name || `${inst.firstName || ''} ${inst.lastName || ''}`}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Room (Optional)</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border rounded-lg"
-                                    placeholder="e.g. 101"
-                                    value={newEntry.room}
-                                    onChange={e => setNewEntry({ ...newEntry, room: e.target.value })}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-6">
-                            <button type="button" onClick={() => setIsAddEntryModalOpen(false)} className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg" disabled={isSubmitting}>Cancel</button>
-                            <button type="button" onClick={handleAddEntry} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                {editingEntryId ? 'Update' : 'Assign'}
-                            </button>
-                        </div>
+            <Modal
+                isOpen={isAddEntryModalOpen}
+                onClose={() => setIsAddEntryModalOpen(false)}
+                title={editingEntryId ? 'Edit Assignment' : 'Assign Subject & Instructor'}
+                footer={
+                    <>
+                        <button type="button" onClick={() => setIsAddEntryModalOpen(false)} className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-lg" disabled={isSubmitting}>Cancel</button>
+                        <button type="button" onClick={handleAddEntry} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            {editingEntryId ? 'Update' : 'Assign'}
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Subject</label>
+                        <select
+                            className="w-full p-2 border border-border bg-chrome text-content-primary rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                            value={newEntry.subjectId}
+                            onChange={e => setNewEntry({ ...newEntry, subjectId: e.target.value })}
+                        >
+                            <option value="">-- Select Subject --</option>
+                            {subjects.filter(s => s != null).map(sub => (
+                                <option key={sub.id} value={sub.id}>{sub.name || sub.title}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Instructor</label>
+                        <select
+                            className="w-full p-2 border border-border bg-chrome text-content-primary rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                            value={newEntry.instructorId}
+                            onChange={e => setNewEntry({ ...newEntry, instructorId: e.target.value })}
+                        >
+                            <option value="">-- Select Instructor --</option>
+                            {instructors.filter(i => i != null).map(inst => (
+                                <option key={inst.id} value={inst.id}>
+                                    {inst.name || `${inst.firstName || ''} ${inst.lastName || ''}`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Room (Optional)</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border border-border bg-chrome text-content-primary rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                            placeholder="e.g. 101"
+                            value={newEntry.room}
+                            onChange={e => setNewEntry({ ...newEntry, room: e.target.value })}
+                        />
                     </div>
                 </div>
-            )}
+            </Modal>
 
             <ConfirmationModal
                 isOpen={confirmModal.isOpen}

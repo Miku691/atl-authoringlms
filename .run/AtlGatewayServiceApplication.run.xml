@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="AtlGatewayServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
-    <envs>
-      <env name="AUTH_JWT_SECRET" value="strongjwt_secret-this-is-my-super-secret" />
-    </envs>
+    <option name="envFilePaths">
+      <option value="$PROJECT_DIR$/.env" />
+    </option>
     <option name="MAIN_CLASS_NAME" value="com.atl.gateway.AtlGatewayServiceApplication" />
     <module name="atl-gateway-service" />
     <extension name="coverage">

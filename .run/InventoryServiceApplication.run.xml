@@ -1,10 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="InventoryServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
-    <envs>
-      <env name="INVENTORY_MYSQL_PASS" value="my-secret-atl" />
-      <env name="INVENTORY_MYSQL_URI" value="jdbc:mysql://localhost:3306/ims-inventory-db?allowPublicKeyRetrieval=true&amp;useSSL=false" />
-      <env name="INVENTORY_MYSQL_USER" value="root" />
-    </envs>
+    <option name="envFilePaths">
+      <option value="$PROJECT_DIR$/.env" />
+    </option>
     <option name="MAIN_CLASS_NAME" value="com.ims.inventory.InventoryServiceApplication" />
     <module name="ims-inventory-service" />
     <extension name="coverage">

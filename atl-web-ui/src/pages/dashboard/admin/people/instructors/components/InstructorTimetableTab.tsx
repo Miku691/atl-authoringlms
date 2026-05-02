@@ -42,7 +42,7 @@ const InstructorTimetableTab: React.FC<Props> = ({ instructorId }) => {
     };
 
     if (loading) return (
-        <div className="p-12 text-center bg-white rounded-xl border border-gray-100 italic text-gray-400">
+        <div className="p-12 text-center bg-surface rounded-xl border border-border italic text-content-muted">
             <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2 text-indigo-500" />
             Synchronizing weekly schedule...
         </div>
@@ -109,12 +109,12 @@ const InstructorTimetableTab: React.FC<Props> = ({ instructorId }) => {
 
     return (
         <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-6 border-b border-gray-50 flex justify-between items-center">
-                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
+                <div className="p-6 border-b border-border flex justify-between items-center">
+                    <h3 className="text-lg font-bold text-content-primary flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-indigo-600" /> Weekly Schedule
                     </h3>
-                    <div className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+                    <div className="text-xs font-medium text-content-muted uppercase tracking-wider">
                         Current Session 2024-25
                     </div>
                 </div>
@@ -122,10 +122,10 @@ const InstructorTimetableTab: React.FC<Props> = ({ instructorId }) => {
                 <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
                         <thead>
-                            <tr className="bg-gray-50/50">
-                                <th className="p-4 border-b border-r text-left text-[10px] font-black uppercase text-gray-400 sticky left-0 bg-gray-50 z-10">Time / Period</th>
+                            <tr className="bg-chrome/50">
+                                <th className="p-4 border-b border-r text-left text-[10px] font-black uppercase text-content-muted sticky left-0 bg-chrome z-10">Time / Period</th>
                                 {DAYS.map(day => (
-                                    <th key={day} className="p-4 border-b text-center text-[10px] font-black uppercase text-gray-400">
+                                    <th key={day} className="p-4 border-b text-center text-[10px] font-black uppercase text-content-muted">
                                         {day}
                                     </th>
                                 ))}
@@ -134,9 +134,9 @@ const InstructorTimetableTab: React.FC<Props> = ({ instructorId }) => {
                         <tbody>
                             {sortedGridRows.map((row, rowIndex) => (
                                 <tr key={rowIndex} className="group hover:bg-indigo-50/20 transition-colors">
-                                    <td className="p-4 border-b border-r sticky left-0 bg-white z-10 group-hover:bg-indigo-50/50 transition-colors">
-                                        <div className="font-bold text-gray-900 text-sm">{row.label}</div>
-                                        <div className="text-[10px] text-gray-400 font-medium flex items-center gap-1 mt-0.5">
+                                    <td className="p-4 border-b border-r sticky left-0 bg-surface z-10 group-hover:bg-indigo-50/50 transition-colors">
+                                        <div className="font-bold text-content-primary text-sm">{row.label}</div>
+                                        <div className="text-[10px] text-content-muted font-medium flex items-center gap-1 mt-0.5">
                                             <Clock className="w-3 h-3" /> {row.startTime} - {row.endTime}
                                         </div>
                                     </td>
@@ -147,16 +147,16 @@ const InstructorTimetableTab: React.FC<Props> = ({ instructorId }) => {
                                         return (
                                             <td key={dayName} className="p-2 border-b min-w-[160px]">
                                                 {entry ? (
-                                                    <div className="p-3 bg-white border border-indigo-100 rounded-xl shadow-sm hover:shadow-md transition-all group/card relative overflow-hidden">
+                                                    <div className="p-3 bg-surface border border-indigo-100 rounded-xl shadow-sm hover:shadow-md transition-all group/card relative overflow-hidden">
                                                         <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                                                         <div className="font-black text-indigo-600 text-xs uppercase truncate">{entry.subjectName || 'Subject'}</div>
-                                                        <div className="text-[10px] font-bold text-gray-500 mt-1 uppercase truncate">{entry.offeringName}</div>
-                                                        <div className="flex items-center gap-1 mt-2 text-[9px] font-black text-gray-400 uppercase">
+                                                        <div className="text-[10px] font-bold text-content-secondary mt-1 uppercase truncate">{entry.offeringName}</div>
+                                                        <div className="flex items-center gap-1 mt-2 text-[9px] font-black text-content-muted uppercase">
                                                             <MapPin className="w-3 h-3" /> {entry.room || 'TBA'}
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <div className="h-full min-h-[60px] flex items-center justify-center border border-dashed border-gray-100 rounded-xl bg-gray-50/30">
+                                                    <div className="h-full min-h-[60px] flex items-center justify-center border border-dashed border-border rounded-xl bg-chrome/30">
                                                         <span className="text-[10px] font-bold text-gray-300 uppercase letter-spacing-widest">Free</span>
                                                     </div>
                                                 )}
@@ -171,7 +171,7 @@ const InstructorTimetableTab: React.FC<Props> = ({ instructorId }) => {
             </div>
 
             <div className="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 flex gap-4 items-start">
-                <div className="p-2 bg-white rounded-lg text-indigo-600 shadow-sm shrink-0">
+                <div className="p-2 bg-surface rounded-lg text-indigo-600 shadow-sm shrink-0">
                     <Clock className="w-5 h-5" />
                 </div>
                 <div>

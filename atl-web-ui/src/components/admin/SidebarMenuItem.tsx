@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import type { MenuItem } from '../../config/SidebarConfig';
 
 interface SidebarMenuItemProps {
@@ -12,42 +12,102 @@ interface SidebarMenuItemProps {
     depth: number;
 }
 
-const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({ item, isOpen, expandedMenus, toggleSubMenu, location, depth }) => {
-    const isExpanded = expandedMenus.includes(item.path);
-    const isActiveParent = location.startsWith(item.path);
+// ── Design tokens: all use CSS variables so they auto-theme ─────────────
+const T = {
+    text:         'var(--text-secondary)',
+    textHover:    'var(--text-primary)',
+    textActive:   'var(--brand)',
+    iconDefault:  'var(--text-muted)',
+    iconActive:   'var(--brand)',
+    bgHover:      'var(--brand-subtle)',
+    bgActive:     'var(--brand-subtle)',
+    activeBorder: 'var(--brand)',
+    indent:       'var(--border)',
+};
 
-    // Indentation for nested items
-    const paddingLeft = depth > 0 ? `${depth * 12 + 12}px` : '12px';
+const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({
+    item,
+    isOpen,
+    expandedMenus,
+    toggleSubMenu,
+    location,
+    depth,
+}) => {
+    const isExpanded     = expandedMenus.includes(item.path);
+    const isActiveParent = location.startsWith(item.path) && item.path !== '/dashboard';
 
+    const rowBase: React.CSSProperties = {
+        display:       'flex',
+        alignItems:    'center',
+        gap:           '10px',
+        width:         '100%',
+        padding:       isOpen
+            ? depth === 0 ? '8px 10px' : '6px 10px 6px 14px'
+            : '8px 0',
+        justifyContent: !isOpen ? 'center' : undefined,
+        borderRadius:  '8px',
+        cursor:        'pointer',
+        transition:    'background 150ms ease, color 150ms ease',
+        position:      'relative',
+        textAlign:     'left',
+        border:        'none',
+        background:    'transparent',
+        textDecoration:'none',
+    };
+
+    // ── Parent with sub-items ───────────────────────────────────────
     if (item.subItems && item.subItems.length > 0) {
+        const isActive = isActiveParent;
+
         return (
-            <div className="mb-1">
+            <div style={{ marginBottom: depth === 0 ? '2px' : '1px' }}>
                 <button
                     onClick={() => toggleSubMenu(item.path)}
-                    className={`
-                        w-full flex items-center gap-3 py-3 rounded-xl transition-all duration-200 group
-                        ${isActiveParent ? 'text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'}
-                        ${!isOpen && 'justify-center'}
-                    `}
-                    style={{ paddingLeft: !isOpen ? '12px' : paddingLeft, paddingRight: '12px' }}
+                    style={{
+                        ...rowBase,
+                        color:      isActive ? T.textActive : T.text,
+                        background: isActive && isExpanded ? T.bgActive : 'transparent',
+                    }}
+                    onMouseEnter={e => {
+                        if (!(isActive && isExpanded)) {
+                            (e.currentTarget as HTMLButtonElement).style.background = T.bgHover;
+                            (e.currentTarget as HTMLButtonElement).style.color = T.textHover;
+                        }
+                    }}
+                    onMouseLeave={e => {
+                        if (!(isActive && isExpanded)) {
+                            (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+                            (e.currentTarget as HTMLButtonElement).style.color = isActive ? T.textActive : T.text;
+                        }
+                    }}
                 >
-                    {item.icon && <item.icon className={`w-5 h-5 flex-shrink-0 ${!isOpen && 'mx-auto'}`} />}
+                    {isActive && isExpanded && isOpen && (
+                        <span style={{ position: 'absolute', left: 0, top: '6px', bottom: '6px', width: '3px', borderRadius: '0 3px 3px 0', background: T.activeBorder }} />
+                    )}
+
+                    {item.icon && (
+                        <item.icon style={{ width: '16px', height: '16px', flexShrink: 0, color: isActive ? T.iconActive : T.iconDefault }} />
+                    )}
+
                     {isOpen && (
                         <>
-                            <span className="font-medium text-sm truncate flex-1 text-left">{item.label}</span>
-                            <ChevronDown
-                                className={`w-4 h-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-                            />
+                            <span style={{ flex: 1, fontSize: depth === 0 ? '13px' : '12px', fontWeight: depth === 0 ? 600 : 500, color: 'inherit', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {item.label}
+                            </span>
+                            {isExpanded
+                                ? <ChevronDown  style={{ width: '14px', height: '14px', flexShrink: 0, color: T.iconDefault }} />
+                                : <ChevronRight style={{ width: '14px', height: '14px', flexShrink: 0, color: T.iconDefault }} />
+                            }
                         </>
                     )}
                 </button>
 
                 {isOpen && isExpanded && (
-                    <div className="space-y-1">
-                        {item.subItems.map((subItem) => (
+                    <div style={{ marginTop: '2px', marginLeft: '10px', paddingLeft: '14px', borderLeft: `1.5px solid ${T.indent}` }}>
+                        {item.subItems.map(sub => (
                             <SidebarMenuItem
-                                key={subItem.path}
-                                item={subItem}
+                                key={sub.path}
+                                item={sub}
                                 isOpen={isOpen}
                                 expandedMenus={expandedMenus}
                                 toggleSubMenu={toggleSubMenu}
@@ -61,31 +121,53 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({ item, isOpen, expande
         );
     }
 
+    // ── Leaf item ───────────────────────────────────────────────────
     return (
-        <NavLink
-            to={item.path}
-            className={({ isActive }) => `
-                flex items-center gap-3 py-3 rounded-xl transition-all duration-200 group
-                ${isActive
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                }
-                ${!isOpen && 'justify-center'}
-            `}
-            style={{ paddingLeft: !isOpen ? '12px' : paddingLeft, paddingRight: '12px' }}
-        >
-            {item.icon && <item.icon className={`w-5 h-5 flex-shrink-0 ${!isOpen && 'mx-auto'}`} />}
-            {isOpen && (
-                <span className="font-medium text-sm truncate">{item.label}</span>
-            )}
-
-            {/* Tooltip for collapsed state */}
-            {!isOpen && depth === 0 && (
-                <div className="absolute left-16 bg-slate-900 text-white px-3 py-1.5 rounded-md text-xs font-medium opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity border border-slate-700 shadow-xl z-50 whitespace-nowrap">
-                    {item.label}
-                </div>
-            )}
-        </NavLink>
+        <div style={{ marginBottom: '1px', position: 'relative' }}>
+            <NavLink
+                to={item.path}
+                style={({ isActive }) => ({
+                    ...rowBase,
+                    color:      isActive ? T.textActive : T.text,
+                    background: isActive ? T.bgActive   : 'transparent',
+                    fontWeight: isActive ? 600 : 500,
+                })}
+                onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                    const el = e.currentTarget as HTMLAnchorElement;
+                    el.style.background = T.bgHover;
+                    el.style.color = T.textHover;
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
+                    const el = e.currentTarget as HTMLAnchorElement;
+                    el.style.background = '';
+                    el.style.color = '';
+                }}
+            >
+                {({ isActive }) => (
+                    <>
+                        {isActive && isOpen && (
+                            <span style={{ position: 'absolute', left: 0, top: '5px', bottom: '5px', width: '3px', borderRadius: '0 3px 3px 0', background: T.activeBorder }} />
+                        )}
+                        {item.icon && (
+                            <item.icon style={{ width: '15px', height: '15px', flexShrink: 0, color: isActive ? T.iconActive : T.iconDefault }} />
+                        )}
+                        {isOpen && (
+                            <span style={{ flex: 1, fontSize: depth === 0 ? '13px' : '12px', color: isActive ? T.textActive : 'inherit', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {item.label}
+                            </span>
+                        )}
+                        {!isOpen && depth === 0 && (
+                            <div
+                                className="sidebar-tooltip"
+                                style={{ position: 'absolute', left: '52px', top: '50%', transform: 'translateY(-50%)', background: 'var(--text-primary)', color: 'var(--bg-main)', padding: '5px 10px', borderRadius: '8px', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap', pointerEvents: 'none', opacity: 0, zIndex: 999, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+                            >
+                                {item.label}
+                            </div>
+                        )}
+                    </>
+                )}
+            </NavLink>
+        </div>
     );
 };
 

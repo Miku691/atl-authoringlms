@@ -5,6 +5,7 @@ import { financeService } from '../../../../api/financeService';
 import type { FeeHead } from '../../../../types/finance';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 import FloatingLabelInput from '../../../../components/common/FloatingLabelInput';
+import Modal from '../../../../components/common/Modal';
 
 const FeeHeadManagementPage: React.FC = () => {
     const [feeHeads, setFeeHeads] = useState<FeeHead[]>([]);
@@ -85,25 +86,25 @@ const FeeHeadManagementPage: React.FC = () => {
         }
     };
 
-    const filteredHeads = feeHeads.filter(head => 
-        head.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    const filteredHeads = feeHeads.filter(head =>
+        head.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         head.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
-        <div className="p-6 space-y-6 bg-gray-50/50 min-h-screen">
+        <div className="p-6 space-y-6 bg-chrome/50 min-h-screen">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface p-6 rounded-2xl shadow-sm border border-border">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <h1 className="text-2xl font-bold text-content-primary flex items-center gap-2">
                         <DollarIcon className="text-indigo-600" />
                         Fee Head Management
                     </h1>
-                    <p className="text-gray-500 text-sm font-medium mt-1">Define categories for various institutional fees like Tuition, Transport, etc.</p>
+                    <p className="text-content-secondary text-sm font-medium mt-1">Define categories for various institutional fees like Tuition, Transport, etc.</p>
                 </div>
                 <button
                     onClick={handleOpenCreateModal}
-                    className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2.5 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 font-bold"
+                    className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-2.5 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-500/20 font-bold"
                 >
                     <Plus size={18} />
                     New Fee Head
@@ -112,13 +113,13 @@ const FeeHeadManagementPage: React.FC = () => {
 
             {/* Stats / Info */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4">
+                <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm flex items-center gap-4">
                     <div className="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
                         <DollarIcon size={24} />
                     </div>
                     <div>
-                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Heads</p>
-                        <h3 className="text-2xl font-black text-gray-900">{feeHeads.length}</h3>
+                        <p className="text-xs font-bold text-content-muted uppercase tracking-widest">Total Heads</p>
+                        <h3 className="text-2xl font-black text-content-primary">{feeHeads.length}</h3>
                     </div>
                 </div>
                 <div className="md:col-span-2 bg-indigo-900 text-white p-6 rounded-2xl shadow-xl flex items-center gap-6 overflow-hidden relative">
@@ -128,7 +129,7 @@ const FeeHeadManagementPage: React.FC = () => {
                             Quick Tip
                         </h4>
                         <p className="text-indigo-100 text-xs leading-relaxed">
-                            Fee Heads are the fundamental building blocks of Fee Structures. 
+                            Fee Heads are the fundamental building blocks of Fee Structures.
                             Ensure each head clearly represents a single cost component for accurate reporting.
                         </p>
                     </div>
@@ -136,22 +137,22 @@ const FeeHeadManagementPage: React.FC = () => {
             </div>
 
             {/* Filters & Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-4 border-b border-gray-50 flex items-center gap-4">
+            <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
+                <div className="p-4 border-b border-border flex items-center gap-4">
                     <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <input 
-                            type="text" 
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-content-muted w-4 h-4" />
+                        <input
+                            type="text"
                             placeholder="Search fee heads..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
+                            className="w-full pl-10 pr-4 py-2 bg-chrome border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all font-medium"
                         />
                     </div>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <thead className="bg-chrome/50 text-[10px] font-black text-content-muted uppercase tracking-widest">
                             <tr>
                                 <th className="px-6 py-4">Fee Head Name</th>
                                 <th className="px-6 py-4 text-center">Status</th>
@@ -165,21 +166,21 @@ const FeeHeadManagementPage: React.FC = () => {
                                     <td colSpan={4} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center gap-2">
                                             <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-                                            <p className="text-sm font-bold text-gray-400 uppercase tracking-tight">Synchronizing data...</p>
+                                            <p className="text-sm font-bold text-content-muted uppercase tracking-tight">Synchronizing data...</p>
                                         </div>
                                     </td>
                                 </tr>
                             ) : filteredHeads.length === 0 ? (
                                 <tr>
-                                    <td colSpan={4} className="px-6 py-12 text-center text-gray-500 font-medium italic">
+                                    <td colSpan={4} className="px-6 py-12 text-center text-content-secondary font-medium italic">
                                         No fee heads found. Click "New Fee Head" to get started.
                                     </td>
                                 </tr>
                             ) : (
                                 filteredHeads.map(head => (
-                                    <tr key={head.id} className="hover:bg-gray-50/50 transition-colors group">
+                                    <tr key={head.id} className="hover:bg-chrome/50 transition-colors group">
                                         <td className="px-6 py-4">
-                                            <div className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">
+                                            <div className="font-bold text-content-primary group-hover:text-indigo-600 transition-colors uppercase tracking-tight">
                                                 {head.name}
                                             </div>
                                         </td>
@@ -189,7 +190,7 @@ const FeeHeadManagementPage: React.FC = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 max-w-sm">
-                                            <p className="text-sm text-gray-500 font-medium truncate italic">
+                                            <p className="text-sm text-content-secondary font-medium truncate italic">
                                                 {head.description || 'No description provided'}
                                             </p>
                                         </td>
@@ -197,14 +198,14 @@ const FeeHeadManagementPage: React.FC = () => {
                                             <div className="flex justify-end gap-1 opacity-10 md:opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => handleEdit(head)}
-                                                    className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                    className="p-2 text-content-muted hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                                                     title="Edit Head"
                                                 >
                                                     <Edit size={16} />
                                                 </button>
                                                 <button
                                                     onClick={() => confirmDelete(head)}
-                                                    className="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                    className="p-2 text-content-muted hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                                                     title="Remove Head"
                                                 >
                                                     <Trash2 size={16} />
@@ -220,52 +221,40 @@ const FeeHeadManagementPage: React.FC = () => {
             </div>
 
             {/* Create / Edit Modal */}
-            {isCreateModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-300">
-                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                            <div className="flex items-center gap-2">
-                                <Plus size={20} className="text-indigo-600" />
-                                <h3 className="text-lg font-bold text-gray-900 uppercase tracking-tight">
-                                    {isEditMode ? 'Modify Fee Head' : 'Add New Fee Head'}
-                                </h3>
-                            </div>
-                        </div>
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                            <FloatingLabelInput
-                                label="Fee Head Identifier *"
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                required
-                            />
-                            <div className="space-y-1">
-                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest pl-1">Description / Purpose</label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-medium min-h-[100px] resize-none"
-                                    placeholder="Enter details about this fee category..."
-                                />
-                            </div>
-                            <div className="flex justify-end gap-3 pt-4 border-t border-gray-50">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsCreateModalOpen(false)}
-                                    className="px-6 py-2.5 text-sm font-bold text-gray-500 hover:bg-gray-50 rounded-xl transition-all"
-                                >
-                                    Dismiss
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="px-10 py-2.5 bg-indigo-600 text-white text-sm font-black rounded-xl hover:bg-indigo-700 shadow-xl shadow-indigo-100 transition-all uppercase tracking-widest"
-                                >
-                                    {isEditMode ? 'Update' : 'Confirm'}
-                                </button>
-                            </div>
-                        </form>
+            <Modal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                title={isEditMode ? 'Modify Fee Head' : 'Add New Fee Head'}
+                icon={<DollarIcon size={18} />}
+                size="sm"
+                footer={
+                    <>
+                        <button type="button" className="modal-btn-secondary" onClick={() => setIsCreateModalOpen(false)}>Dismiss</button>
+                        <button type="submit" form="fee-head-form" className="modal-btn-primary">
+                            {isEditMode ? 'Update' : 'Confirm'}
+                        </button>
+                    </>
+                }
+            >
+                <form id="fee-head-form" onSubmit={handleSubmit} className="space-y-4">
+                    <FloatingLabelInput
+                        label="Fee Head Identifier *"
+                        value={formData.name}
+                        onChange={e => setFormData({ ...formData, name: e.target.value })}
+                        required
+                    />
+                    <div className="space-y-1">
+                        <label className="block text-[10px] font-black uppercase tracking-widest pl-1" style={{ color: 'var(--text-muted)' }}>Description / Purpose</label>
+                        <textarea
+                            value={formData.description}
+                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                            className="w-full px-4 py-3 border rounded-xl outline-none text-sm font-medium min-h-[100px] resize-none"
+                            style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                            placeholder="Enter details about this fee category..."
+                        />
                     </div>
-                </div>
-            )}
+                </form>
+            </Modal>
 
             <ConfirmationModal
                 isOpen={isDeleteModalOpen}

@@ -66,20 +66,20 @@ const StudentDocumentManagementPage: React.FC = () => {
         <div className="space-y-8 animate-fade-in">
             {/* Header */}
             <div>
-                <h1 className="text-3xl font-black text-gray-900 font-outfit uppercase tracking-tight flex items-center gap-3">
+                <h1 className="text-3xl font-black text-content-primary font-outfit uppercase tracking-tight flex items-center gap-3">
                     <ShieldCheck className="w-8 h-8 text-indigo-600" /> Integrity Workspace
                 </h1>
-                <p className="text-gray-500 font-medium mt-1">Review and verify student identity and compliance records</p>
+                <p className="text-content-secondary font-medium mt-1">Review and verify student identity and compliance records</p>
             </div>
 
             {/* Quick Filters */}
             <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1 relative group">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-indigo-600 transition-colors" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-content-muted group-focus-within:text-indigo-600 transition-colors" />
                     <input
                         type="text"
                         placeholder="Search by student or document type..."
-                        className="w-full pl-12 pr-6 py-4 bg-white rounded-2xl text-sm font-bold text-gray-700 shadow-sm border border-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+                        className="w-full pl-12 pr-6 py-4 bg-surface rounded-2xl text-sm font-bold text-content-primary shadow-sm border border-border focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -91,8 +91,8 @@ const StudentDocumentManagementPage: React.FC = () => {
                             key={status}
                             onClick={() => setFilterStatus(status)}
                             className={`px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${filterStatus === status
-                                ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-100'
-                                : 'bg-white text-gray-400 hover:text-gray-600 border border-gray-100'
+                                ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 dark:shadow-none'
+                                : 'bg-surface text-content-muted hover:text-content-secondary border border-border'
                                 }`}
                         >
                             {status}
@@ -105,39 +105,39 @@ const StudentDocumentManagementPage: React.FC = () => {
             {loading ? (
                 <div className="p-20 text-center">
                     <Loader2 className="w-12 h-12 animate-spin text-indigo-500 mx-auto mb-4" />
-                    <p className="text-gray-500 font-bold uppercase tracking-widest text-xs">Parsing encrypted data streams...</p>
+                    <p className="text-content-secondary font-bold uppercase tracking-widest text-xs">Parsing encrypted data streams...</p>
                 </div>
             ) : filteredDocs.length === 0 ? (
-                <div className="bg-white rounded-[2.5rem] p-20 text-center border-2 border-dashed border-gray-100">
-                    <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <div className="bg-surface rounded-[2.5rem] p-20 text-center border-2 border-dashed border-border">
+                    <div className="w-20 h-20 bg-chrome rounded-3xl flex items-center justify-center mx-auto mb-6">
                         <CheckCircle className="w-10 h-10 text-emerald-200" />
                     </div>
-                    <h3 className="text-xl font-black text-gray-900 font-outfit uppercase">All Clear</h3>
-                    <p className="text-gray-400 font-medium mt-2">No documents currently matching this filter</p>
+                    <h3 className="text-xl font-black text-content-primary font-outfit uppercase">All Clear</h3>
+                    <p className="text-content-muted font-medium mt-2">No documents currently matching this filter</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {filteredDocs.map((doc, idx) => (
-                        <div key={doc.id} className="bg-white rounded-3xl p-6 border border-gray-100 hover:border-indigo-200 transition-all group animate-fade-in-up shadow-sm hover:shadow-xl" style={{ animationDelay: `${idx * 50}ms` }}>
+                        <div key={doc.id} className="bg-surface rounded-3xl p-6 border border-border hover:border-indigo-500/30 transition-all group animate-fade-in-up shadow-sm dark:shadow-none hover:shadow-xl dark:hover:shadow-black/20" style={{ animationDelay: `${idx * 50}ms` }}>
                             <div className="flex items-start justify-between mb-6">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600">
+                                    <div className="w-14 h-14 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-600">
                                         <FileText className="w-7 h-7" />
                                     </div>
                                     <div>
-                                        <h4 className="font-black text-gray-900 font-outfit uppercase tracking-tight leading-tight">
+                                        <h4 className="font-black text-content-primary font-outfit uppercase tracking-tight leading-tight">
                                             {doc.documentType.replace('_', ' ')}
                                         </h4>
                                         <div className="flex items-center gap-2 mt-1">
-                                            <User className="w-3.5 h-3.5 text-gray-400" />
+                                            <User className="w-3.5 h-3.5 text-content-muted" />
                                             <span className="text-xs font-bold text-indigo-600 tracking-tighter">STUDENT: {doc.studentId.substring(0, 8)}...</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${doc.verificationStatus === 'PENDING' ? 'bg-amber-100 text-amber-700' :
-                                    doc.verificationStatus === 'VERIFIED' ? 'bg-emerald-100 text-emerald-700' :
-                                        'bg-red-100 text-red-700'
+                                <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${doc.verificationStatus === 'PENDING' ? 'bg-amber-500/10 text-amber-600' :
+                                    doc.verificationStatus === 'VERIFIED' ? 'bg-emerald-500/10 text-emerald-600' :
+                                        'bg-red-500/10 text-red-600'
                                     }`}>
                                     {doc.verificationStatus === 'PENDING' && <Clock className="w-3 h-3" />}
                                     {doc.verificationStatus}
@@ -148,16 +148,16 @@ const StudentDocumentManagementPage: React.FC = () => {
                                 {doc.documentType.includes('PHOTO') || doc.fileUrl?.match(/\.(jpg|jpeg|png|gif)$/i) ? (
                                     <img src={documentService.getViewUrl(doc.id)} className="w-full h-full object-cover opacity-80 group-hover/preview:opacity-100 transition-opacity" alt="Preview" />
                                 ) : (
-                                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-500 scale-90 group-hover/preview:scale-100 transition-transform">
+                                    <div className="w-full h-full flex flex-col items-center justify-center text-content-secondary scale-90 group-hover/preview:scale-100 transition-transform">
                                         <FileText className="w-16 h-16 mb-2 opacity-20" />
-                                        <span className="font-black text-[10px] uppercase tracking-widest text-gray-600">Secure Document Node</span>
+                                        <span className="font-black text-[10px] uppercase tracking-widest text-content-secondary">Secure Document Node</span>
                                     </div>
                                 )}
                                 <div className="absolute inset-0 bg-indigo-900/40 opacity-0 group-hover/preview:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                                    <a href={documentService.getViewUrl(doc.id)} target="_blank" rel="noreferrer" className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-indigo-600 shadow-xl hover:scale-110 transition-transform">
+                                    <a href={documentService.getViewUrl(doc.id)} target="_blank" rel="noreferrer" className="w-12 h-12 bg-surface rounded-xl flex items-center justify-center text-indigo-600 shadow-xl hover:scale-110 transition-transform">
                                         <Eye className="w-6 h-6" />
                                     </a>
-                                    <a href={documentService.getViewUrl(doc.id)} download className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-emerald-600 shadow-xl hover:scale-110 transition-transform">
+                                    <a href={documentService.getViewUrl(doc.id)} download className="w-12 h-12 bg-surface rounded-xl flex items-center justify-center text-emerald-600 shadow-xl hover:scale-110 transition-transform">
                                         <Download className="w-6 h-6" />
                                     </a>
                                 </div>
@@ -167,14 +167,14 @@ const StudentDocumentManagementPage: React.FC = () => {
                                 <button
                                     onClick={() => handleVerify(doc.id, 'VERIFIED')}
                                     disabled={doc.verificationStatus === 'VERIFIED'}
-                                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-emerald-50 text-emerald-700 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-100 transition-all disabled:opacity-50"
+                                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-emerald-500/10 text-emerald-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-500/20 transition-all disabled:opacity-50"
                                 >
                                     <CheckCircle className="w-4 h-4" /> Approve
                                 </button>
                                 <button
                                     onClick={() => handleVerify(doc.id, 'REJECTED')}
                                     disabled={doc.verificationStatus === 'REJECTED'}
-                                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-red-50 text-red-700 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-100 transition-all disabled:opacity-50"
+                                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-red-500/10 text-red-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-red-500/20 transition-all disabled:opacity-50"
                                 >
                                     <XCircle className="w-4 h-4" /> Reject
                                 </button>

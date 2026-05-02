@@ -143,14 +143,14 @@ const SetupMasterPage: React.FC = () => {
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-8">
             <div className="flex flex-col gap-2">
-                <div className="flex items-center gap-2 text-slate-500 text-sm">
+                <div className="flex items-center gap-2 text-content-secondary text-sm">
                     <Settings className="w-4 h-4" />
                     <span>System</span>
                     <ArrowRight className="w-3 h-3" />
-                    <span className="text-slate-900 font-medium">Setup Master</span>
+                    <span className="text-content-primary font-medium">Setup Master</span>
                 </div>
-                <h1 className="text-2xl font-bold text-slate-900">One-Click Bulk Setup</h1>
-                <p className="text-slate-500 max-w-2xl">
+                <h1 className="text-2xl font-bold text-content-primary">One-Click Bulk Setup</h1>
+                <p className="text-content-secondary max-w-2xl">
                     Quickly populate your institution with standard default data. Once initialized, 
                     you can manage these records individually in their respective modules.
                 </p>
@@ -164,25 +164,25 @@ const SetupMasterPage: React.FC = () => {
                     return (
                         <div 
                             key={category.id}
-                            className={`group relative bg-white rounded-2xl border transition-all duration-300 overflow-hidden ${
+                            className={`group relative bg-surface rounded-2xl border transition-all duration-300 overflow-hidden ${
                                 isDone 
                                 ? 'border-emerald-100 bg-emerald-50/10' 
-                                : 'border-slate-200 hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-500/5'
+                                : 'border-border hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-500/5'
                             }`}
                         >
                             <div className="p-6 space-y-4">
                                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${
-                                    isDone ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-600'
+                                    isDone ? 'bg-emerald-100 text-emerald-600' : 'bg-chrome text-content-secondary group-hover:bg-indigo-100 group-hover:text-indigo-600'
                                 }`}>
                                     <category.icon className="w-6 h-6" />
                                 </div>
 
                                 <div className="space-y-1">
-                                    <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                                    <h3 className="font-bold text-content-primary flex items-center gap-2">
                                         {category.title}
                                         {isDone && <CheckCircle2 className="w-4 h-4 text-emerald-500" />}
                                     </h3>
-                                    <p className="text-sm text-slate-500 leading-relaxed">
+                                    <p className="text-sm text-content-secondary leading-relaxed">
                                         {category.description}
                                     </p>
                                 </div>
@@ -194,7 +194,7 @@ const SetupMasterPage: React.FC = () => {
                                         isDone
                                         ? 'bg-emerald-100 text-emerald-700 cursor-not-allowed'
                                         : isRunning
-                                        ? 'bg-slate-100 text-slate-400 cursor-wait'
+                                        ? 'bg-chrome text-content-muted cursor-wait'
                                         : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200'
                                     }`}
                                 >

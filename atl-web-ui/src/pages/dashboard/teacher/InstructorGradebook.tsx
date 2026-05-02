@@ -138,7 +138,7 @@ export default function InstructorGradebook() {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh]">
                 <Loader2 className="w-10 h-10 animate-spin text-indigo-600 mb-4" />
-                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Opening Gradebook...</p>
+                <p className="text-content-secondary font-bold uppercase tracking-widest text-[10px]">Opening Gradebook...</p>
             </div>
         );
     }
@@ -148,7 +148,7 @@ export default function InstructorGradebook() {
     return (
         <div className="space-y-6 pb-12 animate-fade-in">
             {/* Header Section */}
-            <div className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm relative overflow-hidden">
+            <div className="bg-surface rounded-3xl p-8 border border-border shadow-sm relative overflow-hidden">
                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                     <div className="flex items-center gap-5">
                         <div className="w-16 h-16 bg-slate-900 text-white rounded-2xl shadow-xl flex items-center justify-center">
@@ -156,7 +156,7 @@ export default function InstructorGradebook() {
                         </div>
                         <div>
                             <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">Instructor Workspace</p>
-                            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Gradebook</h1>
+                            <h1 className="text-3xl font-black text-content-primary tracking-tight">Gradebook</h1>
                         </div>
                     </div>
 
@@ -181,7 +181,7 @@ export default function InstructorGradebook() {
                             className={`px-6 py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all border-2 whitespace-nowrap ${
                                 selectedOfferingId === off.id 
                                 ? 'bg-slate-900 text-white border-slate-900 shadow-lg' 
-                                : 'bg-white text-slate-500 border-slate-50 hover:border-indigo-100 hover:text-indigo-600'
+                                : 'bg-surface text-content-secondary border-border hover:border-indigo-100 hover:text-indigo-600'
                             }`}
                         >
                             {off.name}
@@ -199,21 +199,21 @@ export default function InstructorGradebook() {
                                 className={`p-5 rounded-2xl border-2 transition-all text-left relative overflow-hidden group ${
                                     selectedScheduleId === sch.id
                                     ? 'bg-indigo-50 border-indigo-600 shadow-sm'
-                                    : 'bg-white border-slate-50 hover:border-indigo-100 hover:bg-slate-50/50'
+                                    : 'bg-surface border-border hover:border-indigo-100 hover:bg-chrome/50'
                                 }`}
                             >
                                 <div className="flex justify-between items-start mb-4">
                                     <div className={`p-3 rounded-xl transition-colors ${
-                                        selectedScheduleId === sch.id ? 'bg-indigo-600 text-white' : 'bg-slate-50 text-slate-400 group-hover:text-indigo-600'
+                                        selectedScheduleId === sch.id ? 'bg-indigo-600 text-white' : 'bg-chrome text-content-muted group-hover:text-indigo-600'
                                     }`}>
                                         <Trophy className="w-5 h-5" />
                                     </div>
                                     <ChevronRight className={`w-4 h-4 ${selectedScheduleId === sch.id ? 'text-indigo-600' : 'text-slate-200'}`} />
                                 </div>
-                                <h3 className={`font-black uppercase tracking-tight text-sm mb-1 ${selectedScheduleId === sch.id ? 'text-indigo-900' : 'text-slate-900'}`}>
+                                <h3 className={`font-black uppercase tracking-tight text-sm mb-1 ${selectedScheduleId === sch.id ? 'text-indigo-900' : 'text-content-primary'}`}>
                                     {sch.subjectName || 'Internal Paper'}
                                 </h3>
-                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-content-muted uppercase tracking-widest">
                                     <Calendar className="w-3.5 h-3.5" />
                                     {new Date(sch.examDate).toLocaleDateString()}
                                 </div>
@@ -225,11 +225,11 @@ export default function InstructorGradebook() {
 
             {/* Students Table */}
             {selectedScheduleId && (
-                <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden animate-slide-up">
-                    <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
+                <div className="bg-surface rounded-3xl border border-border shadow-sm overflow-hidden animate-slide-up">
+                    <div className="px-8 py-6 border-b border-border flex justify-between items-center bg-chrome/30">
                         <div>
-                            <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">Student Performance List</h3>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Maximum Marks: {selectedSchedule?.maxMarks} | Pass Marks: {selectedSchedule?.passMarks}</p>
+                            <h3 className="text-xl font-black text-content-primary uppercase tracking-tighter">Student Performance List</h3>
+                            <p className="text-[10px] font-bold text-content-muted uppercase tracking-widest mt-1">Maximum Marks: {selectedSchedule?.maxMarks} | Pass Marks: {selectedSchedule?.passMarks}</p>
                         </div>
                         <div className="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
                             <Users className="w-3.5 h-3.5" />
@@ -239,7 +239,7 @@ export default function InstructorGradebook() {
 
                     <div className="overflow-x-auto">
                         <table className="w-full">
-                            <thead className="bg-slate-50/50 text-slate-400 font-black text-[10px] uppercase tracking-widest">
+                            <thead className="bg-chrome/50 text-content-muted font-black text-[10px] uppercase tracking-widest">
                                 <tr>
                                     <th className="px-8 py-4 text-left">Student Info</th>
                                     <th className="px-6 py-4 text-center">Status</th>
@@ -249,15 +249,15 @@ export default function InstructorGradebook() {
                             </thead>
                             <tbody className="divide-y divide-slate-50">
                                 {marks.map((m, idx) => (
-                                    <tr key={m.studentId} className="hover:bg-slate-50/30 transition-colors">
+                                    <tr key={m.studentId} className="hover:bg-chrome/30 transition-colors">
                                         <td className="px-8 py-5">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center font-black text-slate-400 text-xs">
+                                                <div className="w-10 h-10 bg-chrome rounded-xl flex items-center justify-center font-black text-content-muted text-xs">
                                                     {idx + 1}
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-slate-800 text-sm">{m.studentName}</h4>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase">Roll: {m.rollNo || 'N/A'}</p>
+                                                    <h4 className="font-bold text-content-primary text-sm">{m.studentName}</h4>
+                                                    <p className="text-[10px] font-bold text-content-muted uppercase">Roll: {m.rollNo || 'N/A'}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -282,8 +282,8 @@ export default function InstructorGradebook() {
                                                     onChange={(e) => handleMarksChange(m.studentId, e.target.value)}
                                                     className={`w-full px-4 py-2.5 rounded-xl border-2 transition-all font-black text-lg outline-none text-center ${
                                                         m.isAbsent 
-                                                        ? 'bg-slate-100 border-slate-100 text-slate-300' 
-                                                        : 'bg-white border-slate-50 focus:border-indigo-600 text-slate-900'
+                                                        ? 'bg-chrome border-border text-slate-300' 
+                                                        : 'bg-surface border-border focus:border-indigo-600 text-content-primary'
                                                     }`}
                                                     placeholder="0"
                                                 />
@@ -299,7 +299,7 @@ export default function InstructorGradebook() {
                                                 type="text"
                                                 value={m.remarks}
                                                 onChange={(e) => setMarks(prev => prev.map(mm => mm.studentId === m.studentId ? { ...mm, remarks: e.target.value } : mm))}
-                                                className="w-full px-4 py-2.5 rounded-xl border-2 border-slate-50 focus:border-indigo-600 outline-none font-bold text-slate-600 text-xs transition-all"
+                                                className="w-full px-4 py-2.5 rounded-xl border-2 border-border focus:border-indigo-600 outline-none font-bold text-content-secondary text-xs transition-all"
                                                 placeholder="Add performance note..."
                                             />
                                         </td>
@@ -312,12 +312,12 @@ export default function InstructorGradebook() {
             )}
             
             {!selectedScheduleId && offerings.length > 0 && (
-                <div className="text-center py-20 bg-white rounded-3xl border-2 border-dashed border-slate-100 max-w-2xl mx-auto mt-12">
-                    <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="text-center py-20 bg-surface rounded-3xl border-2 border-dashed border-border max-w-2xl mx-auto mt-12">
+                    <div className="w-16 h-16 bg-chrome rounded-full flex items-center justify-center mx-auto mb-4">
                         <CheckCircle2 className="w-8 h-8 text-slate-200" />
                     </div>
-                    <h3 className="text-slate-900 font-black uppercase tracking-widest text-sm">Select Assessment</h3>
-                    <p className="text-slate-400 font-bold text-[10px] uppercase mt-1">Please select an offering and a paper to begin marking</p>
+                    <h3 className="text-content-primary font-black uppercase tracking-widest text-sm">Select Assessment</h3>
+                    <p className="text-content-muted font-bold text-[10px] uppercase mt-1">Please select an offering and a paper to begin marking</p>
                 </div>
             )}
         </div>

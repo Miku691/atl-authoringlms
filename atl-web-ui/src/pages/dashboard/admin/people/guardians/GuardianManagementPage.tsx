@@ -20,6 +20,7 @@ import {
 import toast from 'react-hot-toast';
 import FloatingLabelInput from '../../../../../components/common/FloatingLabelInput';
 import { User, Briefcase } from 'lucide-react';
+import Modal from '../../../../../components/common/Modal';
 
 const GuardianManagementPage: React.FC = () => {
     const { user } = useSelector((state: RootState) => state.auth);
@@ -136,24 +137,24 @@ const GuardianManagementPage: React.FC = () => {
     return (
         <div className="space-y-6 p-6 max-w-7xl mx-auto">
             {/* Header */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface p-6 rounded-2xl shadow-sm border border-border">
                 <div className="flex items-center gap-4">
-                    <div className="p-3 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-100">
+                    <div className="p-3 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-600/20 dark:shadow-none">
                         <Users className="w-6 h-6" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-black text-gray-900 tracking-tight">Guardian Network</h1>
-                        <p className="text-sm text-gray-500 font-medium">Manage family contacts and student links</p>
+                        <h1 className="text-2xl font-black text-content-primary tracking-tight">Guardian Network</h1>
+                        <p className="text-sm text-content-secondary font-medium">Manage family contacts and student links</p>
                     </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                     <div className="relative group">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-600 transition-colors" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted group-focus-within:text-indigo-600 transition-colors" />
                         <input
                             type="text"
                             placeholder="Search by name, phone or email..."
-                            className="pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all w-full md:w-80 shadow-sm"
+                            className="pl-10 pr-4 py-2.5 bg-chrome border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-surface transition-all w-full md:w-80 shadow-sm"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -164,7 +165,7 @@ const GuardianManagementPage: React.FC = () => {
                             setFormData({ name: '', phone: '', email: '', occupation: '', address: '' });
                             setIsModalOpen(true);
                         }}
-                        className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 whitespace-nowrap"
+                        className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-600/20 dark:shadow-none whitespace-nowrap"
                     >
                         <UserPlus className="w-4 h-4" />
                         Add Guardian
@@ -173,19 +174,19 @@ const GuardianManagementPage: React.FC = () => {
             </div>
 
             {/* List */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
                 {loading ? (
-                    <div className="p-20 text-center text-gray-400">
+                    <div className="p-20 text-center text-content-muted">
                         <Loader2 className="w-10 h-10 animate-spin mx-auto mb-4 text-indigo-500" />
                         <p className="font-medium">Loading guardian records...</p>
                     </div>
                 ) : filteredGuardians.length === 0 ? (
                     <div className="p-20 text-center">
-                        <div className="w-16 h-16 bg-gray-50 text-gray-300 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-gray-200">
+                        <div className="w-16 h-16 bg-chrome text-gray-300 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-border">
                             <Users className="w-8 h-8" />
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-1">No Guardians Found</h3>
-                        <p className="text-sm text-gray-500 mb-6">Start building your community by adding family contacts.</p>
+                        <h3 className="text-lg font-bold text-content-primary mb-1">No Guardians Found</h3>
+                        <p className="text-sm text-content-secondary mb-6">Start building your community by adding family contacts.</p>
                         <button
                             onClick={() => setIsModalOpen(true)}
                             className="text-indigo-600 font-bold hover:underline"
@@ -196,21 +197,21 @@ const GuardianManagementPage: React.FC = () => {
                 ) : (
                     <div className="divide-y divide-gray-100">
                         {filteredGuardians.map(guardian => (
-                            <div key={guardian.id} className="animate-fade-in group hover:bg-gray-50/50 transition-colors">
+                            <div key={guardian.id} className="animate-fade-in group hover:bg-chrome/50 transition-colors">
                                 <div className="p-6">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-lg border border-indigo-100">
+                                            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 flex items-center justify-center font-black text-lg border border-indigo-500/20">
                                                 {guardian.name[0]}
                                             </div>
                                             <div>
-                                                <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{guardian.name}</h3>
+                                                <h3 className="text-lg font-bold text-content-primary group-hover:text-indigo-600 transition-colors">{guardian.name}</h3>
                                                 <div className="flex items-center gap-4 mt-1">
-                                                    <span className="flex items-center gap-1.5 text-sm text-gray-500">
+                                                    <span className="flex items-center gap-1.5 text-sm text-content-secondary">
                                                         <Phone className="w-3.5 h-3.5" /> {guardian.phone}
                                                     </span>
                                                     {guardian.email && (
-                                                        <span className="flex items-center gap-1.5 text-sm text-gray-500">
+                                                        <span className="flex items-center gap-1.5 text-sm text-content-secondary">
                                                             <Mail className="w-3.5 h-3.5" /> {guardian.email}
                                                         </span>
                                                     )}
@@ -223,7 +224,7 @@ const GuardianManagementPage: React.FC = () => {
                                                 onClick={() => toggleExpand(guardian.id!)}
                                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${expandedGuardianId === guardian.id
                                                     ? 'bg-indigo-600 text-white shadow-md'
-                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                    : 'bg-chrome text-content-secondary hover:bg-chrome'
                                                     }`}
                                             >
                                                 {guardianStudents[guardian.id!]?.length || 0} Students
@@ -231,11 +232,11 @@ const GuardianManagementPage: React.FC = () => {
                                             </button>
                                             <button
                                                 onClick={() => handleEdit(guardian)}
-                                                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
+                                                className="p-2 text-content-muted hover:text-indigo-600 hover:bg-indigo-500/10 rounded-lg transition-all"
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </button>
-                                            <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                                            <button className="p-2 text-content-muted hover:text-red-600 hover:bg-red-500/10 rounded-lg transition-all">
                                                 <Trash2 className="w-4 h-4" />
                                             </button>
                                         </div>
@@ -243,27 +244,27 @@ const GuardianManagementPage: React.FC = () => {
 
                                     {/* Expanded: Linked Students */}
                                     {expandedGuardianId === guardian.id && (
-                                        <div className="mt-6 pt-6 border-t border-gray-100 animate-slide-down">
-                                            <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Wards / Students Linked</h4>
+                                        <div className="mt-6 pt-6 border-t border-border animate-slide-down">
+                                            <h4 className="text-xs font-black text-content-muted uppercase tracking-widest mb-4">Wards / Students Linked</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                                 {guardianStudents[guardian.id!]?.map(mapping => (
-                                                    <div key={mapping.id} className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl shadow-sm hover:border-indigo-200 transition-colors group/ward">
+                                                    <div key={mapping.id} className="flex items-center justify-between p-3 bg-surface border border-border rounded-xl shadow-sm hover:border-indigo-500/30 transition-colors group/ward">
                                                         <div className="flex items-center gap-3">
-                                                            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-sm">
+                                                            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold text-sm">
                                                                 {mapping.studentName?.[0]}
                                                             </div>
                                                             <div>
-                                                                <p className="text-sm font-bold text-gray-900">{mapping.studentName}</p>
-                                                                <p className="text-[10px] text-gray-400 uppercase font-bold">{mapping.relation}</p>
+                                                                <p className="text-sm font-bold text-content-primary">{mapping.studentName}</p>
+                                                                <p className="text-[10px] text-content-muted uppercase font-bold">{mapping.relation}</p>
                                                             </div>
                                                         </div>
                                                         {mapping.isPrimary && (
-                                                            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-md text-[10px] font-black uppercase tracking-tighter shadow-sm">Primary</span>
+                                                            <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-600 rounded-md text-[10px] font-black uppercase tracking-tighter shadow-sm">Primary</span>
                                                         )}
                                                     </div>
                                                 ))}
                                                 {(!guardianStudents[guardian.id!] || guardianStudents[guardian.id!].length === 0) && (
-                                                    <p className="col-span-full text-sm text-gray-400 italic py-2">No students linked to this guardian yet.</p>
+                                                    <p className="col-span-full text-sm text-content-muted italic py-2">No students linked to this guardian yet.</p>
                                                 )}
                                             </div>
                                         </div>
@@ -276,20 +277,20 @@ const GuardianManagementPage: React.FC = () => {
 
                 {/* Pagination footer */}
                 {totalPages > 1 && (
-                    <div className="px-8 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                        <div className="text-sm text-gray-400 font-bold uppercase tracking-widest flex items-center gap-2">
-                            <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-sm shadow-indigo-200"></div>
+                    <div className="px-8 py-4 bg-chrome border-t border-border flex items-center justify-between">
+                        <div className="text-sm text-content-muted font-bold uppercase tracking-widest flex items-center gap-2">
+                            <div className="w-2 h-2 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/20"></div>
                             {totalElements} Guardian Profiles
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                                 disabled={currentPage === 0}
-                                className="p-2 border border-gray-200 rounded-xl text-gray-400 hover:text-indigo-600 hover:bg-white disabled:opacity-30 transition-all cursor-pointer shadow-sm hover:border-indigo-200 hover:shadow-indigo-50"
+                                className="p-2 border border-border rounded-xl text-content-muted hover:text-indigo-600 hover:bg-surface disabled:opacity-30 transition-all cursor-pointer shadow-sm hover:border-indigo-500/30 dark:hover:shadow-none"
                             >
                                 <ChevronLeft className="w-5 h-5" />
                             </button>
-                            <div className="flex items-center gap-1.5 px-4 h-10 bg-white border border-gray-100 rounded-xl shadow-inner-sm">
+                            <div className="flex items-center gap-1.5 px-4 h-10 bg-surface border border-border rounded-xl shadow-inner-sm">
                                 <span className="text-sm font-black text-indigo-600 tracking-tighter">{currentPage + 1}</span>
                                 <span className="text-[10px] font-black text-indigo-200 uppercase">/</span>
                                 <span className="text-sm font-black text-indigo-300">{totalPages}</span>
@@ -297,7 +298,7 @@ const GuardianManagementPage: React.FC = () => {
                             <button
                                 onClick={() => setCurrentPage(prev => prev + 1)}
                                 disabled={currentPage >= totalPages - 1}
-                                className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-30 transition-all font-bold shadow-lg shadow-indigo-100 cursor-pointer"
+                                className="p-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 disabled:opacity-30 transition-all font-bold shadow-lg shadow-indigo-600/20 dark:shadow-none cursor-pointer"
                             >
                                 <ChevronRight className="w-5 h-5" />
                             </button>
@@ -307,86 +308,77 @@ const GuardianManagementPage: React.FC = () => {
             </div>
 
             {/* Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-[40] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setIsModalOpen(false)} />
-                    <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-xl max-h-[90vh] flex flex-col overflow-hidden animate-slide-up">
-                        <div className="px-8 py-6 border-b border-gray-50 flex justify-between items-center bg-gray-50/50">
-                            <div>
-                                <h3 className="text-xl font-black text-gray-900 tracking-tight">{selectedGuardian ? 'Update Profile' : 'New Family Contact'}</h3>
-                                <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">Guardian Master Record</p>
-                            </div>
-                            <button onClick={() => setIsModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 bg-white shadow-sm rounded-xl border border-gray-100"><X className="w-5 h-5" /></button>
-                        </div>
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title={selectedGuardian ? 'Update Profile' : 'New Family Contact'}
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => setIsModalOpen(false)}
+                            className="flex-1 px-6 py-3.5 bg-chrome text-content-secondary rounded-2xl text-sm font-bold hover:bg-chrome transition-all border border-border"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            form="guardian-form"
+                            disabled={isSubmitting}
+                            className="flex-[2] flex items-center justify-center gap-2 px-6 py-3.5 bg-indigo-600 text-white rounded-2xl text-sm font-black hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20 dark:shadow-none disabled:opacity-70"
+                        >
+                            {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                            {selectedGuardian ? 'Update Records' : 'Save Guardian'}
+                        </button>
+                    </>
+                }
+            >
+                <form id="guardian-form" onSubmit={handleSubmit} className="p-4 space-y-5">
+                    <FloatingLabelInput
+                        label="Full Name"
+                        icon={<User className="w-4 h-4" />}
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        required
+                    />
 
-                        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 pt-6 custom-scrollbar">
-                            <div className="space-y-5">
-                                <FloatingLabelInput
-                                    label="Full Name"
-                                    icon={<User className="w-4 h-4" />}
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    required
-                                />
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <FloatingLabelInput
-                                        label="Phone Number"
-                                        type="tel"
-                                        icon={<Phone className="w-4 h-4" />}
-                                        value={formData.phone}
-                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                        required
-                                    />
-                                    <FloatingLabelInput
-                                        label="Email Address"
-                                        type="email"
-                                        icon={<Mail className="w-4 h-4" />}
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    />
-                                </div>
-
-                                <FloatingLabelInput
-                                    label="Occupation"
-                                    icon={<Briefcase className="w-4 h-4" />}
-                                    value={formData.occupation}
-                                    onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
-                                />
-
-                                <div>
-                                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Residential Address</label>
-                                    <textarea
-                                        className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 focus:bg-white transition-all font-medium resize-none"
-                                        rows={3}
-                                        placeholder="Full home or office address..."
-                                        value={formData.address}
-                                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="pt-8 flex gap-3 sticky bottom-0 bg-white">
-                                <button
-                                    type="button"
-                                    onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 px-6 py-3.5 bg-slate-50 text-slate-500 rounded-2xl text-sm font-bold hover:bg-slate-100 transition-all border border-slate-100"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    disabled={isSubmitting}
-                                    className="flex-[2] flex items-center justify-center gap-2 px-6 py-3.5 bg-indigo-600 text-white rounded-2xl text-sm font-black hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 disabled:opacity-70"
-                                >
-                                    {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                                    {selectedGuardian ? 'Update Records' : 'Save Guardian'}
-                                </button>
-                            </div>
-                        </form>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <FloatingLabelInput
+                            label="Phone Number"
+                            type="tel"
+                            icon={<Phone className="w-4 h-4" />}
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            required
+                        />
+                        <FloatingLabelInput
+                            label="Email Address"
+                            type="email"
+                            icon={<Mail className="w-4 h-4" />}
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        />
                     </div>
-                </div>
-            )}
+
+                    <FloatingLabelInput
+                        label="Occupation"
+                        icon={<Briefcase className="w-4 h-4" />}
+                        value={formData.occupation}
+                        onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
+                    />
+
+                    <div>
+                        <label className="block text-[11px] font-black text-content-muted uppercase tracking-widest mb-2 ml-1">Residential Address</label>
+                        <textarea
+                            className="w-full px-4 py-3 bg-chrome border border-border rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 focus:bg-surface transition-all font-medium resize-none"
+                            rows={3}
+                            placeholder="Full home or office address..."
+                            value={formData.address}
+                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                        />
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 };

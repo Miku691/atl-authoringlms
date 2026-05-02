@@ -8,6 +8,7 @@ import { BookOpen, Layers, GraduationCap, Loader2, Plus, Trash2, Edit2, X, UserC
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 import SubjectMappingModal from './SubjectMappingModal';
 import InstructorAssignmentModal from './InstructorAssignmentModal';
+import Modal from '../../../../components/common/Modal';
 
 // --- Interfaces ---
 
@@ -414,16 +415,16 @@ const AcademicStructurePage: React.FC = () => {
                     const isSchool = program.level === 'SCHOOL';
 
                     return (
-                        <div key={program.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden animate-fadeIn">
+                        <div key={program.id} className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden animate-fadeIn">
                             {/* ... header ... */}
-                            <div className="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
+                            <div className="p-4 bg-chrome border-b border-border flex justify-between items-center">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-indigo-100 rounded-lg">
-                                        <GraduationCap className="h-5 w-5 text-indigo-600" />
+                                    <div className="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-lg">
+                                        <GraduationCap className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold text-gray-900">{program.title}</h3>
-                                        <p className="text-xs text-gray-500">{program.code} • {program.level}</p>
+                                        <h3 className="font-semibold text-content-primary">{program.title}</h3>
+                                        <p className="text-xs text-content-secondary">{program.code} • {program.level}</p>
                                     </div>
                                 </div>
                                 {isAdmin && (
@@ -442,7 +443,7 @@ const AcademicStructurePage: React.FC = () => {
 
                             <div className="p-4">
                                 {programClasses.length === 0 ? (
-                                    <div className="text-center py-8 text-gray-500">
+                                    <div className="text-center py-8 text-content-secondary">
                                         <Layers className="w-8 h-8 mx-auto mb-2 opacity-20" />
                                         <p>No {getTerm(program.level).toLowerCase()}es found. Add one to get started.</p>
                                     </div>
@@ -456,18 +457,18 @@ const AcademicStructurePage: React.FC = () => {
                                             const classOfferingsCount = getOfferingsForClass(cls.id).length;
 
                                             return (
-                                                <div key={cls.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow relative group">
+                                                <div key={cls.id} className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow relative group">
                                                     <div className="flex justify-between items-start mb-4">
                                                         <div>
-                                                            <h4 className="font-bold text-gray-800 text-lg">{cls.name}</h4>
-                                                            <p className="text-xs text-gray-400 capitalize">{program.level.toLowerCase()}</p>
+                                                            <h4 className="font-bold text-content-primary text-lg">{cls.name}</h4>
+                                                            <p className="text-xs text-content-muted capitalize">{program.level.toLowerCase()}</p>
                                                         </div>
                                                         <div className="flex gap-2">
                                                             {isAdmin && (
                                                                 <>
                                                                     <button
                                                                         onClick={() => handleAddSemester(cls.id, program.id, classOfferingsCount)}
-                                                                        className="flex items-center gap-1 text-[11px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition-all border border-indigo-100 hover:border-indigo-200"
+                                                                        className="flex items-center gap-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-3 py-1.5 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-500/20 transition-all border border-indigo-100 dark:border-indigo-500/20 hover:border-indigo-200 dark:hover:border-indigo-500/30"
                                                                         title={`Add ${getTerm(program.level, 'SEMESTER')}`}
                                                                     >
                                                                         <Plus className="w-3.5 h-3.5" /> {getTerm(program.level, 'SEMESTER')}
@@ -498,7 +499,7 @@ const AcademicStructurePage: React.FC = () => {
                                                     </div>
 
                                                     <div className="space-y-3">
-                                                            <p className="text-xs font-semibold text-gray-500 uppercase">
+                                                            <p className="text-xs font-semibold text-content-secondary uppercase">
                                                                 {isSchool ? `${getTerm(program.level, 'SECTION')}s` : `${getTerm(program.level, 'SEMESTER')}s & ${getTerm(program.level, 'SECTION')}s`}
                                                             </p>
 
@@ -512,15 +513,15 @@ const AcademicStructurePage: React.FC = () => {
                                                                     return displayedOfferings.map((offering) => {
                                                                         const groupSections = getSectionsForClassAndOffering(cls.id, offering.id);
                                                                         return (
-                                                                            <div key={offering.id} className="flex flex-col bg-gray-50/50 rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
-                                                                                <div className="px-4 py-2 bg-gray-100/50 border-b border-gray-100 flex flex-wrap justify-between items-center gap-2">
-                                                                                    <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider truncate max-w-[120px]">
+                                                                            <div key={offering.id} className="flex flex-col bg-chrome/50 rounded-2xl border border-border overflow-hidden hover:shadow-md transition-shadow">
+                                                                                <div className="px-4 py-2 bg-chrome/50 border-b border-border flex flex-wrap justify-between items-center gap-2">
+                                                                                    <span className="text-[11px] font-bold text-content-secondary uppercase tracking-wider truncate max-w-[120px]">
                                                                                         {offering.name}
                                                                                     </span>
                                                                                     <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
                                                                                         <button
                                                                                             onClick={() => openSubjectMapping(`${cls.name} (${offering.name})`, offering.id)}
-                                                                                            className="p-1.5 px-2 text-indigo-600 hover:bg-indigo-100 rounded-md transition-all text-[10px] font-bold flex gap-1 items-center bg-white/50 border border-indigo-50 shadow-sm shrink-0"
+                                                                                            className="p-1.5 px-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-md transition-all text-[10px] font-bold flex gap-1 items-center bg-surface/50 border border-indigo-50 dark:border-indigo-500/20 shadow-sm shrink-0"
                                                                                             title="Manage Subjects"
                                                                                         >
                                                                                             <BookOpen className="w-3 h-3" /> Subjects
@@ -529,7 +530,7 @@ const AcademicStructurePage: React.FC = () => {
                                                                                             <>
                                                                                                 <button
                                                                                                     onClick={() => openInstructorAssignment(`${cls.name} (${offering.name})`, offering.id)}
-                                                                                                    className="p-1.5 px-2 text-amber-600 hover:bg-amber-100 rounded-md transition-all text-[10px] font-bold flex gap-1 items-center bg-white/50 border border-amber-50 shadow-sm shrink-0"
+                                                                                                    className="p-1.5 px-2 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/20 rounded-md transition-all text-[10px] font-bold flex gap-1 items-center bg-surface/50 border border-amber-50 dark:border-amber-500/20 shadow-sm shrink-0"
                                                                                                     title="Assign Faculty"
                                                                                                 >
                                                                                                     <UserCheck className="w-3 h-3" /> Faculty
@@ -542,7 +543,7 @@ const AcademicStructurePage: React.FC = () => {
                                                                                                         setNewSectionOfferingId(offering.id);
                                                                                                         setIsSectionModalOpen(true);
                                                                                                     }}
-                                                                                                    className="p-1.5 px-2 text-indigo-600 hover:bg-indigo-100 rounded-md transition-all text-[10px] flex items-center gap-1 font-bold bg-white/50 border border-indigo-50 shadow-sm shrink-0"
+                                                                                                    className="p-1.5 px-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-md transition-all text-[10px] flex items-center gap-1 font-bold bg-surface/50 border border-indigo-50 dark:border-indigo-500/20 shadow-sm shrink-0"
                                                                                                     title="Add Section"
                                                                                                 >
                                                                                                     <Plus className="w-3 h-3" /> Section
@@ -552,7 +553,7 @@ const AcademicStructurePage: React.FC = () => {
                                                                                         {isAdmin && isSchool && (
                                                                                             <button
                                                                                                 onClick={() => openInstructorAssignment(`${cls.name} (${offering.name})`, offering.id)}
-                                                                                                className="p-1.5 px-2 text-amber-600 hover:bg-amber-100 rounded-md transition-all text-[10px] font-bold flex gap-1 items-center bg-white/50 border border-amber-50 shadow-sm shrink-0"
+                                                                                                className="p-1.5 px-2 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/20 rounded-md transition-all text-[10px] font-bold flex gap-1 items-center bg-surface/50 border border-amber-50 dark:border-amber-500/20 shadow-sm shrink-0"
                                                                                                 title="Assign Faculty"
                                                                                             >
                                                                                                 <UserCheck className="w-3 h-3" /> Assign Faculty
@@ -564,13 +565,13 @@ const AcademicStructurePage: React.FC = () => {
                                                                                 {(groupSections.length > 0) && (
                                                                                     <div className="p-3 space-y-2">
                                                                                         {isSchool && groupSections.length === 1 ? (
-                                                                                            <div className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-gray-200/60 transition-all hover:border-indigo-200 hover:shadow-sm">
+                                                                                            <div className="flex items-center justify-between p-2.5 bg-surface rounded-xl border border-border/60 transition-all hover:border-indigo-200 hover:shadow-sm">
                                                                                                 <div className="flex items-center gap-3">
-                                                                                                    <div className="w-8 h-8 flex items-center justify-center bg-indigo-50 rounded-lg text-sm font-bold text-indigo-700">
+                                                                                                    <div className="w-8 h-8 flex items-center justify-center bg-indigo-50 dark:bg-indigo-500/10 rounded-lg text-sm font-bold text-indigo-700 dark:text-indigo-400">
                                                                                                         {groupSections[0].name}
                                                                                                     </div>
                                                                                                     <div>
-                                                                                                        <p className="text-[10px] text-gray-400">Class Capacity: {offering.capacity || 40}</p>
+                                                                                                        <p className="text-[10px] text-content-muted">Class Capacity: {offering.capacity || 40}</p>
                                                                                                     </div>
                                                                                                 </div>
                                                                                                 {isAdmin && (
@@ -585,14 +586,14 @@ const AcademicStructurePage: React.FC = () => {
                                                                                                                 });
                                                                                                                 setSelectedClassName(cls.name);
                                                                                                             }}
-                                                                                                            className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                                                                                                            className="p-1 text-content-muted hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
                                                                                                             title="Edit Capacity"
                                                                                                         >
                                                                                                             <Edit2 className="w-3.5 h-3.5" />
                                                                                                         </button>
                                                                                                         <button
                                                                                                             onClick={() => setDeleteModal({ isOpen: true, type: 'OFFERING', id: '', offeringId: offering.id })}
-                                                                                                            className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                                                                                            className="p-1 text-content-muted hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                                                                                                             title="Delete Section"
                                                                                                         >
                                                                                                             <X className="w-3.5 h-3.5" />
@@ -602,13 +603,13 @@ const AcademicStructurePage: React.FC = () => {
                                                                                             </div>
                                                                                         ) : (
                                                                                             groupSections.map(sec => (
-                                                                                                <div key={sec.id} className="flex items-center justify-between p-2.5 bg-white rounded-xl border border-gray-200/60 group/sec transition-all hover:border-indigo-200 hover:shadow-sm">
+                                                                                                <div key={sec.id} className="flex items-center justify-between p-2.5 bg-surface rounded-xl border border-border/60 group/sec transition-all hover:border-indigo-200 hover:shadow-sm">
                                                                                                     <div className="flex items-center gap-3">
-                                                                                                        <span className="w-8 h-8 flex items-center justify-center bg-indigo-50 rounded-lg text-sm font-bold text-indigo-700">
+                                                                                                        <span className="w-8 h-8 flex items-center justify-center bg-indigo-50 dark:bg-indigo-500/10 rounded-lg text-sm font-bold text-indigo-700 dark:text-indigo-400">
                                                                                                             {sec.name}
                                                                                                         </span>
                                                                                                         <div>
-                                                                                                            <p className="text-[10px] text-gray-400">Section Cap: {offering.capacity || 40}</p>
+                                                                                                            <p className="text-[10px] text-content-muted">Section Cap: {offering.capacity || 40}</p>
                                                                                                         </div>
                                                                                                     </div>
                                                                                                     {isAdmin && (
@@ -623,14 +624,14 @@ const AcademicStructurePage: React.FC = () => {
                                                                                                                     });
                                                                                                                     setSelectedClassName(cls.name);
                                                                                                                 }}
-                                                                                                                className="p-1 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
+                                                                                                                className="p-1 text-content-muted hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
                                                                                                                 title="Edit Section"
                                                                                                             >
                                                                                                                 <Edit2 className="w-3.5 h-3.5" />
                                                                                                             </button>
                                                                                                             <button
                                                                                                                 onClick={() => handleDeleteSection(sec.id)}
-                                                                                                                className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                                                                                                className="p-1 text-content-muted hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                                                                                                                 title="Delete Section"
                                                                                                             >
                                                                                                                 <X className="w-3.5 h-3.5" />
@@ -653,7 +654,7 @@ const AcademicStructurePage: React.FC = () => {
                                                                     return (
                                                                         <button 
                                                                             onClick={() => setExpandedBranches(prev => ({...prev, [cls.id]: !prev[cls.id]}))}
-                                                                            className="w-full py-2 bg-white border border-dashed border-gray-200 rounded-xl text-gray-400 hover:text-indigo-600 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all text-xs font-bold uppercase tracking-widest"
+                                                                            className="w-full py-2 bg-surface border border-dashed border-border rounded-xl text-content-muted hover:text-indigo-600 hover:border-indigo-300 dark:hover:border-indigo-500/40 hover:bg-indigo-50/30 dark:hover:bg-indigo-500/10 transition-all text-xs font-bold uppercase tracking-widest"
                                                                         >
                                                                             {expandedBranches[cls.id] ? 'Show Less' : `View All ${groupsCount} ${getTerm(program.level, 'SEMESTER')}s`}
                                                                         </button>
@@ -675,140 +676,142 @@ const AcademicStructurePage: React.FC = () => {
             </div>
 
             {/* Add Class Modal */}
-            {isAddClassOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-scaleIn">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">
-                            {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'ADD_BRANCH')}
-                        </h3>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">
-                                    {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'BRANCH')} Name
-                                </label>
-                                <input
-                                    value={newClassName}
-                                    onChange={(e) => setNewClassName(e.target.value)}
-                                    placeholder={`e.g. ${getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'BRANCH')} 5`}
-                                    className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-                            {/* Semester Count field for non-school programs */}
-                            {!['SCHOOL'].includes(programs.find(p => p.id === selectedProgramId)?.level || '') && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'TOTAL_BRANCHES')}
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="20"
-                                        value={semesterCount}
-                                        onChange={(e) => setSemesterCount(Number(e.target.value))}
-                                        className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                    />
-                                </div>
-                            )}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Total Capacity</label>
-                                <input
-                                    type="number"
-                                    value={defaultCapacity}
-                                    onChange={(e) => setDefaultCapacity(Number(e.target.value))}
-                                    className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button onClick={() => setIsAddClassOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg" disabled={isSubmitting}>Cancel</button>
-                                <button onClick={handleAddClass} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                    Create
-                                </button>
-                            </div>
+            <Modal
+                isOpen={isAddClassOpen}
+                onClose={() => setIsAddClassOpen(false)}
+                title={getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'ADD_BRANCH')}
+                footer={
+                    <>
+                        <button onClick={() => setIsAddClassOpen(false)} className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-lg" disabled={isSubmitting}>Cancel</button>
+                        <button onClick={handleAddClass} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Create
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary">
+                            {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'BRANCH')} Name
+                        </label>
+                        <input
+                            value={newClassName}
+                            onChange={(e) => setNewClassName(e.target.value)}
+                            placeholder={`e.g. ${getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'BRANCH')} 5`}
+                            className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        />
+                    </div>
+                    {/* Semester Count field for non-school programs */}
+                    {!['SCHOOL'].includes(programs.find(p => p.id === selectedProgramId)?.level || '') && (
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">
+                                {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'TOTAL_BRANCHES')}
+                            </label>
+                            <input
+                                type="number"
+                                min="1"
+                                max="20"
+                                value={semesterCount}
+                                onChange={(e) => setSemesterCount(Number(e.target.value))}
+                                className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            />
                         </div>
+                    )}
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary">Total Capacity</label>
+                        <input
+                            type="number"
+                            value={defaultCapacity}
+                            onChange={(e) => setDefaultCapacity(Number(e.target.value))}
+                            className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        />
                     </div>
                 </div>
-            )}
+            </Modal>
 
             {/* Edit Class Modal */}
-            {editedClass && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-scaleIn">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">Edit Class</h3>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Class Name</label>
-                                <input
-                                    value={editedClass.name}
-                                    onChange={(e) => setEditedClass({ ...editedClass, name: e.target.value })}
-                                    placeholder="e.g. Class 5"
-                                    className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button onClick={() => setEditedClass(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg" disabled={isSubmitting}>Cancel</button>
-                                <button onClick={handleUpdateClass} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                    Update
-                                </button>
-                            </div>
+            <Modal
+                isOpen={!!editedClass}
+                onClose={() => setEditedClass(null)}
+                title="Edit Class"
+                footer={
+                    <>
+                        <button onClick={() => setEditedClass(null)} className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-lg" disabled={isSubmitting}>Cancel</button>
+                        <button onClick={handleUpdateClass} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Update
+                        </button>
+                    </>
+                }
+            >
+                {editedClass && (
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">Class Name</label>
+                            <input
+                                value={editedClass.name}
+                                onChange={(e) => setEditedClass({ ...editedClass, name: e.target.value })}
+                                placeholder="e.g. Class 5"
+                                className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            />
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </Modal>
 
             {/* Add Section Modal */}
-            {isSectionModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-scaleIn">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">Add Section to {selectedClassName}</h3>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Section Name</label>
-                                <input
-                                    value={newSectionName}
-                                    onChange={(e) => setNewSectionName(e.target.value)}
-                                    placeholder="e.g. A, B, Rose"
-                                    className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-
-                            {/* Semester selection for College/Coaching */}
-                            {!['SCHOOL'].includes(programs.find(p => p.id === selectedProgramId)?.level || '') && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        Select {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'SEMESTER')}
-                                    </label>
-                                    <select
-                                        value={newSectionOfferingId}
-                                        onChange={(e) => setNewSectionOfferingId(e.target.value)}
-                                        className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white"
-                                    >
-                                        <option value="">-- Auto-Assign or Select --</option>
-                                        {offerings
-                                            .filter(o => o.programId === selectedProgramId)
-                                            .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
-                                            .map(offt => (
-                                                <option key={offt.id} value={offt.id}>
-                                                    {offt.name}
-                                                </option>
-                                            ))
-                                        }
-                                    </select>
-                                </div>
-                            )}
-
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button onClick={() => setIsSectionModalOpen(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg" disabled={isSubmitting}>Cancel</button>
-                                <button onClick={handleAddSection} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                    Add
-                                </button>
-                            </div>
-                        </div>
+            <Modal
+                isOpen={isSectionModalOpen}
+                onClose={() => setIsSectionModalOpen(false)}
+                title={`Add Section to ${selectedClassName}`}
+                footer={
+                    <>
+                        <button onClick={() => setIsSectionModalOpen(false)} className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-lg" disabled={isSubmitting}>Cancel</button>
+                        <button onClick={handleAddSection} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Add
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary">Section Name</label>
+                        <input
+                            value={newSectionName}
+                            onChange={(e) => setNewSectionName(e.target.value)}
+                            placeholder="e.g. A, B, Rose"
+                            className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                        />
                     </div>
+
+                    {/* Semester selection for College/Coaching */}
+                    {!['SCHOOL'].includes(programs.find(p => p.id === selectedProgramId)?.level || '') && (
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">
+                                Select {getTerm(programs.find(p => p.id === selectedProgramId)?.level || '', 'SEMESTER')}
+                            </label>
+                            <select
+                                value={newSectionOfferingId}
+                                onChange={(e) => setNewSectionOfferingId(e.target.value)}
+                                className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 bg-surface"
+                            >
+                                <option value="">-- Auto-Assign or Select --</option>
+                                {offerings
+                                    .filter(o => o.programId === selectedProgramId)
+                                    .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }))
+                                    .map(offt => (
+                                        <option key={offt.id} value={offt.id}>
+                                            {offt.name}
+                                        </option>
+                                    ))
+                                }
+                            </select>
+                        </div>
+                    )}
                 </div>
-            )}
+            </Modal>
 
             {/* Subject Mapping Modal */}
             {isSubjectModalOpen && tenantId && (
@@ -833,40 +836,43 @@ const AcademicStructurePage: React.FC = () => {
             )}
 
             {/* Edit Section Modal */}
-            {editedSection && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 animate-scaleIn">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">Edit Section in {selectedClassName}</h3>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Section Name</label>
-                                <input
-                                    value={editedSection.name}
-                                    onChange={(e) => setEditedSection({ ...editedSection, name: e.target.value })}
-                                    placeholder="e.g. A, B"
-                                    className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700">Capacity</label>
-                                <input
-                                    type="number"
-                                    value={editedSection.capacity}
-                                    onChange={(e) => setEditedSection({ ...editedSection, capacity: Number(e.target.value) })}
-                                    className="w-full mt-1 p-2 border rounded-lg"
-                                />
-                            </div>
-                            <div className="flex justify-end gap-3 mt-6">
-                                <button onClick={() => setEditedSection(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg" disabled={isSubmitting}>Cancel</button>
-                                <button onClick={handleUpdateSection} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                    Update
-                                </button>
-                            </div>
+            <Modal
+                isOpen={!!editedSection}
+                onClose={() => setEditedSection(null)}
+                title={`Edit Section in ${selectedClassName}`}
+                footer={
+                    <>
+                        <button onClick={() => setEditedSection(null)} className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-lg" disabled={isSubmitting}>Cancel</button>
+                        <button onClick={handleUpdateSection} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Update
+                        </button>
+                    </>
+                }
+            >
+                {editedSection && (
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">Section Name</label>
+                            <input
+                                value={editedSection.name}
+                                onChange={(e) => setEditedSection({ ...editedSection, name: e.target.value })}
+                                placeholder="e.g. A, B"
+                                className="w-full mt-1 p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary">Capacity</label>
+                            <input
+                                type="number"
+                                value={editedSection.capacity}
+                                onChange={(e) => setEditedSection({ ...editedSection, capacity: Number(e.target.value) })}
+                                className="w-full mt-1 p-2 border rounded-lg"
+                            />
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </Modal>
 
             <ConfirmationModal
                 isOpen={deleteModal.isOpen}

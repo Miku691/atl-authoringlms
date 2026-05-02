@@ -148,7 +148,7 @@ const MySyllabusPage: React.FC = () => {
                         <p className="text-sm text-[#424655] mt-1 max-w-md">Live Academic Blueprint & Progression Matrix</p>
                     </div>
                     {selectedOS && (
-                        <div className="flex bg-white px-6 py-4 rounded-xl shadow-sm border border-slate-100 items-center gap-4">
+                        <div className="flex bg-surface px-6 py-4 rounded-xl shadow-sm border border-border items-center gap-4">
                             <div className="relative w-12 h-12 flex items-center justify-center">
                                 <svg className="w-full h-full transform -rotate-90">
                                     <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-50" />
@@ -169,7 +169,7 @@ const MySyllabusPage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 {/* Subject Selection Sidebar */}
                 <div className="lg:col-span-4 space-y-6">
-                    <div className="bg-white rounded-2xl p-8 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] sticky top-32">
+                    <div className="bg-surface rounded-2xl p-8 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] sticky top-32">
                         <div className="flex items-center gap-3 mb-8 px-2">
                             <Layers className="w-4 h-4 text-[#2a6df4]" />
                             <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Knowledge Domains</h3>
@@ -195,7 +195,7 @@ const MySyllabusPage: React.FC = () => {
                                             {os.subjectName?.[0] || 'S'}
                                         </div>
                                         <div className="truncate">
-                                            <p className={`text-[8px] font-bold uppercase tracking-wider mb-0.5 ${selectedOS?.id === os.id ? 'text-[#3c5ba9]' : 'text-slate-400'}`}>Subject</p>
+                                            <p className={`text-[8px] font-bold uppercase tracking-wider mb-0.5 ${selectedOS?.id === os.id ? 'text-[#3c5ba9]' : 'text-content-muted'}`}>Subject</p>
                                             <span className={`text-sm font-bold truncate block ${selectedOS?.id === os.id ? 'text-[#1a3d8a]' : 'text-[#64748b]'}`}>{os.subjectName}</span>
                                         </div>
                                     </div>
@@ -207,7 +207,7 @@ const MySyllabusPage: React.FC = () => {
                             {offeringSubjects.length === 0 && (
                                 <div className="p-10 text-center bg-[#f7f9ff] rounded-xl border border-dashed border-[#dae2ff]">
                                     <BookMarked className="w-10 h-10 mx-auto mb-4 text-slate-200" />
-                                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">No Domains Detected</p>
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-content-muted">No Domains Detected</p>
                                 </div>
                             )}
                         </div>
@@ -217,7 +217,7 @@ const MySyllabusPage: React.FC = () => {
                 {/* Main Syllabus Content Area */}
                 <div className="lg:col-span-8 space-y-8">
                     {selectedOS ? (
-                        <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                        <div className="bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
                             <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
                                  <div className="flex items-center gap-4">
                                     <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
@@ -225,7 +225,7 @@ const MySyllabusPage: React.FC = () => {
                                     </div>
                                     <div>
                                         <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Syllabus Breakdown</h3>
-                                        <p className="text-xs text-slate-400 font-medium">{selectedOS.subjectName}</p>
+                                        <p className="text-xs text-content-muted font-medium">{selectedOS.subjectName}</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
@@ -245,12 +245,12 @@ const MySyllabusPage: React.FC = () => {
                                             className={`w-full flex items-center justify-between p-6 rounded-2xl border transition-all ${
                                                 chapter.isExpanded 
                                                 ? 'bg-[#f7f9ff] border-[#dae2ff] shadow-sm' 
-                                                : 'bg-white border-[#f1f3f9] hover:border-[#dae2ff] hover:bg-[#f7f9ff]'
+                                                : 'bg-surface border-[#f1f3f9] hover:border-[#dae2ff] hover:bg-[#f7f9ff]'
                                             }`}
                                         >
                                             <div className="flex items-center gap-6">
                                                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold transition-all ${
-                                                    chapter.isExpanded ? 'bg-gradient-to-br from-[#0054d1] to-[#2a6df4] text-white' : 'bg-white text-[#0054d1] border border-[#dae2ff]'
+                                                    chapter.isExpanded ? 'bg-gradient-to-br from-[#0054d1] to-[#2a6df4] text-white' : 'bg-surface text-[#0054d1] border border-[#dae2ff]'
                                                 }`}>
                                                     {chapter.orderIndex < 10 ? `0${chapter.orderIndex}` : chapter.orderIndex}
                                                 </div>
@@ -273,7 +273,7 @@ const MySyllabusPage: React.FC = () => {
                                                         className={`flex items-center justify-between p-5 rounded-xl border transition-all ${
                                                             topic.status === 'COMPLETED'
                                                             ? 'bg-emerald-50/30 border-emerald-100/50'
-                                                            : 'bg-white border-[#f1f3f9] hover:shadow-md'
+                                                            : 'bg-surface border-[#f1f3f9] hover:shadow-md'
                                                         }`}
                                                     >
                                                         <div className="flex items-center gap-4">
@@ -290,7 +290,7 @@ const MySyllabusPage: React.FC = () => {
                                                             </div>
                                                         </div>
                                                         {topic.status === 'COMPLETED' && (
-                                                            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold text-emerald-600 bg-white border border-emerald-100 shadow-sm">
+                                                            <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-[9px] font-bold text-emerald-600 bg-surface border border-emerald-100 shadow-sm">
                                                                 <Target className="w-3 h-3" />
                                                                 Verified
                                                             </span>
@@ -300,7 +300,7 @@ const MySyllabusPage: React.FC = () => {
                                                 {chapter.topics.length === 0 && (
                                                     <div className="p-8 text-center bg-[#f7f9ff] rounded-xl border border-dashed border-[#dae2ff]">
                                                         <Info className="w-6 h-6 mx-auto mb-2 text-slate-300" />
-                                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">No Topics Indexed</p>
+                                                        <p className="text-[10px] font-bold text-content-muted uppercase tracking-widest">No Topics Indexed</p>
                                                     </div>
                                                 )}
                                             </div>
@@ -311,13 +311,13 @@ const MySyllabusPage: React.FC = () => {
                                     <div className="py-20 text-center">
                                         <BookMarked className="w-16 h-16 text-slate-100 mx-auto mb-6" />
                                         <h3 className="text-xl font-bold text-[#1a3d8a]">Structural Pending</h3>
-                                        <p className="text-xs font-medium text-slate-400 mt-2 uppercase tracking-widest">No curriculum nodes detected for this domain</p>
+                                        <p className="text-xs font-medium text-content-muted mt-2 uppercase tracking-widest">No curriculum nodes detected for this domain</p>
                                     </div>
                                 )}
                             </div>
                         </div>
                     ) : (
-                        <div className="bg-white rounded-2xl p-40 text-center border-2 border-dashed border-[#f1f3f9] flex flex-col items-center">
+                        <div className="bg-surface rounded-2xl p-40 text-center border-2 border-dashed border-[#f1f3f9] flex flex-col items-center">
                             <BookOpen className="w-20 h-20 text-slate-100 mb-8" />
                             <h3 className="text-xl font-bold text-slate-300 uppercase tracking-tight">Select a Domain</h3>
                             <p className="text-xs font-medium text-slate-300 mt-4 uppercase tracking-widest">Select a Knowledge block from the sidebar to reveal nodes</p>

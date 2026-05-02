@@ -3,6 +3,7 @@ import api from '../../../utils/api';
 import { Plus, Edit2, Trash2, CheckCircle, XCircle, Save, X, Database } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import ConfirmationModal from '../../../components/common/ConfirmationModal';
+import Modal from '../../../components/common/Modal';
 
 interface Plan {
   id?: string;
@@ -110,8 +111,8 @@ const SubscriptionPlansManagement: React.FC = () => {
     <div className="p-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Subscription Plans</h1>
-          <p className="text-gray-500 text-sm">Manage dynamic SaaS plans and limits</p>
+          <h1 className="text-2xl font-bold text-content-primary">Subscription Plans</h1>
+          <p className="text-content-secondary text-sm">Manage dynamic SaaS plans and limits</p>
         </div>
         <div className="flex gap-3">
           <button
@@ -131,30 +132,30 @@ const SubscriptionPlansManagement: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
         <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-chrome border-b border-border">
             <tr>
-              <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Plan Name</th>
-              <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Price (Monthly)</th>
-              <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Limits</th>
-              <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Status</th>
-              <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase text-right">Actions</th>
+              <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase">Plan Name</th>
+              <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase">Price (Monthly)</th>
+              <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase">Limits</th>
+              <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase">Status</th>
+              <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {plans.map(plan => (
-              <tr key={plan.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={plan.id} className="hover:bg-chrome transition-colors">
                 <td className="px-6 py-4">
-                  <div className="font-semibold text-gray-900">{plan.name}</div>
-                  <div className="text-xs text-gray-400 truncate max-w-xs">{plan.description}</div>
+                  <div className="font-semibold text-content-primary">{plan.name}</div>
+                  <div className="text-xs text-content-muted truncate max-w-xs">{plan.description}</div>
                 </td>
                 <td className="px-6 py-4">
                   <span className="font-medium">{plan.currency} {plan.priceMonthly}</span>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="text-xs text-gray-600">Students: {plan.maxStudents}</div>
-                  <div className="text-xs text-gray-600">Teachers: {plan.maxTeachers}</div>
+                  <div className="text-xs text-content-secondary">Students: {plan.maxStudents}</div>
+                  <div className="text-xs text-content-secondary">Teachers: {plan.maxTeachers}</div>
                 </td>
                 <td className="px-6 py-4">
                   {plan.isActive ? (
@@ -162,7 +163,7 @@ const SubscriptionPlansManagement: React.FC = () => {
                       <CheckCircle className="w-3 h-3" /> Active
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-gray-500 bg-gray-50 px-2 py-1 rounded-full text-xs font-medium">
+                    <span className="inline-flex items-center gap-1 text-content-secondary bg-chrome px-2 py-1 rounded-full text-xs font-medium">
                       <XCircle className="w-3 h-3" /> Inactive
                     </span>
                   )}
@@ -179,7 +180,7 @@ const SubscriptionPlansManagement: React.FC = () => {
             ))}
           </tbody>
         </table>
-        {loading && <div className="p-10 text-center text-gray-400">Loading plans...</div>}
+        {loading && <div className="p-10 text-center text-content-muted">Loading plans...</div>}
       </div>
 
       {/* Seed Confirmation Modal */}
@@ -195,122 +196,126 @@ const SubscriptionPlansManagement: React.FC = () => {
       />
 
       {/* Create/Edit Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl w-full max-w-2xl shadow-xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-              <h3 className="font-bold text-gray-900">{editingPlan ? 'Edit Plan' : 'Create New Plan'}</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
-              </button>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={editingPlan ? 'Edit Plan' : 'Create New Plan'}
+        icon={<Database size={18} />}
+        size="md"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(false)}
+              className="modal-btn-secondary"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              form="plan-form"
+              className="modal-btn-primary"
+            >
+              {editingPlan ? 'Update Plan' : 'Save Plan'}
+            </button>
+          </>
+        }
+      >
+        <form id="plan-form" onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="col-span-2">
+              <label className="block text-xs font-bold text-content-secondary uppercase mb-1">Plan Name</label>
+              <input
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                value={formData.name}
+                onChange={e => setFormData({...formData, name: e.target.value})}
+                placeholder="e.g. Starter, Professional"
+                required
+              />
             </div>
             
-            <form onSubmit={handleSubmit} className="p-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Plan Name</label>
-                  <input
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={formData.name}
-                    onChange={e => setFormData({...formData, name: e.target.value})}
-                    placeholder="e.g. Starter, Professional"
-                    required
-                  />
-                </div>
-                
-                <div className="col-span-2">
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Description</label>
-                  <textarea
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={formData.description}
-                    onChange={e => setFormData({...formData, description: e.target.value})}
-                    placeholder="A short summary of the plan"
-                  />
-                </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-bold text-content-secondary uppercase mb-1">Description</label>
+              <textarea
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                value={formData.description}
+                onChange={e => setFormData({...formData, description: e.target.value})}
+                placeholder="A short summary of the plan"
+              />
+            </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Price Monthly</label>
-                  <input
-                    type="number"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={formData.priceMonthly}
-                    onChange={e => setFormData({...formData, priceMonthly: parseFloat(e.target.value)})}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Price Yearly</label>
-                  <input
-                    type="number"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={formData.priceYearly}
-                    onChange={e => setFormData({...formData, priceYearly: parseFloat(e.target.value)})}
-                    required
-                  />
-                </div>
+            <div>
+              <label className="block text-xs font-bold text-content-secondary uppercase mb-1">Price Monthly</label>
+              <input
+                type="number"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                value={formData.priceMonthly}
+                onChange={e => setFormData({...formData, priceMonthly: parseFloat(e.target.value)})}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-content-secondary uppercase mb-1">Price Yearly</label>
+              <input
+                type="number"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                value={formData.priceYearly}
+                onChange={e => setFormData({...formData, priceYearly: parseFloat(e.target.value)})}
+                required
+              />
+            </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Max Students</label>
-                  <input
-                    type="number"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={formData.maxStudents}
-                    onChange={e => setFormData({...formData, maxStudents: parseInt(e.target.value)})}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Max Teachers</label>
-                  <input
-                    type="number"
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                    value={formData.maxTeachers}
-                    onChange={e => setFormData({...formData, maxTeachers: parseInt(e.target.value)})}
-                    required
-                  />
-                </div>
+            <div>
+              <label className="block text-xs font-bold text-content-secondary uppercase mb-1">Max Students</label>
+              <input
+                type="number"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                value={formData.maxStudents}
+                onChange={e => setFormData({...formData, maxStudents: parseInt(e.target.value)})}
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-content-secondary uppercase mb-1">Max Teachers</label>
+              <input
+                type="number"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                value={formData.maxTeachers}
+                onChange={e => setFormData({...formData, maxTeachers: parseInt(e.target.value)})}
+                required
+              />
+            </div>
 
-                <div className="col-span-2">
-                  <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Features (JSON Array)</label>
-                  <textarea
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm"
-                    value={formData.featuresList}
-                    onChange={e => setFormData({...formData, featuresList: e.target.value})}
-                    placeholder='["Feature 1", "Feature 2"]'
-                  />
-                </div>
+            <div className="col-span-2">
+              <label className="block text-xs font-bold text-content-secondary uppercase mb-1">Features (JSON Array)</label>
+              <textarea
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm"
+                style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                value={formData.featuresList}
+                onChange={e => setFormData({...formData, featuresList: e.target.value})}
+                placeholder='["Feature 1", "Feature 2"]'
+              />
+            </div>
 
-                <div className="flex items-center gap-2 mt-2">
-                  <input
-                    type="checkbox"
-                    id="isActive"
-                    checked={formData.isActive}
-                    onChange={e => setFormData({...formData, isActive: e.target.checked})}
-                    className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                  />
-                  <label htmlFor="isActive" className="text-sm font-medium text-gray-700">Display this plan as Active</label>
-                </div>
-              </div>
-
-              <div className="mt-8 flex gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors font-semibold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-bold shadow-lg shadow-indigo-200"
-                >
-                  {editingPlan ? 'Update Plan' : 'Save Plan'}
-                </button>
-              </div>
-            </form>
+            <div className="flex items-center gap-2 mt-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={formData.isActive}
+                onChange={e => setFormData({...formData, isActive: e.target.checked})}
+                className="w-4 h-4 text-indigo-600 border-border rounded focus:ring-indigo-500"
+              />
+              <label htmlFor="isActive" className="text-sm font-medium text-content-primary">Display this plan as Active</label>
+            </div>
           </div>
-        </div>
-      )}
+        </form>
+      </Modal>
     </div>
   );
 };

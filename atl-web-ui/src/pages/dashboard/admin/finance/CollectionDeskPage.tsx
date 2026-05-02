@@ -139,7 +139,7 @@ const CollectionDeskPage: React.FC = () => {
         try {
             let blob;
             let filename;
-            
+
             if (receiptNo) {
                 toast.loading('Fetching detailed receipt...', { id: 'downloading' });
                 blob = await financeService.downloadHighFidelityReceipt(receiptNo);
@@ -166,38 +166,38 @@ const CollectionDeskPage: React.FC = () => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Collection Desk</h1>
-                    <p className="text-sm text-gray-500">Fast payment collection and receipt generation</p>
+                    <h1 className="text-2xl font-bold text-content-primary">Collection Desk</h1>
+                    <p className="text-sm text-content-secondary">Fast payment collection and receipt generation</p>
                 </div>
 
                 <div className="relative w-full md:w-80">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-4 w-4 text-gray-400" />
+                        <Search className="h-4 w-4 text-content-muted" />
                     </div>
                     <input
                         type="text"
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                        className="block w-full pl-10 pr-3 py-2 bg-chrome border border-border rounded-lg focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-content-primary"
                         placeholder="Search student to collect fee..."
                         value={searchTerm}
                         onChange={e => handleSearch(e.target.value)}
                     />
 
                     {students.length > 0 && (
-                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                        <div className="absolute z-10 w-full mt-1 bg-surface border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
                             {students.map(s => (
                                 <button
                                     key={s.id}
-                                    className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 border-b last:border-0"
+                                    className="w-full px-4 py-2 text-left hover:bg-chrome flex items-center gap-3 border-b last:border-0"
                                     onClick={() => selectStudent(s)}
                                 >
-                                    <div className="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                                    <div className="w-8 h-8 rounded-full bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-xs font-bold">
                                         {s.firstName[0]}
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-sm font-medium text-gray-900">{s.firstName} {s.lastName}</p>
-                                        <p className="text-xs text-gray-500">ID: {s.admissionNo}</p>
+                                        <p className="text-sm font-medium text-content-primary">{s.firstName} {s.lastName}</p>
+                                        <p className="text-xs text-content-secondary">ID: {s.admissionNo}</p>
                                     </div>
-                                    <ArrowRight className="w-4 h-4 text-gray-400" />
+                                    <ArrowRight className="w-4 h-4 text-content-muted" />
                                 </button>
                             ))}
                         </div>
@@ -210,22 +210,22 @@ const CollectionDeskPage: React.FC = () => {
                     {/* Left Panel: Payment Form & Ledger Details */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Student Badge */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 flex items-center gap-4">
+                        <div className="bg-surface rounded-xl shadow-sm border border-border p-4 flex items-center gap-4">
                             <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center text-white">
                                 <User className="w-6 h-6" />
                             </div>
                             <div className="flex-1">
-                                <h2 className="text-lg font-bold text-gray-900">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
-                                <p className="text-xs text-gray-500">#{selectedStudent.admissionNo} â€¢ {selectedStudent.phone}</p>
+                                <h2 className="text-lg font-bold text-content-primary">{selectedStudent.firstName} {selectedStudent.lastName}</h2>
+                                <p className="text-xs text-content-secondary">#{selectedStudent.admissionNo} â€¢ {selectedStudent.phone}</p>
                             </div>
                             <button onClick={() => setSelectedStudent(null)} className="text-xs text-indigo-600 hover:underline font-medium">Change Student</button>
                         </div>
 
                         {/* Payment Collection Form */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-200 bg-indigo-50/50 flex items-center gap-2">
+                        <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
+                            <div className="px-6 py-4 border-b border-border bg-chrome flex items-center gap-2">
                                 <CreditCard className="w-5 h-5 text-indigo-600" />
-                                <h3 className="font-bold text-gray-800">Collect Payment</h3>
+                                <h3 className="font-bold text-content-primary">Collect Payment</h3>
                             </div>
                             <form onSubmit={handlePaymentSubmit} className="p-6 space-y-5">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -235,10 +235,10 @@ const CollectionDeskPage: React.FC = () => {
                                         readOnly
                                         value={paymentData.amount}
                                         icon={<span>{getCurrencySymbol(currencyCode)}</span>}
-                                        className="bg-gray-50"
+                                        className="bg-chrome"
                                     />
                                     <div className="space-y-1">
-                                        <label className="text-xs font-semibold text-gray-500 uppercase px-1">Payment Mode</label>
+                                        <label className="text-xs font-semibold text-content-secondary uppercase px-1">Payment Mode</label>
                                         <div className="flex gap-2">
                                             {['CASH', 'ONLINE', 'CHEQUE', 'BANK_TRANSFER'].map(mode => (
                                                 <button
@@ -246,8 +246,8 @@ const CollectionDeskPage: React.FC = () => {
                                                     type="button"
                                                     onClick={() => setPaymentData({ ...paymentData, paymentMode: mode as PaymentMode })}
                                                     className={`flex-1 py-2 px-1 text-[10px] font-bold rounded-lg border transition-all ${paymentData.paymentMode === mode
-                                                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-100'
-                                                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                                                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-500/20'
+                                                        : 'bg-surface text-content-secondary border-border hover:bg-chrome'
                                                         }`}
                                                 >
                                                     {mode.replace('_', ' ')}
@@ -267,10 +267,10 @@ const CollectionDeskPage: React.FC = () => {
 
                                 <div>
                                     <div className="flex items-center justify-between px-1 mb-2">
-                                        <p className="text-xs font-semibold text-gray-500 uppercase">Select Fee Heads & Enter Amounts</p>
+                                        <p className="text-xs font-semibold text-content-secondary uppercase">Select Fee Heads & Enter Amounts</p>
                                         {paymentData.feeRecordIds.length > 0 && (
                                             <div className="flex items-center gap-2">
-                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Selected: {paymentData.feeRecordIds.length}</span>
+                                                <span className="text-[10px] font-bold text-content-muted uppercase tracking-tighter">Selected: {paymentData.feeRecordIds.length}</span>
                                             </div>
                                         )}
                                     </div>
@@ -279,8 +279,8 @@ const CollectionDeskPage: React.FC = () => {
                                             <div
                                                 key={record.id}
                                                 className={`p-3 rounded-xl border transition-all flex items-center justify-between ${paymentData.feeRecordIds.includes(record.id)
-                                                    ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200 shadow-sm'
-                                                    : 'bg-white border-gray-100 hover:border-gray-200'
+                                                    ? 'bg-indigo-500/10 border-indigo-500/30 ring-1 ring-indigo-500/20 shadow-sm'
+                                                    : 'bg-surface border-border hover:border-border'
                                                     }`}
                                             >
                                                 <div className="flex items-center gap-3 flex-1">
@@ -307,13 +307,13 @@ const CollectionDeskPage: React.FC = () => {
                                                             }));
                                                             setAmountsPerRecord(newAmounts);
                                                         }}
-                                                        className={`w-5 h-5 rounded-full border flex items-center justify-center cursor-pointer ${paymentData.feeRecordIds.includes(record.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-gray-300'
+                                                        className={`w-5 h-5 rounded-full border flex items-center justify-center cursor-pointer ${paymentData.feeRecordIds.includes(record.id) ? 'bg-indigo-600 border-indigo-600 text-white' : 'border-border'
                                                             }`}>
                                                         {paymentData.feeRecordIds.includes(record.id) && <CheckCircle2 className="w-3 h-3" />}
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-bold text-gray-800">{record.feeHeadName}</p>
-                                                        <p className="text-[10px] text-gray-500 font-medium">Due: {new Date(record.dueDate).toLocaleDateString()} â€¢ Bal: {format(record.balance)}</p>
+                                                        <p className="text-sm font-bold text-content-primary">{record.feeHeadName}</p>
+                                                        <p className="text-[10px] text-content-secondary font-medium">Due: {new Date(record.dueDate).toLocaleDateString()} â€¢ Bal: {format(record.balance)}</p>
                                                     </div>
                                                 </div>
 
@@ -322,7 +322,7 @@ const CollectionDeskPage: React.FC = () => {
                                                         <input
                                                             type="number"
                                                             max={record.balance}
-                                                            className="block w-full px-2 py-1 text-sm border border-indigo-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                                                            className="block w-full px-2 py-1 text-sm bg-chrome border border-indigo-500/30 rounded-md focus:ring-indigo-500 focus:border-indigo-500 text-content-primary outline-none"
                                                             placeholder="Amount"
                                                             value={amountsPerRecord[record.id] || ''}
                                                             onChange={(e) => {
@@ -344,7 +344,7 @@ const CollectionDeskPage: React.FC = () => {
                                 <button
                                     type="submit"
                                     disabled={isSubmitting || paymentData.amount <= 0 || (paymentData.amount > 0 && paymentData.feeRecordIds.length === 0)}
-                                    className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold text-lg hover:bg-indigo-700 disabled:opacity-50 shadow-xl shadow-indigo-100 transition-all flex items-center justify-center gap-3"
+                                    className="w-full py-4 bg-indigo-600 text-white rounded-xl font-bold text-lg hover:bg-indigo-700 disabled:opacity-50 shadow-xl shadow-indigo-500/20 transition-all flex items-center justify-center gap-3"
                                 >
                                     {isSubmitting ? 'Processing Payment...' : (
                                         <>
@@ -359,18 +359,18 @@ const CollectionDeskPage: React.FC = () => {
 
                     {/* Right Panel: Recent Transactions for Selected Student */}
                     <div className="space-y-6">
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                        <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
+                            <div className="px-6 py-4 border-b border-border flex items-center justify-between">
                                 <div className="flex items-center gap-2">
                                     <History className="w-5 h-5 text-indigo-600" />
-                                    <h3 className="font-bold text-gray-800">Recent Receipts</h3>
+                                    <h3 className="font-bold text-content-primary">Recent Receipts</h3>
                                 </div>
                             </div>
-                            <div className="divide-y divide-gray-100 max-h-[500px] overflow-y-auto">
+                            <div className="divide-y divide-border max-h-[500px] overflow-y-auto">
                                 {isLoading ? (
-                                    <div className="p-8 text-center text-gray-400 text-sm italic">Loading history...</div>
+                                    <div className="p-8 text-center text-content-muted text-sm italic">Loading history...</div>
                                 ) : transactions.length === 0 ? (
-                                    <div className="p-8 text-center text-gray-400 text-sm italic">No recent transactions</div>
+                                    <div className="p-8 text-center text-content-muted text-sm italic">No recent transactions</div>
                                 ) : (
                                     (() => {
                                         // Grouping transactions by receiptNo
@@ -391,10 +391,10 @@ const CollectionDeskPage: React.FC = () => {
                                             const items = grouped[rNo];
                                             const total = items.reduce((sum, tx) => sum + tx.amount, 0);
                                             // Use most recent date in group
-                                            const newest = items.reduce((prev, current) => 
+                                            const newest = items.reduce((prev, current) =>
                                                 new Date(prev.transactionDate) > new Date(current.transactionDate) ? prev : current
                                             );
-                                            
+
                                             return {
                                                 id: rNo, // Use receiptNo as ID for list
                                                 receiptNo: rNo,
@@ -414,13 +414,13 @@ const CollectionDeskPage: React.FC = () => {
                                         ].sort((a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime());
 
                                         return allItems.map((item: any) => (
-                                            <div key={item.id} className="p-4 hover:bg-gray-50/50 transition-colors group border-b last:border-0">
+                                            <div key={item.id} className="p-4 hover:bg-chrome/50 transition-colors group border-b last:border-0">
                                                 <div className="flex justify-between items-start mb-1">
                                                     <div className="flex-1 pr-4">
-                                                        <p className="text-sm font-black text-gray-900 leading-tight">
+                                                        <p className="text-sm font-black text-content-primary leading-tight">
                                                             {item.studentName || `${selectedStudent.firstName} ${selectedStudent.lastName}`}
                                                         </p>
-                                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mt-1">
+                                                        <p className="text-[10px] text-content-muted font-bold uppercase tracking-widest leading-none mt-1">
                                                             {item.offeringName ? `${item.offeringName} • ` : ''}{item.paymentMode} • {formatRelativeTime(item.transactionDate)}
                                                         </p>
                                                     </div>
@@ -428,16 +428,16 @@ const CollectionDeskPage: React.FC = () => {
                                                         <span className="text-sm font-black text-emerald-600">+{format(item.amount)}</span>
                                                         <button
                                                             onClick={() => handleDownloadReceipt(item.id, item.receiptNo)}
-                                                            className="p-1.5 text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-600 hover:text-white transition-all shadow-sm group-hover:scale-110"
+                                                            className="p-1.5 text-indigo-500 bg-indigo-500/10 rounded-lg hover:bg-indigo-600 hover:text-white transition-all shadow-sm group-hover:scale-110"
                                                             title={item.receiptNo ? "Download Unified Receipt" : "Download Receipt"}
                                                         >
                                                             <Download className={`w-3.5 h-3.5 ${item.receiptNo ? 'animate-pulse text-indigo-700' : ''}`} />
                                                         </button>
                                                     </div>
                                                 </div>
-                                                
+
                                                 {item.items && (
-                                                    <p className="text-[10px] font-medium text-gray-500 italic truncate mb-1" title={item.items}>
+                                                    <p className="text-[10px] font-medium text-content-secondary italic truncate mb-1" title={item.items}>
                                                         Incl: {item.items}
                                                     </p>
                                                 )}
@@ -452,7 +452,7 @@ const CollectionDeskPage: React.FC = () => {
                                                     {item.referenceNumber && (
                                                         <div className="flex items-center gap-1">
                                                             <CheckCircle2 className="w-2.5 h-2.5 text-emerald-500" />
-                                                            <span className="text-[9px] font-black text-gray-400 uppercase tracking-tighter">REF: {item.referenceNumber}</span>
+                                                            <span className="text-[9px] font-black text-content-muted uppercase tracking-tighter">REF: {item.referenceNumber}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -468,47 +468,47 @@ const CollectionDeskPage: React.FC = () => {
                 <div className="space-y-6 animate-in fade-in duration-500">
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group">
-                            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-green-50 rounded-full group-hover:scale-110 transition-transform" />
+                        <div className="bg-surface p-6 rounded-2xl shadow-sm border border-border relative overflow-hidden group">
+                            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-green-500/10 rounded-full group-hover:scale-110 transition-transform" />
                             <div className="relative z-10 flex flex-col justify-between h-full">
                                 <div className="flex items-center gap-3 text-green-600 mb-4">
-                                    <div className="p-2 bg-green-100 rounded-lg">
+                                    <div className="p-2 bg-green-500/10 rounded-lg">
                                         <TrendingUp className="w-5 h-5" />
                                     </div>
                                     <span className="text-xs font-black uppercase tracking-widest">Today's Collection</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl font-black text-gray-900">{format(summary.todayCollection)}</span>
+                                    <span className="text-3xl font-black text-content-primary">{format(summary.todayCollection)}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group">
-                            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-50 rounded-full group-hover:scale-110 transition-transform" />
+                        <div className="bg-surface p-6 rounded-2xl shadow-sm border border-border relative overflow-hidden group">
+                            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/10 rounded-full group-hover:scale-110 transition-transform" />
                             <div className="relative z-10 flex flex-col justify-between h-full">
                                 <div className="flex items-center gap-3 text-blue-600 mb-4">
-                                    <div className="p-2 bg-blue-100 rounded-lg">
+                                    <div className="p-2 bg-blue-500/10 rounded-lg">
                                         <Calendar className="w-5 h-5" />
                                     </div>
                                     <span className="text-xs font-black uppercase tracking-widest">Monthly Collection</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl font-black text-gray-900">{format(summary.monthCollection)}</span>
+                                    <span className="text-3xl font-black text-content-primary">{format(summary.monthCollection)}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 relative overflow-hidden group">
-                            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-50 rounded-full group-hover:scale-110 transition-transform" />
+                        <div className="bg-surface p-6 rounded-2xl shadow-sm border border-border relative overflow-hidden group">
+                            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/10 rounded-full group-hover:scale-110 transition-transform" />
                             <div className="relative z-10 flex flex-col justify-between h-full">
                                 <div className="flex items-center gap-3 text-indigo-600 mb-4">
-                                    <div className="p-2 bg-indigo-100 rounded-lg">
+                                    <div className="p-2 bg-indigo-500/10 rounded-lg">
                                         <BarChart3 className="w-5 h-5" />
                                     </div>
                                     <span className="text-xs font-black uppercase tracking-widest">Yearly Collection</span>
                                 </div>
                                 <div className="flex items-baseline gap-1">
-                                    <span className="text-3xl font-black text-gray-900">{format(summary.yearCollection)}</span>
+                                    <span className="text-3xl font-black text-content-primary">{format(summary.yearCollection)}</span>
                                 </div>
                             </div>
                         </div>
@@ -516,15 +516,15 @@ const CollectionDeskPage: React.FC = () => {
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Class-wise collection chart */}
-                        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                        <div className="lg:col-span-2 bg-surface rounded-2xl shadow-sm border border-border p-6">
                             <div className="flex items-center justify-between mb-8">
-                                <h3 className="font-black text-gray-900 uppercase tracking-widest text-sm flex items-center gap-2">
+                                <h3 className="font-black text-content-primary uppercase tracking-widest text-sm flex items-center gap-2">
                                     <Filter className="w-4 h-4 text-indigo-600" />
                                     Class-wise Collection
                                 </h3>
-                                <div className="px-3 py-1 bg-gray-50 rounded-full text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Current Academic Year</div>
+                                <div className="px-3 py-1 bg-chrome rounded-full text-[10px] font-bold text-content-muted uppercase tracking-tighter">Current Academic Year</div>
                             </div>
-                            
+
                             <div className="h-[300px] w-full">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
@@ -535,22 +535,30 @@ const CollectionDeskPage: React.FC = () => {
                                         margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                                     >
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                                        <XAxis 
-                                            dataKey="name" 
-                                            axisLine={false} 
-                                            tickLine={false} 
+                                        <XAxis
+                                            dataKey="name"
+                                            axisLine={false}
+                                            tickLine={false}
                                             tick={{ fill: '#9CA3AF', fontSize: 10, fontWeight: 700 }}
                                             dy={10}
                                         />
-                                        <YAxis 
-                                            axisLine={false} 
+                                        <YAxis
+                                            axisLine={false}
                                             tickLine={false}
                                             tick={{ fill: '#9CA3AF', fontSize: 10, fontWeight: 700 }}
                                             tickFormatter={(value) => `${getCurrencySymbol(currencyCode)}${value >= 1000 ? (value / 1000).toFixed(1) + 'k' : value}`}
                                         />
-                                        <Tooltip 
-                                            cursor={{ fill: '#F3F4F6' }}
-                                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                        <Tooltip
+                                            cursor={{ fill: 'rgba(99,102,241,0.08)' }}
+                                            contentStyle={{
+                                                borderRadius: '12px',
+                                                border: '1px solid rgba(99,102,241,0.2)',
+                                                backgroundColor: 'hsl(var(--color-surface))',
+                                                color: 'hsl(var(--color-content-primary))',
+                                                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.3)'
+                                            }}
+                                            labelStyle={{ color: 'hsl(var(--color-content-secondary))', fontWeight: 700, fontSize: '11px' }}
+                                            itemStyle={{ color: 'hsl(var(--color-content-primary))', fontWeight: 800 }}
                                             formatter={(value: any) => [format(value), 'Collected']}
                                         />
                                         <Bar dataKey="amount" fill="#4F46E5" radius={[6, 6, 0, 0]} barSize={40}>
@@ -564,50 +572,50 @@ const CollectionDeskPage: React.FC = () => {
                         </div>
 
                         {/* Recent Activity List */}
-                        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
-                            <div className="p-6 border-b border-gray-100">
-                                <h3 className="font-black text-gray-900 uppercase tracking-widest text-sm flex items-center gap-2">
+                        <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden flex flex-col">
+                            <div className="p-6 border-b border-border">
+                                <h3 className="font-black text-content-primary uppercase tracking-widest text-sm flex items-center gap-2">
                                     <History className="w-4 h-4 text-indigo-600" />
                                     Recent Activity
                                 </h3>
                             </div>
-                            <div className="flex-1 divide-y divide-gray-50 overflow-y-auto max-h-[400px]">
+                            <div className="flex-1 divide-y divide-border overflow-y-auto max-h-[400px]">
                                 {summary.recentTransactions.length === 0 ? (
                                     <div className="p-12 text-center">
-                                        <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <History className="w-6 h-6 text-gray-300" />
+                                        <div className="w-12 h-12 bg-chrome rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <History className="w-6 h-6 text-content-muted" />
                                         </div>
-                                        <p className="text-xs text-gray-400 font-medium">No recent transactions</p>
+                                        <p className="text-xs text-content-muted font-medium">No recent transactions</p>
                                     </div>
                                 ) : (
                                     summary.recentTransactions.map((tx: any) => (
-                                        <div key={tx.id} className="p-4 hover:bg-gray-50/50 transition-colors flex items-center justify-between group">
+                                        <div key={tx.id} className="p-4 hover:bg-chrome/50 transition-colors flex items-center justify-between group">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs font-black uppercase">
+                                                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center text-xs font-black uppercase">
                                                     {tx.paymentMode?.[0]}
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <p className="text-sm font-bold text-gray-900">{tx.studentName || `Student: ${tx.studentId?.substring(0, 8)}`}</p>
+                                                        <p className="text-sm font-bold text-content-primary">{tx.studentName || `Student: ${tx.studentId?.substring(0, 8)}`}</p>
                                                         <span className="text-[10px] font-black text-emerald-600">+{format(tx.amount)}</span>
                                                     </div>
-                                                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest leading-none mb-1">
+                                                    <p className="text-[10px] text-content-muted font-bold uppercase tracking-widest leading-none mb-1">
                                                         {tx.offeringName ? `${tx.offeringName} • ` : ''}{tx.paymentMode} • {formatRelativeTime(tx.transactionDate)}
                                                     </p>
                                                     {tx.feeHeadName && (
-                                                        <p className="text-[9px] text-gray-400 font-medium italic truncate max-w-[150px]" title={tx.feeHeadName}>
+                                                        <p className="text-[9px] text-content-muted font-medium italic truncate max-w-[150px]" title={tx.feeHeadName}>
                                                             {tx.feeHeadName}
                                                         </p>
                                                     )}
                                                 </div>
                                             </div>
-                                            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-indigo-400 transition-colors" />
+                                            <ArrowRight className="w-4 h-4 text-content-muted group-hover:text-indigo-400 transition-colors" />
                                         </div>
                                     ))
                                 )}
                             </div>
-                            <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-center">
-                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Last Updated: {new Date().toLocaleTimeString()}</span>
+                            <div className="p-4 bg-chrome border-t border-border flex items-center justify-center">
+                                <span className="text-[10px] font-black text-content-muted uppercase tracking-widest">Last Updated: {new Date().toLocaleTimeString()}</span>
                             </div>
                         </div>
                     </div>
@@ -615,7 +623,7 @@ const CollectionDeskPage: React.FC = () => {
             ) : (
                 <div className="h-96 flex flex-col items-center justify-center space-y-4">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600" />
-                    <p className="text-sm text-gray-400 font-medium animate-pulse">Loading Collection Statistics...</p>
+                    <p className="text-sm text-content-muted font-medium animate-pulse">Loading Collection Statistics...</p>
                 </div>
             )}
         </div>

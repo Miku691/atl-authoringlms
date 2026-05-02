@@ -134,7 +134,7 @@ const LeaveRequestPage: React.FC = () => {
                     </span>
                 );
             default:
-                return <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-semibold">{status}</span>;
+                return <span className="px-3 py-1 bg-chrome text-content-primary rounded-full text-xs font-semibold">{status}</span>;
         }
     };
 
@@ -167,7 +167,7 @@ const LeaveRequestPage: React.FC = () => {
             {/* Quota Row */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                 {quotas.map((q, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex items-center gap-5 group hover:shadow-xl transition-all">
+                    <div key={idx} className="bg-surface rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex items-center gap-5 group hover:shadow-xl transition-all">
                         <div className={`w-12 h-12 rounded-xl ${q.bg} flex items-center justify-center`}>
                             <q.icon className={`w-6 h-6 ${q.color}`} />
                         </div>
@@ -181,7 +181,7 @@ const LeaveRequestPage: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                 {/* Apply Form Card */}
-                <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden h-fit">
+                <div className="bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden h-fit">
                     <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
                          <div className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
@@ -189,7 +189,7 @@ const LeaveRequestPage: React.FC = () => {
                             </div>
                             <div>
                                 <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Apply Leave</h3>
-                                <p className="text-xs text-slate-400 font-medium">Submit a new request</p>
+                                <p className="text-xs text-content-muted font-medium">Submit a new request</p>
                             </div>
                         </div>
                     </div>
@@ -240,7 +240,7 @@ const LeaveRequestPage: React.FC = () => {
                         <div className="space-y-2">
                             <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest pl-1">Reason for Leave</p>
                             <textarea
-                                className="w-full p-4 bg-[#f7f9ff] border-0 rounded-xl focus:ring-2 focus:ring-[#2a6df4]/20 min-h-[120px] text-sm text-[#181c20] placeholder:text-slate-400 transition-all font-medium"
+                                className="w-full p-4 bg-[#f7f9ff] border-0 rounded-xl focus:ring-2 focus:ring-[#2a6df4]/20 min-h-[120px] text-sm text-[#181c20] placeholder:text-content-muted transition-all font-medium"
                                 placeholder="Describe the reason for your leave..."
                                 value={newLeave.reason}
                                 onChange={(e) => setNewLeave({ ...newLeave, reason: e.target.value })}
@@ -260,7 +260,7 @@ const LeaveRequestPage: React.FC = () => {
                 </div>
 
                 {/* History List Card */}
-                <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden flex flex-col">
+                <div className="bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden flex flex-col">
                     <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
                          <div className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
@@ -268,7 +268,7 @@ const LeaveRequestPage: React.FC = () => {
                             </div>
                             <div>
                                 <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Leave History</h3>
-                                <p className="text-xs text-slate-400 font-medium">Tracking and Status</p>
+                                <p className="text-xs text-content-muted font-medium">Tracking and Status</p>
                             </div>
                         </div>
                     </div>
@@ -280,7 +280,7 @@ const LeaveRequestPage: React.FC = () => {
                                     <Clock className="w-12 h-12 text-slate-200" />
                                 </div>
                                 <h4 className="text-lg font-bold text-[#1a3d8a]">No History</h4>
-                                <p className="text-xs text-slate-400 font-medium tracking-wide">You haven't applied for any leaves yet.</p>
+                                <p className="text-xs text-content-muted font-medium tracking-wide">You haven't applied for any leaves yet.</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-[#f1f3f9]">
@@ -304,13 +304,13 @@ const LeaveRequestPage: React.FC = () => {
                                         </div>
                                         
                                         {leave.remarks && (
-                                            <div className="mt-3 pl-4 border-l-2 border-slate-100">
+                                            <div className="mt-3 pl-4 border-l-2 border-border">
                                                 <p className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest mb-1 opacity-60">Admin Remark</p>
                                                 <p className="text-xs font-semibold text-[#181c20] line-clamp-1 group-hover:line-clamp-none transition-all">{leave.remarks}</p>
                                             </div>
                                         )}
                                         <div className="mt-3 flex items-center justify-between">
-                                             <span className="text-[10px] text-slate-400 font-medium tracking-tight">Applied: {new Date(leave.createdAt).toLocaleDateString()}</span>
+                                             <span className="text-[10px] text-content-muted font-medium tracking-tight">Applied: {new Date(leave.createdAt).toLocaleDateString()}</span>
                                              <span className="text-[9px] font-mono text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity">ID: {leave.id.substring(0,8)}</span>
                                         </div>
                                     </div>

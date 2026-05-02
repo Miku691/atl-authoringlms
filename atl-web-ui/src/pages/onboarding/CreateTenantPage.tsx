@@ -159,13 +159,13 @@ const CreateTenantPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white flex">
+        <div className="min-h-screen bg-surface flex">
             {/* Left Side - Visual */}
             <div className="hidden lg:flex lg:w-1/2 bg-indigo-950 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-30"></div>
                 <div className="relative z-10 flex flex-col justify-center px-12 text-white">
                     <div className="mb-8">
-                        <div className="bg-white/10 p-4 rounded-2xl w-fit backdrop-blur-md">
+                        <div className="bg-surface/10 p-4 rounded-2xl w-fit backdrop-blur-md">
                             <LayoutDashboard className="h-12 w-12 text-white" />
                         </div>
                     </div>
@@ -176,11 +176,11 @@ const CreateTenantPage: React.FC = () => {
                         Standardize your institutional identity with precision location mapping and automated regional settings.
                     </p>
                     <div className="grid grid-cols-2 gap-6 mt-12">
-                        <div className="bg-white/5 p-4 rounded-xl backdrop-blur-sm border border-white/10">
+                        <div className="bg-surface/5 p-4 rounded-xl backdrop-blur-sm border border-white/10">
                             <p className="text-3xl font-black mb-1">100%</p>
                             <p className="text-xs text-indigo-200 font-bold uppercase tracking-wider">Cloud Ready</p>
                         </div>
-                        <div className="bg-white/5 p-4 rounded-xl backdrop-blur-sm border border-white/10">
+                        <div className="bg-surface/5 p-4 rounded-xl backdrop-blur-sm border border-white/10">
                             <p className="text-3xl font-black mb-1">Global</p>
                             <p className="text-xs text-indigo-200 font-bold uppercase tracking-wider">Multi-Currency</p>
                         </div>
@@ -189,13 +189,13 @@ const CreateTenantPage: React.FC = () => {
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 lg:p-20 bg-slate-50 overflow-y-auto">
+            <div className="w-full lg:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 lg:p-20 bg-chrome overflow-y-auto">
                 <div className="w-full max-w-xl space-y-10 py-10">
                     <div className="text-center lg:text-left space-y-2">
-                        <h2 className="text-4xl font-black text-slate-900 tracking-tight">
+                        <h2 className="text-4xl font-black text-content-primary tracking-tight">
                             Institute Registry
                         </h2>
-                        <p className="text-slate-500 font-medium">
+                        <p className="text-content-secondary font-medium">
                             Enter the core establishment details of your institution.
                         </p>
                     </div>
@@ -230,14 +230,14 @@ const CreateTenantPage: React.FC = () => {
                             <h3 className="text-xs font-black text-indigo-600 uppercase tracking-widest px-1">Regional Setting & Location</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Country</label>
+                                    <label className="block text-[11px] font-black text-content-muted uppercase tracking-wider mb-1.5 ml-1">Country</label>
                                     <div className="relative group">
-                                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                                        <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted group-focus-within:text-indigo-600 transition-colors" />
                                         <select
                                             name="country"
                                             value={formData.country}
                                             onChange={handleChange}
-                                            className="block w-full pl-10 pr-4 py-3 border-2 border-slate-100 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 sm:text-sm font-bold transition-all bg-white h-[54px]"
+                                            className="block w-full pl-10 pr-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 sm:text-sm font-bold transition-all bg-surface h-[54px]"
                                         >
                                             {COUNTRIES.map(c => (
                                                 <option key={c.code} value={c.name}>{c.name}</option>
@@ -246,14 +246,14 @@ const CreateTenantPage: React.FC = () => {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5 ml-1">State / Province</label>
+                                    <label className="block text-[11px] font-black text-content-muted uppercase tracking-wider mb-1.5 ml-1">State / Province</label>
                                     <div className="relative group">
-                                        <Landmark className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                                        <Landmark className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted group-focus-within:text-indigo-600 transition-colors" />
                                         <select
                                             name="state"
                                             value={formData.state}
                                             onChange={handleChange}
-                                            className="block w-full pl-10 pr-4 py-3 border-2 border-slate-100 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 sm:text-sm font-bold transition-all bg-white h-[54px]"
+                                            className="block w-full pl-10 pr-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 sm:text-sm font-bold transition-all bg-surface h-[54px]"
                                         >
                                             <option value="">Select State</option>
                                             {currentCountry?.states.map(s => (
@@ -267,9 +267,9 @@ const CreateTenantPage: React.FC = () => {
 
                             {/* Local Address Details */}
                             <div className="relative">
-                                <label className="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5 ml-1">Local Address (City, Street, Building)</label>
+                                <label className="block text-[11px] font-black text-content-muted uppercase tracking-wider mb-1.5 ml-1">Local Address (City, Street, Building)</label>
                                 <div className="relative group">
-                                    <MapPin className="absolute left-3 top-4 w-5 h-5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                                    <MapPin className="absolute left-3 top-4 w-5 h-5 text-content-muted group-focus-within:text-indigo-600 transition-colors" />
                                     <textarea
                                         name="address"
                                         rows={3}
@@ -277,7 +277,7 @@ const CreateTenantPage: React.FC = () => {
                                         value={formData.address}
                                         onChange={handleChange}
                                         placeholder="Enter city, street no, landmark etc..."
-                                        className="block w-full pl-10 pr-4 py-3 border-2 border-slate-100 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 sm:text-sm font-medium transition-all bg-white resize-none"
+                                        className="block w-full pl-10 pr-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 sm:text-sm font-medium transition-all bg-surface resize-none"
                                     />
                                 </div>
                                 {errors.address && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.address}</p>}
@@ -286,7 +286,7 @@ const CreateTenantPage: React.FC = () => {
 
                         {/* Section 3: Geo Coordinates - Hidden temporarily due to errors */}
                         {/* 
-                        <div className="space-y-4 bg-white p-6 rounded-2xl border-2 border-slate-100 shadow-sm">
+                        <div className="space-y-4 bg-surface p-6 rounded-2xl border-2 border-border shadow-sm">
                             <div className="flex items-center justify-between mb-2">
                                 <h3 className="text-xs font-black text-indigo-600 uppercase tracking-widest">Establishment Coordinates</h3>
                                 <button
@@ -319,7 +319,7 @@ const CreateTenantPage: React.FC = () => {
                                     className="mb-0"
                                 />
                             </div>
-                            <p className="text-[10px] text-slate-400 italic">Enter manually or use 'Auto Pick' for precise geo-location mapping.</p>
+                            <p className="text-[10px] text-content-muted italic">Enter manually or use 'Auto Pick' for precise geo-location mapping.</p>
                         </div>
                         */}
 
@@ -333,7 +333,7 @@ const CreateTenantPage: React.FC = () => {
                                         readOnly
                                         value={formData.countryPhoneCode}
                                         className="mb-0 h-[58px]"
-                                        inputClassName="text-center font-bold text-slate-400"
+                                        inputClassName="text-center font-bold text-content-muted"
                                     />
                                 </div>
                                 <div className="flex-1">
@@ -352,10 +352,10 @@ const CreateTenantPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div className="pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
                            <div className="flex flex-col">
                                 <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-1">Operational Currency</span>
-                                <span className="text-xl font-black text-slate-800 ml-1">{formData.currency}</span>
+                                <span className="text-xl font-black text-content-primary ml-1">{formData.currency}</span>
                            </div>
                            
                             <button

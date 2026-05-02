@@ -78,26 +78,26 @@ const ForcePasswordResetPage: React.FC = () => {
 
                 {/* New Password */}
                 <div>
-                    <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="newPassword" className="block text-sm font-medium text-content-primary mb-2">
                         New Password
                     </label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Lock className="h-5 w-5 text-gray-400" />
+                            <Lock className="h-5 w-5 text-content-muted" />
                         </div>
                         <input
                             type={showNewPassword ? "text" : "password"}
                             name="newPassword"
                             id="newPassword"
                             required
-                            className="block w-full pl-10 pr-10 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-all"
+                            className="block w-full pl-10 pr-10 py-4 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-all"
                             placeholder="Create a strong password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                         />
                         <button
                             type="button"
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-content-muted hover:text-content-secondary focus:outline-none"
                             onClick={() => setShowNewPassword(!showNewPassword)}
                         >
                             {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -107,26 +107,26 @@ const ForcePasswordResetPage: React.FC = () => {
 
                 {/* Confirm Password */}
                 <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-content-primary mb-2">
                         Confirm New Password
                     </label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Lock className="h-5 w-5 text-gray-400" />
+                            <Lock className="h-5 w-5 text-content-muted" />
                         </div>
                         <input
                             type={showConfirmPassword ? "text" : "password"}
                             name="confirmPassword"
                             id="confirmPassword"
                             required
-                            className="block w-full pl-10 pr-10 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-all"
+                            className="block w-full pl-10 pr-10 py-4 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm transition-all"
                             placeholder="Re-enter your new password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                         <button
                             type="button"
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-content-muted hover:text-content-secondary focus:outline-none"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         >
                             {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -155,7 +155,7 @@ const ForcePasswordResetPage: React.FC = () => {
                 </div>
 
                 <div className="text-center">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-content-secondary">
                         Suddenly remembered? {' '}
                         <Link to="/login" className="font-bold text-indigo-600 hover:text-indigo-500">
                             Back to Sign In

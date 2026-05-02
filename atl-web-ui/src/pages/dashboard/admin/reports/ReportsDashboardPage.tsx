@@ -143,12 +143,12 @@ export const ReportsDashboardPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-            <div className="p-3 bg-indigo-100 text-indigo-700 rounded-xl shadow-sm border border-indigo-200">
+            <div className="p-3 bg-indigo-500/10 text-indigo-500 rounded-xl shadow-sm border border-indigo-500/20">
             <FileSpreadsheet className="w-7 h-7" />
             </div>
             <div>
-            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{categoryTitle}</h1>
-            <p className="text-sm text-gray-500 mt-1">Export analytical and operational data extracts</p>
+            <h1 className="text-2xl font-bold text-content-primary tracking-tight">{categoryTitle}</h1>
+            <p className="text-sm text-content-secondary mt-1">Export analytical and operational data extracts</p>
             </div>
         </div>
       </div>
@@ -158,9 +158,9 @@ export const ReportsDashboardPage: React.FC = () => {
         {/* Left Column: Report Selection */}
         <div className="lg:col-span-3 space-y-6">
           
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-              <h3 className="text-base font-semibold text-gray-900">Select Report</h3>
+          <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
+            <div className="px-6 py-4 border-b border-border bg-chrome/50">
+              <h3 className="text-base font-semibold text-content-primary">Select Report</h3>
             </div>
             <div className="p-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -168,7 +168,7 @@ export const ReportsDashboardPage: React.FC = () => {
                   <label 
                     key={report.id}
                     className={`relative flex cursor-pointer rounded-xl border p-4 shadow-sm focus:outline-none transition-all ${
-                      selectedReportId === report.id ? 'border-indigo-600 ring-1 ring-indigo-600 bg-indigo-50/30' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'
+                      selectedReportId === report.id ? 'border-indigo-600 ring-1 ring-indigo-600 bg-indigo-500/10' : 'border-border hover:border-indigo-300 hover:bg-chrome'
                     }`}
                   >
                     <input
@@ -180,16 +180,16 @@ export const ReportsDashboardPage: React.FC = () => {
                       onChange={() => setSelectedReportId(report.id)}
                     />
                     <div className="flex flex-col">
-                      <span className="block text-sm font-medium text-gray-900">{report.name}</span>
-                      <span className="mt-1 flex items-center text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                      <span className="block text-sm font-medium text-content-primary">{report.name}</span>
+                      <span className="mt-1 flex items-center text-xs text-content-secondary line-clamp-2 leading-relaxed">
                         {report.description}
                       </span>
                     </div>
                     {/* Active Indicator */}
                     <div className={`absolute top-4 right-4 h-5 w-5 rounded-full border flex items-center justify-center transition-colors ${
-                       selectedReportId === report.id ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'
+                       selectedReportId === report.id ? 'border-indigo-600 bg-indigo-600' : 'border-border'
                     }`}>
-                       {selectedReportId === report.id && <div className="h-2 w-2 rounded-full bg-white" />}
+                       {selectedReportId === report.id && <div className="h-2 w-2 rounded-full bg-surface" />}
                     </div>
                   </label>
                 ))}
@@ -200,23 +200,23 @@ export const ReportsDashboardPage: React.FC = () => {
 
         {/* Right Column: Configuration & Action */}
         <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden sticky top-6">
-            <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
-              <h3 className="text-base font-semibold text-gray-900">Configuration</h3>
+          <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden sticky top-6">
+            <div className="px-6 py-4 border-b border-border bg-chrome/50 flex items-center justify-between">
+              <h3 className="text-base font-semibold text-content-primary">Configuration</h3>
             </div>
             
             <div className="p-6 space-y-8">
               
               {/* Format Selection */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">Export Format</label>
+                <label className="block text-sm font-medium text-content-primary mb-3">Export Format</label>
                 <div className="flex gap-3">
                   <button
                     onClick={() => setSelectedFormat('EXCEL')}
                     className={`flex-1 flex justify-center items-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
                       selectedFormat === 'EXCEL' 
-                      ? 'bg-emerald-50 text-emerald-700 border-2 border-emerald-500 shadow-sm' 
-                      : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-emerald-200 hover:bg-gray-50'
+                      ? 'bg-emerald-500/10 text-emerald-500 border-2 border-emerald-500 shadow-sm' 
+                      : 'bg-surface border-2 border-border text-content-secondary hover:border-emerald-200 hover:bg-chrome'
                     }`}
                   >
                     <FileSpreadsheet className="w-4 h-4" /> Excel
@@ -225,8 +225,8 @@ export const ReportsDashboardPage: React.FC = () => {
                     onClick={() => setSelectedFormat('CSV')}
                     className={`flex-1 flex justify-center items-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${
                       selectedFormat === 'CSV' 
-                      ? 'bg-blue-50 text-blue-700 border-2 border-blue-500 shadow-sm' 
-                      : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-blue-200 hover:bg-gray-50'
+                      ? 'bg-blue-500/10 text-blue-400 border-2 border-blue-500 shadow-sm' 
+                      : 'bg-surface border-2 border-border text-content-secondary hover:border-blue-200 hover:bg-chrome'
                     }`}
                   >
                     <FileSpreadsheet className="w-4 h-4" /> CSV
@@ -236,25 +236,25 @@ export const ReportsDashboardPage: React.FC = () => {
 
               {/* Conditional Date Pickers */}
               {(selectedReport?.requiresStartDate || selectedReport?.requiresEndDate) && (
-                <div className="pt-6 border-t border-gray-100">
+                <div className="pt-6 border-t border-border">
                   <div className="flex items-center justify-between mb-4">
-                    <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
-                        <Calendar className="w-4 h-4 text-gray-400" />
+                    <label className="block text-sm font-medium text-content-primary flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-content-muted" />
                         Date Filter
                     </label>
                     
                     {/* Toggle Single / Range */}
                     {selectedReport.requiresStartDate && selectedReport.requiresEndDate && (
-                        <div className="bg-gray-100 p-0.5 rounded-lg flex text-xs font-medium">
+                        <div className="bg-chrome p-0.5 rounded-lg flex text-xs font-medium">
                             <button 
                                 onClick={() => setDateSelectionType('SINGLE')}
-                                className={`px-3 py-1.5 rounded-md transition-all ${dateSelectionType === 'SINGLE' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                className={`px-3 py-1.5 rounded-md transition-all ${dateSelectionType === 'SINGLE' ? 'bg-surface text-content-primary shadow-sm' : 'text-content-secondary hover:text-content-primary'}`}
                             >
                                 Single Day
                             </button>
                             <button 
                                 onClick={() => setDateSelectionType('RANGE')}
-                                className={`px-3 py-1.5 rounded-md transition-all ${dateSelectionType === 'RANGE' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                className={`px-3 py-1.5 rounded-md transition-all ${dateSelectionType === 'RANGE' ? 'bg-surface text-content-primary shadow-sm' : 'text-content-secondary hover:text-content-primary'}`}
                             >
                                 Range
                             </button>
@@ -266,12 +266,12 @@ export const ReportsDashboardPage: React.FC = () => {
                       {dateSelectionType === 'SINGLE' || !(selectedReport.requiresStartDate && selectedReport.requiresEndDate) ? (
                           /* SINGLE DATE OR ONLY END DATE REQUIRED (e.g., balance up to) */
                           <div>
-                            <label className="block text-xs text-gray-500 mb-1">
+                            <label className="block text-xs text-content-secondary mb-1">
                                 {selectedReport.requiresStartDate && selectedReport.requiresEndDate ? 'Select Date' : (selectedReport.requiresEndDate ? 'Up to Date' : 'From Date')}
                             </label>
                             <input 
                                 type="date"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                                className="w-full px-3 py-2 bg-chrome border border-border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-content-primary outline-none"
                                 value={singleDate}
                                 onChange={(e) => {
                                     setSingleDate(e.target.value);
@@ -285,19 +285,19 @@ export const ReportsDashboardPage: React.FC = () => {
                           /* RANGE DATES */
                           <div className="grid grid-cols-2 gap-3">
                               <div>
-                                <label className="block text-xs text-gray-500 mb-1">Start Date</label>
+                                <label className="block text-xs text-content-secondary mb-1">Start Date</label>
                                 <input 
                                     type="date"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                                    className="w-full px-3 py-2 bg-chrome border border-border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-content-primary outline-none"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
                                 />
                               </div>
                               <div>
-                                <label className="block text-xs text-gray-500 mb-1">End Date</label>
+                                <label className="block text-xs text-content-secondary mb-1">End Date</label>
                                 <input 
                                     type="date"
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                                    className="w-full px-3 py-2 bg-chrome border border-border rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm text-content-primary outline-none"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
                                 />
@@ -309,7 +309,7 @@ export const ReportsDashboardPage: React.FC = () => {
               )}
 
               {/* Action Button */}
-              <div className="pt-6 border-t border-gray-100">
+              <div className="pt-6 border-t border-border">
                 <button 
                   onClick={handleGenerateReport} 
                   disabled={isGenerating}
@@ -321,7 +321,7 @@ export const ReportsDashboardPage: React.FC = () => {
                     <><Download className="mr-2 h-5 w-5" /> Download {selectedFormat}</>
                   )}
                 </button>
-                <div className="mt-4 flex items-start gap-2 text-xs text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                <div className="mt-4 flex items-start gap-2 text-xs text-content-secondary bg-chrome p-3 rounded-lg border border-border">
                     <AlertCircle className="w-4 h-4 text-indigo-500 flex-shrink-0" />
                     <p>Large datasets may take a few moments to aggregate and download.</p>
                 </div>

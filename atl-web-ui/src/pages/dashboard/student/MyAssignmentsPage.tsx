@@ -124,7 +124,7 @@ const MyAssignmentsPage: React.FC = () => {
             </div>
 
             {/* ── Status Tabs ── */}
-            <div className="flex items-center gap-2 bg-white rounded-2xl p-2 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)]">
+            <div className="flex items-center gap-2 bg-surface rounded-2xl p-2 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)]">
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
@@ -137,7 +137,7 @@ const MyAssignmentsPage: React.FC = () => {
                     >
                         {tab.label}
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                            activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-[#f1f3f9] text-[#64748b]'
+                            activeTab === tab.id ? 'bg-surface/20 text-white' : 'bg-[#f1f3f9] text-[#64748b]'
                         }`}>
                             {tab.count}
                         </span>
@@ -147,7 +147,7 @@ const MyAssignmentsPage: React.FC = () => {
 
             {/* ── Assignments Grid ── */}
             {visibleAssignments.length === 0 ? (
-                <div className="bg-white rounded-2xl py-20 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex flex-col items-center">
+                <div className="bg-surface rounded-2xl py-20 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex flex-col items-center">
                     <div className="w-14 h-14 bg-[#f1f3f9] rounded-2xl flex items-center justify-center mb-4">
                         <FileText className="w-7 h-7 text-[#c2c6d7]" />
                     </div>
@@ -165,7 +165,7 @@ const MyAssignmentsPage: React.FC = () => {
                         return (
                             <div
                                 key={assignment.id}
-                                className="group bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col overflow-hidden"
+                                className="group bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col overflow-hidden"
                             >
                                 <div className="p-5 flex-1">
                                     {/* Status Badge + Icon */}
@@ -233,16 +233,16 @@ const MyAssignmentsPage: React.FC = () => {
             {/* ── Submission Modal ── */}
             {selectedAssignment && (
                 <div className="fixed inset-0 bg-[#181c20]/60 backdrop-blur-md flex items-center justify-center z-[100] p-6 animate-fade-in">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+                    <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
                         {/* Modal Header */}
                         <div className="bg-gradient-to-br from-[#0054d1] to-[#2a6df4] p-6 text-white relative">
                             <button
                                 onClick={() => { setSelectedAssignment(null); setFile(null); }}
-                                className="absolute right-4 top-4 p-2 hover:bg-white/10 rounded-xl transition-all"
+                                className="absolute right-4 top-4 p-2 hover:bg-surface/10 rounded-xl transition-all"
                             >
                                 <X className="w-5 h-5" />
                             </button>
-                            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center mb-4 border border-white/20">
+                            <div className="w-10 h-10 bg-surface/10 rounded-xl flex items-center justify-center mb-4 border border-white/20">
                                 <Upload className="w-5 h-5 text-white" />
                             </div>
                             <p className="text-[10px] text-white/70 uppercase tracking-widest font-semibold mb-1">Submitting For</p>
@@ -259,7 +259,7 @@ const MyAssignmentsPage: React.FC = () => {
                                 <div>
                                     <p className="text-xs font-semibold text-[#64748b] mb-2 uppercase tracking-widest">Upload File</p>
                                     <div className={`relative border-2 border-dashed rounded-xl p-10 transition-all cursor-pointer flex flex-col items-center justify-center text-center ${
-                                        file ? 'border-[#2a6df4] bg-[#f0f4ff]' : 'border-[#e0e2e8] bg-[#f7f9ff] hover:border-[#2a6df4] hover:bg-white'
+                                        file ? 'border-[#2a6df4] bg-[#f0f4ff]' : 'border-[#e0e2e8] bg-[#f7f9ff] hover:border-[#2a6df4] hover:bg-surface'
                                     }`}>
                                         <input
                                             type="file"

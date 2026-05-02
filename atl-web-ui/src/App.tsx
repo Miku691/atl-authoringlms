@@ -88,6 +88,14 @@ import UpgradePlanPage from './pages/dashboard/admin/billing/UpgradePlanPage';
 // Protected Route Wrapper
 import { useSelector } from 'react-redux';
 import { Toaster } from 'react-hot-toast';
+import { useTheme } from './context/ThemeContext';
+import LandingPage from './public/LandingPage';
+import PublicLayout from './public/PublicLayout';
+import AboutPage from './public/AboutPage';
+import ContactPage from './public/ContactPage';
+import PrivacyPolicyPage from './public/PrivacyPolicyPage';
+import TermsConditionsPage from './public/TermsConditionsPage';
+import FeaturesPage from './public/FeaturesPage';
 
 const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: string[] }) => {
   const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
@@ -146,16 +154,36 @@ const DashboardWrapper = () => {
   return <AdminDashboardHome />;
 };
 
-import LandingPage from './public/LandingPage';
-
 const App: React.FC = () => {
+  const { isDark } = useTheme();
+
   return (
     <Provider store={store}>
       <CurrencyProvider>
-        <Toaster position="top-right" reverseOrder={false} />
+        <Toaster
+          position="top-right"
+          reverseOrder={false}
+          toastOptions={{
+            style: {
+              background: 'var(--bg-surface)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border)',
+            },
+          }}
+        />
         <Router>
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            
+            {/* Public Informational Routes */}
+            <Route element={<PublicLayout />}>
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+              <Route path="/terms" element={<TermsConditionsPage />} />
+              <Route path="/features" element={<FeaturesPage />} />
+            </Route>
+
             <Route path="/login" element={<LoginPage />} />
             <Route path="/otp" element={<OtpPage />} />
             <Route path="/register-institute" element={<RegisterInstitutePage />} />

@@ -12,8 +12,8 @@ import java.time.LocalDate;
 public interface ExpenseRepository extends JpaRepository<Expense, String> {
     List<Expense> findByTenantId(String tenantId);
 
-    @Query("SELECT FUNCTION('YEAR', e.expenseDate) as year, FUNCTION('MONTH', e.expenseDate) as month, SUM(e.amount) as amount " +
+    @Query("SELECT YEAR(e.expenseDate) as year, MONTH(e.expenseDate) as month, SUM(e.amount) as amount " +
            "FROM Expense e WHERE e.tenantId = :tenantId AND e.expenseDate >= :startDate " +
-           "GROUP BY FUNCTION('YEAR', e.expenseDate), FUNCTION('MONTH', e.expenseDate)")
+           "GROUP BY YEAR(e.expenseDate), MONTH(e.expenseDate)")
     List<Object[]> sumAmountByMonth(@Param("tenantId") String tenantId, @Param("startDate") LocalDate startDate);
 }

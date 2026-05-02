@@ -78,8 +78,8 @@ const SubscriptionBillingPage: React.FC = () => {
         <div className="space-y-8 animate-in fade-in duration-500">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Subscription & Plan</h1>
-                    <p className="text-slate-500 font-medium mt-1">Manage your institution's growth and billing</p>
+                    <h1 className="text-3xl font-black text-content-primary tracking-tight">Subscription & Plan</h1>
+                    <p className="text-content-secondary font-medium mt-1">Manage your institution's growth and billing</p>
                 </div>
                 <button 
                     onClick={() => navigate('/billing/upgrade')}
@@ -94,14 +94,14 @@ const SubscriptionBillingPage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2 space-y-8">
                     {/* Plan Detail Card */}
-                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden p-8">
+                    <div className="bg-surface rounded-[2.5rem] border border-border shadow-sm overflow-hidden p-8">
                         <div className="flex items-start justify-between mb-8">
                             <div className="flex items-center gap-4">
                                 <div className="p-4 bg-indigo-50 rounded-[1.5rem]">
                                     <Zap className="w-8 h-8 text-indigo-600" />
                                 </div>
                                 <div>
-                                    <h2 className="text-2xl font-black text-slate-900">{sub.planName}</h2>
+                                    <h2 className="text-2xl font-black text-content-primary">{sub.planName}</h2>
                                     <div className="flex items-center gap-2 mt-1">
                                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                                         <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">Active Subscription</span>
@@ -109,8 +109,8 @@ const SubscriptionBillingPage: React.FC = () => {
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Renews On</p>
-                                <p className="text-sm font-black text-slate-900">{new Date(sub.validUntil).toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                <p className="text-[10px] font-black text-content-muted uppercase tracking-widest mb-1">Renews On</p>
+                                <p className="text-sm font-black text-content-primary">{new Date(sub.validUntil).toLocaleDateString([], { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                             </div>
                         </div>
 
@@ -118,21 +118,21 @@ const SubscriptionBillingPage: React.FC = () => {
                             {usageCards.map((card, i) => {
                                 const percent = Math.min((card.current / card.max) * 100, 100);
                                 return (
-                                    <div key={i} className="p-6 bg-slate-50 rounded-3xl border border-slate-100 hover:border-indigo-100 transition-colors group">
+                                    <div key={i} className="p-6 bg-chrome rounded-3xl border border-border hover:border-indigo-100 transition-colors group">
                                         <div className="flex items-center justify-between mb-4">
                                             <div className="flex items-center gap-2.5">
                                                 <card.icon className={`w-4 h-4 text-${card.color}-500`} />
-                                                <span className="text-xs font-black text-slate-600 uppercase tracking-widest">{card.label}</span>
+                                                <span className="text-xs font-black text-content-secondary uppercase tracking-widest">{card.label}</span>
                                             </div>
-                                            <span className="text-xs font-black text-slate-900">{card.current} / {card.max}</span>
+                                            <span className="text-xs font-black text-content-primary">{card.current} / {card.max}</span>
                                         </div>
-                                        <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                                        <div className="h-2 bg-chrome rounded-full overflow-hidden">
                                             <div 
                                                 className={`h-full transition-all duration-1000 ${percent > 90 ? 'bg-rose-500' : `bg-${card.color}-500`}`}
                                                 style={{ width: `${percent}%` }}
                                             />
                                         </div>
-                                        <p className="text-[10px] text-slate-400 font-bold mt-3 uppercase tracking-tighter">
+                                        <p className="text-[10px] text-content-muted font-bold mt-3 uppercase tracking-tighter">
                                             {percent.toFixed(0)}% of your plan limit used
                                         </p>
                                     </div>
@@ -157,7 +157,7 @@ const SubscriptionBillingPage: React.FC = () => {
                                 "Staff & Instructor Records"
                             ].map((feature, i) => (
                                 <div key={i} className="flex items-center gap-3">
-                                    <div className="p-1 bg-white/10 rounded-full">
+                                    <div className="p-1 bg-surface/10 rounded-full">
                                         <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                                     </div>
                                     <span className="text-sm font-bold text-slate-300">{feature}</span>
@@ -173,7 +173,7 @@ const SubscriptionBillingPage: React.FC = () => {
                         <div className="relative z-10">
                             <h3 className="text-xs font-black uppercase tracking-widest text-indigo-200 mb-6">Payment Method</h3>
                             <div className="flex items-center gap-4 mb-8">
-                                <div className="p-4 bg-white/10 rounded-2xl backdrop-blur-sm">
+                                <div className="p-4 bg-surface/10 rounded-2xl backdrop-blur-sm">
                                     <CreditCard className="w-8 h-8" />
                                 </div>
                                 <div>
@@ -181,7 +181,7 @@ const SubscriptionBillingPage: React.FC = () => {
                                     <p className="text-xs font-medium text-indigo-100">Automatic Renewals Enabled</p>
                                 </div>
                             </div>
-                            <button className="w-full py-4 bg-white text-indigo-600 text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-slate-50 transition-all">
+                            <button className="w-full py-4 bg-surface text-indigo-600 text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-chrome transition-all">
                                 Manage Payments
                             </button>
                         </div>
@@ -189,10 +189,10 @@ const SubscriptionBillingPage: React.FC = () => {
                     </div>
 
                     {/* Branding / Info Card */}
-                    <div className="bg-white rounded-[2.5rem] p-8 border border-slate-100">
-                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6">Need Assistance?</h3>
+                    <div className="bg-surface rounded-[2.5rem] p-8 border border-border">
+                        <h3 className="text-xs font-black text-content-muted uppercase tracking-widest mb-6">Need Assistance?</h3>
                         <div className="space-y-4">
-                            <p className="text-xs font-medium text-slate-600 leading-relaxed">
+                            <p className="text-xs font-medium text-content-secondary leading-relaxed">
                                 Our support team is here to help you scale your institution. Contact us for custom enterprise quotes or onboarding assistance.
                             </p>
                             <button className="flex items-center gap-2 text-sm font-black text-indigo-600 hover:text-indigo-700 transition-colors">

@@ -10,6 +10,7 @@ import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 import FloatingLabelInput from '../../../../components/common/FloatingLabelInput';
 import { useCurrency } from '../../../../context/CurrencyContext';
 import { getCurrencySymbol } from '../../../../utils/currency';
+import Modal from '../../../../components/common/Modal';
 
 const FeeStructurePage: React.FC = () => {
     const { format, currencyCode } = useCurrency();
@@ -54,7 +55,7 @@ const FeeStructurePage: React.FC = () => {
             setFeeHeads(headData);
             setOfferings(offeringData);
             setSessions(sessionData);
-            
+
             // Set default academic year to current session if available
             const currentSession = sessionData.find((s: AcademicSession) => s.isCurrent);
             if (currentSession) {
@@ -100,7 +101,7 @@ const FeeStructurePage: React.FC = () => {
 
     const filteredStructures = structures.filter(s => {
         const matchesOffering = selectedOfferingId === 'ALL' || s.offeringId === selectedOfferingId;
-        const matchesSearch = searchTerm === '' || 
+        const matchesSearch = searchTerm === '' ||
             getHeadName(s.feeHeadId).toLowerCase().includes(searchTerm.toLowerCase()) ||
             getOfferingName(s.offeringId).toLowerCase().includes(searchTerm.toLowerCase());
         return matchesOffering && matchesSearch;
@@ -110,8 +111,8 @@ const FeeStructurePage: React.FC = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Fee Structure</h1>
-                    <p className="text-sm text-gray-500">Map fee heads to classes/batches and set seasonal amounts.</p>
+                    <h1 className="text-2xl font-bold text-content-primary">Fee Structure</h1>
+                    <p className="text-sm text-content-secondary">Map fee heads to classes/batches and set seasonal amounts.</p>
                 </div>
                 <button
                     onClick={() => setIsCreateModalOpen(true)}
@@ -122,16 +123,16 @@ const FeeStructurePage: React.FC = () => {
                 </button>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-                <div className="p-6 border-b border-gray-100 bg-gray-50/30">
+            <div className="bg-surface rounded-xl shadow-sm border border-border">
+                <div className="p-6 border-b border-border bg-chrome/30">
                     <div className="flex items-center gap-4 flex-wrap">
-                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest px-1">Filter by Class:</span>
+                        <span className="text-[10px] font-black text-content-muted uppercase tracking-widest px-1">Filter by Class:</span>
                         <div className="flex items-center gap-2 flex-wrap">
                             <button
                                 onClick={() => setSelectedOfferingId('ALL')}
                                 className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${selectedOfferingId === 'ALL'
-                                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100 ring-2 ring-indigo-100'
-                                    : 'bg-white text-gray-500 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+                                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20 ring-2 ring-indigo-500/30'
+                                    : 'bg-surface text-content-secondary border border-border hover:border-indigo-300 hover:text-indigo-600'
                                     }`}
                             >
                                 All Classes
@@ -141,8 +142,8 @@ const FeeStructurePage: React.FC = () => {
                                     key={offering.id}
                                     onClick={() => setSelectedOfferingId(offering.id)}
                                     className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${selectedOfferingId === offering.id
-                                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100 ring-2 ring-indigo-100'
-                                        : 'bg-white text-gray-500 border border-gray-200 hover:border-indigo-300 hover:text-indigo-600'
+                                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/20 ring-2 ring-indigo-500/30'
+                                        : 'bg-surface text-content-secondary border border-border hover:border-indigo-300 hover:text-indigo-600'
                                         }`}
                                 >
                                     {offering.name}
@@ -152,17 +153,17 @@ const FeeStructurePage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                    <div className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                        Mapped Fee Heads 
-                        <span className="ml-2 px-2 py-0.5 bg-gray-100 rounded-full text-gray-500">{filteredStructures.length}</span>
+                <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+                    <div className="text-xs font-bold text-content-muted uppercase tracking-widest">
+                        Mapped Fee Heads
+                        <span className="ml-2 px-2 py-0.5 bg-chrome rounded-full text-content-secondary">{filteredStructures.length}</span>
                     </div>
                     <div className="relative w-64">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-300 w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-content-muted w-4 h-4" />
                         <input
                             type="text"
                             placeholder="Search heads..."
-                            className="w-full pl-9 pr-4 py-1.5 text-xs border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-indigo-100 transition-all"
+                            className="w-full pl-9 pr-4 py-1.5 text-xs bg-chrome border border-border rounded-lg outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-content-primary"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -171,7 +172,7 @@ const FeeStructurePage: React.FC = () => {
 
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
-                        <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+                        <thead className="bg-chrome text-content-secondary text-xs uppercase">
                             <tr>
                                 <th className="px-6 py-3 font-medium">Offering</th>
                                 <th className="px-6 py-3 font-medium">Fee Head</th>
@@ -180,23 +181,23 @@ const FeeStructurePage: React.FC = () => {
                                 <th className="px-6 py-3 font-medium text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody className="divide-y divide-border">
                             {loading ? (
-                                <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Loading mappings...</td></tr>
+                                <tr><td colSpan={5} className="px-6 py-8 text-center text-content-secondary">Loading mappings...</td></tr>
                             ) : filteredStructures.length === 0 ? (
-                                <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">No mappings found.</td></tr>
+                                <tr><td colSpan={5} className="px-6 py-8 text-center text-content-secondary">No mappings found.</td></tr>
                             ) : (
                                 filteredStructures.map(s => (
-                                    <tr key={s.id} className="hover:bg-gray-50">
+                                    <tr key={s.id} className="hover:bg-chrome">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
                                                 <Layers className="w-4 h-4 text-indigo-500" />
-                                                <span className="text-sm font-medium text-gray-900">{getOfferingName(s.offeringId)}</span>
+                                                <span className="text-sm font-medium text-content-primary">{getOfferingName(s.offeringId)}</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-gray-700">{getHeadName(s.feeHeadId)}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 font-mono">{s.academicYear}</td>
-                                        <td className="px-6 py-4 text-sm text-right font-bold text-gray-900">{format(s.amount)}</td>
+                                        <td className="px-6 py-4 text-sm text-content-primary">{getHeadName(s.feeHeadId)}</td>
+                                        <td className="px-6 py-4 text-sm text-content-secondary font-mono">{s.academicYear}</td>
+                                        <td className="px-6 py-4 text-sm text-right font-bold text-content-primary">{format(s.amount)}</td>
                                         <td className="px-6 py-4 text-right">
                                             <button onClick={() => { setItemToDelete(s); setIsDeleteModalOpen(true); }} className="text-red-600 hover:bg-red-50 p-1 rounded">
                                                 <Trash2 className="w-4 h-4" />
@@ -211,63 +212,55 @@ const FeeStructurePage: React.FC = () => {
             </div>
 
             {/* Create Modal */}
-            {isCreateModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-                        <div className="p-6 border-b bg-gray-50">
-                            <h2 className="text-xl font-bold">Map Fee to Offering</h2>
-                        </div>
-                        <form onSubmit={handleCreate} className="p-6 space-y-4">
-                            <div>
-                                <label className="text-xs font-semibold text-gray-500 uppercase px-1">Offering (Class/Batch)</label>
-                                <select required className="w-full p-3 border rounded-lg" value={newStructure.offeringId} onChange={e => setNewStructure({ ...newStructure, offeringId: e.target.value })}>
-                                    <option value="">-- Select Offering --</option>
-                                    {offerings.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
-                                </select>
-                            </div>
-                            <div>
-                                <label className="text-xs font-semibold text-gray-500 uppercase px-1">Fee Head</label>
-                                <select required className="w-full p-3 border rounded-lg" value={newStructure.feeHeadId} onChange={e => setNewStructure({ ...newStructure, feeHeadId: e.target.value })}>
-                                    <option value="">-- Select Fee Head --</option>
-                                    {feeHeads.map(h => {
-                                        const isMapped = structures.some(s => s.offeringId === newStructure.offeringId && s.feeHeadId === h.id);
-                                        return (
-                                            <option key={h.id} value={h.id} disabled={isMapped}>
-                                                {h.name} {isMapped ? '(Already Mapped)' : ''}
-                                            </option>
-                                        );
-                                    })}
-                                </select>
-                            </div>
-                             <FloatingLabelInput label="Amount" type="number" required value={newStructure.amount} onChange={e => setNewStructure({ ...newStructure, amount: parseFloat(e.target.value) })} icon={<span>{getCurrencySymbol(currencyCode)}</span>} />
-                             
-                             <div>
-                                <label className="text-xs font-semibold text-gray-500 uppercase px-1">Academic Year</label>
-                                <select 
-                                    required 
-                                    className="w-full p-3 border rounded-lg" 
-                                    value={newStructure.academicYear} 
-                                    onChange={e => setNewStructure({ ...newStructure, academicYear: e.target.value })}
-                                >
-                                    <option value="">-- Select Academic Year --</option>
-                                    {sessions.sort((a,b) => b.name.localeCompare(a.name)).map(s => (
-                                        <option key={s.id} value={s.name}>
-                                            {s.name} {s.isCurrent ? '(Current)' : ''}
-                                        </option>
-                                    ))}
-                                </select>
-                             </div>
-
-                            <div className="flex justify-end gap-3 pt-4 border-t">
-                                <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Cancel</button>
-                                <button type="submit" disabled={isCreating} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50">
-                                    {isCreating ? 'Mapping...' : 'Create Mapping'}
-                                </button>
-                            </div>
-                        </form>
+            <Modal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                title="Map Fee to Offering"
+                icon={<Layers size={18} />}
+                size="sm"
+                footer={
+                    <>
+                        <button type="button" className="modal-btn-secondary" onClick={() => setIsCreateModalOpen(false)}>Cancel</button>
+                        <button type="submit" form="fee-struct-form" disabled={isCreating} className="modal-btn-primary">
+                            {isCreating ? 'Mapping...' : 'Create Mapping'}
+                        </button>
+                    </>
+                }
+            >
+                <form id="fee-struct-form" onSubmit={handleCreate} className="space-y-4">
+                    <div>
+                        <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>Offering (Class/Batch)</label>
+                        <select required className="w-full px-4 py-2.5 border rounded-xl outline-none" style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} value={newStructure.offeringId} onChange={e => setNewStructure({ ...newStructure, offeringId: e.target.value })}>
+                            <option value="">-- Select Offering --</option>
+                            {offerings.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                        </select>
                     </div>
-                </div>
-            )}
+                    <div>
+                        <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>Fee Head</label>
+                        <select required className="w-full px-4 py-2.5 border rounded-xl outline-none" style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} value={newStructure.feeHeadId} onChange={e => setNewStructure({ ...newStructure, feeHeadId: e.target.value })}>
+                            <option value="">-- Select Fee Head --</option>
+                            {feeHeads.map(h => {
+                                const isMapped = structures.some(s => s.offeringId === newStructure.offeringId && s.feeHeadId === h.id);
+                                return (
+                                    <option key={h.id} value={h.id} disabled={isMapped}>
+                                        {h.name} {isMapped ? '(Already Mapped)' : ''}
+                                    </option>
+                                );
+                            })}
+                        </select>
+                    </div>
+                    <FloatingLabelInput label="Amount" type="number" required value={newStructure.amount} onChange={e => setNewStructure({ ...newStructure, amount: parseFloat(e.target.value) })} icon={<span>{getCurrencySymbol(currencyCode)}</span>} />
+                    <div>
+                        <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>Academic Year</label>
+                        <select required className="w-full px-4 py-2.5 border rounded-xl outline-none" style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} value={newStructure.academicYear} onChange={e => setNewStructure({ ...newStructure, academicYear: e.target.value })}>
+                            <option value="">-- Select Academic Year --</option>
+                            {sessions.sort((a, b) => b.name.localeCompare(a.name)).map(s => (
+                                <option key={s.id} value={s.name}>{s.name} {s.isCurrent ? '(Current)' : ''}</option>
+                            ))}
+                        </select>
+                    </div>
+                </form>
+            </Modal>
 
             <ConfirmationModal
                 isOpen={isDeleteModalOpen}

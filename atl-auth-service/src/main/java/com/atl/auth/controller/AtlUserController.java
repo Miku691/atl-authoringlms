@@ -12,6 +12,9 @@ import com.atl.auth.dto.VerifyPasswordResetOtpDto;
 import com.atl.auth.exception.ApiResponse;
 import com.atl.auth.service.AtlUserService;
 import com.atl.auth.service.BootstrapAdminService;
+import com.atl.auth.service.RefreshTokenService;
+import com.atl.auth.dto.TokenRefreshRequest;
+import com.atl.auth.dto.TokenRefreshResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AtlUserController {
     private final AtlUserService userService;
     private final BootstrapAdminService bootstrapAdminService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/signup")
     public ResponseEntity<ApiResponse<AtlSingupResponseDto>> signup(
@@ -61,5 +65,19 @@ public class AtlUserController {
     @PostMapping("/forgot-password/reset")
     public ResponseEntity<ApiResponse<String>> resetPassword(@RequestBody ResetPasswordDto requestDto) {
         return new ResponseEntity<>(userService.resetPassword(requestDto), HttpStatus.OK);
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<ApiResponse<TokenRefreshResponse>> refreshToken(
+            @Valid @RequestBody TokenRefreshRequest request) {
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), 
+                "Token refreshed successfully", refreshTokenService.refreshToken(request)));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<ApiResponse<String>> logoutUser(@RequestBody TokenRefreshRequest request) {
+        refreshTokenService.revokeToken(request.getRefreshToken());
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), 
+                "User logged out successfully", "Logout Successful"));
     }
 }

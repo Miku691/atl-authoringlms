@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: ['class', '[data-theme="dark"]'],
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -7,20 +8,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        // EduFlow Design System — from DESIGN.md / Stitch Project 15155094690541932935
+        // EduFlow Design System
         primary: {
-          DEFAULT: '#2A6DF4', // Institutional Blue
-          hover:   '#1A5CE0',
-          light:   '#EBF1FE',
-          dark:    '#1A3D8A',
+          DEFAULT: 'var(--brand, #2A6DF4)', 
+          hover:   'var(--brand-hover, #1A5CE0)',
+          light:   'var(--brand-subtle, #EBF1FE)',
+          dark:    'var(--brand-shadow, #1A3D8A)',
         },
-        surface:  '#FFFFFF',
-        background: '#F7F9FF',
-        border:   '#E2E8F8',
+        surface:  'var(--bg-surface)',
+        chrome:   'var(--bg-chrome)',
+        background: 'var(--bg-main)',
+        border:   'var(--border)',
         text: {
-          primary:   '#0F1D3A',
-          secondary: '#5A6B88',
-          muted:     '#8FA3C0',
+          primary:   'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          muted:     'var(--text-muted)',
+        },
+        content: {
+          primary:   'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          muted:     'var(--text-muted)',
         },
         success: '#16A34A',
         error:   '#DC2626',
@@ -29,6 +36,22 @@ export default {
       fontFamily: {
         sans:    ['Inter', 'system-ui', 'sans-serif'],
         display: ['Inter', 'system-ui', 'sans-serif'],
+      },
+      fontSize: {
+        // ─── IMS UI Font Size Scale ───────────────────────────────────────
+        // Usage: text-ui-xs, text-ui-sm, text-ui-md, etc.
+        // Intentionally compact — slightly smaller than Tailwind defaults.
+        'ui-xs':   ['10px', { lineHeight: '1.4' }],  // role chips, tiny badges
+        'ui-sm':   ['11px', { lineHeight: '1.4' }],  // breadcrumbs, uppercase labels
+        'ui-base': ['12px', { lineHeight: '1.5' }],  // table secondary, metadata
+        'ui-md':   ['13px', { lineHeight: '1.5' }],  // body text, form labels, dropdowns
+        'ui-body': ['14px', { lineHeight: '1.6' }],  // default paragraph, modal messages
+        'ui-lg':   ['15px', { lineHeight: '1.5' }],  // button labels, card subtitles
+        'ui-xl':   ['16px', { lineHeight: '1.5' }],  // section subtitles, nav items
+        'ui-2xl':  ['18px', { lineHeight: '1.35' }], // modal titles, card headings
+        'ui-3xl':  ['20px', { lineHeight: '1.3' }],  // page section headings
+        'ui-4xl':  ['24px', { lineHeight: '1.25' }], // page main titles
+        'ui-5xl':  ['30px', { lineHeight: '1.2' }],  // hero stats / dashboard numbers
       },
       borderRadius: {
         card:   '12px',

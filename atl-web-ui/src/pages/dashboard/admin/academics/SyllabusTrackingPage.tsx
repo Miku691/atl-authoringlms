@@ -7,6 +7,7 @@ import PageHeader from '../../../../components/common/PageHeader';
 import { CheckCircle, Circle, Plus, Trash2, ChevronDown, ChevronRight, X, Loader2, Edit2, Layout } from 'lucide-react';
 import { academicService } from '../../../../api/academicService';
 import { instructorService } from '../../../../api/instructorService';
+import Modal from '../../../../components/common/Modal';
 
 interface Chapter {
     id: string;
@@ -315,12 +316,12 @@ const SyllabusTrackingPage: React.FC = () => {
                 icon={Layout}
             />
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-surface rounded-xl shadow-sm border border-border p-6">
                 <div className="mb-6 grid md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Class (Offering)</label>
+                        <label className="block text-sm font-medium text-content-primary mb-2">Class (Offering)</label>
                         <select
-                            className="w-full border rounded-lg p-2 bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full border rounded-lg p-2 bg-chrome outline-none focus:ring-2 focus:ring-indigo-500"
                             value={selectedOfferingId}
                             onChange={(e) => setSelectedOfferingId(e.target.value)}
                         >
@@ -331,9 +332,9 @@ const SyllabusTrackingPage: React.FC = () => {
                         </select>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                        <label className="block text-sm font-medium text-content-primary mb-2">Subject</label>
                         <select
-                            className="w-full border rounded-lg p-2 bg-gray-50 outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full border rounded-lg p-2 bg-chrome outline-none focus:ring-2 focus:ring-indigo-500"
                             value={selectedOfferingSubjectId}
                             onChange={(e) => setSelectedOfferingSubjectId(e.target.value)}
                             disabled={!selectedOfferingId}
@@ -347,7 +348,7 @@ const SyllabusTrackingPage: React.FC = () => {
                 </div>
 
                 {!selectedOfferingSubjectId && (
-                    <div className="text-center py-12 text-gray-400 border border-dashed rounded-xl">
+                    <div className="text-center py-12 text-content-muted border border-dashed rounded-xl">
                         Select a class and subject to view syllabus
                     </div>
                 )}
@@ -355,7 +356,7 @@ const SyllabusTrackingPage: React.FC = () => {
                 {loading && <div className="text-center py-12">Loading Syllabus...</div>}
 
                 {selectedOfferingSubjectId && !loading && chapters.length === 0 && (
-                    <div className="text-center py-12 text-gray-400 border border-dashed rounded-xl flex flex-col items-center">
+                    <div className="text-center py-12 text-content-muted border border-dashed rounded-xl flex flex-col items-center">
                         <p className="mb-4">No syllabus defined for this subject.</p>
                         {isAdmin && (
                             <button
@@ -372,12 +373,12 @@ const SyllabusTrackingPage: React.FC = () => {
                     !loading &&
                     chapters.length > 0 && (
                         <div className="space-y-6">
-                            <div className="flex justify-between items-center bg-gray-50 p-4 rounded-lg">
-                                <h3 className="font-medium text-gray-700">Course Content</h3>
+                            <div className="flex justify-between items-center bg-chrome p-4 rounded-lg">
+                                <h3 className="font-medium text-content-primary">Course Content</h3>
                                 {isAdmin && (
                                     <button
                                         onClick={() => setIsAddChapterModalOpen(true)}
-                                        className="text-sm flex items-center gap-1 text-indigo-600 hover:text-indigo-700 bg-white border border-indigo-200 px-3 py-1.5 rounded-lg shadow-sm"
+                                        className="text-sm flex items-center gap-1 text-indigo-600 hover:text-indigo-700 bg-surface border border-indigo-200 dark:border-indigo-500/30 px-3 py-1.5 rounded-lg shadow-sm"
                                     >
                                         <Plus className="w-4 h-4" /> Add Chapter
                                     </button>
@@ -385,17 +386,17 @@ const SyllabusTrackingPage: React.FC = () => {
                             </div>
 
                             {chapters.map((chapter) => (
-                                <div key={chapter.id} className="relative pl-8 border-l-2 border-indigo-100">
+                                <div key={chapter.id} className="relative pl-8 border-l-2 border-indigo-100 dark:border-indigo-500/20">
                                     <div
-                                        className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-indigo-600 border-4 border-white shadow-sm cursor-pointer z-10"
+                                        className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-indigo-600 border-4 border-surface shadow-sm cursor-pointer z-10"
                                         onClick={() => toggleChapter(chapter.id)}
                                     />
 
                                     <div className="flex justify-between items-center mb-3">
                                         <div className="flex items-center gap-2 cursor-pointer group" onClick={() => toggleChapter(chapter.id)}>
-                                            {chapter.isExpanded ? <ChevronDown className="w-4 h-4 text-gray-400" /> : <ChevronRight className="w-4 h-4 text-gray-400" />}
-                                            <h3 className="text-lg font-semibold text-gray-800 group-hover:text-indigo-600 transition">{chapter.title}</h3>
-                                            <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{chapter.topics.length} topics</span>
+                                            {chapter.isExpanded ? <ChevronDown className="w-4 h-4 text-content-muted" /> : <ChevronRight className="w-4 h-4 text-content-muted" />}
+                                            <h3 className="text-lg font-semibold text-content-primary group-hover:text-indigo-600 transition">{chapter.title}</h3>
+                                            <span className="text-xs text-content-muted bg-chrome px-2 py-0.5 rounded-full">{chapter.topics.length} topics</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             {isAdmin && (
@@ -405,7 +406,7 @@ const SyllabusTrackingPage: React.FC = () => {
                                                             setSelectedChapterId(chapter.id);
                                                             setIsAddTopicModalOpen(true);
                                                         }}
-                                                        className="p-1 text-gray-400 hover:text-indigo-600 transition-colors"
+                                                        className="p-1 text-content-muted hover:text-indigo-600 transition-colors"
                                                         title="Add Topic"
                                                     >
                                                         <Plus className="w-4 h-4" />
@@ -416,14 +417,14 @@ const SyllabusTrackingPage: React.FC = () => {
                                                             setNewChapterTitle(chapter.title);
                                                             setIsEditChapterModalOpen(true);
                                                         }}
-                                                        className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+                                                        className="p-1 text-content-muted hover:text-green-600 transition-colors"
                                                         title="Edit Chapter"
                                                     >
                                                         <Edit2 className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDeleteChapter(chapter.id)}
-                                                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                                        className="p-1 text-content-muted hover:text-red-600 transition-colors"
                                                         title="Delete Chapter"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
@@ -440,8 +441,8 @@ const SyllabusTrackingPage: React.FC = () => {
                                                     key={topic.id}
                                                     onClick={() => toggleTopicStatus(chapter.id, topic)}
                                                     className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${topic.status === 'COMPLETED'
-                                                        ? 'bg-green-50 border-green-100'
-                                                        : 'bg-white border-gray-100 hover:border-indigo-100 hover:shadow-sm'
+                                                        ? 'bg-green-50 dark:bg-green-500/10 border-green-100 dark:border-green-500/20'
+                                                        : 'bg-surface border-border hover:border-indigo-100 dark:hover:border-indigo-500/30 hover:shadow-sm'
                                                         }`}
                                                 >
                                                     <div className="flex items-center gap-3">
@@ -449,7 +450,7 @@ const SyllabusTrackingPage: React.FC = () => {
                                                             ? <CheckCircle className="w-5 h-5 text-green-600" />
                                                             : <Circle className="w-5 h-5 text-gray-300" />
                                                         }
-                                                        <span className={`${topic.status === 'COMPLETED' ? 'text-gray-600 line-through' : 'text-gray-700'}`}>
+                                                        <span className={`${topic.status === 'COMPLETED' ? 'text-content-secondary line-through' : 'text-content-primary'}`}>
                                                             {topic.title}
                                                         </span>
                                                     </div>
@@ -463,7 +464,7 @@ const SyllabusTrackingPage: React.FC = () => {
                                                                         setNewTopicTitle(topic.title);
                                                                         setIsEditTopicModalOpen(true);
                                                                     }}
-                                                                    className="p-1 text-gray-400 hover:text-green-600 transition-colors"
+                                                                    className="p-1 text-content-muted hover:text-green-600 transition-colors"
                                                                 >
                                                                     <Edit2 className="w-3 h-3" />
                                                                 </button>
@@ -472,14 +473,14 @@ const SyllabusTrackingPage: React.FC = () => {
                                                                         e.stopPropagation();
                                                                         handleDeleteTopic(topic.id);
                                                                     }}
-                                                                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                                                    className="p-1 text-content-muted hover:text-red-600 transition-colors"
                                                                 >
                                                                     <Trash2 className="w-3 h-3" />
                                                                 </button>
                                                             </>
                                                         )}
                                                         {topic.status === 'COMPLETED' && (
-                                                            <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded">
+                                                            <span className="text-xs font-medium text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-500/20 px-2 py-1 rounded">
                                                                 Completed
                                                             </span>
                                                         )}
@@ -487,7 +488,7 @@ const SyllabusTrackingPage: React.FC = () => {
                                                 </div>
                                             ))}
                                             {chapter.topics.length === 0 && (
-                                                <div className="text-sm text-gray-400 italic pl-2">No topics in this chapter</div>
+                                                <div className="text-sm text-content-muted italic pl-2">No topics in this chapter</div>
                                             )}
                                         </div>
                                     )}
@@ -498,143 +499,135 @@ const SyllabusTrackingPage: React.FC = () => {
             </div>
 
             {/* Create Chapter Modal */}
-            {isAddChapterModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-semibold">Add Chapter</h3>
-                            <button onClick={() => setIsAddChapterModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X /></button>
-                        </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border rounded-lg"
-                                    value={newChapterTitle}
-                                    onChange={e => setNewChapterTitle(e.target.value)}
-                                    placeholder="e.g. Introduction to Algebra"
-                                />
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-6">
-                            <button onClick={() => setIsAddChapterModalOpen(false)} disabled={isSubmitting} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-                            <button onClick={handleAddChapter} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                Create
-                            </button>
-                        </div>
+            <Modal
+                isOpen={isAddChapterModalOpen}
+                onClose={() => setIsAddChapterModalOpen(false)}
+                title="Add Chapter"
+                footer={
+                    <>
+                        <button onClick={() => setIsAddChapterModalOpen(false)} disabled={isSubmitting} className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-lg">Cancel</button>
+                        <button onClick={handleAddChapter} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Create
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Title</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded-lg"
+                            value={newChapterTitle}
+                            onChange={e => setNewChapterTitle(e.target.value)}
+                            placeholder="e.g. Introduction to Algebra"
+                        />
                     </div>
                 </div>
-            )}
+            </Modal>
 
             {/* Create Topic Modal */}
-            {isAddTopicModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-semibold">Add Topic</h3>
-                            <button onClick={() => setIsAddTopicModalOpen(false)} className="text-gray-400 hover:text-gray-600"><X /></button>
-                        </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border rounded-lg"
-                                    value={newTopicTitle}
-                                    onChange={e => setNewTopicTitle(e.target.value)}
-                                    placeholder="e.g. Linear Equations"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Summary (Optional)</label>
-                                <textarea
-                                    className="w-full p-2 border rounded-lg"
-                                    value={newTopicSummary}
-                                    onChange={e => setNewTopicSummary(e.target.value)}
-                                    rows={3}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-6">
-                            <button onClick={() => setIsAddTopicModalOpen(false)} disabled={isSubmitting} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-                            <button onClick={handleAddTopic} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                Add Topic
-                            </button>
-                        </div>
+            <Modal
+                isOpen={isAddTopicModalOpen}
+                onClose={() => setIsAddTopicModalOpen(false)}
+                title="Add Topic"
+                footer={
+                    <>
+                        <button onClick={() => setIsAddTopicModalOpen(false)} disabled={isSubmitting} className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-lg">Cancel</button>
+                        <button onClick={handleAddTopic} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Add Topic
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Title</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded-lg"
+                            value={newTopicTitle}
+                            onChange={e => setNewTopicTitle(e.target.value)}
+                            placeholder="e.g. Linear Equations"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Summary (Optional)</label>
+                        <textarea
+                            className="w-full p-2 border rounded-lg"
+                            value={newTopicSummary}
+                            onChange={e => setNewTopicSummary(e.target.value)}
+                            rows={3}
+                        />
                     </div>
                 </div>
-            )}
+            </Modal>
             {/* Edit Chapter Modal */}
-            {isEditChapterModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-semibold">Edit Chapter</h3>
-                            <button onClick={() => { setIsEditChapterModalOpen(false); setEditingChapter(null); }} className="text-gray-400 hover:text-gray-600"><X /></button>
-                        </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border rounded-lg"
-                                    value={newChapterTitle}
-                                    onChange={e => setNewChapterTitle(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-6">
-                            <button onClick={() => { setIsEditChapterModalOpen(false); setEditingChapter(null); }} disabled={isSubmitting} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-                            <button onClick={handleUpdateChapter} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                Save Changes
-                            </button>
-                        </div>
+            <Modal
+                isOpen={isEditChapterModalOpen}
+                onClose={() => { setIsEditChapterModalOpen(false); setEditingChapter(null); }}
+                title="Edit Chapter"
+                footer={
+                    <>
+                        <button onClick={() => { setIsEditChapterModalOpen(false); setEditingChapter(null); }} disabled={isSubmitting} className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-lg">Cancel</button>
+                        <button onClick={handleUpdateChapter} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Save Changes
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Title</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded-lg"
+                            value={newChapterTitle}
+                            onChange={e => setNewChapterTitle(e.target.value)}
+                        />
                     </div>
                 </div>
-            )}
+            </Modal>
 
             {/* Edit Topic Modal */}
-            {isEditTopicModalOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-semibold">Edit Topic</h3>
-                            <button onClick={() => { setIsEditTopicModalOpen(false); setEditingTopic(null); }} className="text-gray-400 hover:text-gray-600"><X /></button>
-                        </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                                <input
-                                    type="text"
-                                    className="w-full p-2 border rounded-lg"
-                                    value={newTopicTitle}
-                                    onChange={e => setNewTopicTitle(e.target.value)}
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Summary</label>
-                                <textarea
-                                    className="w-full p-2 border rounded-lg"
-                                    value={newTopicSummary}
-                                    onChange={e => setNewTopicSummary(e.target.value)}
-                                    rows={3}
-                                />
-                            </div>
-                        </div>
-                        <div className="flex justify-end gap-3 mt-6">
-                            <button onClick={() => { setIsEditTopicModalOpen(false); setEditingTopic(null); }} disabled={isSubmitting} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
-                            <button onClick={handleUpdateTopic} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
-                                {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                                Save Changes
-                            </button>
-                        </div>
+            <Modal
+                isOpen={isEditTopicModalOpen}
+                onClose={() => { setIsEditTopicModalOpen(false); setEditingTopic(null); }}
+                title="Edit Topic"
+                footer={
+                    <>
+                        <button onClick={() => { setIsEditTopicModalOpen(false); setEditingTopic(null); }} disabled={isSubmitting} className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-lg">Cancel</button>
+                        <button onClick={handleUpdateTopic} disabled={isSubmitting} className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 flex items-center gap-2">
+                            {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                            Save Changes
+                        </button>
+                    </>
+                }
+            >
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Title</label>
+                        <input
+                            type="text"
+                            className="w-full p-2 border rounded-lg"
+                            value={newTopicTitle}
+                            onChange={e => setNewTopicTitle(e.target.value)}
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Summary</label>
+                        <textarea
+                            className="w-full p-2 border rounded-lg"
+                            value={newTopicSummary}
+                            onChange={e => setNewTopicSummary(e.target.value)}
+                            rows={3}
+                        />
                     </div>
                 </div>
-            )}
+            </Modal>
         </div>
     );
 };

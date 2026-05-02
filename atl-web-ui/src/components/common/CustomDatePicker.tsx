@@ -3,8 +3,6 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import * as Popover from "@radix-ui/react-popover";
-import { Calendar } from "./Calendar";
 
 const cn = (...inputs: ClassValue[]) => {
   return twMerge(clsx(inputs));
@@ -18,10 +16,8 @@ interface CustomDatePickerProps {
   error?: string;
   className?: string;
   required?: boolean;
-  maxDate?: Date;
-  minDate?: Date;
-  showMonthDropdown?: boolean;
-  showYearDropdown?: boolean;
+  maxDate?: Date | string;
+  minDate?: Date | string;
 }
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
@@ -34,67 +30,65 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   required = false,
   minDate,
   maxDate,
-  showYearDropdown = false
 }) => {
-  // Handle string dates from older components
-  const date = typeof selectedDate === 'string' ? (selectedDate ? new Date(selectedDate) : null) : selectedDate;
+  // Normalize date to YYYY-MM-DD string for native input
+  const getStringValue = (d: Date | string | null | undefined): string => {
+    if (!d) return "";
+    const dateObj = typeof d === 'string' ? new Date(d) : d;
+    if (isNaN(dateObj.getTime())) return "";
+    return format(dateObj, "yyyy-MM-dd");
+  };
+
+  const stringValue = getStringValue(selectedDate);
+  const minStr = getStringValue(minDate);
+  const maxStr = getStringValue(maxDate);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (!val) {
+      onChange(null);
+    } else {
+      // Create date at midnight local time to avoid timezone shifts
+      const [year, month, day] = val.split('-').map(Number);
+      const newDate = new Date(year, month - 1, day);
+      onChange(newDate);
+    }
+  };
 
   return (
-    <div className={cn("flex flex-col gap-2", className)}>
+    <div className={cn("flex flex-col gap-1.5", className)}>
       {label && (
-        <label className="text-xs font-black text-gray-400 uppercase ml-1 tracking-widest leading-none mb-1">
+        <label className="text-[10px] font-bold text-content-muted uppercase ml-1 tracking-widest leading-none mb-0.5">
           {label} {required && <span className="text-rose-500">*</span>}
         </label>
       )}
-      <Popover.Root>
-        <Popover.Trigger asChild>
-          <button
-            type="button"
-            className={cn(
-              "w-full flex items-center justify-between pl-4 pr-4 py-3.5 bg-white rounded-lg border transition-all duration-200 outline-none text-sm font-medium",
-              "border-gray-200 hover:border-[#2A6DF4]/40 focus-visible:border-[#2A6DF4] focus-visible:ring-4 focus-visible:ring-[#2A6DF4]/10",
-              !date && "text-gray-400",
-              error && "border-rose-500 ring-4 ring-red-50"
-            )}
-          >
-            <div className="flex items-center gap-3">
-              <CalendarIcon className={cn("h-5 w-5 transition-colors", date ? "text-[#2A6DF4]" : "text-gray-400")} />
-              <span className={cn("font-medium", date ? "text-gray-900" : "text-gray-400")}>
-                {date ? format(date, "PPP") : placeholderText}
-              </span>
-            </div>
-            <div
-              className="w-2 h-2 rounded-full transition-colors"
-              style={{ background: date ? '#2A6DF4' : '#E2E8F8' }}
-            />
-          </button>
-        </Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Content
-            className="z-[200] min-w-[300px] bg-white rounded-[16px] p-4 shadow-[0_16px_48px_rgba(42,109,244,0.14)] border border-[#E2E8F8] animate-in fade-in zoom-in-95 duration-150"
-            align="start"
-            sideOffset={8}
-          >
-            <Calendar
-              mode="single"
-              selected={date || undefined}
-              onSelect={(d) => {
-                onChange(d || null);
-              }}
-              captionLayout={showYearDropdown ? "dropdown" : "label"}
-              startMonth={showYearDropdown ? new Date(1900, 0) : undefined}
-              endMonth={showYearDropdown ? new Date(new Date().getFullYear() + 10, 11) : undefined}
-              disabled={(d: Date) => {
-                if (minDate && d < minDate) return true;
-                if (maxDate && d > maxDate) return true;
-                return false;
-              }}
-              autoFocus
-            />
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
-      {error && <p className="mt-1 text-xs text-rose-600 font-bold ml-1">{error}</p>}
+      <div className="relative group">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none transition-colors group-focus-within:text-brand text-content-muted">
+          <CalendarIcon className="h-4 w-4" />
+        </div>
+        <input
+          type="date"
+          className={cn(
+            "w-full pl-11 pr-4 py-3 bg-surface rounded-xl border transition-all duration-200 outline-none text-sm font-medium [color-scheme:dark]",
+            "border-border hover:border-brand/40 focus:border-brand focus:ring-4 focus:ring-brand/10 text-content-primary",
+            !stringValue && "text-content-muted",
+            error && "border-rose-500 ring-4 ring-rose-50 dark:ring-rose-500/10"
+          )}
+          value={stringValue}
+          min={minStr}
+          max={maxStr}
+          onChange={handleChange}
+          required={required}
+        />
+        {/* Shadow indicator for value presence */}
+        <div
+          className={cn(
+            "absolute right-4 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full transition-colors",
+            stringValue ? "bg-brand" : "bg-chrome"
+          )}
+        />
+      </div>
+      {error && <p className="mt-1 text-[10px] text-rose-600 font-bold ml-1">{error}</p>}
     </div>
   );
 };

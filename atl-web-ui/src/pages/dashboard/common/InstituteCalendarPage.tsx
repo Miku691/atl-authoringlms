@@ -121,28 +121,28 @@ const InstituteCalendarPage: React.FC = () => {
   }, [selectedDate, filteredEvents]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)] bg-gray-50/50 p-6 space-y-6 overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-120px)] bg-chrome/50 p-6 space-y-6 overflow-hidden">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface p-6 rounded-2xl border border-border shadow-sm">
         <div className="flex items-center gap-4">
           <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600">
             <CalendarIcon className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{format(currentMonth, 'MMMM yyyy')}</h1>
-            <p className="text-sm text-gray-500">Institute Academic & Operations Calendar</p>
+            <h1 className="text-2xl font-bold text-content-primary">{format(currentMonth, 'MMMM yyyy')}</h1>
+            <p className="text-sm text-content-secondary">Institute Academic & Operations Calendar</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex bg-gray-100 p-1 rounded-xl">
-            <button onClick={prevMonth} className="p-2 hover:bg-white hover:shadow-sm rounded-lg transition-all text-gray-600">
+          <div className="flex bg-chrome p-1 rounded-xl">
+            <button onClick={prevMonth} className="p-2 hover:bg-surface hover:shadow-sm rounded-lg transition-all text-content-secondary">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button onClick={() => setCurrentMonth(new Date())} className="px-4 py-2 hover:bg-white hover:shadow-sm rounded-lg transition-all text-sm font-semibold text-gray-700">
+            <button onClick={() => setCurrentMonth(new Date())} className="px-4 py-2 hover:bg-surface hover:shadow-sm rounded-lg transition-all text-sm font-semibold text-content-primary">
               Today
             </button>
-            <button onClick={nextMonth} className="p-2 hover:bg-white hover:shadow-sm rounded-lg transition-all text-gray-600">
+            <button onClick={nextMonth} className="p-2 hover:bg-surface hover:shadow-sm rounded-lg transition-all text-content-secondary">
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -157,11 +157,11 @@ const InstituteCalendarPage: React.FC = () => {
 
       <div className="flex flex-1 gap-6 overflow-hidden">
         {/* Main Calendar Grid */}
-        <div className="flex-1 bg-white rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col">
+        <div className="flex-1 bg-surface rounded-3xl border border-border shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col">
           {/* Week Days Header */}
-          <div className="grid grid-cols-7 border-b border-gray-100 bg-gray-50/80">
+          <div className="grid grid-cols-7 border-b border-border bg-chrome/80">
             {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(day => (
-              <div key={day} className="py-4 text-center text-xs font-bold text-gray-400 tracking-widest uppercase">
+              <div key={day} className="py-4 text-center text-xs font-bold text-content-muted tracking-widest uppercase">
                 {day}
               </div>
             ))}
@@ -179,14 +179,14 @@ const InstituteCalendarPage: React.FC = () => {
                 <div 
                   key={idx}
                   onClick={() => setSelectedDate(day)}
-                  className={`min-h-[120px] p-2 border-r border-b border-gray-50 transition-all cursor-pointer group hover:bg-indigo-50/20
-                    ${!isCurrentMonth ? 'bg-gray-50/40 opacity-40' : 'bg-white'}
+                  className={`min-h-[120px] p-2 border-r border-b border-border transition-all cursor-pointer group hover:bg-indigo-50/20
+                    ${!isCurrentMonth ? 'bg-chrome/40 opacity-40' : 'bg-surface'}
                     ${isSelected ? 'ring-2 ring-inset ring-indigo-500 bg-indigo-50/30' : ''}
                   `}
                 >
                   <div className="flex justify-between items-start mb-1">
                     <span className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-all
-                      ${isCurrentToday ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-gray-700'}
+                      ${isCurrentToday ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-content-primary'}
                       ${isSelected && !isCurrentToday ? 'bg-indigo-100 text-indigo-700' : ''}
                       group-hover:scale-110
                     `}>
@@ -206,7 +206,7 @@ const InstituteCalendarPage: React.FC = () => {
                       </div>
                     ))}
                     {dayEvents.length > 3 && (
-                      <div className="text-[10px] text-gray-400 font-bold pl-1">
+                      <div className="text-[10px] text-content-muted font-bold pl-1">
                         + {dayEvents.length - 3} more
                       </div>
                     )}
@@ -220,8 +220,8 @@ const InstituteCalendarPage: React.FC = () => {
         {/* Sidebar: Selected Day Details & Filters */}
         <div className="w-96 flex flex-col gap-6 h-full">
           {/* Filters */}
-          <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-            <div className="flex items-center gap-2 mb-4 text-gray-900">
+          <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
+            <div className="flex items-center gap-2 mb-4 text-content-primary">
               <Filter className="w-5 h-5 text-indigo-500" />
               <h3 className="font-bold">Layer Filters</h3>
             </div>
@@ -239,28 +239,28 @@ const InstituteCalendarPage: React.FC = () => {
                   className={`w-full flex items-center justify-between p-2 rounded-xl border transition-all
                     ${viewFilter.includes(f.type) 
                       ? 'border-transparent text-white shadow-sm' 
-                      : 'border-gray-100 text-gray-500 grayscale opacity-60'}
+                      : 'border-border text-content-secondary grayscale opacity-60'}
                   `}
                   style={{ backgroundColor: viewFilter.includes(f.type) ? f.color : 'transparent' }}
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`p-1.5 rounded-md ${viewFilter.includes(f.type) ? 'bg-white/20' : 'bg-gray-100'}`}>
+                    <div className={`p-1.5 rounded-md ${viewFilter.includes(f.type) ? 'bg-surface/20' : 'bg-chrome'}`}>
                       {f.icon}
                     </div>
                     <span className="text-xs font-bold uppercase tracking-wide">{f.label}</span>
                   </div>
-                  {viewFilter.includes(f.type) && <div className="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />}
+                  {viewFilter.includes(f.type) && <div className="w-1.5 h-1.5 rounded-full bg-surface shadow-sm" />}
                 </button>
               ))}
             </div>
           </div>
 
           {/* Selected Day Details */}
-          <div className="flex-1 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+          <div className="flex-1 bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col overflow-hidden">
             <div className="mb-6 flex justify-between items-center">
               <div>
-                <h3 className="font-bold text-gray-900">{format(selectedDate, 'EEEE')}</h3>
-                <p className="text-sm text-gray-500">{format(selectedDate, 'do MMMM')}</p>
+                <h3 className="font-bold text-content-primary">{format(selectedDate, 'EEEE')}</h3>
+                <p className="text-sm text-content-secondary">{format(selectedDate, 'do MMMM')}</p>
               </div>
               <div className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg uppercase">
                 {selectedDayEvents.length} Tasks
@@ -275,22 +275,22 @@ const InstituteCalendarPage: React.FC = () => {
                 </div>
               ) : (
                 selectedDayEvents.map((event, idx) => (
-                  <div key={idx} className="group relative pl-4 border-l-4 rounded-r-xl p-3 bg-gray-50/50 hover:bg-indigo-50/30 transition-all border-l-indigo-500" style={{ borderLeftColor: event.color }}>
+                  <div key={idx} className="group relative pl-4 border-l-4 rounded-r-xl p-3 bg-chrome/50 hover:bg-indigo-50/30 transition-all border-l-indigo-500" style={{ borderLeftColor: event.color }}>
                     <div className="flex justify-between items-start mb-1">
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white border border-gray-100 shadow-sm uppercase tracking-wide" style={{ color: event.color }}>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-surface border border-border shadow-sm uppercase tracking-wide" style={{ color: event.color }}>
                         {event.type}
                       </span>
                       {!event.allDay && (
-                        <div className="flex items-center gap-1 text-[10px] text-gray-400 font-bold">
+                        <div className="flex items-center gap-1 text-[10px] text-content-muted font-bold">
                           <Clock className="w-3 h-3" />
                           {format(parseISO(event.start), 'hh:mm a')}
                         </div>
                       )}
                     </div>
-                    <h4 className="text-sm font-bold text-gray-800 mb-1 leading-tight">{event.title}</h4>
+                    <h4 className="text-sm font-bold text-content-primary mb-1 leading-tight">{event.title}</h4>
                     {event.location && (
-                      <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-medium">
-                        <MapPin className="w-3 h-3 text-gray-400" />
+                      <div className="flex items-center gap-1.5 text-[10px] text-content-secondary font-medium">
+                        <MapPin className="w-3 h-3 text-content-muted" />
                         {event.location}
                       </div>
                     )}

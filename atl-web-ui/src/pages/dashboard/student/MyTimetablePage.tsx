@@ -63,8 +63,9 @@ const MyTimetablePage: React.FC = () => {
 
             const instructorsRes = await instructorService.getInstructorsByTenant(user!.tenantId!);
             const iMap: Record<string, string> = {};
-            if (instructorsRes) {
-                instructorsRes.forEach((inst: any) => { iMap[inst.id] = `${inst.firstName} ${inst.lastName}`; });
+            if (instructorsRes.status === 'SUCCESS' && instructorsRes.apiData) {
+                const instList = Array.isArray(instructorsRes.apiData) ? instructorsRes.apiData : (instructorsRes.apiData.content || []);
+                instList.forEach((inst: any) => { iMap[inst.id] = `${inst.firstName} ${inst.lastName}`; });
             }
             setInstructorsMap(iMap);
 
@@ -109,7 +110,7 @@ const MyTimetablePage: React.FC = () => {
                     <span className="text-[10px] font-semibold text-[#3c5ba9] uppercase tracking-widest">Class Schedule</span>
                     <h1 className="mt-2 text-3xl font-bold text-[#1a3d8a]">My Timetable</h1>
                 </div>
-                <div className="bg-white rounded-2xl p-16 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)]">
+                <div className="bg-surface rounded-2xl p-16 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)]">
                     <Calendar className="w-14 h-14 text-[#e0e2e8] mx-auto mb-4" />
                     <h2 className="text-lg font-bold text-[#181c20]">Schedule Not Published</h2>
                     <p className="text-sm text-[#424655] max-w-sm mx-auto mt-2">
@@ -137,7 +138,7 @@ const MyTimetablePage: React.FC = () => {
                     </div>
                     <button
                         onClick={() => toast.success('PDF export processing...')}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-white rounded-xl text-sm font-semibold text-[#0054d1] shadow-[0_2px_8px_-2px_rgba(26,61,138,0.12)] hover:shadow-[0_4px_16px_-4px_rgba(26,61,138,0.16)] hover:-translate-y-0.5 transition-all duration-200 border border-[#dae2ff] self-start sm:self-auto"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-surface rounded-xl text-sm font-semibold text-[#0054d1] shadow-[0_2px_8px_-2px_rgba(26,61,138,0.12)] hover:shadow-[0_4px_16px_-4px_rgba(26,61,138,0.16)] hover:-translate-y-0.5 transition-all duration-200 border border-[#dae2ff] self-start sm:self-auto"
                     >
                         <Download className="w-4 h-4" />
                         Export PDF
@@ -147,7 +148,7 @@ const MyTimetablePage: React.FC = () => {
             </div>
 
             {/* ── Day Selector Tabs ── */}
-            <div className="bg-white rounded-2xl p-3 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex items-center gap-2 overflow-x-auto no-scrollbar">
+            <div className="bg-surface rounded-2xl p-3 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex items-center gap-2 overflow-x-auto no-scrollbar">
                 {DAYS.map((day, idx) => {
                     const slotCount = getSlotsForDay(idx).length;
                     const isActive = activeDayIdx === idx;
@@ -169,7 +170,7 @@ const MyTimetablePage: React.FC = () => {
                             </span>
                             {slotCount > 0 && (
                                 <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded-full ${
-                                    isActive ? 'bg-white/20 text-white' : 'bg-[#dae2ff] text-[#0054d1]'
+                                    isActive ? 'bg-surface/20 text-white' : 'bg-[#dae2ff] text-[#0054d1]'
                                 }`}>
                                     {slotCount}
                                 </span>
@@ -181,7 +182,7 @@ const MyTimetablePage: React.FC = () => {
 
             {/* ── Class Slots ── */}
             {activeSlots.length === 0 ? (
-                <div className="bg-white rounded-2xl py-20 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex flex-col items-center">
+                <div className="bg-surface rounded-2xl py-20 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex flex-col items-center">
                     <div className="w-14 h-14 bg-[#f1f3f9] rounded-2xl flex items-center justify-center mb-4">
                         <Calendar className="w-7 h-7 text-[#c2c6d7]" />
                     </div>
@@ -195,7 +196,7 @@ const MyTimetablePage: React.FC = () => {
                         return (
                             <div
                                 key={slot.id}
-                                className="group bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex"
+                                className="group bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex"
                             >
                                 {/* Left accent bar */}
                                 <div className="w-1.5 shrink-0 rounded-l-2xl" style={{ backgroundColor: accent.bar }} />

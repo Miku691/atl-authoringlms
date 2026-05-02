@@ -1,0 +1,181 @@
+services:
+  discovery:
+    build:
+      context: ./atl-discovery-server
+    container_name: atl-discovery
+    environment:
+      - SERVER_PORT=8761
+    networks:
+      - atl-network
+
+  gateway:
+    build:
+      context: ./atl-gateway-service
+    container_name: atl-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - AUTH_JWT_SECRET=${AUTH_JWT_SECRET}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+  auth:
+    build:
+      context: ./atl-auth-service
+    container_name: atl-auth
+    environment:
+      - AUTH_JWT_SECRET=${AUTH_JWT_SECRET}
+      - AUTH_DB_URL=${AUTH_DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - AUTH_EMAIL=${AUTH_EMAIL}
+      - AUTH_MAIL_PASS=${AUTH_MAIL_PASS}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+  academic:
+    build:
+      context: ./ims-academic-service
+    container_name: ims-academic
+    environment:
+      - ACADEMIC_DB_URL=${ACADEMIC_DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+  student:
+    build:
+      context: ./ims-student-service
+    container_name: ims-student
+    environment:
+      - STUDENT_DB_URL=${STUDENT_DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+  instructor:
+    build:
+      context: ./ims-instructor-service
+    container_name: ims-instructor
+    environment:
+      - INSTRUCTOR_DB_URL=${INSTRUCTOR_DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+  staff:
+    build:
+      context: ./ims-staff-service
+    container_name: ims-staff
+    environment:
+      - STAFF_DB_URL=${STAFF_DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+  finance:
+    build:
+      context: ./ims-finance-service
+    container_name: ims-finance
+    environment:
+      - FINANCE_DB_URL=${FINANCE_DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+  inventory:
+    build:
+      context: ./ims-inventory-service
+    container_name: ims-inventory
+    environment:
+      - INVENTORY_DB_URL=${INVENTORY_DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+  platform:
+    build:
+      context: ./ims-platform-service
+    container_name: ims-platform
+    environment:
+      - PLATFORM_DB_URL=${PLATFORM_DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - AUTH_JWT_SECRET=${AUTH_JWT_SECRET}
+      - RAZORPAY_KEY_ID=${RAZORPAY_KEY_ID}
+      - RAZORPAY_KEY_SECRET=${RAZORPAY_KEY_SECRET}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+  reports:
+    build:
+      context: ./ims-reports-service
+    container_name: ims-reports
+    environment:
+      - REPORTS_DB_URL=${REPORTS_DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+  notification:
+    build:
+      context: ./ims-notification-service
+    container_name: ims-notification
+    environment:
+      - AUTH_EMAIL=${AUTH_EMAIL}
+      - AUTH_MAIL_PASS=${AUTH_MAIL_PASS}
+      - AUTH_JWT_SECRET=${AUTH_JWT_SECRET}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+    depends_on:
+      - discovery
+    networks:
+      - atl-network
+
+networks:
+  atl-network:
+    driver: bridge

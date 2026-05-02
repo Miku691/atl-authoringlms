@@ -151,26 +151,26 @@ const AcademicSetupWizard: React.FC = () => {
     };
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 max-w-3xl">
+        <div className="bg-surface rounded-xl shadow-sm border border-border p-6 max-w-3xl">
             <div className="mb-8">
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <h2 className="text-xl font-bold text-content-primary flex items-center gap-2">
                     <School className="w-6 h-6 text-indigo-600" />
                     Academic Setup Wizard
                 </h2>
-                <p className="text-gray-500 mt-1">Complete these steps to activate your institute.</p>
+                <p className="text-content-secondary mt-1">Complete these steps to activate your institute.</p>
             </div>
 
             {/* Stepper Header */}
             <div className="flex items-center justify-between mb-8 relative">
-                <div className="absolute left-0 top-1/2 w-full h-1 bg-gray-100 -z-10"></div>
+                <div className="absolute left-0 top-1/2 w-full h-1 bg-chrome -z-10"></div>
                 {[1, 2, 3, 4].map((step) => (
-                    <div key={step} className={`flex flex-col items-center gap-2 bg-white px-2`}>
+                    <div key={step} className={`flex flex-col items-center gap-2 bg-surface px-2`}>
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-colors
                             ${step < currentStep ? 'bg-green-100 text-green-600' :
-                                step === currentStep ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-gray-100 text-gray-400'}`}>
+                                step === currentStep ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'bg-chrome text-content-muted'}`}>
                             {step < currentStep ? <Check className="w-4 h-4" /> : step}
                         </div>
-                        <span className="text-xs font-medium text-gray-500">
+                        <span className="text-xs font-medium text-content-secondary">
                             {step === 1 && 'Program'}
                             {step === 2 && 'Year'}
                             {step === 3 && 'Classes'}
@@ -188,12 +188,12 @@ const AcademicSetupWizard: React.FC = () => {
                     <>
                         {currentStep === 1 && (
                             <div className="space-y-4 animate-fadeIn">
-                                <h3 className="text-lg font-semibold text-gray-800">Step 1: Create Academic Program</h3>
-                                <p className="text-sm text-gray-500">This defines your institute's structure (e.g., K-12, High School).</p>
+                                <h3 className="text-lg font-semibold text-content-primary">Step 1: Create Academic Program</h3>
+                                <p className="text-sm text-content-secondary">This defines your institute's structure (e.g., K-12, High School).</p>
 
                                 <div className="grid gap-4 max-w-md">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Program Name</label>
+                                        <label className="block text-sm font-medium text-content-primary mb-1">Program Name</label>
                                         <input
                                             value={programName}
                                             onChange={e => setProgramName(e.target.value)}
@@ -201,7 +201,7 @@ const AcademicSetupWizard: React.FC = () => {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Program Code</label>
+                                        <label className="block text-sm font-medium text-content-primary mb-1">Program Code</label>
                                         <input
                                             value={programCode}
                                             onChange={e => setProgramCode(e.target.value)}
@@ -222,10 +222,10 @@ const AcademicSetupWizard: React.FC = () => {
 
                         {currentStep === 2 && (
                             <div className="space-y-4 animate-fadeIn">
-                                <h3 className="text-lg font-semibold text-gray-800">Step 2: Set Current Academic Year</h3>
+                                <h3 className="text-lg font-semibold text-content-primary">Step 2: Set Current Academic Year</h3>
                                 <div className="grid gap-4 max-w-md">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Session Name</label>
+                                        <label className="block text-sm font-medium text-content-primary mb-1">Session Name</label>
                                         <input
                                             value={academicYearName}
                                             onChange={e => setAcademicYearName(e.target.value)}
@@ -234,11 +234,11 @@ const AcademicSetupWizard: React.FC = () => {
                                     </div>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                                            <label className="block text-sm font-medium text-content-primary mb-1">Start Date</label>
                                             <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                                            <label className="block text-sm font-medium text-content-primary mb-1">End Date</label>
                                             <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="w-full px-3 py-2 border rounded-lg" />
                                         </div>
                                     </div>
@@ -256,13 +256,13 @@ const AcademicSetupWizard: React.FC = () => {
 
                         {currentStep === 3 && (
                             <div className="space-y-4 animate-fadeIn">
-                                <h3 className="text-lg font-semibold text-gray-800">Step 3: Configure Classes</h3>
-                                <p className="text-sm text-gray-500">Select the range of classes your institute operates.</p>
+                                <h3 className="text-lg font-semibold text-content-primary">Step 3: Configure Classes</h3>
+                                <p className="text-sm text-content-secondary">Select the range of classes your institute operates.</p>
 
-                                <div className="max-w-md p-6 bg-gray-50 rounded-xl border border-gray-200">
+                                <div className="max-w-md p-6 bg-chrome rounded-xl border border-border">
                                     <div className="flex items-center justify-between gap-4">
                                         <div className="text-center">
-                                            <span className="block text-xs uppercase text-gray-500 font-bold">Start Class</span>
+                                            <span className="block text-xs uppercase text-content-secondary font-bold">Start Class</span>
                                             <input
                                                 type="number"
                                                 min={1} max={12}
@@ -273,7 +273,7 @@ const AcademicSetupWizard: React.FC = () => {
                                         </div>
                                         <div className="h-0.5 flex-1 bg-gray-300"></div>
                                         <div className="text-center">
-                                            <span className="block text-xs uppercase text-gray-500 font-bold">End Class</span>
+                                            <span className="block text-xs uppercase text-content-secondary font-bold">End Class</span>
                                             <input
                                                 type="number"
                                                 min={startClass} max={12}
@@ -297,8 +297,8 @@ const AcademicSetupWizard: React.FC = () => {
 
                         {currentStep === 4 && (
                             <div className="space-y-4 animate-fadeIn">
-                                <h3 className="text-lg font-semibold text-gray-800">Step 4: Generate Offerings</h3>
-                                <p className="text-sm text-gray-500">We will now create academic offerings for <strong>Class {startClass} to {endClass}</strong>.</p>
+                                <h3 className="text-lg font-semibold text-content-primary">Step 4: Generate Offerings</h3>
+                                <p className="text-sm text-content-secondary">We will now create academic offerings for <strong>Class {startClass} to {endClass}</strong>.</p>
 
                                 <div className="flex gap-4">
                                     <button
@@ -318,8 +318,8 @@ const AcademicSetupWizard: React.FC = () => {
                                 <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <Check className="w-8 h-8" />
                                 </div>
-                                <h2 className="text-2xl font-bold text-gray-900">Setup Complete!</h2>
-                                <p className="text-gray-500 mt-2">Your academic structure is ready. You can now start managing students and operations.</p>
+                                <h2 className="text-2xl font-bold text-content-primary">Setup Complete!</h2>
+                                <p className="text-content-secondary mt-2">Your academic structure is ready. You can now start managing students and operations.</p>
                                 <button
                                     onClick={async () => {
                                         try {

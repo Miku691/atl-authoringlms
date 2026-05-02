@@ -87,7 +87,7 @@ const TeacherDashboard: React.FC = () => {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh]">
                 <Loader2 className="w-10 h-10 animate-spin text-indigo-600 mb-4" />
-                <p className="text-gray-500 animate-pulse">Setting up your faculty workspace...</p>
+                <p className="text-content-secondary animate-pulse">Setting up your faculty workspace...</p>
             </div>
         );
     }
@@ -96,13 +96,13 @@ const TeacherDashboard: React.FC = () => {
     if (!instructor) {
         return (
             <div className="min-h-[70vh] flex items-center justify-center p-6">
-                <div className="max-w-md w-full bg-white rounded-[3rem] p-10 shadow-2xl border border-slate-100 text-center space-y-6 relative overflow-hidden">
+                <div className="max-w-md w-full bg-surface rounded-[3rem] p-10 shadow-2xl border border-border text-center space-y-6 relative overflow-hidden">
                     <div className="relative z-10">
                         <div className="w-20 h-20 bg-amber-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-amber-100">
                             <Users className="w-10 h-10 text-amber-500" />
                         </div>
-                        <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Instructor Profile Not Found</h2>
-                        <p className="text-slate-500 font-medium leading-relaxed">
+                        <h2 className="text-2xl font-black text-content-primary uppercase tracking-tight">Instructor Profile Not Found</h2>
+                        <p className="text-content-secondary font-medium leading-relaxed">
                             We couldn't find an instructor record for <span className="text-indigo-600 font-bold">{user?.username}</span>.
                             If you are a staff member, please contact your administration to set up your profile.
                         </p>
@@ -124,20 +124,20 @@ const TeacherDashboard: React.FC = () => {
     return (
         <div className="space-y-6 animate-fade-in">
             {/* Welcome Header */}
-            <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="bg-surface rounded-2xl p-8 border border-border shadow-sm flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="flex items-center gap-6">
                     <div className="w-20 h-20 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-3xl font-bold uppercase shadow-lg shadow-indigo-100">
                         {user?.username?.[0]}
                     </div>
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Hello, Professor {instructor?.lastName || user?.username}!</h1>
-                        <p className="text-gray-500 mt-1">{instructor?.specialization || 'Faculty Member'} • {instructor?.qualification}</p>
+                        <h1 className="text-3xl font-bold text-content-primary">Hello, Professor {instructor?.lastName || user?.username}!</h1>
+                        <p className="text-content-secondary mt-1">{instructor?.specialization || 'Faculty Member'} • {instructor?.qualification}</p>
                     </div>
                 </div>
                 <div className="flex gap-3">
-                    <div className="text-right hidden md:block border-r pr-6 border-gray-100">
-                        <p className="text-xs text-gray-400 uppercase font-bold tracking-wider">Today's Date</p>
-                        <p className="text-lg font-bold text-gray-800">
+                    <div className="text-right hidden md:block border-r pr-6 border-border">
+                        <p className="text-xs text-content-muted uppercase font-bold tracking-wider">Today's Date</p>
+                        <p className="text-lg font-bold text-content-primary">
                             {new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                         </p>
                     </div>
@@ -152,38 +152,38 @@ const TeacherDashboard: React.FC = () => {
 
             {/* Quick Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group">
+                <div className="bg-surface p-6 rounded-2xl shadow-sm border border-border hover:shadow-md transition-all group">
                     <div className="flex items-center gap-4">
                         <div className="p-4 bg-blue-50 text-blue-600 rounded-2xl group-hover:scale-110 transition-transform">
                             <Users className="w-6 h-6" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">My Classes</p>
-                            <h3 className="text-2xl font-black text-gray-900">{stats.totalClasses}</h3>
+                            <p className="text-sm text-content-muted font-bold uppercase tracking-wider">My Classes</p>
+                            <h3 className="text-2xl font-black text-content-primary">{stats.totalClasses}</h3>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group">
+                <div className="bg-surface p-6 rounded-2xl shadow-sm border border-border hover:shadow-md transition-all group">
                     <div className="flex items-center gap-4">
                         <div className="p-4 bg-indigo-50 text-indigo-600 rounded-2xl group-hover:scale-110 transition-transform">
                             <BookOpen className="w-6 h-6" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">Total Subjects</p>
-                            <h3 className="text-2xl font-black text-gray-900">{stats.totalSubjects}</h3>
+                            <p className="text-sm text-content-muted font-bold uppercase tracking-wider">Total Subjects</p>
+                            <h3 className="text-2xl font-black text-content-primary">{stats.totalSubjects}</h3>
                         </div>
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-all group">
+                <div className="bg-surface p-6 rounded-2xl shadow-sm border border-border hover:shadow-md transition-all group">
                     <div className="flex items-center gap-4">
                         <div className="p-4 bg-amber-50 text-amber-600 rounded-2xl group-hover:scale-110 transition-transform">
                             <Clock className="w-6 h-6" />
                         </div>
                         <div>
-                            <p className="text-sm text-gray-400 font-bold uppercase tracking-wider">Hours Today</p>
-                            <h3 className="text-2xl font-black text-gray-900">4.5h</h3>
+                            <p className="text-sm text-content-muted font-bold uppercase tracking-wider">Hours Today</p>
+                            <h3 className="text-2xl font-black text-content-primary">4.5h</h3>
                         </div>
                     </div>
                 </div>
@@ -193,18 +193,18 @@ const TeacherDashboard: React.FC = () => {
                 {/* Main Content: Tasks & Schedule */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* My Classes Grid */}
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <div className="bg-surface rounded-2xl shadow-sm border border-border p-6">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <h2 className="text-xl font-bold text-content-primary flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-indigo-600" /> My Active Classes
                             </h2>
                             <button className="text-sm text-indigo-600 font-bold hover:underline">View All</button>
                         </div>
 
                         {assignments.length === 0 ? (
-                            <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                                <p className="text-gray-400 italic mb-2">You haven't been assigned to any classes yet.</p>
-                                <p className="text-xs text-gray-400">Please contact the administrator for course allocation.</p>
+                            <div className="text-center py-12 bg-chrome rounded-2xl border border-dashed border-border">
+                                <p className="text-content-muted italic mb-2">You haven't been assigned to any classes yet.</p>
+                                <p className="text-xs text-content-muted">Please contact the administrator for course allocation.</p>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -212,15 +212,15 @@ const TeacherDashboard: React.FC = () => {
                                     <div
                                         key={a.id}
                                         onClick={() => navigate(`/instructor/class/${a.offeringId}`)}
-                                        className="p-4 border border-gray-100 rounded-2xl hover:border-indigo-200 hover:shadow-sm transition-all flex justify-between items-center group cursor-pointer"
+                                        className="p-4 border border-border rounded-2xl hover:border-indigo-200 hover:shadow-sm transition-all flex justify-between items-center group cursor-pointer"
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-lg bg-gray-50 flex items-center justify-center font-bold text-gray-400 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                                            <div className="w-10 h-10 rounded-lg bg-chrome flex items-center justify-center font-bold text-content-muted group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                                                 {a.className?.[0] || 'C'}
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{a.className || 'Class Room'}</h4>
-                                                <p className="text-xs text-gray-500">{a.subjectName || 'All Subjects'} • {a.role}</p>
+                                                <h4 className="font-bold text-content-primary group-hover:text-indigo-600 transition-colors">{a.className || 'Class Room'}</h4>
+                                                <p className="text-xs text-content-secondary">{a.subjectName || 'All Subjects'} • {a.role}</p>
                                             </div>
                                         </div>
                                         <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-indigo-500 transition-colors" />
@@ -232,38 +232,38 @@ const TeacherDashboard: React.FC = () => {
 
                     {/* Quick Actions */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <button className="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-indigo-600 hover:shadow-md transition-all group flex flex-col items-center gap-2">
+                        <button className="p-4 bg-surface border border-border rounded-2xl shadow-sm hover:border-indigo-600 hover:shadow-md transition-all group flex flex-col items-center gap-2">
                             <div className="p-3 bg-red-50 text-red-600 rounded-xl group-hover:scale-110 transition-transform">
                                 <Calendar className="w-5 h-5" />
                             </div>
-                            <span className="text-xs font-bold text-gray-600">Mark Attendance</span>
+                            <span className="text-xs font-bold text-content-secondary">Mark Attendance</span>
                         </button>
-                        <button className="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-indigo-600 hover:shadow-md transition-all group flex flex-col items-center gap-2">
+                        <button className="p-4 bg-surface border border-border rounded-2xl shadow-sm hover:border-indigo-600 hover:shadow-md transition-all group flex flex-col items-center gap-2">
                             <div className="p-3 bg-blue-50 text-blue-600 rounded-xl group-hover:scale-110 transition-transform">
                                 <BookOpen className="w-5 h-5" />
                             </div>
-                            <span className="text-xs font-bold text-gray-600">Upload Content</span>
+                            <span className="text-xs font-bold text-content-secondary">Upload Content</span>
                         </button>
-                        <button className="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-indigo-600 hover:shadow-md transition-all group flex flex-col items-center gap-2">
+                        <button className="p-4 bg-surface border border-border rounded-2xl shadow-sm hover:border-indigo-600 hover:shadow-md transition-all group flex flex-col items-center gap-2">
                             <div className="p-3 bg-purple-50 text-purple-600 rounded-xl group-hover:scale-110 transition-transform">
                                 <Bell className="w-5 h-5" />
                             </div>
-                            <span className="text-xs font-bold text-gray-600">Post Notice</span>
+                            <span className="text-xs font-bold text-content-secondary">Post Notice</span>
                         </button>
-                        <button className="p-4 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-indigo-600 hover:shadow-md transition-all group flex flex-col items-center gap-2">
+                        <button className="p-4 bg-surface border border-border rounded-2xl shadow-sm hover:border-indigo-600 hover:shadow-md transition-all group flex flex-col items-center gap-2">
                             <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl group-hover:scale-110 transition-transform">
                                 <Clock className="w-5 h-5" />
                             </div>
-                            <span className="text-xs font-bold text-gray-600">My Timetable</span>
+                            <span className="text-xs font-bold text-content-secondary">My Timetable</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Sidebar: Announcements */}
                 <div className="space-y-6">
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full flex flex-col">
+                    <div className="bg-surface rounded-2xl shadow-sm border border-border p-6 h-full flex flex-col">
                         <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                            <h2 className="text-xl font-bold text-content-primary flex items-center gap-2">
                                 <Bell className="w-5 h-5 text-amber-500" /> Notifications
                             </h2>
                         </div>
@@ -271,24 +271,24 @@ const TeacherDashboard: React.FC = () => {
                             {announcements.length === 0 ? (
                                 <div className="text-center py-12">
                                     <Bell className="w-12 h-12 text-gray-100 mx-auto mb-3" />
-                                    <p className="text-sm text-gray-400">No active updates for you today.</p>
+                                    <p className="text-sm text-content-muted">No active updates for you today.</p>
                                 </div>
                             ) : (
                                 announcements.map((item) => (
                                     <div key={item.id} className={`p-4 rounded-2xl border transition-all hover:shadow-sm cursor-pointer ${item.priority === 'URGENT' ? 'bg-red-50 border-red-100 hover:border-red-200' :
                                         item.priority === 'IMPORTANT' ? 'bg-amber-50 border-amber-100 hover:border-amber-200' :
-                                            'bg-gray-50 border-gray-100 hover:border-gray-200'
+                                            'bg-chrome border-border hover:border-border'
                                         }`}>
                                         <div className="flex justify-between items-start mb-1">
                                             <h4 className={`font-bold text-sm ${item.priority === 'URGENT' ? 'text-red-900' :
-                                                item.priority === 'IMPORTANT' ? 'text-amber-900' : 'text-gray-900'
+                                                item.priority === 'IMPORTANT' ? 'text-amber-900' : 'text-content-primary'
                                                 }`}>{item.title}</h4>
                                             {item.priority === 'URGENT' && <div className="w-2 h-2 rounded-full bg-red-500 animate-ping"></div>}
                                         </div>
                                         <p className={`text-xs line-clamp-2 ${item.priority === 'URGENT' ? 'text-red-700' :
-                                            item.priority === 'IMPORTANT' ? 'text-amber-700' : 'text-gray-600'
+                                            item.priority === 'IMPORTANT' ? 'text-amber-700' : 'text-content-secondary'
                                             }`}>{item.content}</p>
-                                        <span className="text-[10px] text-gray-400 mt-3 block font-medium">
+                                        <span className="text-[10px] text-content-muted mt-3 block font-medium">
                                             {new Date(item.createdAt!).toLocaleDateString()}
                                         </span>
                                     </div>
@@ -296,7 +296,7 @@ const TeacherDashboard: React.FC = () => {
                             )}
                         </div>
                         {announcements.length > 0 && (
-                            <button className="w-full mt-6 py-3 text-sm font-bold text-gray-500 hover:text-indigo-600 transition-colors border-t border-gray-50">
+                            <button className="w-full mt-6 py-3 text-sm font-bold text-content-secondary hover:text-indigo-600 transition-colors border-t border-border">
                                 View All Notifications
                             </button>
                         )}

@@ -94,7 +94,7 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
           style={{
             width:      s === step ? '20px' : '6px',
             height:     '6px',
-            background: s <= step ? '#2A6DF4' : '#E2E8F8',
+            background: s <= step ? 'var(--brand)' : 'var(--border)',
           }}
         />
       ))}
@@ -112,7 +112,7 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
             exit={{ opacity: 0 }}
             onClick={handleClose}
             className="absolute inset-0 backdrop-blur-sm"
-            style={{ background: 'rgba(15,29,58,0.55)' }}
+            style={{ background: 'rgba(15,29,58,0.65)' }}
           />
 
           {/* Modal card */}
@@ -121,27 +121,32 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
             animate={{ opacity: 1, scale: 1,    y: 0 }}
             exit={{   opacity: 0, scale: 0.93, y: 24 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="relative w-full max-w-[540px] bg-white overflow-hidden"
-            style={{ borderRadius: '20px', boxShadow: '0 24px 64px rgba(42,109,244,0.18)' }}
+            className="relative w-full max-w-[540px] overflow-hidden"
+            style={{ 
+              background: 'var(--bg-surface)',
+              border: '1px solid var(--border)',
+              borderRadius: '20px', 
+              boxShadow: '0 24px 64px rgba(0,0,0,0.18)' 
+            }}
           >
             {/* ── Header ── */}
             <div
               className="px-7 pt-7 pb-5 flex items-start justify-between"
-              style={{ borderBottom: '1px solid #E2E8F8' }}
+              style={{ borderBottom: '1px solid var(--border)' }}
             >
               <div className="flex items-center gap-3">
                 <div
                   className="w-10 h-10 rounded-[10px] flex items-center justify-center shrink-0"
-                  style={{ background: '#EBF1FE' }}
+                  style={{ background: 'var(--brand-subtle)' }}
                 >
-                  <CalendarIcon className="w-5 h-5" style={{ color: '#2A6DF4' }} />
+                  <CalendarIcon className="w-5 h-5" style={{ color: 'var(--brand)' }} />
                 </div>
                 <div>
-                  <h2 className="text-[18px] font-bold tracking-tight" style={{ color: '#0F1D3A' }}>
+                  <h2 className="text-[18px] font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
                     Book a Live Demo
                   </h2>
                   <div className="flex items-center gap-2">
-                    <p className="text-[12px] font-medium" style={{ color: '#8FA3C0' }}>
+                    <p className="text-[12px] font-medium" style={{ color: 'var(--text-muted)' }}>
                       Step {Math.min(step, 2)} of 2
                     </p>
                     {step < 3 && <StepDots />}
@@ -150,10 +155,13 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
               </div>
               <button
                 onClick={handleClose}
-                className="p-1.5 rounded-[8px] transition-colors hover:bg-[#F7F9FF]"
+                className="p-1.5 rounded-[8px] transition-colors"
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-chrome)'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
                 aria-label="Close"
               >
-                <X className="w-5 h-5" style={{ color: '#8FA3C0' }} />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -174,7 +182,7 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
                   <div>
                     <label
                       className="block text-[11px] font-bold uppercase tracking-[0.1em] mb-2"
-                      style={{ color: '#8FA3C0' }}
+                      style={{ color: 'var(--text-muted)' }}
                     >
                       Select Preferred Date
                     </label>
@@ -189,7 +197,7 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
                   <div>
                     <label
                       className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em] mb-3"
-                      style={{ color: '#8FA3C0' }}
+                      style={{ color: 'var(--text-muted)' }}
                     >
                       <Clock className="w-3.5 h-3.5" />
                       Preferred Time (IST)
@@ -206,29 +214,29 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
                             style={
                               active
                                 ? {
-                                    background: '#2A6DF4',
+                                    background: 'var(--brand)',
                                     color: '#FFFFFF',
                                     boxShadow: '0 4px 12px rgba(42,109,244,0.30)',
-                                    border: '1.5px solid #2A6DF4',
+                                    border: '1.5px solid var(--brand)',
                                   }
                                 : {
-                                    background: '#F7F9FF',
-                                    color: '#5A6B88',
-                                    border: '1.5px solid #E2E8F8',
+                                    background: 'var(--bg-chrome)',
+                                    color: 'var(--text-secondary)',
+                                    border: '1.5px solid var(--border)',
                                   }
                             }
                             onMouseEnter={(e) => {
                               if (!active) {
-                                (e.currentTarget as HTMLButtonElement).style.borderColor = '#2A6DF4';
-                                (e.currentTarget as HTMLButtonElement).style.color = '#2A6DF4';
-                                (e.currentTarget as HTMLButtonElement).style.background = '#EBF1FE';
+                                (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--brand)';
+                                (e.currentTarget as HTMLButtonElement).style.color = 'var(--brand)';
+                                (e.currentTarget as HTMLButtonElement).style.background = 'var(--brand-subtle)';
                               }
                             }}
                             onMouseLeave={(e) => {
                               if (!active) {
-                                (e.currentTarget as HTMLButtonElement).style.borderColor = '#E2E8F8';
-                                (e.currentTarget as HTMLButtonElement).style.color = '#5A6B88';
-                                (e.currentTarget as HTMLButtonElement).style.background = '#F7F9FF';
+                                (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+                                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
+                                (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-chrome)';
                               }
                             }}
                           >
@@ -245,11 +253,11 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
                     onClick={() => setStep(2)}
                     className="w-full flex items-center justify-center gap-2 py-4 rounded-[12px] text-[15px] font-semibold text-white transition-all duration-150 group"
                     style={{
-                      background: '#2A6DF4',
+                      background: 'var(--brand)',
                       boxShadow: '0 4px 16px rgba(42,109,244,0.30)',
                     }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#1A5CE0'; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#2A6DF4'; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--brand-hover)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--brand)'; }}
                   >
                     Continue
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -316,19 +324,19 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
                       onClick={() => setStep(1)}
                       className="px-6 py-4 rounded-[12px] text-[14px] font-semibold transition-all duration-150"
                       style={{
-                        background: '#F7F9FF',
-                        color: '#5A6B88',
-                        border: '1.5px solid #E2E8F8',
+                        background: 'var(--bg-chrome)',
+                        color: 'var(--text-secondary)',
+                        border: '1.5px solid var(--border)',
                       }}
                       onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.background = '#EBF1FE';
-                        (e.currentTarget as HTMLButtonElement).style.borderColor = '#2A6DF4';
-                        (e.currentTarget as HTMLButtonElement).style.color = '#2A6DF4';
+                        (e.currentTarget as HTMLButtonElement).style.background = 'var(--brand-subtle)';
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--brand)';
+                        (e.currentTarget as HTMLButtonElement).style.color = 'var(--brand)';
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.background = '#F7F9FF';
-                        (e.currentTarget as HTMLButtonElement).style.borderColor = '#E2E8F8';
-                        (e.currentTarget as HTMLButtonElement).style.color = '#5A6B88';
+                        (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-chrome)';
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+                        (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
                       }}
                     >
                       Back
@@ -340,14 +348,14 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
                       disabled={loading}
                       className="flex-1 flex items-center justify-center gap-2 py-4 rounded-[12px] text-[15px] font-semibold text-white transition-all duration-150 group disabled:opacity-60 disabled:cursor-not-allowed"
                       style={{
-                        background: '#2A6DF4',
+                        background: 'var(--brand)',
                         boxShadow: '0 4px 16px rgba(42,109,244,0.30)',
                       }}
                       onMouseEnter={(e) => {
-                        if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#1A5CE0';
+                        if (!loading) (e.currentTarget as HTMLButtonElement).style.background = 'var(--brand-hover)';
                       }}
                       onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLButtonElement).style.background = '#2A6DF4';
+                        (e.currentTarget as HTMLButtonElement).style.background = 'var(--brand)';
                       }}
                     >
                       {loading ? (
@@ -374,24 +382,24 @@ const BookDemoModal: React.FC<BookDemoModalProps> = ({ isOpen, onClose }) => {
                 >
                   <div
                     className="w-20 h-20 rounded-full flex items-center justify-center mx-auto"
-                    style={{ background: '#DCFCE7' }}
+                    style={{ background: 'rgba(22,163,74,0.1)' }}
                   >
                     <CheckCircle2 className="w-11 h-11" style={{ color: '#16A34A' }} />
                   </div>
                   <div>
-                    <h3 className="text-[22px] font-bold tracking-tight mb-2" style={{ color: '#0F1D3A' }}>
+                    <h3 className="text-[22px] font-bold tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>
                       Booking Confirmed!
                     </h3>
-                    <p className="text-[14px] leading-relaxed max-w-sm mx-auto" style={{ color: '#5A6B88' }}>
+                    <p className="text-[14px] leading-relaxed max-w-sm mx-auto" style={{ color: 'var(--text-secondary)' }}>
                       We've received your request. A confirmation has been sent to{' '}
-                      <span className="font-semibold" style={{ color: '#0F1D3A' }}>{formData.email}</span>.{' '}
+                      <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>{formData.email}</span>.{' '}
                       Our team will reach out shortly with the meeting link.
                     </p>
                   </div>
                   <button
                     onClick={handleClose}
                     className="inline-flex items-center gap-2 px-8 py-3.5 rounded-[12px] text-[14px] font-semibold text-white"
-                    style={{ background: '#2A6DF4', boxShadow: '0 4px 16px rgba(42,109,244,0.30)' }}
+                    style={{ background: 'var(--brand)', boxShadow: '0 4px 16px rgba(42,109,244,0.30)' }}
                   >
                     Got it, Thanks!
                   </button>

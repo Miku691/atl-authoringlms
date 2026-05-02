@@ -183,7 +183,7 @@ const RegisterInstitutePage: React.FC = () => {
 
                 {/* Phone */}
                 <div>
-                    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 px-1">
+                    <label className="block text-xs font-semibold text-content-secondary uppercase tracking-wider mb-1 px-1">
                         Phone Number
                     </label>
                     <div className="flex gap-2">
@@ -192,7 +192,7 @@ const RegisterInstitutePage: React.FC = () => {
                                 name="countryCode"
                                 value={formData.countryCode}
                                 onChange={handleChange}
-                                className="block w-full px-3 py-[15px] border border-gray-200 rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 sm:text-sm transition-all bg-gray-50/50 h-[54px]"
+                                className="block w-full px-3 py-[15px] border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 sm:text-sm transition-all bg-chrome/50 h-[54px]"
                             >
                                 {COUNTRY_CODES.map(c => (
                                     <option key={`${c.code}-${c.label}`} value={c.code}>{c.label}</option>
@@ -233,17 +233,17 @@ const RegisterInstitutePage: React.FC = () => {
                         {formData.password && !errors.password && (
                             <div className="px-1 pt-1">
                                 <div className="flex justify-between items-center mb-1">
-                                    <span className="text-[10px] font-bold uppercase text-gray-400">Strength: {passwordStrength.message}</span>
+                                    <span className="text-[10px] font-bold uppercase text-content-muted">Strength: {passwordStrength.message}</span>
                                     <div className="flex gap-0.5">
                                         {[1, 2, 3, 4].map((step) => (
                                             <div
                                                 key={step}
-                                                className={`h-1 w-4 rounded-full ${step <= passwordStrength.score ? `bg-${passwordStrength.color}-500` : 'bg-gray-200'}`}
+                                                className={`h-1 w-4 rounded-full ${step <= passwordStrength.score ? `bg-${passwordStrength.color}-500` : 'bg-chrome'}`}
                                             ></div>
                                         ))}
                                     </div>
                                 </div>
-                                <p className="text-[9px] text-gray-400 leading-tight">Must be 8+ chars with uppercase, number & symbol.</p>
+                                <p className="text-[9px] text-content-muted leading-tight">Must be 8+ chars with uppercase, number & symbol.</p>
                             </div>
                         )}
                     </div>
@@ -264,7 +264,7 @@ const RegisterInstitutePage: React.FC = () => {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className={`w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl shadow-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all duration-300 transform active:scale-95 ${isLoading ? 'opacity-70 cursor-not-allowed shadow-none' : 'hover:shadow-indigo-200'}`}
+                        className={`w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl shadow-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 transform active:scale-95 ${isLoading ? 'opacity-70 cursor-not-allowed shadow-none' : 'hover:shadow-indigo-500/30'}`}
                     >
                         {isLoading ? (
                             <>
@@ -281,7 +281,7 @@ const RegisterInstitutePage: React.FC = () => {
                 </div>
 
                 <div className="text-sm text-center pt-2">
-                    <span className="text-gray-500 font-medium">Already have an account? </span>
+                    <span className="text-content-secondary font-medium">Already have an account? </span>
                     <Link to="/login" className="font-bold text-indigo-600 hover:text-indigo-500 hover:underline underline-offset-4 decoration-2">
                         Sign in
                     </Link>

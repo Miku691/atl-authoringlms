@@ -125,13 +125,13 @@ const GuardianSearchAndLink: React.FC<Props> = ({ studentId, onMappingCreated })
     };
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden animate-fade-in">
-            <div className="p-5 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between">
+        <div className="bg-surface rounded-2xl border border-border shadow-sm overflow-hidden animate-fade-in">
+            <div className="p-5 bg-chrome/50 border-b border-border flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="p-2 bg-indigo-600 text-white rounded-lg">
                         <UserPlus className="w-4 h-4" />
                     </div>
-                    <h3 className="font-bold text-gray-900">Add Guardian</h3>
+                    <h3 className="font-bold text-content-primary">Add Guardian</h3>
                 </div>
             </div>
 
@@ -139,11 +139,11 @@ const GuardianSearchAndLink: React.FC<Props> = ({ studentId, onMappingCreated })
                 {!foundGuardian && !showCreateForm && (
                     <form onSubmit={handleSearch} className="flex gap-2">
                         <div className="relative flex-1 group">
-                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-600 transition-colors" />
+                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted group-focus-within:text-indigo-600 transition-colors" />
                             <input
                                 type="tel"
                                 placeholder="Search by phone number..."
-                                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-white transition-all font-medium"
+                                className="w-full pl-10 pr-4 py-2.5 bg-chrome border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:bg-surface transition-all font-medium"
                                 value={searchPhone}
                                 onChange={(e) => setSearchPhone(e.target.value)}
                             />
@@ -151,7 +151,7 @@ const GuardianSearchAndLink: React.FC<Props> = ({ studentId, onMappingCreated })
                         <button
                             type="submit"
                             disabled={isSearching || !searchPhone}
-                            className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-100 hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center gap-2"
+                            className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-lg shadow-indigo-600/20 dark:shadow-none hover:bg-indigo-700 disabled:opacity-50 transition-all flex items-center gap-2"
                         >
                             {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                             Find
@@ -162,24 +162,24 @@ const GuardianSearchAndLink: React.FC<Props> = ({ studentId, onMappingCreated })
                 {/* Found Guardian Result */}
                 {foundGuardian && (
                     <div className="animate-slide-down">
-                        <div className="p-5 bg-indigo-50/50 border border-indigo-100 rounded-2xl flex items-center justify-between mb-6">
+                        <div className="p-5 bg-indigo-500/5 border border-indigo-500/20 rounded-2xl flex items-center justify-between mb-6">
                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-indigo-600">
+                                <div className="w-12 h-12 bg-surface rounded-xl shadow-sm flex items-center justify-center text-indigo-600">
                                     <CheckCircle2 className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <p className="text-sm font-black text-indigo-900">{foundGuardian.name}</p>
-                                    <p className="text-xs text-indigo-600/70 font-bold">{foundGuardian.phone}</p>
+                                    <p className="text-sm font-black text-indigo-600">{foundGuardian.name}</p>
+                                    <p className="text-xs text-content-muted font-bold">{foundGuardian.phone}</p>
                                 </div>
                             </div>
-                            <button onClick={() => setFoundGuardian(null)} className="text-gray-400 hover:text-gray-600"><X className="w-5 h-5" /></button>
+                            <button onClick={() => setFoundGuardian(null)} className="text-content-muted hover:text-content-secondary"><X className="w-5 h-5" /></button>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 mb-6">
                             <div>
-                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Relation to Student</label>
+                                <label className="block text-[10px] font-black text-content-muted uppercase tracking-widest mb-2 ml-1">Relation to Student</label>
                                 <select
-                                    className="w-full px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm font-bold text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
+                                    className="w-full px-4 py-2.5 bg-chrome border border-border rounded-xl text-sm font-bold text-content-primary focus:outline-none focus:ring-2 focus:ring-indigo-600 transition-all"
                                     value={mappingData.relation}
                                     onChange={(e) => setMappingData({ ...mappingData, relation: e.target.value })}
                                 >
@@ -194,11 +194,11 @@ const GuardianSearchAndLink: React.FC<Props> = ({ studentId, onMappingCreated })
                                 <label className="flex items-center gap-2 cursor-pointer group">
                                     <input
                                         type="checkbox"
-                                        className="w-5 h-5 rounded-lg border-gray-100 text-indigo-600 focus:ring-indigo-600"
+                                        className="w-5 h-5 rounded-lg border-border text-indigo-600 focus:ring-indigo-600"
                                         checked={mappingData.isPrimary}
                                         onChange={(e) => setMappingData({ ...mappingData, isPrimary: e.target.checked })}
                                     />
-                                    <span className="text-sm font-bold text-gray-700">Set as Primary</span>
+                                    <span className="text-sm font-bold text-content-primary">Set as Primary</span>
                                 </label>
                             </div>
                         </div>
@@ -206,7 +206,7 @@ const GuardianSearchAndLink: React.FC<Props> = ({ studentId, onMappingCreated })
                         <button
                             onClick={handleLink}
                             disabled={isLinking}
-                            className="w-full bg-emerald-600 text-white py-3 rounded-2xl font-black text-sm shadow-xl shadow-emerald-100 hover:bg-emerald-700 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                            className="w-full bg-emerald-600 text-white py-3 rounded-2xl font-black text-sm shadow-xl shadow-emerald-600/20 dark:shadow-none hover:bg-emerald-700 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                         >
                             {isLinking ? <Loader2 className="w-5 h-5 animate-spin" /> : <LinkIcon className="w-4 h-4" />}
                             Link Existing Guardian
@@ -217,11 +217,11 @@ const GuardianSearchAndLink: React.FC<Props> = ({ studentId, onMappingCreated })
                 {/* Not Found -> Offer to Create */}
                 {hasAttemptedSearch && !foundGuardian && !showCreateForm && !isSearching && (
                     <div className="text-center py-6 animate-fade-in">
-                        <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <div className="w-12 h-12 bg-amber-500/10 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-3">
                             <Search className="w-6 h-6" />
                         </div>
-                        <h4 className="font-bold text-gray-900 mb-1">Guardian Not Found</h4>
-                        <p className="text-xs text-gray-500 mb-4">No master record exists for phone: {searchPhone}</p>
+                        <h4 className="font-bold text-content-primary mb-1">Guardian Not Found</h4>
+                        <p className="text-xs text-content-secondary mb-4">No master record exists for phone: {searchPhone}</p>
                         <button
                             onClick={() => {
                                 setNewGuardian({ ...newGuardian, phone: searchPhone });
@@ -239,20 +239,20 @@ const GuardianSearchAndLink: React.FC<Props> = ({ studentId, onMappingCreated })
                     <form onSubmit={handleCreateAndLink} className="space-y-5 animate-slide-up">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="col-span-full">
-                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Full Name</label>
+                                <label className="block text-[10px] font-black text-content-muted uppercase tracking-widest mb-1.5 ml-1">Full Name</label>
                                 <input
                                     type="text"
                                     required
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-medium focus:ring-2 focus:ring-indigo-600 focus:bg-white"
+                                    className="w-full px-4 py-3 bg-chrome border border-border rounded-2xl text-sm font-medium focus:ring-2 focus:ring-indigo-600 focus:bg-surface"
                                     placeholder="e.g. Robert Smith"
                                     value={newGuardian.name}
                                     onChange={(e) => setNewGuardian({ ...newGuardian, name: e.target.value })}
                                 />
                             </div>
                             <div>
-                                <label className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1.5 ml-1">Relation</label>
+                                <label className="block text-[10px] font-black text-content-muted uppercase tracking-widest mb-1.5 ml-1">Relation</label>
                                 <select
-                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl text-sm font-bold text-gray-700"
+                                    className="w-full px-4 py-3 bg-chrome border border-border rounded-2xl text-sm font-bold text-content-primary"
                                     value={mappingData.relation}
                                     onChange={(e) => setMappingData({ ...mappingData, relation: e.target.value })}
                                 >
@@ -267,11 +267,11 @@ const GuardianSearchAndLink: React.FC<Props> = ({ studentId, onMappingCreated })
                                 <label className="flex items-center gap-2 cursor-pointer group">
                                     <input
                                         type="checkbox"
-                                        className="w-5 h-5 rounded-lg border-gray-100 text-indigo-600 focus:ring-indigo-600"
+                                        className="w-5 h-5 rounded-lg border-border text-indigo-600 focus:ring-indigo-600"
                                         checked={mappingData.isPrimary}
                                         onChange={(e) => setMappingData({ ...mappingData, isPrimary: e.target.checked })}
                                     />
-                                    <span className="text-[11px] font-bold text-gray-500 uppercase">Primary Contact</span>
+                                    <span className="text-[11px] font-bold text-content-secondary uppercase">Primary Contact</span>
                                 </label>
                             </div>
                         </div>
@@ -280,14 +280,14 @@ const GuardianSearchAndLink: React.FC<Props> = ({ studentId, onMappingCreated })
                             <button
                                 type="button"
                                 onClick={() => setShowCreateForm(false)}
-                                className="flex-1 py-3 border border-gray-100 rounded-2xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all"
+                                className="flex-1 py-3 border border-border rounded-2xl text-xs font-bold text-content-secondary hover:bg-chrome transition-all"
                             >
                                 Back to Search
                             </button>
                             <button
                                 type="submit"
                                 disabled={isLinking}
-                                className="flex-[2] py-3 bg-indigo-600 text-white rounded-2xl text-sm font-black shadow-xl shadow-indigo-100 hover:bg-indigo-700 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                                className="flex-[2] py-3 bg-indigo-600 text-white rounded-2xl text-sm font-black shadow-xl shadow-indigo-600/20 dark:shadow-none hover:bg-indigo-700 flex items-center justify-center gap-2 transition-all disabled:opacity-50"
                             >
                                 {isLinking ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                                 Create & Link

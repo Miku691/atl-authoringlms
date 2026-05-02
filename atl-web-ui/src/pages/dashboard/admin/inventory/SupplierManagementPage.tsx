@@ -5,6 +5,7 @@ import {
 import { inventoryService } from '../../../../api/inventoryService';
 import type { Supplier } from '../../../../types/inventory';
 import toast from 'react-hot-toast';
+import Modal from '../../../../components/common/Modal';
 
 const SupplierManagementPage: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -101,11 +102,11 @@ const SupplierManagementPage: React.FC = () => {
     );
 
     return (
-        <div className="p-6 space-y-6 bg-gray-50/50 min-h-screen">
+        <div className="p-6 space-y-6 bg-chrome/50 min-h-screen">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Supplier Management</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage vendor contacts and information</p>
+                    <h1 className="text-2xl font-bold text-content-primary">Supplier Management</h1>
+                    <p className="text-sm text-content-secondary mt-1">Manage vendor contacts and information</p>
                 </div>
                 <button
                     onClick={() => openModal()}
@@ -117,15 +118,15 @@ const SupplierManagementPage: React.FC = () => {
             </div>
 
             {/* Toolbar */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="bg-surface p-4 rounded-xl shadow-sm border border-border">
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                     <input
                         type="text"
                         placeholder="Search by supplier name, contact person or email..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                     />
                 </div>
             </div>
@@ -133,48 +134,48 @@ const SupplierManagementPage: React.FC = () => {
             {/* Grid View */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {isLoading ? (
-                    <div className="col-span-full py-12 text-center text-gray-500">Loading suppliers...</div>
+                    <div className="col-span-full py-12 text-center text-content-secondary">Loading suppliers...</div>
                 ) : filteredSuppliers.length === 0 ? (
-                    <div className="col-span-full py-12 text-center text-gray-500 italic">No suppliers found.</div>
+                    <div className="col-span-full py-12 text-center text-content-secondary italic">No suppliers found.</div>
                 ) : (
                     filteredSuppliers.map((supplier) => (
-                        <div key={supplier.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group">
-                            <div className="p-5 border-b border-gray-50 bg-gray-50/30 flex justify-between items-start">
+                        <div key={supplier.id} className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden hover:shadow-md transition-shadow group">
+                            <div className="p-5 border-b border-border bg-chrome/30 flex justify-between items-start">
                                 <div className="flex items-center gap-3">
                                     <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
                                         <Truck size={20} />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-gray-900 line-clamp-1">{supplier.name}</h3>
-                                        <p className="text-xs text-gray-500">{supplier.contactPerson || 'No contact person'}</p>
+                                        <h3 className="font-bold text-content-primary line-clamp-1">{supplier.name}</h3>
+                                        <p className="text-xs text-content-secondary">{supplier.contactPerson || 'No contact person'}</p>
                                     </div>
                                 </div>
                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                     <button 
                                         onClick={() => openModal(supplier)}
-                                        className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded"
+                                        className="p-1.5 text-content-muted hover:text-indigo-600 hover:bg-indigo-50 rounded"
                                     >
                                         <Edit2 size={16} />
                                     </button>
                                     <button 
                                         onClick={() => handleDelete(supplier.id)}
-                                        className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
+                                        className="p-1.5 text-content-muted hover:text-red-600 hover:bg-red-50 rounded"
                                     >
                                         <Trash2 size={16} />
                                     </button>
                                 </div>
                             </div>
                             <div className="p-5 space-y-3">
-                                <div className="flex items-center gap-3 text-sm text-gray-600">
-                                    <Phone size={14} className="text-gray-400" />
+                                <div className="flex items-center gap-3 text-sm text-content-secondary">
+                                    <Phone size={14} className="text-content-muted" />
                                     <span>{supplier.phone || 'N/A'}</span>
                                 </div>
-                                <div className="flex items-center gap-3 text-sm text-gray-600">
-                                    <Mail size={14} className="text-gray-400" />
+                                <div className="flex items-center gap-3 text-sm text-content-secondary">
+                                    <Mail size={14} className="text-content-muted" />
                                     <span className="truncate">{supplier.email || 'N/A'}</span>
                                 </div>
-                                <div className="flex items-start gap-3 text-sm text-gray-600">
-                                    <MapPin size={14} className="text-gray-400 mt-1 flex-shrink-0" />
+                                <div className="flex items-start gap-3 text-sm text-content-secondary">
+                                    <MapPin size={14} className="text-content-muted mt-1 flex-shrink-0" />
                                     <span className="line-clamp-2">{supplier.address || 'N/A'}</span>
                                 </div>
                                 {supplier.website && (
@@ -192,99 +193,94 @@ const SupplierManagementPage: React.FC = () => {
             </div>
 
             {/* Modal */}
-            {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-                        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <h3 className="text-lg font-bold text-gray-900">
-                                {editingSupplier ? 'Edit Supplier' : 'Add New Supplier'}
-                            </h3>
-                            <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-lg">
-                                <X className="h-5 w-5" />
-                            </button>
-                        </div>
-                        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Supplier Name *</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={formData.name}
-                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                    placeholder="Enter company or individual name"
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Contact Person</label>
-                                    <input
-                                        type="text"
-                                        value={formData.contactPerson}
-                                        onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Phone Number</label>
-                                    <input
-                                        type="tel"
-                                        value={formData.phone}
-                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                    />
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
-                                    <input
-                                        type="email"
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-gray-700 mb-1">Website</label>
-                                    <input
-                                        type="text"
-                                        value={formData.website}
-                                        onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                                        className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                        placeholder="www.example.com"
-                                    />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-1">Office Address</label>
-                                <textarea
-                                    rows={3}
-                                    value={formData.address}
-                                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none"
-                                />
-                            </div>
-                            <div className="flex justify-end space-x-3 pt-6">
-                                <button
-                                    type="button"
-                                    onClick={closeModal}
-                                    className="px-4 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
-                                >
-                                    Cancel
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="flex items-center px-6 py-2 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
-                                >
-                                    <Save className="h-4 w-4 mr-2" />
-                                    {editingSupplier ? 'Update Supplier' : 'Save Supplier'}
-                                </button>
-                            </div>
-                        </form>
+            <Modal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                title={editingSupplier ? 'Edit Supplier' : 'Add New Supplier'}
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            onClick={closeModal}
+                            className="px-4 py-2 text-sm font-semibold text-content-primary bg-surface border border-border rounded-xl hover:bg-chrome transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            form="supplier-form"
+                            className="flex items-center px-6 py-2 text-sm font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
+                        >
+                            <Save className="h-4 w-4 mr-2" />
+                            {editingSupplier ? 'Update Supplier' : 'Save Supplier'}
+                        </button>
+                    </>
+                }
+            >
+                <form id="supplier-form" onSubmit={handleSubmit} className="space-y-4 p-4">
+                    <div>
+                        <label className="block text-sm font-semibold text-content-primary mb-1">Supplier Name *</label>
+                        <input
+                            type="text"
+                            required
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            placeholder="Enter company or individual name"
+                        />
                     </div>
-                </div>
-            )}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-semibold text-content-primary mb-1">Contact Person</label>
+                            <input
+                                type="text"
+                                value={formData.contactPerson}
+                                onChange={(e) => setFormData({ ...formData, contactPerson: e.target.value })}
+                                className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-content-primary mb-1">Phone Number</label>
+                            <input
+                                type="tel"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-semibold text-content-primary mb-1">Email Address</label>
+                            <input
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-semibold text-content-primary mb-1">Website</label>
+                            <input
+                                type="text"
+                                value={formData.website}
+                                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                                className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                                placeholder="www.example.com"
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-semibold text-content-primary mb-1">Office Address</label>
+                        <textarea
+                            rows={3}
+                            value={formData.address}
+                            onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                            className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all resize-none"
+                        />
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 };

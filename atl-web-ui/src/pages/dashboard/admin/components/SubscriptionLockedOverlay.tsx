@@ -55,7 +55,7 @@ const SubscriptionLockedOverlay: React.FC<SubscriptionLockedOverlayProps> = ({
 
     return (
         <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4">
-            <div className="bg-white rounded-[3rem] p-8 md:p-12 max-w-2xl w-full shadow-2xl relative overflow-hidden border border-slate-100">
+            <div className="bg-surface rounded-[3rem] p-8 md:p-12 max-w-2xl w-full shadow-2xl relative overflow-hidden border border-border">
                 {/* Decorative Gradients */}
                 <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -65,14 +65,14 @@ const SubscriptionLockedOverlay: React.FC<SubscriptionLockedOverlayProps> = ({
                         <Icon className={`w-12 h-12 text-${details.color}-600`} />
                     </div>
 
-                    <h2 className="text-4xl font-black text-slate-900 tracking-tight mb-4 uppercase">
+                    <h2 className="text-4xl font-black text-content-primary tracking-tight mb-4 uppercase">
                         {details.title}
                     </h2>
                     
-                    <p className="text-slate-500 text-lg font-medium leading-relaxed mb-10 max-w-md">
+                    <p className="text-content-secondary text-lg font-medium leading-relaxed mb-10 max-w-md">
                         {details.description}
                         <br />
-                        <span className="text-sm font-bold text-slate-400 mt-4 block uppercase tracking-widest italic">
+                        <span className="text-sm font-bold text-content-muted mt-4 block uppercase tracking-widest italic">
                             Platform access is restricted until upgrade
                         </span>
                     </p>
@@ -89,7 +89,7 @@ const SubscriptionLockedOverlay: React.FC<SubscriptionLockedOverlayProps> = ({
                         
                         <button
                             onClick={() => navigate('/billing/subscription')}
-                            className="flex items-center justify-center gap-3 py-5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-3xl text-sm font-black uppercase tracking-widest transition-all active:scale-95"
+                            className="flex items-center justify-center gap-3 py-5 bg-chrome hover:bg-chrome text-content-secondary rounded-3xl text-sm font-black uppercase tracking-widest transition-all active:scale-95"
                         >
                             View Plan Details
                         </button>

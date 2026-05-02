@@ -37,13 +37,7 @@ export const instructorService = {
 
     getInstructorsByTenant: async (tenantId: string, page = 0, size = 100) => {
         const response = await api.get(`/ims-instructor-service/instructors/tenant/${tenantId}?page=${page}&size=${size}`);
-        
-        // Extract the actual array from various response structures
-        const data = response.data?.apiData;
-        if (data && typeof data === 'object' && 'content' in data) {
-            return data.content;
-        }
-        return data || [];
+        return response.data;
     },
 
     getInstructorById: async (id: string) => {

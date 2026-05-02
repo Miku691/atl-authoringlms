@@ -39,7 +39,7 @@ const DashboardChart: React.FC<DashboardChartProps> = ({
         if (active && payload && payload.length) {
             return (
                 <div className="bg-slate-900 border border-slate-700 p-3 rounded-xl shadow-2xl backdrop-blur-md bg-opacity-90">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{payload[0].name}</p>
+                    <p className="text-[10px] font-black text-content-muted uppercase tracking-widest mb-1">{payload[0].name}</p>
                     <p className="text-sm font-black text-white">
                         {payload[0].value} {payload[0].value === 1 ? 'Student' : 'Students'}
                         <span className="ml-2 text-indigo-400">
@@ -53,26 +53,26 @@ const DashboardChart: React.FC<DashboardChartProps> = ({
     };
 
     return (
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden flex flex-col group hover:shadow-xl hover:border-indigo-100 transition-all duration-500">
-            <div className="p-6 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-                <h3 className="text-xs font-black text-slate-900 flex items-center gap-3 tracking-widest">
+        <div className="bg-surface rounded-3xl border border-border shadow-sm overflow-hidden flex flex-col group hover:shadow-xl hover:border-indigo-100 transition-all duration-500">
+            <div className="p-6 border-b border-border flex justify-between items-center bg-chrome/30">
+                <h3 className="text-xs font-black text-content-primary flex items-center gap-3 tracking-widest">
                     <div className="p-2 bg-indigo-100 rounded-lg group-hover:rotate-12 transition-transform">
                         <Layout className="w-3.5 h-3.5 text-indigo-600" />
                     </div>
                     {title.toUpperCase()}
                 </h3>
 
-                <div className="flex bg-slate-100 p-1 rounded-xl">
+                <div className="flex bg-chrome p-1 rounded-xl">
                     <button
                         onClick={() => setView('pie')}
-                        className={`p-1.5 rounded-lg transition-all ${view === 'pie' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`p-1.5 rounded-lg transition-all ${view === 'pie' ? 'bg-surface shadow-sm text-indigo-600' : 'text-content-muted hover:text-content-secondary'}`}
                         title="Pie View"
                     >
                         <PieIcon className="w-4 h-4" />
                     </button>
                     <button
                         onClick={() => setView('bar')}
-                        className={`p-1.5 rounded-lg transition-all ${view === 'bar' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`p-1.5 rounded-lg transition-all ${view === 'bar' ? 'bg-surface shadow-sm text-indigo-600' : 'text-content-muted hover:text-content-secondary'}`}
                         title="Bar View"
                     >
                         <BarChart3 className="w-4 h-4" />
@@ -112,7 +112,7 @@ const DashboardChart: React.FC<DashboardChartProps> = ({
                                             {payload?.map((entry: any, index: number) => (
                                                 <div key={index} className="flex items-center gap-1.5">
                                                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
-                                                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">{entry.value}</span>
+                                                    <span className="text-[10px] font-bold text-content-secondary uppercase tracking-tighter">{entry.value}</span>
                                                 </div>
                                             ))}
                                         </div>

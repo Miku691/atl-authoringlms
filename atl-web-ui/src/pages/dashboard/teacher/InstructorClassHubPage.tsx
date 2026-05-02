@@ -75,7 +75,7 @@ const InstructorClassHubPage: React.FC = () => {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh]">
                 <Loader2 className="w-10 h-10 animate-spin text-indigo-600 mb-4" />
-                <p className="text-gray-500 animate-pulse">Syncing class data...</p>
+                <p className="text-content-secondary animate-pulse">Syncing class data...</p>
             </div>
         );
     }
@@ -87,18 +87,18 @@ const InstructorClassHubPage: React.FC = () => {
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate('/dashboard')}
-                        className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
+                        className="p-2 hover:bg-chrome rounded-xl transition-colors"
                     >
-                        <ChevronLeft className="w-6 h-6 text-gray-400" />
+                        <ChevronLeft className="w-6 h-6 text-content-muted" />
                     </button>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-black text-gray-900">{offering?.name}</h1>
+                            <h1 className="text-2xl font-black text-content-primary">{offering?.name}</h1>
                             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-indigo-100 text-indigo-700">
                                 {offering?.type?.replace('_', ' ')}
                             </span>
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">Instructor Workspace • Session 2024-25</p>
+                        <p className="text-sm text-content-secondary mt-1">Instructor Workspace • Session 2024-25</p>
                     </div>
                 </div>
                 <div className="flex gap-2 w-full md:w-auto">
@@ -110,7 +110,7 @@ const InstructorClassHubPage: React.FC = () => {
                     </button>
                     <button
                         onClick={() => navigate('/academics/syllabus', { state: { offeringId } })}
-                        className="flex-1 md:flex-none px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 shadow-sm"
+                        className="flex-1 md:flex-none px-4 py-2 bg-surface border border-border text-content-primary rounded-xl text-sm font-bold hover:bg-chrome transition-colors flex items-center justify-center gap-2 shadow-sm"
                     >
                         <BookOpen className="w-4 h-4" /> Track Syllabus
                     </button>
@@ -118,7 +118,7 @@ const InstructorClassHubPage: React.FC = () => {
             </div>
 
             {/* Hub Navigation Tabs */}
-            <div className="flex border-b border-gray-100 bg-white rounded-t-2xl px-6 pt-4">
+            <div className="flex border-b border-border bg-surface rounded-t-2xl px-6 pt-4">
                 {[
                     { id: 'students', label: 'Students', icon: Users },
                     { id: 'attendance', label: 'Attendance Logs', icon: Calendar },
@@ -127,7 +127,7 @@ const InstructorClassHubPage: React.FC = () => {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all relative ${activeTab === tab.id ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-600'
+                        className={`flex items-center gap-2 px-6 py-4 text-sm font-bold transition-all relative ${activeTab === tab.id ? 'text-indigo-600' : 'text-content-muted hover:text-content-secondary'
                             }`}
                     >
                         <tab.icon className="w-4 h-4" />
@@ -140,21 +140,21 @@ const InstructorClassHubPage: React.FC = () => {
             </div>
 
             {/* Tab Content */}
-            <div className="bg-white rounded-b-2xl shadow-sm border border-gray-100 p-6">
+            <div className="bg-surface rounded-b-2xl shadow-sm border border-border p-6">
                 {activeTab === 'students' && (
                     <div className="space-y-6">
                         <div className="flex flex-col md:flex-row justify-between gap-4">
                             <div className="relative flex-1 group">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-indigo-500 transition-colors" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted group-focus-within:text-indigo-500 transition-colors" />
                                 <input
                                     type="text"
                                     placeholder="Search by name or admission number..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-chrome border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-surface transition-all"
                                 />
                             </div>
-                            <div className="flex items-center gap-3 text-sm text-gray-500 font-medium px-2">
+                            <div className="flex items-center gap-3 text-sm text-content-secondary font-medium px-2">
                                 <Users className="w-4 h-4" />
                                 Total: {totalElements} Students
                             </div>
@@ -162,7 +162,7 @@ const InstructorClassHubPage: React.FC = () => {
 
                         <div className="overflow-x-auto">
                             <table className="w-full border-separate border-spacing-y-1">
-                                <thead className="text-xs font-black text-gray-400 uppercase tracking-widest text-left">
+                                <thead className="text-xs font-black text-content-muted uppercase tracking-widest text-left">
                                     <tr>
                                         <th className="px-4 pb-2">Roll</th>
                                         <th className="px-4 pb-2">Student</th>
@@ -174,11 +174,11 @@ const InstructorClassHubPage: React.FC = () => {
                                 </thead>
                                 <tbody>
                                     {filteredStudents.map((std) => (
-                                        <tr key={std.studentId} className="group hover:bg-gray-50 transition-colors">
-                                            <td className="px-4 py-2 bg-white border-y border-l border-gray-50 rounded-l-2xl font-black text-indigo-600">
+                                        <tr key={std.studentId} className="group hover:bg-chrome transition-colors">
+                                            <td className="px-4 py-2 bg-surface border-y border-l border-border rounded-l-2xl font-black text-indigo-600">
                                                 #{std.rollNo || '-'}
                                             </td>
-                                            <td className="px-4 py-2 bg-white border-y border-gray-50">
+                                            <td className="px-4 py-2 bg-surface border-y border-border">
                                                 <div className="flex items-center gap-3">
                                                     <div className="h-10 w-10 flex-shrink-0 shadow-sm transition-transform group-hover:scale-105">
                                                         <AuthenticatedAvatar
@@ -189,29 +189,29 @@ const InstructorClassHubPage: React.FC = () => {
                                                             className="h-full w-full"
                                                         />
                                                     </div>
-                                                    <span className="font-bold text-gray-900">{std.name}</span>
+                                                    <span className="font-bold text-content-primary">{std.name}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-2 bg-white border-y border-gray-50 text-sm font-medium text-gray-500">
+                                            <td className="px-4 py-2 bg-surface border-y border-border text-sm font-medium text-content-secondary">
                                                 {std.admissionNo}
                                             </td>
-                                            <td className="px-4 py-2 bg-white border-y border-gray-50">
+                                            <td className="px-4 py-2 bg-surface border-y border-border">
                                                 <div className="flex items-center gap-3">
-                                                    <a href={`mailto:${std.email}`} className="p-2 bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all" title={std.email}>
+                                                    <a href={`mailto:${std.email}`} className="p-2 bg-chrome text-content-muted hover:bg-blue-50 hover:text-blue-600 rounded-lg transition-all" title={std.email}>
                                                         <Mail className="w-4 h-4" />
                                                     </a>
-                                                    <a href={`tel:${std.phone}`} className="p-2 bg-gray-50 text-gray-400 hover:bg-green-50 hover:text-green-600 rounded-lg transition-all" title={std.phone}>
+                                                    <a href={`tel:${std.phone}`} className="p-2 bg-chrome text-content-muted hover:bg-green-50 hover:text-green-600 rounded-lg transition-all" title={std.phone}>
                                                         <Phone className="w-4 h-4" />
                                                     </a>
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-2 bg-white border-y border-gray-50">
+                                            <td className="px-4 py-2 bg-surface border-y border-border">
                                                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${std.enrollmentStatus === 'ACTIVE' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
                                                     }`}>
                                                     {std.enrollmentStatus}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-2 bg-white border-y border-r border-gray-50 rounded-r-2xl">
+                                            <td className="px-4 py-2 bg-surface border-y border-r border-border rounded-r-2xl">
                                                 <button className="p-2 text-gray-300 hover:text-indigo-600 transition-colors rounded-lg">
                                                     <MoreHorizontal className="w-5 h-5" />
                                                 </button>
@@ -222,16 +222,16 @@ const InstructorClassHubPage: React.FC = () => {
                             </table>
 
                             {filteredStudents.length === 0 && (
-                                <div className="text-center py-20 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                                <div className="text-center py-20 bg-chrome/50 rounded-2xl border border-dashed border-border">
                                     <Users className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-                                    <p className="text-gray-400 italic">No students found matching your search.</p>
+                                    <p className="text-content-muted italic">No students found matching your search.</p>
                                 </div>
                             )}
 
                             {/* Pagination Controls */}
                             {totalPages > 1 && (
-                                <div className="mt-8 flex items-center justify-between border-t border-gray-100 pt-6">
-                                    <div className="text-sm font-medium text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
+                                    <div className="text-sm font-medium text-content-secondary uppercase tracking-widest flex items-center gap-2">
                                         <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
                                         Showing {students.length} of {totalElements} Students
                                     </div>
@@ -239,7 +239,7 @@ const InstructorClassHubPage: React.FC = () => {
                                         <button
                                             disabled={currentPage === 0}
                                             onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
-                                            className="px-4 py-2 border border-gray-200 rounded-xl text-sm font-black text-gray-600 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-2"
+                                            className="px-4 py-2 border border-border rounded-xl text-sm font-black text-content-secondary hover:bg-chrome disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-2"
                                         >
                                             <ChevronLeft className="w-4 h-4" /> Previous
                                         </button>
@@ -265,8 +265,8 @@ const InstructorClassHubPage: React.FC = () => {
                 {activeTab === 'attendance' && (
                     <div className="py-20 text-center">
                         <Calendar className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                        <h3 className="text-lg font-bold text-gray-900">Attendance Dashboard Pending</h3>
-                        <p className="text-sm text-gray-500 max-w-sm mx-auto mt-2">
+                        <h3 className="text-lg font-bold text-content-primary">Attendance Dashboard Pending</h3>
+                        <p className="text-sm text-content-secondary max-w-sm mx-auto mt-2">
                             Detailed daily logs and monthly summaries are being integrated.
                             Use the <b>Take Attendance</b> button for real-time marking.
                         </p>
@@ -276,8 +276,8 @@ const InstructorClassHubPage: React.FC = () => {
                 {activeTab === 'syllabus' && (
                     <div className="py-20 text-center">
                         <BookOpen className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                        <h3 className="text-lg font-bold text-gray-900">Curriculum Mapping Pending</h3>
-                        <p className="text-sm text-gray-500 max-w-sm mx-auto mt-2">
+                        <h3 className="text-lg font-bold text-content-primary">Curriculum Mapping Pending</h3>
+                        <p className="text-sm text-content-secondary max-w-sm mx-auto mt-2">
                             A visual chart of completed chapters and pending topics will appear here.
                         </p>
                     </div>

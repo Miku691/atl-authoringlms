@@ -21,6 +21,7 @@ import { toast } from 'react-hot-toast';
 import { instructorService } from '../../../../api/instructorService';
 import { staffService } from '../../../../api/staffService';
 import AttendanceChart from '../../../../components/attendance/AttendanceChart';
+import Modal from '../../../../components/common/Modal';
 
 interface PersonListItem {
     id: string; // backend person ID (studentId or staffId)
@@ -216,8 +217,8 @@ const AttendanceMarkingPage: React.FC = () => {
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Attendance Center</h1>
-                    <p className="text-gray-500">Manage daily records for Students, Instructors, and Staff</p>
+                    <h1 className="text-2xl font-bold text-content-primary">Attendance Center</h1>
+                    <p className="text-content-secondary">Manage daily records for Students, Instructors, and Staff</p>
                 </div>
                 <button
                     onClick={saveAttendance}
@@ -230,34 +231,34 @@ const AttendanceMarkingPage: React.FC = () => {
             </div>
 
             {/* Selection Bar */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200 grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4">
+            <div className="bg-surface p-4 rounded-xl shadow-sm border border-border grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Category</label>
-                    <div className="flex bg-gray-100 p-1 rounded-lg">
+                    <label className="block text-xs font-medium text-content-secondary mb-1 uppercase tracking-wider">Category</label>
+                    <div className="flex bg-chrome p-1 rounded-lg">
                         <button
                             onClick={() => setPersonType('STUDENT')}
-                            className={`flex-1 py-1 text-xs font-semibold rounded-md transition-all ${personType === 'STUDENT' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`flex-1 py-1 text-xs font-semibold rounded-md transition-all ${personType === 'STUDENT' ? 'bg-surface text-indigo-600 shadow-sm' : 'text-content-secondary hover:text-content-primary'}`}
                         >
                             Students
                         </button>
                         <button
                             onClick={() => setPersonType('INSTRUCTOR')}
-                            className={`flex-1 py-1 text-xs font-semibold rounded-md transition-all ${personType === 'INSTRUCTOR' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`flex-1 py-1 text-xs font-semibold rounded-md transition-all ${personType === 'INSTRUCTOR' ? 'bg-surface text-indigo-600 shadow-sm' : 'text-content-secondary hover:text-content-primary'}`}
                         >
                             Instructors
                         </button>
                         <button
                             onClick={() => setPersonType('STAFF')}
-                            className={`flex-1 py-1 text-xs font-semibold rounded-md transition-all ${personType === 'STAFF' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`flex-1 py-1 text-xs font-semibold rounded-md transition-all ${personType === 'STAFF' ? 'bg-surface text-indigo-600 shadow-sm' : 'text-content-secondary hover:text-content-primary'}`}
                         >
                             Staff
                         </button>
                     </div>
                 </div>
                 <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Class / Offering</label>
+                    <label className="block text-xs font-medium text-content-secondary mb-1 uppercase tracking-wider">Class / Offering</label>
                     <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-chrome disabled:opacity-50 disabled:cursor-not-allowed"
                         value={selectedOffering}
                         disabled={personType === 'STAFF'}
                         onChange={(e) => setSelectedOffering(e.target.value)}
@@ -269,9 +270,9 @@ const AttendanceMarkingPage: React.FC = () => {
                     </select>
                 </div>
                 <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Subject (Optional)</label>
+                    <label className="block text-xs font-medium text-content-secondary mb-1 uppercase tracking-wider">Subject (Optional)</label>
                     <select
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-chrome disabled:opacity-50 disabled:cursor-not-allowed"
                         value={selectedSubject}
                         disabled={personType === 'STAFF'}
                         onChange={(e) => setSelectedSubject(e.target.value)}
@@ -283,12 +284,12 @@ const AttendanceMarkingPage: React.FC = () => {
                     </select>
                 </div>
                 <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1 uppercase tracking-wider">Date</label>
+                    <label className="block text-xs font-medium text-content-secondary mb-1 uppercase tracking-wider">Date</label>
                     <div className="relative">
-                        <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-content-muted w-4 h-4" />
                         <input
                             type="date"
-                            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-gray-50"
+                            className="w-full pl-10 pr-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-chrome"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}
                         />
@@ -296,11 +297,11 @@ const AttendanceMarkingPage: React.FC = () => {
                 </div>
                 <div className="flex items-end">
                     <div className="relative w-full">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-content-muted w-4 h-4" />
                         <input
                             type="text"
                             placeholder={`Find ${personType.toLowerCase()}...`}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                            className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -318,65 +319,65 @@ const AttendanceMarkingPage: React.FC = () => {
                         { label: 'Leave', value: stats.leave, color: 'orange', icon: Clock },
                         { label: 'Late', value: stats.late, color: 'purple', icon: Clock },
                     ].map((stat) => (
-                        <div key={stat.label} className={`bg-${stat.color}-50 border border-${stat.color}-100 p-3 rounded-xl`}>
+                        <div key={stat.label} className={`bg-${stat.color}-500/5 dark:bg-${stat.color}-500/10 border border-${stat.color}-500/10 dark:border-${stat.color}-500/20 p-3 rounded-xl`}>
                             <div className="flex items-center gap-2 mb-1">
-                                <stat.icon className={`w-4 h-4 text-${stat.color}-600`} />
-                                <span className={`text-xs font-medium text-${stat.color}-700 uppercase`}>{stat.label}</span>
+                                <stat.icon className={`w-4 h-4 text-${stat.color}-600 dark:text-${stat.color}-400`} />
+                                <span className={`text-xs font-medium text-${stat.color}-700 dark:text-${stat.color}-300 uppercase`}>{stat.label}</span>
                             </div>
-                            <p className={`text-xl font-bold text-${stat.color}-900`}>{stat.value}</p>
+                            <p className={`text-xl font-bold text-${stat.color}-900 dark:text-${stat.color}-100`}>{stat.value}</p>
                         </div>
                     ))}
                 </div>
             )}
 
             {/* People List */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
                 {!selectedOffering && personType !== 'STAFF' ? (
-                    <div className="p-12 text-center text-gray-400">
+                    <div className="p-12 text-center text-content-muted">
                         <Users className="w-12 h-12 mx-auto mb-4 opacity-10" />
                         <p>Select a class and date to start marking attendance</p>
                     </div>
                 ) : loading ? (
-                    <div className="p-12 text-center text-gray-500">
+                    <div className="p-12 text-center text-content-secondary">
                         <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-indigo-600" />
                         <p>Loading {personType === 'STUDENT' ? 'student' : 'staff'} list...</p>
                     </div>
                 ) : filteredPeople.length === 0 ? (
-                    <div className="p-12 text-center text-gray-500">
+                    <div className="p-12 text-center text-content-secondary">
                         <p>No records found for the selected criteria.</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-gray-50 border-b border-gray-200">
+                            <thead className="bg-chrome border-b border-border">
                                 <tr>
-                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">{personType === 'STUDENT' ? 'Student' : 'Staff Member'}</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase text-center">Status</th>
-                                    <th className="px-6 py-4 text-xs font-semibold text-gray-500 uppercase">Remarks</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase">{personType === 'STUDENT' ? 'Student' : 'Staff Member'}</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase text-center">Status</th>
+                                    <th className="px-6 py-4 text-xs font-semibold text-content-secondary uppercase">Remarks</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100">
+                            <tbody className="divide-y divide-border">
                                 {filteredPeople.map((person, idx) => (
-                                    <tr key={person.id || `person-${idx}`} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={person.id || `person-${idx}`} className="hover:bg-chrome transition-colors">
                                         <td className="px-6 py-4">
                                             <div
                                                 className="flex items-center gap-3 cursor-pointer group"
                                                 onClick={() => fetchMonthlyStats(person.id, person.name)}
                                             >
                                                 <div className="relative">
-                                                    <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+                                                    <div className="w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center font-bold">
                                                         {person.name[0]}
                                                     </div>
-                                                    <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <div className="absolute -bottom-1 -right-1 bg-surface rounded-full p-0.5 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <BarChart3 className="w-3 h-3 text-indigo-600" />
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <p className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors flex items-center gap-1">
+                                                    <p className="font-semibold text-content-primary group-hover:text-indigo-600 transition-colors flex items-center gap-1">
                                                         {person.name}
                                                         <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
                                                     </p>
-                                                    <p className="text-xs text-gray-500">ID: {person.identifier}</p>
+                                                    <p className="text-xs text-content-secondary">ID: {person.identifier}</p>
                                                 </div>
                                             </div>
                                         </td>
@@ -386,7 +387,7 @@ const AttendanceMarkingPage: React.FC = () => {
                                                     onClick={() => handleStatusChange(person.id, 'PRESENT')}
                                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${person.status === 'PRESENT'
                                                         ? 'bg-green-600 text-white shadow-sm scale-105'
-                                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                        : 'bg-chrome text-content-secondary hover:bg-chrome'
                                                         }`}
                                                 >
                                                     P
@@ -395,7 +396,7 @@ const AttendanceMarkingPage: React.FC = () => {
                                                     onClick={() => handleStatusChange(person.id, 'ABSENT')}
                                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${person.status === 'ABSENT'
                                                         ? 'bg-red-600 text-white shadow-sm scale-105'
-                                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                        : 'bg-chrome text-content-secondary hover:bg-chrome'
                                                         }`}
                                                 >
                                                     A
@@ -404,7 +405,7 @@ const AttendanceMarkingPage: React.FC = () => {
                                                     onClick={() => handleStatusChange(person.id, 'LATE')}
                                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${person.status === 'LATE'
                                                         ? 'bg-purple-600 text-white shadow-sm scale-105'
-                                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                        : 'bg-chrome text-content-secondary hover:bg-chrome'
                                                         }`}
                                                 >
                                                     L
@@ -413,7 +414,7 @@ const AttendanceMarkingPage: React.FC = () => {
                                                     onClick={() => handleStatusChange(person.id, 'LEAVE')}
                                                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${person.status === 'LEAVE'
                                                         ? 'bg-orange-600 text-white shadow-sm scale-105'
-                                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                        : 'bg-chrome text-content-secondary hover:bg-chrome'
                                                         }`}
                                                 >
                                                     LV
@@ -423,7 +424,7 @@ const AttendanceMarkingPage: React.FC = () => {
                                         <td className="px-6 py-4">
                                             <input
                                                 type="text"
-                                                className="w-full text-sm border-gray-200 rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                className="w-full text-sm bg-chrome border border-border rounded-lg focus:ring-1 focus:ring-indigo-500 outline-none text-content-primary"
                                                 placeholder="Add note..."
                                                 value={person.remarks}
                                                 onChange={(e) => handleRemarksChange(person.id, e.target.value)}
@@ -438,46 +439,40 @@ const AttendanceMarkingPage: React.FC = () => {
             </div>
 
             {/* Monthly Details Modal */}
-            {showDetails && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl overflow-hidden relative">
+            <Modal
+                isOpen={showDetails}
+                onClose={() => setShowDetails(false)}
+                title="Monthly Attendance Details"
+                size="lg"
+            >
+                <div className="p-4">
+                    {loadingStats ? (
+                        <div className="h-64 flex flex-col items-center justify-center gap-4">
+                            <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+                            <p className="text-content-secondary font-medium">Analyzing attendance data...</p>
+                        </div>
+                    ) : monthlyStats ? (
+                        <AttendanceChart
+                            stats={monthlyStats}
+                            personName={selectedPerson?.name || 'User'}
+                        />
+                    ) : (
+                        <div className="h-64 flex flex-col items-center justify-center text-content-muted">
+                            <BarChart3 className="w-16 h-16 opacity-10 mb-4" />
+                            <p>No statistics available for this period.</p>
+                        </div>
+                    )}
+
+                    <div className="mt-8 flex justify-end">
                         <button
                             onClick={() => setShowDetails(false)}
-                            className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-full text-gray-400 hover:text-gray-600 transition-colors"
+                            className="px-6 py-2 bg-gray-900 text-white rounded-lg font-bold hover:bg-black transition-colors"
                         >
-                            <XCircle className="w-6 h-6" />
+                            Close Details
                         </button>
-
-                        <div className="p-8">
-                            {loadingStats ? (
-                                <div className="h-64 flex flex-col items-center justify-center gap-4">
-                                    <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
-                                    <p className="text-gray-500 font-medium">Analyzing attendance data...</p>
-                                </div>
-                            ) : monthlyStats ? (
-                                <AttendanceChart
-                                    stats={monthlyStats}
-                                    personName={selectedPerson?.name || 'User'}
-                                />
-                            ) : (
-                                <div className="h-64 flex flex-col items-center justify-center text-gray-400">
-                                    <BarChart3 className="w-16 h-16 opacity-10 mb-4" />
-                                    <p>No statistics available for this period.</p>
-                                </div>
-                            )}
-
-                            <div className="mt-8 flex justify-end">
-                                <button
-                                    onClick={() => setShowDetails(false)}
-                                    className="px-6 py-2 bg-gray-900 text-white rounded-lg font-bold hover:bg-black transition-colors"
-                                >
-                                    Close Details
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
-            )}
+            </Modal>
         </div>
     );
 };

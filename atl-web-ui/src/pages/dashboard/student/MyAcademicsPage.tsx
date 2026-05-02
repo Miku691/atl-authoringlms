@@ -49,17 +49,17 @@ const MyAcademicsPage: React.FC = () => {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh]">
                 <Loader2 className="w-8 h-8 animate-spin text-[#0054d1] mb-4" />
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Compiling Academic Map...</p>
+                <p className="text-[10px] font-bold text-content-muted uppercase tracking-widest">Compiling Academic Map...</p>
             </div>
         );
     }
 
     if (!enrollment) {
         return (
-            <div className="bg-white rounded-2xl p-16 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] mt-10">
+            <div className="bg-surface rounded-2xl p-16 text-center shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] mt-10">
                 <GraduationCap className="w-16 h-16 text-slate-200 mx-auto mb-6" />
                 <h2 className="text-xl font-bold text-[#1a3d8a]">Academics Not Active</h2>
-                <p className="text-sm text-slate-500 max-w-sm mx-auto mt-2 font-medium">
+                <p className="text-sm text-content-secondary max-w-sm mx-auto mt-2 font-medium">
                     You are currently not enrolled in any active class. Please complete your admission or contact management.
                 </p>
             </div>
@@ -90,14 +90,14 @@ const MyAcademicsPage: React.FC = () => {
                 {/* Left Column: Enrollment Detail */}
                 <div className="lg:col-span-4 space-y-8">
                     {/* Primary Enrollment Card */}
-                    <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                    <div className="bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
                         <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center gap-4">
                             <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
                                 <GraduationCap className="w-5 h-5 text-[#2a6df4]" />
                             </div>
                             <div>
                                 <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Academic Hub</h3>
-                                <p className="text-xs text-slate-400 font-medium">Standard Enrollment</p>
+                                <p className="text-xs text-content-muted font-medium">Standard Enrollment</p>
                             </div>
                         </div>
 
@@ -141,7 +141,7 @@ const MyAcademicsPage: React.FC = () => {
                                     <span className="text-[10px] font-bold text-white/40 uppercase">Units</span>
                                 </div>
                             </div>
-                            <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center group-hover:bg-[#2a6df4] group-hover:rotate-6 transition-all duration-500">
+                            <div className="w-16 h-16 rounded-2xl bg-surface/5 flex items-center justify-center group-hover:bg-[#2a6df4] group-hover:rotate-6 transition-all duration-500">
                                 <BookOpen className="w-8 h-8 text-[#2a6df4] group-hover:text-white" />
                             </div>
                         </div>
@@ -151,7 +151,7 @@ const MyAcademicsPage: React.FC = () => {
 
                 {/* Right Column: Knowledge Matrix */}
                 <div className="lg:col-span-8 space-y-8">
-                     <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                     <div className="bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
                         <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
                              <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
@@ -159,7 +159,7 @@ const MyAcademicsPage: React.FC = () => {
                                 </div>
                                 <div>
                                     <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">Intellectual Mapping</h3>
-                                    <p className="text-xs text-slate-400 font-medium">Authorized Subject Registry</p>
+                                    <p className="text-xs text-content-muted font-medium">Authorized Subject Registry</p>
                                 </div>
                             </div>
                             <span className="px-4 py-1.5 bg-[#f7f9ff] text-[#0054d1] text-[10px] font-bold rounded-lg uppercase tracking-widest border border-[#dae2ff]">
@@ -171,7 +171,7 @@ const MyAcademicsPage: React.FC = () => {
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                  {subjects.map((subject, idx) => (
                                      <div key={idx} className="p-6 rounded-2xl border border-[#f1f3f9] hover:bg-[#f7f9ff] hover:border-[#dae2ff] transition-all group flex items-center gap-5">
-                                          <div className="w-12 h-12 rounded-xl bg-white border border-[#f1f3f9] flex items-center justify-center font-bold text-[#2a6df4] shadow-sm group-hover:bg-[#0054d1] group-hover:text-white transition-all">
+                                          <div className="w-12 h-12 rounded-xl bg-surface border border-[#f1f3f9] flex items-center justify-center font-bold text-[#2a6df4] shadow-sm group-hover:bg-[#0054d1] group-hover:text-white transition-all">
                                               {subject.subjectName?.[0] || 'S'}
                                           </div>
                                           <div className="flex-1 min-w-0">
@@ -195,7 +195,7 @@ const MyAcademicsPage: React.FC = () => {
                                           <div className="w-20 h-20 bg-[#f7f9ff] rounded-full flex items-center justify-center mx-auto mb-6">
                                                <BookMarked className="w-10 h-10 text-slate-200" />
                                           </div>
-                                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Knowledge Matrix Empty</p>
+                                          <p className="text-[10px] font-bold text-content-muted uppercase tracking-widest">Knowledge Matrix Empty</p>
                                      </div>
                                  )}
                              </div>
@@ -204,7 +204,7 @@ const MyAcademicsPage: React.FC = () => {
 
                      {/* Policy Info */}
                      <div className="bg-[#f0f4ff] rounded-2xl p-8 flex items-center gap-8 relative overflow-hidden group">
-                         <div className="w-14 h-14 bg-white rounded-xl shadow-lg shadow-indigo-100 flex items-center justify-center shrink-0 border border-indigo-50 relative z-10 transition-transform group-hover:rotate-6">
+                         <div className="w-14 h-14 bg-surface rounded-xl shadow-lg shadow-indigo-100 flex items-center justify-center shrink-0 border border-indigo-50 relative z-10 transition-transform group-hover:rotate-6">
                              <Inbox className="w-7 h-7 text-[#0054d1]" />
                          </div>
                          <div className="relative z-10">
@@ -213,7 +213,7 @@ const MyAcademicsPage: React.FC = () => {
                                  Academic nodes are managed by the institutional gateway. Attendance and performance metrics are strictly scoped to these registered subjects.
                              </p>
                          </div>
-                         <div className="absolute -top-12 -right-12 w-32 h-32 bg-white/40 rounded-full blur-2xl"></div>
+                         <div className="absolute -top-12 -right-12 w-32 h-32 bg-surface/40 rounded-full blur-2xl"></div>
                      </div>
                 </div>
             </div>

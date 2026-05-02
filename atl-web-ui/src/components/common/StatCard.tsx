@@ -20,24 +20,24 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, change, icon: Icon, c
         purple: 'bg-purple-50 text-purple-600',
     };
 
-    const iconBgClass = colorClasses[color] || 'bg-gray-50 text-gray-600';
+    const iconBgClass = colorClasses[color] || 'bg-chrome text-content-secondary';
 
     return (
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-surface p-6 rounded-xl border border-border shadow-sm hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
                 <div>
-                    <p className="text-sm font-medium text-gray-500">{label}</p>
-                    <p className="text-2xl font-bold text-gray-900 mt-2">{value}</p>
+                    <p className="text-sm font-medium text-content-secondary">{label}</p>
+                    <p className="text-2xl font-bold text-content-primary mt-2">{value}</p>
                 </div>
                 <div className={`p-3 rounded-lg ${iconBgClass}`}>
                     <Icon className="w-6 h-6" />
                 </div>
             </div>
             <div className="mt-4 flex items-center text-sm">
-                <span className={`font-medium ${change.startsWith('+') ? 'text-green-600' : change.startsWith('-') ? 'text-red-600' : 'text-gray-600'}`}>
+                <span className={`font-medium ${change.startsWith('+') ? 'text-green-600' : change.startsWith('-') ? 'text-red-600' : 'text-content-secondary'}`}>
                     {change}
                 </span>
-                <span className="text-gray-400 ml-2">from last month</span>
+                <span className="text-content-muted ml-2">from last month</span>
             </div>
         </div>
     );

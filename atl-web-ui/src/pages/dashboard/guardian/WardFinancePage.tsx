@@ -88,7 +88,7 @@ const WardFinancePage: React.FC = () => {
             case 'PAID': return 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400';
             case 'PARTIAL': return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400';
             case 'UNPAID': return 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400';
-            default: return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400';
+            default: return 'bg-chrome text-content-primary dark:bg-gray-800 dark:text-content-muted';
         }
     };
 
@@ -116,7 +116,7 @@ const WardFinancePage: React.FC = () => {
                         <select
                             value={selectedWardId}
                             onChange={(e) => setSelectedWardId(e.target.value)}
-                            className="block w-full appearance-none bg-white dark:bg-gray-800 border border-border px-4 py-2.5 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                            className="block w-full appearance-none bg-surface dark:bg-gray-800 border border-border px-4 py-2.5 pr-10 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                         >
                             {wardIds.map((id) => (
                                 <option key={id} value={id}>Ward ID: {id}</option>
@@ -128,8 +128,8 @@ const WardFinancePage: React.FC = () => {
             </div>
 
             {wardIds.length === 0 ? (
-                <div className="bg-white dark:bg-gray-800 rounded-2xl border border-border p-12 text-center">
-                    <div className="bg-gray-100 dark:bg-gray-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="bg-surface dark:bg-gray-800 rounded-2xl border border-border p-12 text-center">
+                    <div className="bg-chrome dark:bg-gray-900 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Users className="w-8 h-8 text-muted-foreground" />
                     </div>
                     <h2 className="text-xl font-semibold mb-2">No Wards Linked</h2>
@@ -139,7 +139,7 @@ const WardFinancePage: React.FC = () => {
                 <>
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-border flex items-center gap-4">
+                        <div className="bg-surface dark:bg-gray-800 p-6 rounded-xl border border-border flex items-center gap-4">
                             <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                                 <DollarSign className="w-6 h-6 text-blue-600 dark:text-blue-400" />
                             </div>
@@ -149,7 +149,7 @@ const WardFinancePage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-border flex items-center gap-4">
+                        <div className="bg-surface dark:bg-gray-800 p-6 rounded-xl border border-border flex items-center gap-4">
                             <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
                                 <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
                             </div>
@@ -159,7 +159,7 @@ const WardFinancePage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-border flex items-center gap-4">
+                        <div className="bg-surface dark:bg-gray-800 p-6 rounded-xl border border-border flex items-center gap-4">
                             <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg">
                                 <TrendingDown className="w-6 h-6 text-red-600 dark:text-red-400" />
                             </div>
@@ -169,7 +169,7 @@ const WardFinancePage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-border flex items-center gap-4">
+                        <div className="bg-surface dark:bg-gray-800 p-6 rounded-xl border border-border flex items-center gap-4">
                             <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
                                 <FileText className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
                             </div>
@@ -181,7 +181,7 @@ const WardFinancePage: React.FC = () => {
                     </div>
 
                     {/* Fee Records Table */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl border border-border overflow-hidden">
+                    <div className="bg-surface dark:bg-gray-800 rounded-xl border border-border overflow-hidden">
                         <div className="p-4 border-b border-border flex items-center justify-between">
                             <h2 className="text-lg font-semibold flex items-center gap-2">
                                 <CreditCard className="w-5 h-5 text-primary" />
@@ -195,7 +195,7 @@ const WardFinancePage: React.FC = () => {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
-                                    <tr className="bg-gray-50 dark:bg-gray-900/50">
+                                    <tr className="bg-chrome dark:bg-gray-900/50">
                                         <th className="p-4 text-sm font-semibold uppercase tracking-wider">Fee Head</th>
                                         <th className="p-4 text-sm font-semibold uppercase tracking-wider">Due Date</th>
                                         <th className="p-4 text-sm font-semibold uppercase tracking-wider">Amount Due</th>
@@ -207,7 +207,7 @@ const WardFinancePage: React.FC = () => {
                                 <tbody className="divide-y divide-border">
                                     {(wardsData[selectedWardId] || []).length > 0 ? (
                                         (wardsData[selectedWardId] || []).map((record) => (
-                                            <tr key={record.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <tr key={record.id} className="hover:bg-chrome/50 dark:hover:bg-gray-800/50 transition-colors">
                                                 <td className="p-4 font-medium">{record.feeHeadName}</td>
                                                 <td className="p-4 text-sm text-muted-foreground">
                                                     {format(new Date(record.dueDate), 'MMM dd, yyyy')}
@@ -238,7 +238,7 @@ const WardFinancePage: React.FC = () => {
                     </div>
 
                     {/* Transaction History */}
-                    <div className="bg-white dark:bg-gray-800 rounded-xl border border-border overflow-hidden">
+                    <div className="bg-surface dark:bg-gray-800 rounded-xl border border-border overflow-hidden">
                         <div className="p-4 border-b border-border flex items-center justify-between">
                             <h2 className="text-lg font-semibold flex items-center gap-2">
                                 <History className="w-5 h-5 text-primary" />
@@ -248,7 +248,7 @@ const WardFinancePage: React.FC = () => {
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
-                                    <tr className="bg-gray-50 dark:bg-gray-900/50">
+                                    <tr className="bg-chrome dark:bg-gray-900/50">
                                         <th className="p-4 text-sm font-semibold uppercase tracking-wider">Date</th>
                                         <th className="p-4 text-sm font-semibold uppercase tracking-wider">Mode</th>
                                         <th className="p-4 text-sm font-semibold uppercase tracking-wider">Reference</th>
@@ -259,12 +259,12 @@ const WardFinancePage: React.FC = () => {
                                 <tbody className="divide-y divide-border">
                                     {(wardsTransactions[selectedWardId] || []).length > 0 ? (
                                         (wardsTransactions[selectedWardId] || []).map((tx) => (
-                                            <tr key={tx.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors">
+                                            <tr key={tx.id} className="hover:bg-chrome/50 dark:hover:bg-gray-800/50 transition-colors">
                                                 <td className="p-4 text-sm whitespace-nowrap">
                                                     {format(new Date(tx.transactionDate), 'MMM dd, yyyy HH:mm')}
                                                 </td>
                                                 <td className="p-4">
-                                                    <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs">
+                                                    <span className="px-2 py-1 bg-chrome dark:bg-gray-800 rounded text-xs">
                                                         {tx.paymentMode}
                                                     </span>
                                                 </td>

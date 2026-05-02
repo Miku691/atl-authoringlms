@@ -78,7 +78,7 @@ const AuthenticatedAvatar: React.FC<AuthenticatedAvatarProps> = ({
 
     // Fallback or Loading
     return (
-        <div className={`${containerClass} bg-indigo-100 text-indigo-600 font-semibold`}>
+        <div className={`${containerClass} bg-indigo-500/10 text-indigo-600 font-semibold`}>
             {loading ? (
                 <Loader2 className="animate-spin w-1/3 h-1/3" />
             ) : (

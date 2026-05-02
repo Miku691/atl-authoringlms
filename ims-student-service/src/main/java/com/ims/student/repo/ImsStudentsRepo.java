@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -33,15 +34,18 @@ public interface ImsStudentsRepo extends JpaRepository<ImsStudents, String> {
     @Query("SELECT DISTINCT s FROM ImsStudents s " +
             "LEFT JOIN ImsStudentEnrollments e ON s.id = e.studentId " +
             "WHERE s.tenantId = :tenantId " +
-            "AND (:gender IS NULL OR s.gender = :gender) " +
-            "AND (:offeringId IS NULL OR (e.offeringId = :offeringId AND e.status = 'ACTIVE' AND (e.isDeleted IS NULL OR e.isDeleted = false))) "
-            +
-            "AND (:searchTerm IS NULL OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) " +
-            "OR LOWER(s.admissionNo) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) " +
+            "AND (cast(:gender as String) IS NULL OR s.gender = cast(:gender as String)) " +
+            "AND (cast(:offeringId as String) IS NULL OR (e.offeringId = cast(:offeringId as String) AND e.status = 'ACTIVE' AND (e.isDeleted IS NULL OR e.isDeleted = false))) " +
+            "AND (cast(:searchTerm as String) IS NULL OR LOWER(s.firstName) LIKE LOWER(CONCAT('%', cast(:searchTerm as String), '%')) " +
+            "     OR LOWER(s.lastName) LIKE LOWER(CONCAT('%', cast(:searchTerm as String), '%')) " +
+            "     OR LOWER(s.admissionNo) LIKE LOWER(CONCAT('%', cast(:searchTerm as String), '%'))) " +
             "AND (s.isDeleted IS NULL OR s.isDeleted = false)")
     Page<ImsStudents> searchStudents(
-            String tenantId, String gender, String offeringId, String searchTerm, Pageable pageable);
+            @Param("tenantId") String tenantId,
+            @Param("gender") String gender,
+            @Param("offeringId") String offeringId,
+            @Param("searchTerm") String searchTerm,
+            Pageable pageable);
 
     @Query("SELECT DISTINCT s FROM ImsStudents s " +
             "JOIN ImsStudentEnrollments e ON s.id = e.studentId " +

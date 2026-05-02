@@ -53,7 +53,7 @@ export default function MyResultsPage() {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh]">
                 <Loader2 className="w-8 h-8 animate-spin text-[#0054d1] mb-4" />
-                <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Generating Result Sheet...</p>
+                <p className="text-content-muted font-bold uppercase tracking-widest text-[10px]">Generating Result Sheet...</p>
             </div>
         );
     }
@@ -73,7 +73,7 @@ export default function MyResultsPage() {
     ];
 
     const getGradeInfo = (marks: number | string | null | undefined) => {
-        if (typeof marks === 'string') return { label: marks, color: 'bg-slate-100 text-slate-600' };
+        if (typeof marks === 'string') return { label: marks, color: 'bg-chrome text-content-secondary' };
         const m = Number(marks) || 0;
         if (m >= 90) return { label: 'O', color: 'bg-[#dae2ff] text-[#0054d1]' };
         if (m >= 80) return { label: 'A+', color: 'bg-[#eef2ff] text-[#2a6df4]' };
@@ -95,7 +95,7 @@ export default function MyResultsPage() {
                     </div>
                     <button
                         onClick={() => toast.success("Transcript processing...")}
-                        className="flex bg-white px-6 py-4 rounded-xl border border-slate-100 shadow-sm items-center gap-4 group hover:shadow-md transition-all active:scale-95"
+                        className="flex bg-surface px-6 py-4 rounded-xl border border-border shadow-sm items-center gap-4 group hover:shadow-md transition-all active:scale-95"
                     >
                         <div className="w-10 h-10 rounded-lg bg-[#f1f3f9] flex items-center justify-center text-[#2a6df4] group-hover:bg-[#0054d1] group-hover:text-white transition-all">
                             <Download className="w-5 h-5" />
@@ -113,7 +113,7 @@ export default function MyResultsPage() {
             {/* GPA Stats Block */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                 {stats.map((stat, idx) => (
-                    <div key={idx} className="bg-white p-8 rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex items-center justify-between group hover:shadow-xl transition-all">
+                    <div key={idx} className="bg-surface p-8 rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] flex items-center justify-between group hover:shadow-xl transition-all">
                         <div className="space-y-1">
                             <p className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">{stat.label}</p>
                             <p className="text-4xl font-bold text-[#1a3d8a] tracking-tight">{stat.value}</p>
@@ -128,7 +128,7 @@ export default function MyResultsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 {/* Subject Results Table */}
                 <div className="lg:col-span-8">
-                    <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+                    <div className="bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
                         <div className="px-8 py-6 border-b border-[#f1f3f9] flex items-center justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-xl bg-[#f1f3f9] flex items-center justify-center">
@@ -141,7 +141,7 @@ export default function MyResultsPage() {
                         {results.length === 0 ? (
                             <div className="p-20 text-center">
                                 <BookOpen className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-                                <p className="text-sm font-medium text-slate-400 uppercase tracking-widest">No results indexed for this cycle</p>
+                                <p className="text-sm font-medium text-content-muted uppercase tracking-widest">No results indexed for this cycle</p>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
@@ -221,7 +221,7 @@ export default function MyResultsPage() {
 
                 {/* Performance Chart Card */}
                 <div className="lg:col-span-4 space-y-6">
-                    <div className="bg-white rounded-2xl p-8 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] h-full">
+                    <div className="bg-surface rounded-2xl p-8 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] h-full">
                         <div className="flex items-center gap-4 mb-10">
                             <div className="w-1.5 h-6 bg-[#0054d1] rounded-full"></div>
                             <h3 className="text-[10px] font-bold text-[#64748b] uppercase tracking-widest">GPA Progression</h3>
@@ -260,7 +260,7 @@ export default function MyResultsPage() {
                         </div>
                         
                         <div className="mt-8 pt-6 border-t border-[#f1f3f9] text-center">
-                            <p className="text-[10px] text-slate-400 font-medium mb-1 uppercase tracking-wide">Next Target</p>
+                            <p className="text-[10px] text-content-muted font-medium mb-1 uppercase tracking-wide">Next Target</p>
                             <p className="text-sm font-bold text-[#181c20]">Aim for 9.50 GPA to maintain Dean's List</p>
                         </div>
                     </div>

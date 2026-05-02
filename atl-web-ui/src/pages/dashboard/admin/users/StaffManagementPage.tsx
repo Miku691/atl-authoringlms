@@ -165,14 +165,14 @@ const StaffManagementPage: React.FC = () => {
             />
 
             {/* Search & Filters */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="bg-surface p-4 rounded-xl shadow-sm border border-border">
                 <div className="relative max-w-md">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-4 w-4 text-gray-400" />
+                        <Search className="h-4 w-4 text-content-muted" />
                     </div>
                     <input
                         type="text"
-                        className="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
+                        className="block w-full pl-9 pr-3 py-2 border border-border rounded-lg bg-chrome placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
                         placeholder="Search by name, employee ID or role..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -181,24 +181,24 @@ const StaffManagementPage: React.FC = () => {
             </div>
 
             {/* Content Area */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-chrome">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Name / Employee ID
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Contact
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Role / Department
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Login Access
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Status
                                 </th>
                                 <th scope="col" className="relative px-6 py-3">
@@ -206,27 +206,27 @@ const StaffManagementPage: React.FC = () => {
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-surface divide-y divide-gray-200">
                             {isLoading ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-12 text-center">
                                         <Loader2 className="h-8 w-8 animate-spin mx-auto text-indigo-500" />
-                                        <p className="mt-2 text-sm text-gray-500">Loading staff...</p>
+                                        <p className="mt-2 text-sm text-content-secondary">Loading staff...</p>
                                     </td>
                                 </tr>
                             ) : filteredStaff.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-12 text-center">
-                                        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-gray-100">
-                                            <Briefcase className="h-6 w-6 text-gray-400" />
+                                        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-chrome">
+                                            <Briefcase className="h-6 w-6 text-content-muted" />
                                         </div>
-                                        <p className="mt-2 text-sm font-medium text-gray-900">No staff found</p>
-                                        <p className="mt-1 text-sm text-gray-500">Get started by adding a new staff member.</p>
+                                        <p className="mt-2 text-sm font-medium text-content-primary">No staff found</p>
+                                        <p className="mt-1 text-sm text-content-secondary">Get started by adding a new staff member.</p>
                                     </td>
                                 </tr>
                             ) : (
                                 filteredStaff.map((staffMember) => (
-                                    <tr key={staffMember.id} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={staffMember.id} className="hover:bg-chrome transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 h-10 w-10">
@@ -235,22 +235,22 @@ const StaffManagementPage: React.FC = () => {
                                                     </div>
                                                 </div>
                                                 <div className="ml-4">
-                                                    <div className="text-sm font-medium text-gray-900">
+                                                    <div className="text-sm font-medium text-content-primary">
                                                         {staffMember.firstName} {staffMember.lastName}
                                                     </div>
-                                                    <div className="text-sm text-gray-500">
+                                                    <div className="text-sm text-content-secondary">
                                                         #{staffMember.employeeId}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">{staffMember.email}</div>
-                                            <div className="text-sm text-gray-500">{staffMember.phone}</div>
+                                            <div className="text-sm text-content-primary">{staffMember.email}</div>
+                                            <div className="text-sm text-content-secondary">{staffMember.phone}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">{staffMember.role}</div>
-                                            <div className="text-sm text-gray-500">{staffMember.department}</div>
+                                            <div className="text-sm text-content-primary">{staffMember.role}</div>
+                                            <div className="text-sm text-content-secondary">{staffMember.department}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             {staffMember.userId ? (
@@ -267,7 +267,7 @@ const StaffManagementPage: React.FC = () => {
                                             )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${staffMember.status === 'ACTIVE' || staffMember.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${staffMember.status === 'ACTIVE' || staffMember.status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-chrome text-content-primary'
                                                 }`}>
                                                 {staffMember.status || 'Active'}
                                             </span>
@@ -297,22 +297,22 @@ const StaffManagementPage: React.FC = () => {
 
                 {/* Pagination footer */}
                 {totalPages > 1 && (
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                        <div className="text-sm text-gray-500 font-medium tracking-tight">
+                    <div className="px-6 py-4 bg-chrome border-t border-border flex items-center justify-between">
+                        <div className="text-sm text-content-secondary font-medium tracking-tight">
                             Showing <span className="text-indigo-600 font-black">{staff.length}</span> of <span className="text-indigo-600 font-black">{totalElements}</span> Staff Members
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                                 disabled={currentPage === 0}
-                                className="p-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-white disabled:opacity-30 transition-all cursor-pointer shadow-sm"
+                                className="p-2 border border-border rounded-lg text-content-secondary hover:bg-surface disabled:opacity-30 transition-all cursor-pointer shadow-sm"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
-                            <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-lg shadow-sm">
+                            <div className="flex items-center gap-1.5 px-3 py-1 bg-surface border border-border rounded-lg shadow-sm">
                                 <span className="text-sm font-black text-indigo-600">{currentPage + 1}</span>
                                 <span className="text-[10px] font-black text-gray-200 uppercase tracking-tighter">/</span>
-                                <span className="text-sm font-black text-gray-400">{totalPages}</span>
+                                <span className="text-sm font-black text-content-muted">{totalPages}</span>
                             </div>
                             <button
                                 onClick={() => setCurrentPage(prev => prev + 1)}

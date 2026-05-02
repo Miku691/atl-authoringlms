@@ -159,12 +159,12 @@ const InstructorManagementPage: React.FC = () => {
             />
 
             {/* Search & Filters */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="bg-surface p-4 rounded-xl shadow-sm border border-border">
                 <div className="relative max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                     <input
                         type="text"
-                        className="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg bg-gray-50 placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
+                        className="block w-full pl-9 pr-3 py-2 border border-border rounded-lg bg-chrome placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
                         placeholder="Find instructor by name or ID..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -172,45 +172,45 @@ const InstructorManagementPage: React.FC = () => {
                 </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-chrome">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name / ID</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expertise</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Name / ID</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Expertise</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Contact</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Status</th>
                                 <th className="relative px-6 py-3"><span className="sr-only">Actions</span></th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-surface divide-y divide-gray-200">
                             {isLoading ? (
-                                <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-500">Loading...</td></tr>
+                                <tr><td colSpan={6} className="px-6 py-12 text-center text-content-secondary">Loading...</td></tr>
                             ) : filteredInstructors.length === 0 ? (
                                 <tr><td colSpan={6} className="px-6 py-24 text-center">No Instructors Found</td></tr>
                             ) : (
                                 filteredInstructors.map((inst) => (
-                                    <tr key={inst.id} className="hover:bg-gray-50 transition-colors">
+                                    <tr key={inst.id} className="hover:bg-chrome transition-colors">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold mr-3">{inst.firstName[0]}</div>
                                                 <div>
-                                                    <div className="text-sm font-medium text-gray-900">{inst.firstName} {inst.lastName}</div>
-                                                    <div className="text-xs text-gray-500">#{inst.employeeId}</div>
+                                                    <div className="text-sm font-medium text-content-primary">{inst.firstName} {inst.lastName}</div>
+                                                    <div className="text-xs text-content-secondary">#{inst.employeeId}</div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">{inst.specialization}</div>
-                                            <div className="text-xs text-gray-500">{inst.qualification}</div>
+                                            <div className="text-sm text-content-primary">{inst.specialization}</div>
+                                            <div className="text-xs text-content-secondary">{inst.qualification}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm text-gray-900">{inst.email}</div>
-                                            <div className="text-xs text-gray-500">{inst.phone}</div>
+                                            <div className="text-sm text-content-primary">{inst.email}</div>
+                                            <div className="text-xs text-content-secondary">{inst.phone}</div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${inst.status?.toUpperCase() === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>{inst.status}</span>
+                                            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${inst.status?.toUpperCase() === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-chrome text-content-primary'}`}>{inst.status}</span>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <div className="flex justify-end gap-2">
@@ -230,22 +230,22 @@ const InstructorManagementPage: React.FC = () => {
 
                 {/* Pagination footer */}
                 {totalPages > 1 && (
-                    <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-                        <div className="text-sm text-gray-500 font-medium tracking-tight">
+                    <div className="px-6 py-4 bg-chrome border-t border-border flex items-center justify-between">
+                        <div className="text-sm text-content-secondary font-medium tracking-tight">
                             Showing <span className="text-indigo-600 font-black">{instructors.length}</span> of <span className="text-indigo-600 font-black">{totalElements}</span> Faculty Members
                         </div>
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={() => setCurrentPage(prev => Math.max(0, prev - 1))}
                                 disabled={currentPage === 0}
-                                className="p-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-white disabled:opacity-30 transition-all cursor-pointer shadow-sm"
+                                className="p-2 border border-border rounded-lg text-content-secondary hover:bg-surface disabled:opacity-30 transition-all cursor-pointer shadow-sm"
                             >
                                 <ChevronLeft className="w-4 h-4" />
                             </button>
-                            <div className="flex items-center gap-1.5 px-3 py-1 bg-white border border-gray-200 rounded-lg shadow-sm">
+                            <div className="flex items-center gap-1.5 px-3 py-1 bg-surface border border-border rounded-lg shadow-sm">
                                 <span className="text-sm font-black text-indigo-600">{currentPage + 1}</span>
                                 <span className="text-[10px] font-black text-gray-200 uppercase tracking-tighter">/</span>
-                                <span className="text-sm font-black text-gray-400">{totalPages}</span>
+                                <span className="text-sm font-black text-content-muted">{totalPages}</span>
                             </div>
                             <button
                                 onClick={() => setCurrentPage(prev => prev + 1)}

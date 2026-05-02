@@ -35,13 +35,17 @@ public class AuthUtil {
                 .claim("userId", user.getId().toString())
                 .claim("roles", roles)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60));
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60)); // 1 Minute
 
         if (user.getTenant() != null) {
             builder.claim("tenantId", user.getTenant().getId());
         }
 
         return builder.signWith(getSecretKey()).compact();
+    }
+
+    public String generateRefreshToken() {
+        return java.util.UUID.randomUUID().toString();
     }
 
     public String returnMaskedEmail(String rowEmail) {

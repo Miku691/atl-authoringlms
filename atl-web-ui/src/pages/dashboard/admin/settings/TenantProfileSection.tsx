@@ -85,26 +85,26 @@ const TenantProfileSection: React.FC = () => {
     }
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <div className="p-6 border-b border-gray-200">
-                <h2 className="text-lg font-semibold text-gray-900">General Information</h2>
-                <p className="text-sm text-gray-500 mt-1">Update your institute's public profile.</p>
+        <div className="bg-surface rounded-xl shadow-sm border border-border">
+            <div className="p-6 border-b border-border">
+                <h2 className="text-lg font-semibold text-content-primary">General Information</h2>
+                <p className="text-sm text-content-secondary mt-1">Update your institute's public profile.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label htmlFor="tenantName" className="block text-sm font-medium text-gray-700">Institute Name</label>
+                        <label htmlFor="tenantName" className="block text-sm font-medium text-content-primary">Institute Name</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Building2 className="h-5 w-5 text-gray-400" />
+                                <Building2 className="h-5 w-5 text-content-muted" />
                             </div>
                             <input
                                 type="text"
                                 name="tenantName"
                                 id="tenantName"
                                 required
-                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-border rounded-md py-2 border"
                                 value={formData.tenantName}
                                 onChange={handleChange}
                             />
@@ -112,17 +112,17 @@ const TenantProfileSection: React.FC = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="tenantCode" className="block text-sm font-medium text-gray-700">Institute Code</label>
+                        <label htmlFor="tenantCode" className="block text-sm font-medium text-content-primary">Institute Code</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Globe className="h-5 w-5 text-gray-400" />
+                                <Globe className="h-5 w-5 text-content-muted" />
                             </div>
                             <input
                                 type="text"
                                 name="tenantCode"
                                 id="tenantCode"
                                 required
-                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-border rounded-md py-2 border"
                                 value={formData.tenantCode}
                                 onChange={handleChange}
                             />
@@ -130,16 +130,16 @@ const TenantProfileSection: React.FC = () => {
                     </div>
 
                     <div className="md:col-span-2">
-                        <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
+                        <label htmlFor="address" className="block text-sm font-medium text-content-primary">Address</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MapPin className="h-5 w-5 text-gray-400" />
+                                <MapPin className="h-5 w-5 text-content-muted" />
                             </div>
                             <input
                                 type="text"
                                 name="address"
                                 id="address"
-                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-border rounded-md py-2 border"
                                 value={formData.address}
                                 onChange={handleChange}
                             />
@@ -147,16 +147,16 @@ const TenantProfileSection: React.FC = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700">Contact Email</label>
+                        <label htmlFor="contactEmail" className="block text-sm font-medium text-content-primary">Contact Email</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Mail className="h-5 w-5 text-gray-400" />
+                                <Mail className="h-5 w-5 text-content-muted" />
                             </div>
                             <input
                                 type="email"
                                 name="contactEmail"
                                 id="contactEmail"
-                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-border rounded-md py-2 border"
                                 value={formData.contactEmail}
                                 onChange={handleChange}
                             />
@@ -164,16 +164,16 @@ const TenantProfileSection: React.FC = () => {
                     </div>
 
                     <div>
-                        <label htmlFor="contactPhone" className="block text-sm font-medium text-gray-700">Contact Phone</label>
+                        <label htmlFor="contactPhone" className="block text-sm font-medium text-content-primary">Contact Phone</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Phone className="h-5 w-5 text-gray-400" />
+                                <Phone className="h-5 w-5 text-content-muted" />
                             </div>
                             <input
                                 type="tel"
                                 name="contactPhone"
                                 id="contactPhone"
-                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 border"
+                                className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-border rounded-md py-2 border"
                                 value={formData.contactPhone}
                                 onChange={handleChange}
                             />

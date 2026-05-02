@@ -72,8 +72,8 @@ const FeeAllocationPage: React.FC = () => {
         <div className="max-w-4xl mx-auto space-y-6">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Bulk Fee Allocation</h1>
-                    <p className="text-sm text-gray-500">Allocate fees to all students in a class/offering at once</p>
+                    <h1 className="text-2xl font-bold text-content-primary">Bulk Fee Allocation</h1>
+                    <p className="text-sm text-content-secondary">Allocate fees to all students in a class/offering at once</p>
                 </div>
                 <div className="p-3 bg-indigo-50 rounded-full text-indigo-600">
                     <Calculator className="w-6 h-6" />
@@ -82,9 +82,9 @@ const FeeAllocationPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="md:col-span-2 space-y-6">
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                        <div className="p-6 border-b border-gray-100 bg-gray-50/50">
-                            <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                    <div className="bg-surface rounded-2xl shadow-sm border border-border overflow-hidden">
+                        <div className="p-6 border-b border-border bg-chrome/50">
+                            <h3 className="font-bold text-content-primary flex items-center gap-2">
                                 <Layers className="w-5 h-5 text-indigo-600" />
                                 Allocation Details
                             </h3>
@@ -93,12 +93,12 @@ const FeeAllocationPage: React.FC = () => {
                         <form onSubmit={handleBulkAllocation} className="p-6 space-y-6">
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
+                                    <label className="block text-xs font-black text-content-muted uppercase tracking-widest mb-2 px-1">
                                         Select Offering ({offerings.length > 0 ? (offerings[0].type === 'COLLEGE' ? 'Semester' : offerings[0].type === 'COACHING' ? 'Batch' : 'Class') : 'Class'})
                                     </label>
                                     <div className="relative">
                                         <select
-                                            className="block w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none appearance-none disabled:bg-gray-50 disabled:text-gray-400"
+                                            className="block w-full px-4 py-3 bg-surface border border-border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none appearance-none disabled:bg-chrome disabled:text-content-muted"
                                             value={selectedOffering}
                                             onChange={(e) => setSelectedOffering(e.target.value)}
                                             disabled={isLoadingOfferings || isAllocating}
@@ -111,22 +111,22 @@ const FeeAllocationPage: React.FC = () => {
                                                 </option>
                                             ))}
                                         </select>
-                                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400">
+                                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-content-muted">
                                             <ArrowRight className="w-4 h-4 rotate-90" />
                                         </div>
                                     </div>
                                 </div>
 
                                  <div>
-                                    <label className="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2 px-1">
+                                    <label className="block text-xs font-black text-content-muted uppercase tracking-widest mb-2 px-1">
                                         Academic Year
                                     </label>
                                     <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-content-muted">
                                             <Calendar className="w-4 h-4" />
                                         </div>
                                         <select
-                                            className="block w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none appearance-none disabled:bg-gray-50 disabled:text-gray-400"
+                                            className="block w-full pl-11 pr-4 py-3 bg-surface border border-border rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all outline-none appearance-none disabled:bg-chrome disabled:text-content-muted"
                                             value={academicYear}
                                             onChange={(e) => setAcademicYear(e.target.value)}
                                             disabled={isAllocating}
@@ -139,7 +139,7 @@ const FeeAllocationPage: React.FC = () => {
                                                 </option>
                                             ))}
                                         </select>
-                                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-gray-400">
+                                        <div className="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-content-muted">
                                             <ArrowRight className="w-4 h-4 rotate-90" />
                                         </div>
                                     </div>
@@ -183,23 +183,23 @@ const FeeAllocationPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-6">
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-4">
-                        <h4 className="font-bold text-gray-900 flex items-center gap-2">
+                    <div className="bg-surface rounded-2xl shadow-sm border border-border p-6 space-y-4">
+                        <h4 className="font-bold text-content-primary flex items-center gap-2">
                             <Info className="w-4 h-4 text-blue-500" />
                             How it works
                         </h4>
                         <ul className="space-y-4">
                             <li className="flex gap-3">
                                 <div className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0">1</div>
-                                <p className="text-xs text-gray-600 leading-relaxed">Define a Fee Structure for the offering in the <span className="text-indigo-600 font-medium">Fee Structure</span> page.</p>
+                                <p className="text-xs text-content-secondary leading-relaxed">Define a Fee Structure for the offering in the <span className="text-indigo-600 font-medium">Fee Structure</span> page.</p>
                             </li>
                             <li className="flex gap-3">
                                 <div className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0">2</div>
-                                <p className="text-xs text-gray-600 leading-relaxed">Select the offering and academic year on this page.</p>
+                                <p className="text-xs text-content-secondary leading-relaxed">Select the offering and academic year on this page.</p>
                             </li>
                             <li className="flex gap-3">
                                 <div className="w-6 h-6 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0">3</div>
-                                <p className="text-xs text-gray-600 leading-relaxed">System creates ledger entries for each fee head in the structure, splitting them proportionally if an Installment Plan is defined.</p>
+                                <p className="text-xs text-content-secondary leading-relaxed">System creates ledger entries for each fee head in the structure, splitting them proportionally if an Installment Plan is defined.</p>
                             </li>
                         </ul>
                     </div>

@@ -208,26 +208,26 @@ const AddStudentPage: React.FC = () => {
         <div className="max-w-4xl mx-auto p-6">
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Add New Student</h1>
-                    <p className="text-sm text-gray-500">Enter personal and academic details.</p>
+                    <h1 className="text-2xl font-bold text-content-primary">Add New Student</h1>
+                    <p className="text-sm text-content-secondary">Enter personal and academic details.</p>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-8">
 
                 {/* Academic Context */}
-                <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100">
-                    <h3 className="text-lg font-semibold text-indigo-900 mb-4 flex items-center gap-2">
+                <div className="bg-indigo-500/5 p-6 rounded-xl border border-indigo-500/10">
+                    <h3 className="text-lg font-semibold text-indigo-600 mb-4 flex items-center gap-2">
                         <BookOpen className="w-5 h-5" /> Academic Enrollment
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-indigo-800">Class <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-content-primary">Class <span className="text-red-500">*</span></label>
                             <select
                                 name="selectedClassId"
                                 value={formData.selectedClassId}
                                 onChange={handleChange}
-                                className="mt-1 w-full p-2 rounded border border-indigo-200 focus:ring-2 focus:ring-indigo-500"
+                                className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500"
                                 required
                             >
                                 <option value="">Select Class</option>
@@ -237,12 +237,12 @@ const AddStudentPage: React.FC = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-indigo-800">Section</label>
+                            <label className="block text-sm font-medium text-content-primary">Section</label>
                             <select
                                 name="selectedSectionId"
                                 value={formData.selectedSectionId}
                                 onChange={handleChange}
-                                className="mt-1 w-full p-2 rounded border border-indigo-200 focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                                className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
                                 disabled={availableSections.length === 0}
                             >
                                 <option value="">{availableSections.length === 0 ? 'No Sections' : 'Select Section'}</option>
@@ -252,52 +252,52 @@ const AddStudentPage: React.FC = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-indigo-800">Roll Number</label>
+                            <label className="block text-sm font-medium text-content-primary">Roll Number</label>
                             <input
                                 type="number"
                                 name="rollNo"
                                 value={formData.rollNo}
                                 onChange={handleChange}
-                                className="mt-1 w-full p-2 rounded border border-indigo-200 focus:ring-2 focus:ring-indigo-500"
+                                className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-indigo-800">Fee Discount (%)</label>
+                            <label className="block text-sm font-medium text-content-primary">Fee Discount (%)</label>
                             <input
                                 type="number"
                                 name="admissionDiscount"
                                 value={formData.admissionDiscount}
                                 onChange={handleChange}
                                 placeholder="e.g. 10"
-                                className="mt-1 w-full p-2 rounded border border-indigo-200 focus:ring-2 focus:ring-indigo-500"
+                                className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500"
                             />
                         </div>
                     </div>
                 </div>
 
                 {/* Personal Information */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <User className="w-5 h-5 text-gray-500" /> Personal Information
+                <div className="bg-surface p-6 rounded-xl shadow-sm border border-border">
+                    <h3 className="text-lg font-semibold text-content-primary mb-4 flex items-center gap-2">
+                        <User className="w-5 h-5 text-content-secondary" /> Personal Information
                     </h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">First Name <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-content-primary">First Name <span className="text-red-500">*</span></label>
                             <input
                                 name="firstName" value={formData.firstName} onChange={handleChange}
                                 className="mt-1 w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500" required
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Last Name</label>
+                            <label className="block text-sm font-medium text-content-primary">Last Name</label>
                             <input
                                 name="lastName" value={formData.lastName} onChange={handleChange}
                                 className="mt-1 w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500"
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Admission No <span className="text-red-500">*</span></label>
+                            <label className="block text-sm font-medium text-content-primary">Admission No <span className="text-red-500">*</span></label>
                             <input
                                 name="admissionNo" value={formData.admissionNo} onChange={handleChange}
                                 className="mt-1 w-full p-2 border rounded focus:ring-2 focus:ring-indigo-500" required
@@ -312,7 +312,7 @@ const AddStudentPage: React.FC = () => {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Gender</label>
+                            <label className="block text-sm font-medium text-content-primary">Gender</label>
                             <select name="gender" value={formData.gender} onChange={handleChange} className="mt-1 w-full p-2 border rounded">
                                 <option value="">Select</option>
                                 <option value="Male">Male</option>
@@ -326,25 +326,22 @@ const AddStudentPage: React.FC = () => {
                                 selectedDate={formData.dob ? new Date(formData.dob) : null}
                                 onChange={(date) => setFormData({ ...formData, dob: date ? date.toISOString().split('T')[0] : '' })}
                                 maxDate={new Date()}
-                                showYearDropdown
-                                scrollableYearDropdown
-                                yearDropdownItemNumber={20}
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Category</label>
+                            <label className="block text-sm font-medium text-content-primary">Category</label>
                             <input name="category" value={formData.category} onChange={handleChange} className="mt-1 w-full p-2 border rounded" placeholder="e.g. Regular, Private" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Enrollment Type</label>
+                            <label className="block text-sm font-medium text-content-primary">Enrollment Type</label>
                             <select name="enrollmentType" value={formData.enrollmentType} onChange={handleChange} className="mt-1 w-full p-2 border rounded">
                                 <option value="FULL_TIME">Full Time</option>
                                 <option value="DISTANCE">Distance</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Blood Group</label>
+                            <label className="block text-sm font-medium text-content-primary">Blood Group</label>
                             <select name="bloodGroup" value={formData.bloodGroup} onChange={handleChange} className="mt-1 w-full p-2 border rounded">
                                 <option value="">Select</option>
                                 {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map(bg => <option key={bg} value={bg}>{bg}</option>)}
@@ -354,18 +351,18 @@ const AddStudentPage: React.FC = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Father's Name</label>
+                            <label className="block text-sm font-medium text-content-primary">Father's Name</label>
                             <input name="fatherName" value={formData.fatherName} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Mother's Name</label>
+                            <label className="block text-sm font-medium text-content-primary">Mother's Name</label>
                             <input name="motherName" value={formData.motherName} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">ID Proof Type</label>
+                            <label className="block text-sm font-medium text-content-primary">ID Proof Type</label>
                             <select name="idProofType" value={formData.idProofType} onChange={handleChange} className="mt-1 w-full p-2 border rounded">
                                 <option value="">Select Type</option>
                                 <option value="AADHAR">Aadhar Card</option>
@@ -375,25 +372,25 @@ const AddStudentPage: React.FC = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">ID Proof Number</label>
+                            <label className="block text-sm font-medium text-content-primary">ID Proof Number</label>
                             <input name="idProofNumber" value={formData.idProofNumber} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Ethnicity</label>
+                            <label className="block text-sm font-medium text-content-primary">Ethnicity</label>
                             <input name="ethnicity" value={formData.ethnicity} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Nationality</label>
+                            <label className="block text-sm font-medium text-content-primary">Nationality</label>
                             <input name="nationality" value={formData.nationality} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Marital Status</label>
+                            <label className="block text-sm font-medium text-content-primary">Marital Status</label>
                             <select name="maritalStatus" value={formData.maritalStatus} onChange={handleChange} className="mt-1 w-full p-2 border rounded">
                                 <option value="">Select Status</option>
                                 <option value="SINGLE">Single</option>
@@ -403,29 +400,29 @@ const AddStudentPage: React.FC = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Languages Known</label>
+                            <label className="block text-sm font-medium text-content-primary">Languages Known</label>
                             <input name="languages" value={formData.languages} onChange={handleChange} className="mt-1 w-full p-2 border rounded" placeholder="e.g. English, Spanish" />
                         </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+                            <label className="block text-sm font-medium text-content-primary">Phone Number</label>
                             <input name="phone" value={formData.phone} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700">Email Address</label>
+                            <label className="block text-sm font-medium text-content-primary">Email Address</label>
                             <input type="email" name="email" value={formData.email} onChange={handleChange} className="mt-1 w-full p-2 border rounded" />
                         </div>
                     </div>
 
                     <div className="mt-6">
-                        <label className="block text-sm font-medium text-gray-700">Previous School Information</label>
+                        <label className="block text-sm font-medium text-content-primary">Previous School Information</label>
                         <input name="previousSchool" value={formData.previousSchool} onChange={handleChange} className="mt-1 w-full p-2 border rounded" placeholder="School name and last class attended" />
                     </div>
 
                     <div className="mt-6">
-                        <label className="block text-sm font-medium text-gray-700">Home Address</label>
+                        <label className="block text-sm font-medium text-content-primary">Home Address</label>
                         <textarea
                             name="address" value={formData.address} onChange={handleChange}
                             className="mt-1 w-full p-2 border rounded h-20"
@@ -434,7 +431,7 @@ const AddStudentPage: React.FC = () => {
                 </div>
 
                 <div className="flex justify-end gap-4 pb-12">
-                    <button type="button" onClick={() => navigate(-1)} className="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+                    <button type="button" onClick={() => navigate(-1)} className="px-6 py-2 text-content-secondary hover:bg-chrome rounded-lg transition-colors">Cancel</button>
                     <button
                         type="submit"
                         disabled={isSubmitting}

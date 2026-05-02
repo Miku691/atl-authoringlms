@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
     AlertCircle, Search, Download, Filter, TrendingUp, Calendar, AlertTriangle
 } from 'lucide-react';
 import { format as formatDate } from 'date-fns';
@@ -78,7 +78,7 @@ export const DefaultersPage: React.FC = () => {
         link.click();
     };
 
-    const filteredDefaulters = defaulters.filter(d => 
+    const filteredDefaulters = defaulters.filter(d =>
         d.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         d.studentId.includes(searchTerm)
     );
@@ -91,13 +91,13 @@ export const DefaultersPage: React.FC = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Defaulters List</h1>
-                    <p className="text-sm text-gray-500 mt-1">Track students with overdue fees and applied penalties</p>
+                    <h1 className="text-2xl font-bold text-content-primary">Defaulters List</h1>
+                    <p className="text-sm text-content-secondary mt-1">Track students with overdue fees and applied penalties</p>
                 </div>
                 <button
                     onClick={handleExport}
                     disabled={defaulters.length === 0}
-                    className="flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                    className="flex items-center px-4 py-2 bg-surface border border-border rounded-lg text-sm font-medium text-content-primary hover:bg-chrome disabled:opacity-50"
                 >
                     <Download className="h-4 w-4 mr-2" />
                     Export CSV
@@ -106,11 +106,11 @@ export const DefaultersPage: React.FC = () => {
 
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div className="bg-surface rounded-xl shadow-sm p-6 border border-border">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-500">Total Defaulters</p>
-                            <p className="text-2xl font-bold text-gray-900 mt-1">{totalDefaulters}</p>
+                            <p className="text-sm font-medium text-content-secondary">Total Defaulters</p>
+                            <p className="text-2xl font-bold text-content-primary mt-1">{totalDefaulters}</p>
                         </div>
                         <div className="p-3 bg-red-50 rounded-lg">
                             <AlertCircle className="h-6 w-6 text-red-600" />
@@ -118,11 +118,11 @@ export const DefaultersPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div className="bg-surface rounded-xl shadow-sm p-6 border border-border">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-500">Total Overdue Amount</p>
-                            <p className="text-2xl font-bold text-gray-900 mt-1">{format(totalAmountOverdue)}</p>
+                            <p className="text-sm font-medium text-content-secondary">Total Overdue Amount</p>
+                            <p className="text-2xl font-bold text-content-primary mt-1">{format(totalAmountOverdue)}</p>
                         </div>
                         <div className="p-3 bg-orange-50 rounded-lg">
                             <TrendingUp className="h-6 w-6 text-orange-600" />
@@ -130,11 +130,11 @@ export const DefaultersPage: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
+                <div className="bg-surface rounded-xl shadow-sm p-6 border border-border">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-500">Total Late Fees Applied</p>
-                            <p className="text-2xl font-bold text-gray-900 mt-1">{format(totalLateFees)}</p>
+                            <p className="text-sm font-medium text-content-secondary">Total Late Fees Applied</p>
+                            <p className="text-2xl font-bold text-content-primary mt-1">{format(totalLateFees)}</p>
                         </div>
                         <div className="p-3 bg-purple-50 rounded-lg">
                             <AlertTriangle className="h-6 w-6 text-purple-600" />
@@ -144,24 +144,24 @@ export const DefaultersPage: React.FC = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+            <div className="bg-surface p-4 rounded-xl shadow-sm border border-border">
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1 relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                         <input
                             type="text"
                             placeholder="Search by student name or ID..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                     </div>
                     <div className="w-full md:w-64 relative">
-                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
                         <select
                             value={selectedOffering}
                             onChange={(e) => setSelectedOffering(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white"
+                            className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-surface"
                         >
                             <option value="">All Classes/Offerings</option>
                             {offerings.map(offering => (
@@ -175,35 +175,35 @@ export const DefaultersPage: React.FC = () => {
             </div>
 
             {/* Defaulters Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
+                        <thead className="bg-chrome">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Student Details
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Class/Offering
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Overdue Installments
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Late Fee Active
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Total Overdue
                                 </th>
-                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-content-secondary uppercase tracking-wider">
                                     Oldest Due Date
                                 </th>
                             </tr>
                         </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                        <tbody className="bg-surface divide-y divide-gray-200">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-500">
+                                    <td colSpan={6} className="px-6 py-12 text-center text-sm text-content-secondary">
                                         <div className="flex items-center justify-center">
                                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                                         </div>
@@ -211,14 +211,14 @@ export const DefaultersPage: React.FC = () => {
                                 </tr>
                             ) : filteredDefaulters.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-sm text-gray-500">
-                                        <AlertCircle className="mx-auto h-8 w-8 text-gray-400 mb-2" />
+                                    <td colSpan={6} className="px-6 py-12 text-center text-sm text-content-secondary">
+                                        <AlertCircle className="mx-auto h-8 w-8 text-content-muted mb-2" />
                                         No defaulters found matching your criteria
                                     </td>
                                 </tr>
                             ) : (
                                 filteredDefaulters.map((defaulter) => (
-                                    <tr key={defaulter.studentId} className="hover:bg-gray-50">
+                                    <tr key={defaulter.studentId} className="hover:bg-chrome">
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center">
                                                 <div className="h-10 w-10 flex-shrink-0 rounded-full bg-blue-100 flex items-center justify-center">
@@ -227,12 +227,12 @@ export const DefaultersPage: React.FC = () => {
                                                     </span>
                                                 </div>
                                                 <div className="ml-4">
-                                                    <div className="font-medium text-gray-900">{defaulter.studentName}</div>
-                                                    <div className="text-xs text-gray-500">ID: {defaulter.studentId}</div>
+                                                    <div className="font-medium text-content-primary">{defaulter.studentName}</div>
+                                                    <div className="text-xs text-content-secondary">ID: {defaulter.studentId}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">
                                             {offerings.find(o => o.id === defaulter.offeringId)?.name || defaulter.offeringName || '-'}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
@@ -240,7 +240,7 @@ export const DefaultersPage: React.FC = () => {
                                                 {defaulter.overdueInstallmentsCount}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-content-secondary">
                                             {defaulter.totalLateFee > 0 ? (
                                                 <span className="text-purple-600 font-medium">{format(defaulter.totalLateFee)}</span>
                                             ) : (
@@ -250,9 +250,9 @@ export const DefaultersPage: React.FC = () => {
                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-red-600">
                                             {format(defaulter.totalOverdue)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">
+                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-content-secondary">
                                             <div className="flex items-center justify-end text-red-600 font-medium space-x-1">
-                                                <Calendar className="h-4 w-4 mr-1 text-gray-400" />
+                                                <Calendar className="h-4 w-4 mr-1 text-content-muted" />
                                                 {defaulter.earliestDueDate ? formatDate(new Date(defaulter.earliestDueDate), 'MMM dd, yyyy') : '-'}
                                             </div>
                                         </td>
@@ -262,11 +262,11 @@ export const DefaultersPage: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
-                
+
                 {/* Pagination Placeholder */}
-                <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex items-center justify-between">
+                <div className="bg-surface px-4 py-3 border-t border-border sm:px-6 flex items-center justify-between">
                     <div className="hidden sm:block">
-                        <p className="text-sm text-gray-700">
+                        <p className="text-sm text-content-primary">
                             Showing <span className="font-medium">{filteredDefaulters.length > 0 ? 1 : 0}</span> to <span className="font-medium">{filteredDefaulters.length}</span> of <span className="font-medium">{filteredDefaulters.length}</span> results
                         </p>
                     </div>

@@ -22,9 +22,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     @Query("SELECT t.offeringId, SUM(t.amount) FROM Transaction t WHERE t.tenantId = :tenantId AND t.offeringId IS NOT NULL GROUP BY t.offeringId")
     List<Object[]> sumAmountByOffering(@Param("tenantId") String tenantId);
 
-    @Query("SELECT FUNCTION('YEAR', t.transactionDate) as year, FUNCTION('MONTH', t.transactionDate) as month, SUM(t.amount) as amount " +
+    @Query("SELECT YEAR(t.transactionDate) as year, MONTH(t.transactionDate) as month, SUM(t.amount) as amount " +
            "FROM Transaction t WHERE t.tenantId = :tenantId AND t.transactionDate >= :startDate " +
-           "GROUP BY FUNCTION('YEAR', t.transactionDate), FUNCTION('MONTH', t.transactionDate)")
+           "GROUP BY YEAR(t.transactionDate), MONTH(t.transactionDate)")
     List<Object[]> sumAmountByMonth(@Param("tenantId") String tenantId, @Param("startDate") LocalDateTime startDate);
 
     List<Transaction> findAllByTenantIdAndTransactionDateBetween(String tenantId, LocalDateTime start, LocalDateTime end);

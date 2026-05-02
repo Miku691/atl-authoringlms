@@ -41,13 +41,13 @@ const Pricing: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="py-24 text-center">
+            <div className="py-24 text-center" style={{ background: 'var(--bg-chrome)' }}>
                 <div className="animate-pulse flex flex-col items-center">
-                    <div className="h-10 w-64 bg-gray-200 rounded mb-4" />
-                    <div className="h-4 w-48 bg-gray-200 rounded mb-12" />
+                    <div className="h-10 w-64 rounded mb-4" style={{ background: 'var(--border)' }} />
+                    <div className="h-4 w-48 rounded mb-12" style={{ background: 'var(--border)' }} />
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-[1200px] px-6">
                         {[1, 2, 3].map(i => (
-                            <div key={i} className="h-[450px] bg-white rounded-[12px] border border-gray-200" />
+                            <div key={i} className="h-[450px] rounded-[12px] border" style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }} />
                         ))}
                     </div>
                 </div>
@@ -56,7 +56,7 @@ const Pricing: React.FC = () => {
     }
 
   return (
-    <section id="pricing" className="py-24" style={{ background: '#F7F9FF' }}>
+    <section id="pricing" className="py-24" style={{ background: 'var(--bg-chrome)' }}>
       <div className="max-w-[1200px] mx-auto px-6 sm:px-8">
 
         {/* Header */}
@@ -68,23 +68,23 @@ const Pricing: React.FC = () => {
           className="text-center max-w-[560px] mx-auto mb-12"
         >
           <span
-            className="inline-block text-[11px] font-bold uppercase tracking-[0.12em] mb-4 px-3 py-1 rounded-full"
-            style={{ background: '#EBF1FE', color: '#2A6DF4' }}
+            className="inline-block text-[11px] font-bold uppercase tracking-[0.12em] mb-4 px-3 py-1 rounded-full border"
+            style={{ background: 'var(--brand-subtle)', color: 'var(--brand)', borderColor: 'var(--brand-border)' }}
           >
             Pricing
           </span>
-          <h2 className="text-[36px] lg:text-[42px] font-bold leading-[1.18] tracking-[-0.01em] mb-4" style={{ color: '#0F1D3A' }}>
+          <h2 className="text-[36px] lg:text-[42px] font-bold leading-[1.18] tracking-[-0.01em] mb-4" style={{ color: 'var(--text-primary)' }}>
             Simple, Transparent Pricing
           </h2>
-          <p className="text-[16px] leading-relaxed mb-7" style={{ color: '#5A6B88' }}>
+          <p className="text-[16px] leading-relaxed mb-7" style={{ color: 'var(--text-secondary)' }}>
             No hidden fees. Choose a plan that fits your institution's size and needs.
           </p>
 
           {/* Billing toggle */}
-          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full" style={{ background: '#EBF1FE' }}>
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border" style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
             <span
               className="text-[13px] font-semibold cursor-pointer transition-colors"
-              style={{ color: annual ? '#8FA3C0' : '#2A6DF4' }}
+              style={{ color: annual ? 'var(--text-muted)' : 'var(--brand)' }}
               onClick={() => setAnnual(false)}
             >
               Monthly
@@ -93,7 +93,7 @@ const Pricing: React.FC = () => {
               id="pricing-billing-toggle"
               onClick={() => setAnnual(!annual)}
               className="relative w-11 h-6 rounded-full transition-colors duration-200"
-              style={{ background: annual ? '#2A6DF4' : '#C7D8FC' }}
+              style={{ background: annual ? 'var(--brand)' : 'var(--text-muted)' }}
               aria-label="Toggle billing cycle"
             >
               <div
@@ -103,12 +103,12 @@ const Pricing: React.FC = () => {
             </button>
             <span
               className="text-[13px] font-semibold cursor-pointer transition-colors flex items-center gap-1.5"
-              style={{ color: annual ? '#2A6DF4' : '#8FA3C0' }}
+              style={{ color: annual ? 'var(--brand)' : 'var(--text-muted)' }}
               onClick={() => setAnnual(true)}
             >
               Annual
               {annual && (
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: '#DCFCE7', color: '#16A34A' }}>
+                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'rgba(22,163,74,0.1)', color: '#16A34A', border: '1px solid rgba(22,163,74,0.2)' }}>
                   Save 20%
                 </span>
               )}
@@ -133,18 +133,18 @@ const Pricing: React.FC = () => {
                 transition={{ delay: index * 0.1, duration: 0.55 }}
                 className="relative flex flex-col rounded-[12px] p-8"
                 style={{
-                  background: '#FFFFFF',
-                  border: isHighlighted ? '2px solid #2A6DF4' : '1px solid #E2E8F8',
+                  background: 'var(--bg-surface)',
+                  border: isHighlighted ? '2px solid var(--brand)' : '1px solid var(--border)',
                   boxShadow: isHighlighted
-                    ? '0 16px 48px rgba(42,109,244,0.15)'
-                    : '0 2px 8px rgba(0,0,0,0.04)',
+                    ? '0 16px 48px var(--brand-shadow, rgba(42,109,244,0.15))'
+                    : '0 2px 8px rgba(0,0,0,0.06)',
                 }}
               >
                 {/* Most popular badge */}
                 {isHighlighted && (
                   <div
-                    className="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12px] font-bold text-white"
-                    style={{ background: '#2A6DF4' }}
+                    className="absolute -top-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-4 py-1.5 rounded-full text-[12px] font-bold text-white shadow-md"
+                    style={{ background: 'var(--brand)' }}
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     Most Popular
@@ -153,14 +153,14 @@ const Pricing: React.FC = () => {
 
                 {/* Plan name & price */}
                 <div className="mb-7">
-                  <h3 className="text-[18px] font-bold mb-1" style={{ color: '#0F1D3A' }}>{plan.name}</h3>
+                  <h3 className="text-[18px] font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{plan.name}</h3>
                   <div className="flex items-baseline gap-1.5 mt-3 mb-3">
-                    <span className="text-[42px] font-extrabold leading-none tracking-tight" style={{ color: '#0F1D3A' }}>
+                    <span className="text-[42px] font-extrabold leading-none tracking-tight" style={{ color: 'var(--text-primary)' }}>
                       {currencySymbol}{price.toLocaleString()}
                     </span>
-                    <span className="text-[14px] font-medium" style={{ color: '#8FA3C0' }}>/month</span>
+                    <span className="text-[14px] font-medium" style={{ color: 'var(--text-muted)' }}>/month</span>
                   </div>
-                  <p className="text-[13px] leading-relaxed" style={{ color: '#5A6B88' }}>{plan.description}</p>
+                  <p className="text-[13px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{plan.description}</p>
                 </div>
 
                 {/* Feature list */}
@@ -169,30 +169,30 @@ const Pricing: React.FC = () => {
                     <li key={feature} className="flex items-start gap-3">
                       <div
                         className="mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                        style={{ background: isHighlighted ? '#EBF1FE' : '#F7F9FF' }}
+                        style={{ background: isHighlighted ? 'var(--brand-subtle)' : 'var(--bg-surface-2)' }}
                       >
-                        <Check className="w-3 h-3" style={{ color: isHighlighted ? '#2A6DF4' : '#8FA3C0' }} />
+                        <Check className="w-3 h-3" style={{ color: isHighlighted ? 'var(--brand)' : 'var(--text-muted)' }} />
                       </div>
-                      <span className="text-[13px] font-medium" style={{ color: '#5A6B88' }}>{feature}</span>
+                      <span className="text-[13px] font-medium" style={{ color: 'var(--text-secondary)' }}>{feature}</span>
                     </li>
                   ))}
                   <li className="flex items-start gap-3">
                     <div
                         className="mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                        style={{ background: isHighlighted ? '#EBF1FE' : '#F7F9FF' }}
+                        style={{ background: isHighlighted ? 'var(--brand-subtle)' : 'var(--bg-surface-2)' }}
                     >
-                        <Check className="w-3 h-3" style={{ color: isHighlighted ? '#2A6DF4' : '#8FA3C0' }} />
+                        <Check className="w-3 h-3" style={{ color: isHighlighted ? 'var(--brand)' : 'var(--text-muted)' }} />
                     </div>
-                    <span className="text-[13px] font-medium" style={{ color: '#5A6B88' }}>Up to {plan.maxStudents} Students</span>
+                    <span className="text-[13px] font-medium" style={{ color: 'var(--text-secondary)' }}>Up to {plan.maxStudents} Students</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <div
                         className="mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0"
-                        style={{ background: isHighlighted ? '#EBF1FE' : '#F7F9FF' }}
+                        style={{ background: isHighlighted ? 'var(--brand-subtle)' : 'var(--bg-surface-2)' }}
                     >
-                        <Check className="w-3 h-3" style={{ color: isHighlighted ? '#2A6DF4' : '#8FA3C0' }} />
+                        <Check className="w-3 h-3" style={{ color: isHighlighted ? 'var(--brand)' : 'var(--text-muted)' }} />
                     </div>
-                    <span className="text-[13px] font-medium" style={{ color: '#5A6B88' }}>Up to {plan.maxTeachers} Teachers</span>
+                    <span className="text-[13px] font-medium" style={{ color: 'var(--text-secondary)' }}>Up to {plan.maxTeachers} Teachers</span>
                   </li>
                 </ul>
 
@@ -204,28 +204,32 @@ const Pricing: React.FC = () => {
                   style={
                     isHighlighted
                       ? {
-                          background: '#2A6DF4',
+                          background: 'var(--brand)',
                           color: '#FFFFFF',
-                          boxShadow: '0 4px 16px rgba(42,109,244,0.35)',
+                          boxShadow: '0 4px 16px rgba(42,109,244,0.30)',
                         }
                       : {
-                          background: '#F7F9FF',
-                          color: '#0F1D3A',
-                          border: '1px solid #E2E8F8',
+                          background: 'var(--bg-surface-2)',
+                          color: 'var(--text-primary)',
+                          border: '1px solid var(--border)',
                         }
                   }
                   onMouseEnter={(e) => {
                     if (isHighlighted) {
-                      (e.currentTarget as HTMLButtonElement).style.background = '#1A5CE0';
+                      (e.currentTarget as HTMLButtonElement).style.background = 'var(--brand-hover)';
                     } else {
-                      (e.currentTarget as HTMLButtonElement).style.background = '#EBF1FE';
+                      (e.currentTarget as HTMLButtonElement).style.background = 'var(--brand-subtle)';
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--brand)';
+                      (e.currentTarget as HTMLButtonElement).style.color = 'var(--brand)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (isHighlighted) {
-                      (e.currentTarget as HTMLButtonElement).style.background = '#2A6DF4';
+                      (e.currentTarget as HTMLButtonElement).style.background = 'var(--brand)';
                     } else {
-                      (e.currentTarget as HTMLButtonElement).style.background = '#F7F9FF';
+                      (e.currentTarget as HTMLButtonElement).style.background = 'var(--bg-surface-2)';
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)';
+                      (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)';
                     }
                   }}
                 >

@@ -1,10 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="ImsFinanceServiceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
-    <envs>
-      <env name="FINANCE_MYSQL_PASS" value="my-secret-atl" />
-      <env name="FINANCE_MYSQL_URI" value="jdbc:mysql://localhost:3306/ims-finance-db?allowPublicKeyRetrieval=true&amp;useSSL=false" />
-      <env name="FINANCE_MYSQL_USER" value="root" />
-    </envs>
+    <option name="envFilePaths">
+      <option value="$PROJECT_DIR$/.env" />
+    </option>
     <option name="MAIN_CLASS_NAME" value="com.ims.finance.ImsFinanceServiceApplication" />
     <module name="ims-finance-service" />
     <extension name="coverage">

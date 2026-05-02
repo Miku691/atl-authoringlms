@@ -15,7 +15,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
     backgroundImage = "https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2850&q=80"
 }) => {
     return (
-        <div className="min-h-screen bg-gray-50 flex">
+        <div className="min-h-screen bg-chrome flex">
             {/* Left Side - Decorative */}
             <div className="hidden lg:flex lg:w-1/2 relative bg-gray-900 overflow-hidden">
                 <div className="absolute inset-0">
@@ -45,14 +45,14 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                         </div>
                     </div>
 
-                    <div className="text-gray-400 text-sm">
+                    <div className="text-content-muted text-sm">
                         &copy; {new Date().getFullYear()} Academia Tech Labs. All rights reserved.
                     </div>
                 </div>
             </div>
 
             {/* Right Side - Form */}
-            <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24 bg-white">
+            <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24 bg-surface">
                 <div className="mx-auto w-full max-w-sm lg:w-96">
                     {/* Mobile Logo View */}
                     <div className="lg:hidden flex justify-center mb-8">
@@ -62,10 +62,10 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
                     </div>
 
                     <div className="text-center lg:text-left">
-                        <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                        <h2 className="text-3xl font-bold tracking-tight text-content-primary">
                             {title}
                         </h2>
-                        <p className="mt-2 text-sm text-gray-600">
+                        <p className="mt-2 text-sm text-content-secondary">
                             {subtitle}
                         </p>
                     </div>

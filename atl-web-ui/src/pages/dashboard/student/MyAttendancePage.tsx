@@ -84,7 +84,7 @@ const MyAttendancePage: React.FC = () => {
             {/* ── 3 KPI Stat Cards ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Total Sessions */}
-                <div className="group bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                <div className="group bg-surface rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
                     <div className="flex items-center justify-between mb-5">
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Total Sessions</p>
                         <div className="w-9 h-9 rounded-xl bg-[#f1f3f9] flex items-center justify-center group-hover:bg-[#eceef4] transition-colors">
@@ -99,7 +99,7 @@ const MyAttendancePage: React.FC = () => {
                 </div>
 
                 {/* Present */}
-                <div className="group bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                <div className="group bg-surface rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
                     <div className="flex items-center justify-between mb-5">
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Present Days</p>
                         <div className="w-9 h-9 rounded-xl bg-[#dae2ff] flex items-center justify-center group-hover:bg-[#b2c5ff] transition-colors">
@@ -117,7 +117,7 @@ const MyAttendancePage: React.FC = () => {
                 </div>
 
                 {/* Absent */}
-                <div className="group bg-white rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
+                <div className="group bg-surface rounded-2xl p-6 shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] hover:shadow-[0_8px_32px_-4px_rgba(26,61,138,0.1)] transition-all duration-300">
                     <div className="flex items-center justify-between mb-5">
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest">Absent Days</p>
                         <div className="w-9 h-9 rounded-xl bg-[#ffdad6] flex items-center justify-center group-hover:bg-[#ffb4ab] transition-colors">
@@ -147,7 +147,7 @@ const MyAttendancePage: React.FC = () => {
                             {stats.percentage.toFixed(1)}%
                         </p>
                     </div>
-                    <div className="h-2 w-full bg-white/60 rounded-full overflow-hidden">
+                    <div className="h-2 w-full bg-surface/60 rounded-full overflow-hidden">
                         <div
                             className={`h-full rounded-full transition-all duration-700 ${stats.percentage >= 75 ? 'bg-[#0054d1]' : 'bg-[#ba1a1a]'}`}
                             style={{ width: `${Math.min(stats.percentage, 100)}%` }}
@@ -162,7 +162,7 @@ const MyAttendancePage: React.FC = () => {
             </div>
 
             {/* ── Attendance History Table ── */}
-            <div className="bg-white rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
+            <div className="bg-surface rounded-2xl shadow-[0_2px_16px_-4px_rgba(26,61,138,0.06)] overflow-hidden">
                 <div className="px-6 py-5 border-b border-[#f1f3f9] flex items-center justify-between">
                     <div>
                         <p className="text-[10px] font-semibold text-[#64748b] uppercase tracking-widest mb-1">Attendance Log</p>

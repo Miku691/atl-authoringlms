@@ -5,6 +5,7 @@ import { financeService } from '../../../../api/financeService';
 import type { FeeHead, FeeDiscount } from '../../../../types/finance';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 import FloatingLabelInput from '../../../../components/common/FloatingLabelInput';
+import Modal from '../../../../components/common/Modal';
 
 const FeeConfigPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
@@ -98,8 +99,8 @@ const FeeConfigPage: React.FC = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Fee Discounts</h1>
-                    <p className="text-sm text-gray-500">Manage scholarship, sibling, and merit-based discounts.</p>
+                    <h1 className="text-2xl font-bold text-content-primary">Fee Discounts</h1>
+                    <p className="text-sm text-content-secondary">Manage scholarship, sibling, and merit-based discounts.</p>
                 </div>
                 <button
                     onClick={() => {
@@ -116,9 +117,9 @@ const FeeConfigPage: React.FC = () => {
             </div>
 
             {/* Content Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">
                 <table className="w-full text-left">
-                    <thead className="bg-gray-50 text-gray-500 text-xs uppercase">
+                    <thead className="bg-chrome text-content-secondary text-xs uppercase">
                         <tr>
                             <th className="px-6 py-3 font-medium">Name</th>
                             <th className="px-6 py-3 font-medium">Type</th>
@@ -127,19 +128,19 @@ const FeeConfigPage: React.FC = () => {
                             <th className="px-6 py-3 font-medium text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-border">
                         {loading ? (
-                            <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Loading...</td></tr>
+                            <tr><td colSpan={5} className="px-6 py-8 text-center text-content-secondary">Loading...</td></tr>
                         ) : (
                             <>
                                 {discounts.map(d => (
-                                    <tr key={d.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{d.name}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-500">{d.type}</td>
-                                        <td className="px-6 py-4 text-sm text-gray-900 font-mono">
+                                    <tr key={d.id} className="hover:bg-chrome">
+                                        <td className="px-6 py-4 text-sm font-medium text-content-primary">{d.name}</td>
+                                        <td className="px-6 py-4 text-sm text-content-secondary">{d.type}</td>
+                                        <td className="px-6 py-4 text-sm text-content-primary font-mono">
                                             {d.type === 'PERCENTAGE' ? `${d.value}%` : `₹${d.value}`}
                                         </td>
-                                        <td className="px-6 py-4 text-sm text-gray-500 uppercase tracking-tight font-bold">{d.scope || 'GLOBAL'}</td>
+                                        <td className="px-6 py-4 text-sm text-content-secondary uppercase tracking-tight font-bold">{d.scope || 'GLOBAL'}</td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex justify-end gap-2">
                                                 <button onClick={() => handleEdit(d)} className="text-indigo-600 hover:bg-indigo-50 p-1 rounded"><Edit className="w-4 h-4" /></button>
@@ -151,71 +152,70 @@ const FeeConfigPage: React.FC = () => {
                             </>
                         )}
                         {!loading && discounts.length === 0 && (
-                            <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">No discounts found.</td></tr>
+                            <tr><td colSpan={5} className="px-6 py-8 text-center text-content-secondary">No discounts found.</td></tr>
                         )}
                     </tbody>
                 </table>
             </div>
 
             {/* Create Modal */}
-            {isCreateModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                            <h2 className="text-xl font-bold text-gray-800">{isEditMode ? 'Edit' : 'New'} Discount</h2>
+            <Modal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                title={`${isEditMode ? 'Edit' : 'New'} Discount`}
+                footer={
+                    <>
+                        <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-4 py-2 bg-chrome text-content-primary hover:bg-chrome rounded-lg transition-colors font-medium">Cancel</button>
+                        <button type="submit" form="discount-form" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-bold shadow-lg shadow-indigo-500/20">Save Discount</button>
+                    </>
+                }
+            >
+                <form id="discount-form" onSubmit={handleCreate} className="p-4 space-y-4 max-h-[calc(100vh-15rem)] overflow-y-auto custom-scrollbar">
+                    <FloatingLabelInput label="Discount Name" required value={newDiscount.name} onChange={e => setNewDiscount({ ...newDiscount, name: e.target.value })} />
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-xs font-semibold text-content-secondary uppercase px-1">Type</label>
+                            <select className="w-full p-3 bg-chrome border border-border rounded-lg text-sm text-content-primary outline-none focus:ring-2 focus:ring-indigo-500" value={newDiscount.type} onChange={e => setNewDiscount({ ...newDiscount, type: e.target.value as any })}>
+                                <option value="PERCENTAGE">Percentage</option>
+                                <option value="FIXED">Fixed Amount</option>
+                            </select>
                         </div>
-                        <form onSubmit={handleCreate} className="p-6 space-y-4 max-h-[calc(100vh-15rem)] overflow-y-auto custom-scrollbar">
-                            <FloatingLabelInput label="Discount Name" required value={newDiscount.name} onChange={e => setNewDiscount({ ...newDiscount, name: e.target.value })} />
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-xs font-semibold text-gray-500 uppercase px-1">Type</label>
-                                    <select className="w-full p-3 border rounded-lg text-sm" value={newDiscount.type} onChange={e => setNewDiscount({ ...newDiscount, type: e.target.value as any })}>
-                                        <option value="PERCENTAGE">Percentage</option>
-                                        <option value="FIXED">Fixed Amount</option>
-                                    </select>
-                                </div>
-                                <FloatingLabelInput label="Value" type="number" required value={newDiscount.value} onChange={e => setNewDiscount({ ...newDiscount, value: parseFloat(e.target.value) || 0 })} icon={newDiscount.type === 'PERCENTAGE' ? <Percent className="w-4 h-4" /> : <DollarIcon className="w-4 h-4" />} />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="text-xs font-semibold text-gray-500 uppercase px-1">Scope</label>
-                                    <select className="w-full p-3 bg-white border border-gray-200 rounded-lg outline-none text-sm" value={newDiscount.scope || 'GLOBAL'} onChange={e => setNewDiscount({ ...newDiscount, scope: e.target.value as any })}>
-                                        <option value="GLOBAL">Global (All)</option>
-                                        <option value="SIBLING">Sibling Discount</option>
-                                        <option value="MERIT">Merit / Scholarship</option>
-                                        <option value="CUSTOM">Custom</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="border border-gray-200 rounded-lg p-4 space-y-2">
-                                <label className="text-xs font-semibold text-gray-500 uppercase">Applicable Fee Heads <span className="text-[10px] lowercase font-normal">(Leave empty for all)</span></label>
-                                <div className="max-h-32 overflow-y-auto space-y-2">
-                                    {feeHeads.map(head => (
-                                        <label key={head.id} className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer hover:bg-gray-50 p-1 rounded transition-colors">
-                                            <input
-                                                type="checkbox"
-                                                className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
-                                                checked={newDiscount.applicableFeeHeadIds?.includes(head.id!) || false}
-                                                onChange={(e) => {
-                                                    const newHeads = e.target.checked
-                                                        ? [...(newDiscount.applicableFeeHeadIds || []), head.id!]
-                                                        : (newDiscount.applicableFeeHeadIds || []).filter(id => id !== head.id);
-                                                    setNewDiscount({ ...newDiscount, applicableFeeHeadIds: newHeads });
-                                                }}
-                                            />
-                                            {head.name}
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="flex justify-end gap-3 pt-4 border-t mt-4">
-                                <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors font-medium">Cancel</button>
-                                <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-bold shadow-lg shadow-indigo-100">Save Discount</button>
-                            </div>
-                        </form>
+                        <FloatingLabelInput label="Value" type="number" required value={newDiscount.value} onChange={e => setNewDiscount({ ...newDiscount, value: parseFloat(e.target.value) || 0 })} icon={newDiscount.type === 'PERCENTAGE' ? <Percent className="w-4 h-4" /> : <DollarIcon className="w-4 h-4" />} />
                     </div>
-                </div>
-            )}
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-xs font-semibold text-content-secondary uppercase px-1">Scope</label>
+                            <select className="w-full p-3 bg-surface border border-border rounded-lg outline-none text-sm" value={newDiscount.scope || 'GLOBAL'} onChange={e => setNewDiscount({ ...newDiscount, scope: e.target.value as any })}>
+                                <option value="GLOBAL">Global (All)</option>
+                                <option value="SIBLING">Sibling Discount</option>
+                                <option value="MERIT">Merit / Scholarship</option>
+                                <option value="CUSTOM">Custom</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div className="border border-border rounded-lg p-4 space-y-2">
+                        <label className="text-xs font-semibold text-content-secondary uppercase">Applicable Fee Heads <span className="text-[10px] lowercase font-normal">(Leave empty for all)</span></label>
+                        <div className="max-h-32 overflow-y-auto space-y-2">
+                            {feeHeads.map(head => (
+                                <label key={head.id} className="flex items-center gap-2 text-sm text-content-primary cursor-pointer hover:bg-chrome p-1 rounded transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        className="rounded text-indigo-600 focus:ring-indigo-500 w-4 h-4"
+                                        checked={newDiscount.applicableFeeHeadIds?.includes(head.id!) || false}
+                                        onChange={(e) => {
+                                            const newHeads = e.target.checked
+                                                ? [...(newDiscount.applicableFeeHeadIds || []), head.id!]
+                                                : (newDiscount.applicableFeeHeadIds || []).filter(id => id !== head.id);
+                                            setNewDiscount({ ...newDiscount, applicableFeeHeadIds: newHeads });
+                                        }}
+                                    />
+                                    {head.name}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                </form>
+            </Modal>
 
             <ConfirmationModal
                 isOpen={isDeleteModalOpen}
