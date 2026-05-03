@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base-layout :: main-layout(~{::.success-body}, 'Registration Successful')}">
+
+<body>
+    <div class="success-body">
+        <h2>Welcome to IMS!</h2>
+        <p>Dear <span th:text="${adminName}">Admin</span>,</p>
+        <p>Congratulations! Your Institute Management System (IMS) account has been successfully created.</p>
+        <p>You are now the <b>Tenant Administrator</b> for your institute. Your next step is to log in and complete the initial setup to activate your dashboard.</p>
+        
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="http://localhost:5173/login" class="button">Log In to Dashboard</a>
+        </div>
+
+        <p><b>What to do next?</b></p>
+        <ul>
+            <li>Log in using your registered email and password.</li>
+            <li>Follow the setup wizard to configure your institution type.</li>
+            <li>Define your academic structure (Programs, Offerings, etc.).</li>
+        </ul>
+
+        <p>If you have any questions or need assistance, our support team is here to help.</p>
+        <p>Best regards,<br />The IMS Team</p>
+    </div>
+</body>
+
+</html>

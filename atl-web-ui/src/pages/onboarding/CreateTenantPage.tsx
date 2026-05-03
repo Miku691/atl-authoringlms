@@ -237,7 +237,7 @@ const CreateTenantPage: React.FC = () => {
                                             name="country"
                                             value={formData.country}
                                             onChange={handleChange}
-                                            className="block w-full pl-10 pr-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 sm:text-sm font-bold transition-all bg-surface h-[54px]"
+                                            className="block w-full pl-10 pr-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 sm:text-sm font-bold transition-all bg-surface h-[54px]"
                                         >
                                             {COUNTRIES.map(c => (
                                                 <option key={c.code} value={c.name}>{c.name}</option>
@@ -253,7 +253,7 @@ const CreateTenantPage: React.FC = () => {
                                             name="state"
                                             value={formData.state}
                                             onChange={handleChange}
-                                            className="block w-full pl-10 pr-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 sm:text-sm font-bold transition-all bg-surface h-[54px]"
+                                            className="block w-full pl-10 pr-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 sm:text-sm font-bold transition-all bg-surface h-[54px]"
                                         >
                                             <option value="">Select State</option>
                                             {currentCountry?.states.map(s => (
@@ -277,7 +277,7 @@ const CreateTenantPage: React.FC = () => {
                                         value={formData.address}
                                         onChange={handleChange}
                                         placeholder="Enter city, street no, landmark etc..."
-                                        className="block w-full pl-10 pr-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 sm:text-sm font-medium transition-all bg-surface resize-none"
+                                        className="block w-full pl-10 pr-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 sm:text-sm font-medium transition-all bg-surface resize-none"
                                     />
                                 </div>
                                 {errors.address && <p className="text-red-500 text-[10px] mt-1 font-bold">{errors.address}</p>}
@@ -361,7 +361,7 @@ const CreateTenantPage: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className={`w-full sm:w-auto flex justify-center items-center py-4 px-10 border border-transparent rounded-2xl shadow-xl text-sm font-black text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-100 transition-all duration-300 transform active:scale-95 ${isLoading ? 'opacity-70 cursor-not-allowed shadow-none' : 'hover:shadow-indigo-200'}`}
+                                className={`w-full sm:w-auto flex justify-center items-center py-4 px-10 border border-transparent rounded-2xl shadow-xl text-sm font-black text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 transform active:scale-95 ${isLoading ? 'opacity-70 cursor-not-allowed shadow-none' : 'hover:shadow-indigo-500/30'}`}
                             >
                                 {isLoading ? (
                                     <>

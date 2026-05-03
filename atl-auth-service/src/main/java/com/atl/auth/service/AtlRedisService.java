@@ -22,4 +22,8 @@ public class AtlRedisService {
     public Boolean checkKeyExistence(String key){
         return redisTemplate.hasKey(key);
     }
+
+    public void deleteRedisKey(String key) {
+        redisTemplate.delete(key);
+    }
 }

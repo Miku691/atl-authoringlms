@@ -35,7 +35,7 @@ public class AuthUtil {
                 .claim("userId", user.getId().toString())
                 .claim("roles", roles)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60)); // 1 Minute
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 15)); // 1 Minute
 
         if (user.getTenant() != null) {
             builder.claim("tenantId", user.getTenant().getId());

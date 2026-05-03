@@ -22,12 +22,25 @@ public class BootstrapAdminService {
         private final PasswordEncoder passwordEncoder;
         private final AtlRoleService roleService;
         private final AuthUtil authUtil;
+        private final AtlRedisService atlRedisService;
+        private final ExternalNotificationClient notificationClient;
 
         /**
          * 🚀 Creating a bootstrap admin - super admin which will manage the app
          *
          */
         public ApiResponse<AtlSinginResponseDto> createBootstrapAdmin(BootstrapAdminRequestDto dto) {
+                // Check if email is verified in Redis
+                String verifiedKey = ApplicationConstant.REG_VERIFIED_PREFIX + dto.getEmail();
+                if (!Boolean.TRUE.equals(atlRedisService.checkKeyExistence(verifiedKey))) {
+                        return ApiResponse.<AtlSinginResponseDto>builder()
+                                        .message("Email not verified. Please verify your email first.")
+                                        .status(ApplicationConstant.API_FAILED)
+                                        .statusCode(HttpStatus.FORBIDDEN.value())
+                                        .apiData(null)
+                                        .build();
+                }
+
                 AtlUser admin = new AtlUser();
                 // AtlRole superAdmin =
                 // roleRepo.findByRoleName(ApplicationConstant.TENANT_ADMIN_ROLE)
@@ -44,6 +57,12 @@ public class BootstrapAdminService {
                 admin.setPlanName(dto.getPlanName());
 
                 AtlUser saved = userRepo.save(admin);
+
+                // After successful creation, delete the verification key
+                atlRedisService.deleteRedisKey(verifiedKey);
+
+                // Send Welcome/Success Email
+                sendSuccessEmail(saved.getEmail(), dto.getAdminName());
 
                 String maskedEmail = authUtil.returnMaskedEmail(saved.getEmail());
 
@@ -63,4 +82,18 @@ public class BootstrapAdminService {
                  */
         }
 
+        private void sendSuccessEmail(String email, String adminName) {
+                java.util.Map<String, Object> templateData = new java.util.HashMap<>();
+                templateData.put("adminName", adminName);
+
+                com.atl.auth.dto.ExternalEmailRequestDto emailRequest = com.atl.auth.dto.ExternalEmailRequestDto.builder()
+                                .to(email)
+                                .subject("Account Created Successfully - Welcome to IMS")
+                                .templateName("registration-success")
+                                .templateData(templateData)
+                                .isHtml(true)
+                                .build();
+
+                notificationClient.sendEmail(emailRequest);
+        }
 }

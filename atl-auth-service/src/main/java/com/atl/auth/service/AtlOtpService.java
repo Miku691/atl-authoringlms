@@ -85,7 +85,7 @@ public class AtlOtpService {
 
         if (isOtpValid) {
             String token = authUtil.generateAccessToken(userObj);
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userObj.getId());
+            String refreshToken = refreshTokenService.createRefreshToken(userObj.getId());
 
             boolean tenantSetupCompleted = false;
             TenantType tenantType = null;
@@ -121,7 +121,7 @@ public class AtlOtpService {
                             .id(String.valueOf(userObj.getId()))
                             .username(userObj.getUsername())
                             .jwt(token)
-                            .refreshToken(refreshToken.getToken())
+                            .refreshToken(refreshToken)
                             .roles(userObj.getRoles().stream()
                                     .map(AtlRole::getRoleName)
                                     .collect(Collectors.toSet()))
@@ -154,6 +154,81 @@ public class AtlOtpService {
         sendOtpEmail(userObj.getEmail(), otp);
 
         System.out.println("Forgot Password OTP for " + username + ": " + otp);
+    }
+
+    public ApiResponse<String> generateOtpForRegistration(String email) {
+        if (userRepo.findByEmail(email).isPresent()) {
+            return ApiResponse.<String>builder()
+                    .message("Email is already registered. Please sign in.")
+                    .status(ApplicationConstant.API_FAILED)
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .apiData(null)
+                    .build();
+        }
+
+        String otp = authUtil.generateRandomOtp();
+        String otpKey = ApplicationConstant.REG_OTP_PREFIX + email;
+        atlRedisService.saveValueToRedisWithTTL(otpKey, otp, 15);
+
+        // Send OTP via Notification Service
+        sendRegistrationOtpEmail(email, otp);
+
+        return ApiResponse.<String>builder()
+                .message("OTP sent successfully to " + email)
+                .status(ApplicationConstant.API_SUCCESS)
+                .statusCode(HttpStatus.OK.value())
+                .apiData("OTP Sent")
+                .build();
+    }
+
+    private void sendRegistrationOtpEmail(String email, String otp) {
+        Map<String, Object> templateData = new HashMap<>();
+        templateData.put("otp", otp);
+
+        ExternalEmailRequestDto emailRequest = ExternalEmailRequestDto.builder()
+                .to(email)
+                .subject("Verify Your Institute Registration")
+                .templateName("registration-otp")
+                .templateData(templateData)
+                .isHtml(true)
+                .build();
+
+        notificationClient.sendEmail(emailRequest);
+    }
+
+    public ApiResponse<String> verifyOtpForRegistration(RegistrationOtpVerifyDto verifyDto) {
+        String otpKey = ApplicationConstant.REG_OTP_PREFIX + verifyDto.getEmail();
+        String storedOtp = atlRedisService.getRedisValue(otpKey);
+
+        if (storedOtp == null) {
+            return ApiResponse.<String>builder()
+                    .message("OTP has expired or was not sent")
+                    .status(ApplicationConstant.API_FAILED)
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .build();
+        }
+
+        if (!storedOtp.equals(verifyDto.getOtp())) {
+            return ApiResponse.<String>builder()
+                    .message("Invalid OTP")
+                    .status(ApplicationConstant.API_FAILED)
+                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                    .build();
+        }
+
+        // OTP is valid, mark as verified in Redis for 15 minutes
+        String verifiedKey = ApplicationConstant.REG_VERIFIED_PREFIX + verifyDto.getEmail();
+        atlRedisService.saveValueToRedisWithTTL(verifiedKey, "true", 15);
+        
+        // Remove the OTP key after successful verification
+        atlRedisService.deleteRedisKey(otpKey);
+
+        return ApiResponse.<String>builder()
+                .message("Email verified successfully")
+                .status(ApplicationConstant.API_SUCCESS)
+                .statusCode(HttpStatus.OK.value())
+                .apiData("Verified")
+                .build();
     }
 
     private void sendOtpEmail(String email, String otp) {

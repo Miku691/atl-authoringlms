@@ -15,6 +15,8 @@ public class ApplicationConstant {
     public static final String API_FAILURE_COMMON_MESSAGE = "Something went wrong. Please try after sometime";
 
     public static final String OTP_PREFIX = "otp:";
+    public static final String REG_OTP_PREFIX = "reg:otp:";
+    public static final String REG_VERIFIED_PREFIX = "reg:verified:";
     public static final String LOGGED_IN_PREFIX = "login:verified:";
 
     public static final String USER_ID_HEADER = "X-User-Id";

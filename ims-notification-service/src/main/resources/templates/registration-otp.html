@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{base-layout :: main-layout(~{::.otp-body}, 'Institute Registration')}">
+
+<body>
+    <div class="otp-body">
+        <h2>Verify Your Email</h2>
+        <p>Hello,</p>
+        <p>Thank you for choosing the Institute Management System. To complete your institute registration, please use the following verification code:</p>
+        <div class="otp-code" th:text="${otp}">000000</div>
+        <p>This code is valid for <b>15 minutes</b>. Please enter this code in the registration form to verify your identity.</p>
+        <p>If you did not initiate this registration, please disregard this email.</p>
+        <p>Welcome aboard,<br />The IMS Onboarding Team</p>
+    </div>
+</body>
+
+</html>

@@ -175,15 +175,22 @@ const InitialSetupPage: React.FC = () => {
                             }
                             setStep(2);
                         }}
-                        className={`cursor-pointer p-6 border-2 rounded-xl transition-all hover:shadow-lg flex flex-col items-center
-                            ${type === item.id ? `border-indigo-500 bg-indigo-50` : 'border-border hover:border-border'}
+                        className={`group cursor-pointer p-8 border-2 rounded-2xl transition-all duration-300 flex flex-col items-center relative overflow-hidden
+                            ${type === item.id 
+                                ? 'border-indigo-500 bg-indigo-500/5 shadow-indigo-500/10 shadow-lg' 
+                                : 'border-border hover:border-indigo-500/30 hover:bg-chrome hover:shadow-md'}
                         `}
                     >
-                        <div className={`p-4 rounded-full mb-4 ${type === item.id ? 'bg-indigo-100' : 'bg-chrome'}`}>
-                            <item.icon className="w-8 h-8 text-indigo-600" />
+                        {type === item.id && (
+                            <div className="absolute top-3 right-3">
+                                <CheckCircle className="w-5 h-5 text-indigo-500" />
+                            </div>
+                        )}
+                        <div className={`p-5 rounded-2xl mb-5 transition-transform duration-300 group-hover:scale-110 ${type === item.id ? 'bg-indigo-500/20 text-indigo-500' : 'bg-chrome text-content-muted group-hover:text-indigo-500'}`}>
+                            <item.icon className="w-10 h-10" />
                         </div>
-                        <h3 className="font-semibold text-lg text-content-primary">{item.label}</h3>
-                        <p className="text-sm text-content-secondary text-center mt-2">{item.desc}</p>
+                        <h3 className={`font-black text-xl mb-2 ${type === item.id ? 'text-indigo-500' : 'text-content-primary'}`}>{item.label}</h3>
+                        <p className="text-sm text-content-secondary text-center font-medium opacity-80">{item.desc}</p>
                     </div>
                 ))}
             </div>
@@ -219,7 +226,7 @@ const InitialSetupPage: React.FC = () => {
                         <select
                             value={schoolDetails.board}
                             onChange={(e) => setSchoolDetails({ ...schoolDetails, board: e.target.value })}
-                            className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 sm:text-sm transition-all bg-surface"
+                            className="w-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 sm:text-sm font-bold transition-all bg-chrome h-[54px]"
                         >
                             <option value="CBSE">CBSE</option>
                             <option value="ICSE">ICSE</option>
@@ -284,7 +291,7 @@ const InitialSetupPage: React.FC = () => {
                                 <select
                                     value={collegeDetails.collegeCategory}
                                     onChange={(e) => setCollegeDetails({ ...collegeDetails, collegeCategory: e.target.value })}
-                                    className="w-full h-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 text-sm transition-all bg-surface appearance-none cursor-pointer"
+                                    className="w-full h-full px-4 py-3 border-2 border-border rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 text-sm font-bold transition-all bg-chrome appearance-none cursor-pointer"
                                 >
                                     <option value="Engineering">Engineering</option>
                                     <option value="Medical">Medical</option>
@@ -380,7 +387,7 @@ const InitialSetupPage: React.FC = () => {
 
                         <button
                             onClick={addProgram}
-                            className="w-full py-2 border-2 border-dashed border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-50 flex items-center justify-center gap-2 font-medium"
+                            className="w-full py-3 border-2 border-dashed border-indigo-500/30 text-indigo-500 rounded-xl hover:bg-indigo-500/5 hover:border-indigo-500 flex items-center justify-center gap-2 font-black transition-all text-xs uppercase tracking-widest"
                         >
                             <Plus className="w-4 h-4" /> Add {type === 'COLLEGE' ? 'Program' : 'Course'}
                         </button>
@@ -399,9 +406,9 @@ const InitialSetupPage: React.FC = () => {
                 <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="bg-indigo-600 text-white px-8 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-2 shadow-lg shadow-indigo-200"
+                    className="bg-indigo-600 text-white px-10 py-3 rounded-2xl hover:bg-indigo-700 disabled:opacity-50 flex items-center gap-3 shadow-xl shadow-indigo-500/20 font-black text-sm transition-all transform active:scale-95"
                 >
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <CheckCircle className="w-5 h-5" />}
                     Complete Setup
                 </button>
             </div>
@@ -412,9 +419,9 @@ const InitialSetupPage: React.FC = () => {
         <div className="min-h-screen bg-chrome flex flex-col items-center justify-center p-4">
             <div className="w-full max-w-4xl bg-surface rounded-2xl shadow-xl overflow-hidden p-8 animate-slideUp">
                 {/* Progress */}
-                <div className="mb-8 flex justify-center gap-2">
-                    <div className={`h-1.5 w-12 rounded-full transition-colors ${step >= 1 ? 'bg-indigo-600' : 'bg-chrome'}`} />
-                    <div className={`h-1.5 w-12 rounded-full transition-colors ${step >= 2 ? 'bg-indigo-600' : 'bg-chrome'}`} />
+                <div className="mb-12 flex justify-center items-center gap-3">
+                    <div className={`h-2 rounded-full transition-all duration-500 ${step === 1 ? 'w-12 bg-indigo-600 shadow-lg shadow-indigo-500/30' : 'w-4 bg-indigo-600/20'}`} />
+                    <div className={`h-2 rounded-full transition-all duration-500 ${step === 2 ? 'w-12 bg-indigo-600 shadow-lg shadow-indigo-500/30' : 'w-4 bg-indigo-600/20'}`} />
                 </div>
 
                 {step === 1 ? renderTypeSelection() : renderConfig()}

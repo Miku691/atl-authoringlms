@@ -16,6 +16,23 @@ const OtpPage: React.FC = () => {
     const dispatch = useDispatch();
     const hasSentOtp = useRef(false);
 
+    // Timer states
+    const [timer, setTimer] = useState(60);
+    const [canResend, setCanResend] = useState(false);
+    const [isResending, setIsResending] = useState(false);
+
+    useEffect(() => {
+        let interval: any;
+        if (timer > 0 && !canResend) {
+            interval = setInterval(() => {
+                setTimer((prev) => prev - 1);
+            }, 1000);
+        } else if (timer === 0) {
+            setCanResend(true);
+        }
+        return () => clearInterval(interval);
+    }, [timer, canResend]);
+
     // Get username from navigation state, fallback to empty string if not present
     const username = location.state?.username;
 
@@ -41,6 +58,26 @@ const OtpPage: React.FC = () => {
         };
         sendOtp();
     }, [username, navigate]);
+
+    const handleResend = async () => {
+        if (!canResend || isResending) return;
+
+        setIsResending(true);
+        setError('');
+        try {
+            const response = await api.post('/atl-auth-service/auth/otp/sendOtp', { username });
+            if (response.data.message) {
+                setInfoMessage(`We've sent a new 6-digit code to your email`);
+                setTimer(60);
+                setCanResend(false);
+                setOtp(''); // Clear old OTP
+            }
+        } catch (err) {
+            setError('Failed to resend OTP. Please try again.');
+        } finally {
+            setIsResending(false);
+        }
+    };
 
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -157,9 +194,20 @@ const OtpPage: React.FC = () => {
                     </div>
                     <p className="mt-4 text-center text-sm text-content-secondary">
                         Didn't receive the code?{' '}
-                        <button type="button" className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 dark:hover:text-indigo-300 transition-colors">
-                            Resend
-                        </button>
+                        {canResend ? (
+                            <button 
+                                type="button" 
+                                onClick={handleResend}
+                                disabled={isResending}
+                                className="font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-50"
+                            >
+                                {isResending ? 'Resending...' : 'Resend'}
+                            </button>
+                        ) : (
+                            <span className="font-medium text-content-muted">
+                                Resend in <span className="text-indigo-500 font-bold">{timer}s</span>
+                            </span>
+                        )}
                     </p>
                 </div>
 

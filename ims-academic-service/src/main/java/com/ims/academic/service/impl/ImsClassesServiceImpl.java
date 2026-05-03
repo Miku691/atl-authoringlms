@@ -8,6 +8,8 @@ import com.ims.academic.dto.ImsSectionsDto;
 import com.ims.academic.repo.ImsClassesRepo;
 import com.ims.academic.service.ImsClassesService;
 import com.ims.academic.service.ImsSectionsService;
+import com.ims.academic.repo.ImsProgramsRepo;
+import com.ims.academic.enums.ProgramLevel;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ public class ImsClassesServiceImpl implements ImsClassesService {
 
     private final ImsClassesRepo repo;
     private final ImsSectionsService sectionsService;
+    private final ImsProgramsRepo programsRepo;
     private final ModelMapper modelMapper;
 
     private ImsClassesDto toDto(ImsClasses entity) {
@@ -43,24 +46,31 @@ public class ImsClassesServiceImpl implements ImsClassesService {
         ImsClasses savedEntity = repo.save(toEntity(dto));
 
         // Create Sections/Offerings if programId is provided (manual dashboard creation)
+        // Strictly for SCHOOL model where Class + Section = Offering
         if (dto.getProgramId() != null) {
-            int count = (dto.getSemesterCount() != null && dto.getSemesterCount() > 0) ? dto.getSemesterCount() : 1;
-            
-            for (int i = 1; i <= count; i++) {
-                String offName = null;
-                if (dto.getSemesterCount() != null && dto.getSemesterCount() > 1) {
-                    offName = "Semester " + i;
+            ProgramLevel level = programsRepo.findById(dto.getProgramId())
+                    .map(com.ims.academic.entity.ImsPrograms::getLevel)
+                    .orElse(ProgramLevel.SCHOOL); // Default to School if not found
+
+            if (level == ProgramLevel.SCHOOL) {
+                int count = (dto.getSemesterCount() != null && dto.getSemesterCount() > 0) ? dto.getSemesterCount() : 1;
+
+                for (int i = 1; i <= count; i++) {
+                    String offName = null;
+                    if (dto.getSemesterCount() != null && dto.getSemesterCount() > 1) {
+                        offName = "Semester " + i;
+                    }
+
+                    ImsSectionsDto sectionDto = ImsSectionsDto.builder()
+                            .tenantId(dto.getTenantId())
+                            .classId(savedEntity.getId())
+                            .name("A")
+                            .capacity(dto.getCapacity())
+                            .programId(dto.getProgramId())
+                            .offeringName(offName)
+                            .build();
+                    sectionsService.create(sectionDto);
                 }
-                
-                ImsSectionsDto sectionDto = ImsSectionsDto.builder()
-                        .tenantId(dto.getTenantId())
-                        .classId(savedEntity.getId())
-                        .name("A")
-                        .capacity(dto.getCapacity())
-                        .programId(dto.getProgramId())
-                        .offeringName(offName)
-                        .build();
-                sectionsService.create(sectionDto);
             }
         }
 

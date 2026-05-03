@@ -3,7 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import api from '../../utils/api';
 import AuthLayout from '../../layouts/AuthLayout';
 import FloatingLabelInput from '../../components/common/FloatingLabelInput';
-import { User, Mail, Phone, Lock, Loader2, Building2 } from 'lucide-react';
+import { User, Mail, Phone, Lock, Loader2, Building2, CheckCircle2, ShieldCheck } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const COUNTRY_CODES = [
@@ -35,6 +35,28 @@ const RegisterInstitutePage: React.FC = () => {
     });
 
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+    const [isOtpSent, setIsOtpSent] = useState(false);
+    const [isEmailVerified, setIsEmailVerified] = useState(false);
+
+    // Timer states for Resend OTP
+    const [timer, setTimer] = useState(60);
+    const [canResend, setCanResend] = useState(false);
+
+    useEffect(() => {
+        let interval: any;
+        if (isOtpSent && timer > 0 && !canResend) {
+            interval = setInterval(() => {
+                setTimer((prev) => prev - 1);
+            }, 1000);
+        } else if (timer === 0) {
+            setCanResend(true);
+        }
+        return () => clearInterval(interval);
+    }, [isOtpSent, timer, canResend]);
+
+    const [otp, setOtp] = useState('');
+    const [isSendingOtp, setIsSendingOtp] = useState(false);
+    const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
     const checkPasswordStrength = (pass: string) => {
         let score = 0;
@@ -91,6 +113,10 @@ const RegisterInstitutePage: React.FC = () => {
             newErrors.confirmPassword = 'Passwords do not match';
         }
 
+        if (!isEmailVerified) {
+            newErrors.email = 'Email verification is required';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -98,9 +124,72 @@ const RegisterInstitutePage: React.FC = () => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        // Clear error when user starts typing
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+
+        // If email changes, reset verification status
+        if (name === 'email') {
+            setIsEmailVerified(false);
+            setIsOtpSent(false);
+            setOtp('');
+        }
+    };
+
+    const handleSendOtp = async () => {
+        if (!formData.email) {
+            setErrors(prev => ({ ...prev, email: 'Email is required to send OTP' }));
+            return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            setErrors(prev => ({ ...prev, email: 'Invalid email format' }));
+            return;
+        }
+
+        setIsSendingOtp(true);
+        try {
+            const response = await api.post(`/atl-auth-service/auth/otp/send-registration-otp?email=${formData.email}`);
+            if (response.data.status === 'SUCCESS') {
+                setIsOtpSent(true);
+                setTimer(60);
+                setCanResend(false);
+                toast.success('OTP sent successfully');
+            } else {
+                toast.error(response.data.message || 'Failed to send OTP');
+            }
+        } catch (error: any) {
+            console.error('Failed to send OTP:', error);
+            toast.error(error.response?.data?.message || 'Failed to send OTP');
+        } finally {
+            setIsSendingOtp(false);
+        }
+    };
+
+    const handleVerifyOtp = async () => {
+        if (!otp || otp.length < 4) {
+            toast.error('Please enter a valid OTP');
+            return;
+        }
+
+        setIsVerifyingOtp(true);
+        try {
+            const response = await api.post('/atl-auth-service/auth/otp/verify-registration-otp', {
+                email: formData.email,
+                otp: otp
+            });
+
+            if (response.data.status === 'SUCCESS') {
+                setIsEmailVerified(true);
+                setIsOtpSent(false);
+                toast.success('Email verified successfully');
+            } else {
+                toast.error(response.data.message || 'Invalid OTP');
+            }
+        } catch (error: any) {
+            console.error('OTP verification failed:', error);
+            toast.error(error.response?.data?.message || 'OTP verification failed');
+        } finally {
+            setIsVerifyingOtp(false);
         }
     };
 
@@ -170,16 +259,87 @@ const RegisterInstitutePage: React.FC = () => {
                 />
 
                 {/* Email */}
-                <FloatingLabelInput
-                    label="Email Address"
-                    type="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    icon={<Mail className="h-5 w-5" />}
-                    error={errors.email}
-                />
+                <div className="space-y-2">
+                    <div className="relative">
+                        <FloatingLabelInput
+                            label="Email Address"
+                            type="email"
+                            name="email"
+                            required
+                            value={formData.email}
+                            onChange={handleChange}
+                            icon={<Mail className="h-5 w-5" />}
+                            error={errors.email}
+                            disabled={isEmailVerified || isOtpSent}
+                        />
+                        {isEmailVerified && (
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
+                                <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                                <span className="text-[10px] font-bold text-green-500 uppercase tracking-wider">Verified</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {!isEmailVerified && !isOtpSent && formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) === false && (
+                        <button
+                            type="button"
+                            onClick={handleSendOtp}
+                            disabled={isSendingOtp}
+                            className="w-full flex justify-center items-center py-2 px-4 border border-indigo-600/20 rounded-xl text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 transition-all"
+                        >
+                            {isSendingOtp ? <Loader2 className="animate-spin h-3 w-3 mr-2" /> : <ShieldCheck className="h-3 w-3 mr-2" />}
+                            Verify Email
+                        </button>
+                    )}
+
+                    {isOtpSent && (
+                        <div className="p-4 bg-chrome/50 border border-border rounded-2xl space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-bold text-content-secondary uppercase tracking-widest">Enter Verification Code</span>
+                                <button type="button" onClick={() => setIsOtpSent(false)} className="text-[10px] font-bold text-indigo-600 hover:underline">Change Email</button>
+                            </div>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    maxLength={6}
+                                    placeholder="Enter 6-digit OTP"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
+                                    className="flex-1 bg-white dark:bg-chrome px-4 py-2 rounded-xl border border-border focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-center tracking-[0.5em] font-bold"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={handleVerifyOtp}
+                                    disabled={isVerifyingOtp}
+                                    className="px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold text-xs hover:bg-indigo-700 transition-all flex items-center"
+                                >
+                                    {isVerifyingOtp ? <Loader2 className="animate-spin h-3 w-3" /> : 'Verify'}
+                                </button>
+                            </div>
+                            <div className="flex justify-between items-center px-1">
+                                <p className="text-[9px] text-content-muted italic">OTP valid for 15 minutes</p>
+                                {isOtpSent && (
+                                    <div className="text-[10px] font-medium">
+                                        {canResend ? (
+                                            <button 
+                                                type="button" 
+                                                onClick={handleSendOtp}
+                                                disabled={isSendingOtp}
+                                                className="text-indigo-600 hover:underline font-bold"
+                                            >
+                                                {isSendingOtp ? 'Resending...' : 'Resend OTP'}
+                                            </button>
+                                        ) : (
+                                            <span className="text-content-muted">
+                                                Resend in <span className="text-indigo-500 font-bold">{timer}s</span>
+                                            </span>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
 
                 {/* Phone */}
                 <div>
@@ -263,8 +423,8 @@ const RegisterInstitutePage: React.FC = () => {
                 <div className="pt-4">
                     <button
                         type="submit"
-                        disabled={isLoading}
-                        className={`w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl shadow-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 transform active:scale-95 ${isLoading ? 'opacity-70 cursor-not-allowed shadow-none' : 'hover:shadow-indigo-500/30'}`}
+                        disabled={isLoading || !isEmailVerified}
+                        className={`w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-2xl shadow-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 transform active:scale-95 ${(isLoading || !isEmailVerified) ? 'opacity-70 cursor-not-allowed shadow-none' : 'hover:shadow-indigo-500/30'}`}
                     >
                         {isLoading ? (
                             <>

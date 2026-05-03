@@ -27,4 +27,14 @@ public class AtlOtpController {
     public ResponseEntity<ApiResponse<AtlVerifiedResDto>> verifyOtp(@RequestBody AtlVerifyOtpReqDto verifyOtpDto){
         return new ResponseEntity<ApiResponse<AtlVerifiedResDto>>(otpService.verifyOtp(verifyOtpDto), HttpStatus.OK);
     }
+
+    @PostMapping("/send-registration-otp")
+    public ResponseEntity<ApiResponse<String>> sendRegistrationOtp(@RequestParam String email) {
+        return new ResponseEntity<>(otpService.generateOtpForRegistration(email), HttpStatus.OK);
+    }
+
+    @PostMapping("/verify-registration-otp")
+    public ResponseEntity<ApiResponse<String>> verifyRegistrationOtp(@RequestBody com.atl.auth.dto.RegistrationOtpVerifyDto verifyDto) {
+        return new ResponseEntity<>(otpService.verifyOtpForRegistration(verifyDto), HttpStatus.OK);
+    }
 }
