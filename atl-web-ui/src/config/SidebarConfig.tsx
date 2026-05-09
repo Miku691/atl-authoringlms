@@ -226,14 +226,17 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             subItems: [
                 { path: '/finance/dashboard', label: 'Finance Dashboard', icon: LayoutDashboard, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
                 { path: '/finance/fee-heads', label: 'Fee Heads', icon: Tag, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
-                { path: '/finance/late-fee-rules', label: 'Late Fee Policies', icon: Clock, roles: ['TENANT_ADMIN'] },
-                { path: '/finance/config', label: 'Financial Masters', icon: Settings, roles: ['TENANT_ADMIN'] },
+                // hiding for now as it seems mesh
+                // { path: '/finance/late-fee-rules', label: 'Late Fee Policies', icon: Clock, roles: ['TENANT_ADMIN'] },
+                // { path: '/finance/config', label: 'Financial Masters', icon: Settings, roles: ['TENANT_ADMIN'] },
                 // { path: '/finance/concessions', label: 'Concessions', icon: FileText, roles: ['TENANT_ADMIN'] },
                 { path: '/finance/structure', label: 'Fee Structure', icon: FileText, roles: ['TENANT_ADMIN'] },
-                { path: '/finance/installment-plans', label: 'Installment Plans', icon: Calendar, roles: ['TENANT_ADMIN'] },
+                // hiding for now as it seems mesh
+                // { path: '/finance/installment-plans', label: 'Installment Plans', icon: Calendar, roles: ['TENANT_ADMIN'] },
                 { path: '/finance/collection-desk', label: 'Collection Desk', icon: Banknote, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
                 { path: '/finance/ledger', label: 'Student Ledgers', icon: Users, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
-                { path: '/finance/defaulters', label: 'Defaulters', icon: AlertTriangle, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
+                // hiding for now as it seems mesh
+                // { path: '/finance/defaulters', label: 'Defaulters', icon: AlertTriangle, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
                 { path: '/finance/expenses', label: 'Expenses', icon: ShoppingBag, roles: ['TENANT_ADMIN', 'ACCOUNTANT'] },
                 { path: '/finance/expense-categories', label: 'Expense Categories', icon: Tag, roles: ['TENANT_ADMIN'] },
                 { path: '/finance/budgets', label: 'Budgets', icon: Target, roles: ['TENANT_ADMIN'] },

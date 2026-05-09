@@ -11,6 +11,8 @@ public class ImsSectionsDto {
     private String id;
     private String tenantId;
     private String classId;
+    private String yearId;
+    private String courseId;
     private String name;
     private String offeringId;
     private String offeringName;

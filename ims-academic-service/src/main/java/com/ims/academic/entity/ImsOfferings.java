@@ -66,4 +66,10 @@ public class ImsOfferings {
     // Link to Class (especially for College/Coaching where Semesters directly link to Years)
     @Column(name = "class_id")
     private String classId;
+
+    @Column(name = "year_id")
+    private String yearId;
+
+    @Column(name = "course_id")
+    private String courseId;
 }

@@ -56,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     }, [user?.tenantId, user?.roles]);
 
     const rawMenuItems = useMemo(
-        () => getSidebarConfig(user?.tenantType, { readiness, hasActiveOfferings }),
+        () => getSidebarConfig(user?.tenantType || readiness?.tenantType, { readiness, hasActiveOfferings }),
         [user?.tenantType, readiness, hasActiveOfferings]
     );
 

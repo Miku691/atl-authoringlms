@@ -8,8 +8,35 @@ export interface ImsOffering {
     status: 'ACTIVE' | 'INACTIVE' | 'UPCOMING';
     startDate?: string;
     endDate?: string;
-    type?: 'SCHOOL' | 'COLLEGE' | 'COACHING';
+    type?: 'SCHOOL_CLASS' | 'COLLEGE_PROGRAM' | 'COACHING_BATCH' | string;
     programName?: string;
+    classId?: string;
+    yearId?: string;
+    courseId?: string;
+}
+
+export interface ImsBranch {
+    id: string;
+    tenantId: string;
+    programId: string;
+    name: string;
+    code: string;
+}
+
+export interface ImsYear {
+    id: string;
+    tenantId: string;
+    branchId: string;
+    name: string;
+    yearNumber: number;
+}
+
+export interface ImsCourse {
+    id: string;
+    tenantId: string;
+    programId: string;
+    name: string;
+    code: string;
 }
 
 export interface Subject {
@@ -100,6 +127,22 @@ export const academicService = {
     linkProgramToDepartment: async (programId: string, departmentId: string) => {
         const response = await api.put(`/ims-academic-service/programs/${programId}/department/${departmentId}`);
         return response.data;
+    },
+
+    // Branches, Years, Courses
+    getBranchesByProgram: async (tenantId: string, programId: string) => {
+        const response = await api.get(`/ims-academic-service/branches/tenant/${tenantId}/program/${programId}`);
+        return response.data.apiData;
+    },
+    
+    getYearsByBranch: async (tenantId: string, branchId: string) => {
+        const response = await api.get(`/ims-academic-service/years/tenant/${tenantId}/branch/${branchId}`);
+        return response.data.apiData;
+    },
+
+    getCoursesByProgram: async (tenantId: string, programId: string) => {
+        const response = await api.get(`/ims-academic-service/courses/tenant/${tenantId}/program/${programId}`);
+        return response.data.apiData;
     },
 
     // Offerings & Sections (Added for Student Details)

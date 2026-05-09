@@ -22,6 +22,8 @@ public class ImsOfferingsDto {
     private LocalDate endDate;
     private Integer capacity;
     private String classId;
+    private String yearId;
+    private String courseId;
     private String metadata;
     private OfferingStatus status;
 }

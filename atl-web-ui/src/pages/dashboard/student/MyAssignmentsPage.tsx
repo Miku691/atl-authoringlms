@@ -13,12 +13,12 @@ import {
     Calendar,
     Upload,
     ArrowRight,
-    X,
     FileCheck,
     ShieldCheck,
     CheckCircle2
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import Modal from '../../../components/common/Modal';
 
 type TabType = 'PENDING' | 'SUBMITTED' | 'OVERDUE';
 
@@ -231,80 +231,62 @@ const MyAssignmentsPage: React.FC = () => {
             )}
 
             {/* ── Submission Modal ── */}
-            {selectedAssignment && (
-                <div className="fixed inset-0 bg-[#181c20]/60 backdrop-blur-md flex items-center justify-center z-[100] p-6 animate-fade-in">
-                    <div className="bg-surface rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
-                        {/* Modal Header */}
-                        <div className="bg-gradient-to-br from-[#0054d1] to-[#2a6df4] p-6 text-white relative">
-                            <button
-                                onClick={() => { setSelectedAssignment(null); setFile(null); }}
-                                className="absolute right-4 top-4 p-2 hover:bg-surface/10 rounded-xl transition-all"
-                            >
-                                <X className="w-5 h-5" />
-                            </button>
-                            <div className="w-10 h-10 bg-surface/10 rounded-xl flex items-center justify-center mb-4 border border-white/20">
-                                <Upload className="w-5 h-5 text-white" />
-                            </div>
-                            <p className="text-[10px] text-white/70 uppercase tracking-widest font-semibold mb-1">Submitting For</p>
-                            <h2 className="text-xl font-bold leading-tight line-clamp-2">{selectedAssignment.title}</h2>
-                            <div className="mt-3 flex items-center gap-2">
-                                <ShieldCheck className="w-3.5 h-3.5 text-white/60" />
-                                <span className="text-[10px] text-white/60 font-semibold">ID: {selectedAssignment.id?.substring(0, 8)}</span>
-                            </div>
-                        </div>
-
-                        {/* Modal Body */}
-                        <div className="p-6">
-                            <form onSubmit={handleFileUpload} className="space-y-4">
-                                <div>
-                                    <p className="text-xs font-semibold text-[#64748b] mb-2 uppercase tracking-widest">Upload File</p>
-                                    <div className={`relative border-2 border-dashed rounded-xl p-10 transition-all cursor-pointer flex flex-col items-center justify-center text-center ${
-                                        file ? 'border-[#2a6df4] bg-[#f0f4ff]' : 'border-[#e0e2e8] bg-[#f7f9ff] hover:border-[#2a6df4] hover:bg-surface'
-                                    }`}>
-                                        <input
-                                            type="file"
-                                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                                            onChange={(e) => setFile(e.target.files?.[0] || null)}
-                                        />
-                                        {file ? (
-                                            <div className="space-y-3">
-                                                <div className="w-12 h-12 bg-[#2a6df4] rounded-xl flex items-center justify-center text-white mx-auto">
-                                                    <FileCheck className="w-6 h-6" />
-                                                </div>
-                                                <p className="text-sm font-semibold text-[#181c20] truncate max-w-[200px]">{file.name}</p>
-                                                <p className="text-xs text-[#0054d1]">File selected — click to change</p>
-                                            </div>
-                                        ) : (
-                                            <div className="space-y-3">
-                                                <div className="w-12 h-12 bg-[#f1f3f9] rounded-xl flex items-center justify-center text-[#c2c6d7] mx-auto">
-                                                    <Upload className="w-6 h-6" />
-                                                </div>
-                                                <p className="text-sm font-semibold text-[#181c20]">Click or drop file here</p>
-                                                <p className="text-xs text-[#64748b]">PDF, DOCX, ZIP — Max 10MB</p>
-                                            </div>
-                                        )}
+            <Modal
+                isOpen={!!selectedAssignment}
+                onClose={() => { setSelectedAssignment(null); setFile(null); }}
+                title={selectedAssignment?.title ?? ''}
+                subtitle={selectedAssignment ? `ID: ${selectedAssignment.id?.substring(0, 8)}` : undefined}
+                icon={<Upload size={18} />}
+                iconVariant="info"
+                size="lg"
+            >
+                <form onSubmit={handleFileUpload} className="space-y-4">
+                    <div>
+                        <p className="text-xs font-semibold text-[#64748b] mb-2 uppercase tracking-widest">Upload File</p>
+                        <div className={`relative border-2 border-dashed rounded-xl p-10 transition-all cursor-pointer flex flex-col items-center justify-center text-center ${
+                            file ? 'border-[#2a6df4] bg-[#f0f4ff]' : 'border-[#e0e2e8] bg-[#f7f9ff] hover:border-[#2a6df4] hover:bg-surface'
+                        }`}>
+                            <input
+                                type="file"
+                                className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                onChange={(e) => setFile(e.target.files?.[0] || null)}
+                            />
+                            {file ? (
+                                <div className="space-y-3">
+                                    <div className="w-12 h-12 bg-[#2a6df4] rounded-xl flex items-center justify-center text-white mx-auto">
+                                        <FileCheck className="w-6 h-6" />
                                     </div>
+                                    <p className="text-sm font-semibold text-[#181c20] truncate max-w-[200px]">{file.name}</p>
+                                    <p className="text-xs text-[#0054d1]">File selected — click to change</p>
                                 </div>
-
-                                <button
-                                    type="submit"
-                                    disabled={!file || uploading}
-                                    className="w-full py-3 bg-gradient-to-br from-[#0054d1] to-[#2a6df4] text-white rounded-xl text-sm font-semibold disabled:opacity-40 flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-md"
-                                >
-                                    {uploading ? (
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    ) : (
-                                        <>
-                                            <FileCheck className="w-4 h-4" />
-                                            Submit Assignment
-                                        </>
-                                    )}
-                                </button>
-                            </form>
+                            ) : (
+                                <div className="space-y-3">
+                                    <div className="w-12 h-12 bg-[#f1f3f9] rounded-xl flex items-center justify-center text-[#c2c6d7] mx-auto">
+                                        <Upload className="w-6 h-6" />
+                                    </div>
+                                    <p className="text-sm font-semibold text-[#181c20]">Click or drop file here</p>
+                                    <p className="text-xs text-[#64748b]">PDF, DOCX, ZIP — Max 10MB</p>
+                                </div>
+                            )}
                         </div>
                     </div>
-                </div>
-            )}
+
+                    <button
+                        type="submit"
+                        disabled={!file || uploading}
+                        className="w-full py-3 bg-gradient-to-br from-[#0054d1] to-[#2a6df4] text-white rounded-xl text-sm font-semibold disabled:opacity-40 flex items-center justify-center gap-2 hover:opacity-90 transition-all shadow-md"
+                    >
+                        {uploading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            <>
+                                <FileCheck className="w-4 h-4" />
+                                Submit Assignment
+                            </>
+                        )}
+                    </button>
+                </form>
+            </Modal>
         </div>
     );
 };

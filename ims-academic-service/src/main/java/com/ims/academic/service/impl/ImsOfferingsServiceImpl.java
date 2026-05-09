@@ -87,9 +87,18 @@ public class ImsOfferingsServiceImpl implements ImsOfferingsService {
                 .orElseThrow(() -> new ResourceNotFoundException("Session ID", dto.getSessionId()));
         }
 
-        // Idempotency: Return existing if matches name and session
-        repo.findByNameAndSessionId(dto.getName(), dto.getSessionId())
-                .ifPresent(existing -> dto.setId(existing.getId()));
+        // Idempotency: Return existing if matches name, session, and specific container ID
+        List<ImsOfferings> existingOfferings = repo.findExactDuplicate(
+                dto.getName(), 
+                dto.getSessionId(), 
+                dto.getClassId(), 
+                dto.getYearId(), 
+                dto.getCourseId()
+        );
+        
+        if (!existingOfferings.isEmpty()) {
+            dto.setId(existingOfferings.get(0).getId());
+        }
 
         if (dto.getId() != null) {
             log.info("Offering {} already exists, returning existing.", dto.getName());

@@ -42,6 +42,9 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
     private final GradingScaleRepo gradingScaleRepo;
     private final DepartmentRepo departmentRepo;
     private final com.ims.academic.service.AcademicSessionService sessionService;
+    private final com.ims.academic.service.ImsBranchesService branchesService;
+    private final com.ims.academic.service.ImsYearsService yearsService;
+    private final com.ims.academic.service.ImsCoursesService coursesService;
 
     @Override
     @Transactional
@@ -238,21 +241,30 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
         // Loop through requested programs (branches) and map them natively to ImsPrograms
         for (BootstrapReqDto.ProgramReq progReq : config.getPrograms()) {
             
-            // 1. Create Program (Branch)
-            String programTitle = categoryPrefix + progReq.getName();
-            String programCode = progReq.getCode() != null ? progReq.getCode() : progReq.getName().toUpperCase().replace(" ", "-");
+            // 1. Create Program (e.g. B.Tech)
+            String programTitle = categoryPrefix;
+            String programCode = config.getCollegeCategory() != null ? config.getCollegeCategory().toUpperCase().replace(" ", "-") : "PROG";
 
             ImsProgramsDto programDto = ImsProgramsDto.builder()
                     .tenantId(req.getTenantId())
-                    .code(programCode)
-                    .title(programTitle)
+                    .code(programCode + "-" + progReq.getName().toUpperCase().replace(" ", "-"))
+                    .title(programTitle + " " + progReq.getName())
                     .level(ProgramLevel.UNDERGRAD)
                     .collegeCategory(config.getCollegeCategory())
                     .affiliation(config.getAffiliation())
-                    .description(programTitle)
+                    .description(programTitle + " " + progReq.getName())
                     .build();
 
             ImsProgramsDto savedProgram = programsService.create(programDto);
+
+            // 1.5 Create Branch
+            com.ims.academic.dto.ImsBranchesDto branchDto = com.ims.academic.dto.ImsBranchesDto.builder()
+                    .tenantId(req.getTenantId())
+                    .programId(savedProgram.getId())
+                    .name(progReq.getName())
+                    .code(progReq.getCode() != null ? progReq.getCode() : progReq.getName().toUpperCase().replace(" ", "-"))
+                    .build();
+            com.ims.academic.dto.ImsBranchesDto savedBranch = branchesService.create(branchDto);
 
             // 2. Create Session for this Program
             com.ims.academic.dto.AcademicSessionDto session = com.ims.academic.dto.AcademicSessionDto.builder()
@@ -265,7 +277,7 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
                     .build();
             com.ims.academic.dto.AcademicSessionDto savedSession = sessionService.create(session);
 
-            // 3. Create Classes (Years) and Offerings (Semesters)
+            // 3. Create Years and Offerings (Semesters)
             int terms = progReq.getNumberOfTerms() > 0 ? progReq.getNumberOfTerms() : 8;
             int years = (int) Math.ceil((double) terms / 2);
             String label = progReq.getTermLabel() != null && !progReq.getTermLabel().isEmpty() ? progReq.getTermLabel() : "Semester";
@@ -273,24 +285,23 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
             int termCounter = 1;
             for (int y = 1; y <= years; y++) {
                 
-                // 3.1 Create Year (Class)
+                // 3.1 Create Year
                 String suffix = (y == 1) ? "st" : (y == 2) ? "nd" : (y == 3) ? "rd" : "th";
-                ImsClassesDto yearClassDto = ImsClassesDto.builder()
+                com.ims.academic.dto.ImsYearsDto yearDto = com.ims.academic.dto.ImsYearsDto.builder()
                         .tenantId(req.getTenantId())
+                        .branchId(savedBranch.getId())
                         .name(y + suffix + " Year")
-                        .code(programCode + "-Y" + y)
-                        .capacity(60)
-                        .programId(savedProgram.getId())
+                        .yearNumber(y)
                         .build();
-                ImsClassesDto savedYearClass = classesService.create(yearClassDto);
+                com.ims.academic.dto.ImsYearsDto savedYear = yearsService.create(yearDto);
 
-                // 3.2 Create Semesters (Offerings) natively linked to the Year Class
+                // 3.2 Create Semesters (Offerings) natively linked to the Year
                 for (int s = 1; s <= 2 && termCounter <= terms; s++) {
                     ImsOfferingsDto offering = ImsOfferingsDto.builder()
                             .tenantId(req.getTenantId())
                             .programId(savedProgram.getId())
                             .sessionId(savedSession.getId())
-                            .classId(savedYearClass.getId()) // LINK TO YEAR
+                            .yearId(savedYear.getId()) // LINK TO YEAR
                             .type(OfferingType.COLLEGE_PROGRAM)
                             .name(label + " " + termCounter)
                             .startDate(LocalDate.now())
@@ -313,17 +324,26 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
         // Loop through requested programs (courses)
         for (BootstrapReqDto.ProgramReq progReq : config.getPrograms()) {
             
-            // 1. Create Course as Program
+            // 1. Create Program
             ImsProgramsDto programDto = ImsProgramsDto.builder()
                     .tenantId(req.getTenantId())
-                    .code(progReq.getCode() != null ? progReq.getCode() : progReq.getName().toUpperCase().replace(" ", "-"))
-                    .title(progReq.getName())
+                    .code(progReq.getCode() != null ? progReq.getCode() : "COACHING")
+                    .title(progReq.getName() != null ? progReq.getName() : "Coaching Program")
                     .level(ProgramLevel.COACHING)
                     .affiliation(config.getAffiliation())
-                    .description("Competitive Coaching Course")
+                    .description("Competitive Coaching Program")
                     .build();
 
             ImsProgramsDto savedProgram = programsService.create(programDto);
+
+            // 1.5 Create Course
+            com.ims.academic.dto.ImsCoursesDto courseDto = com.ims.academic.dto.ImsCoursesDto.builder()
+                    .tenantId(req.getTenantId())
+                    .programId(savedProgram.getId())
+                    .name(progReq.getName())
+                    .code(progReq.getCode() != null ? progReq.getCode() : progReq.getName().toUpperCase().replace(" ", "-"))
+                    .build();
+            com.ims.academic.dto.ImsCoursesDto savedCourse = coursesService.create(courseDto);
 
             // 2. Create Session
             com.ims.academic.dto.AcademicSessionDto session = com.ims.academic.dto.AcademicSessionDto.builder()
@@ -336,17 +356,7 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
                     .build();
             com.ims.academic.dto.AcademicSessionDto savedSession = sessionService.create(session);
 
-            // 3. Create General Phase (Class)
-            ImsClassesDto phaseClassDto = ImsClassesDto.builder()
-                    .tenantId(req.getTenantId())
-                    .name("Phase 1")
-                    .code(savedProgram.getCode() + "-PH1")
-                    .capacity(40)
-                    .programId(savedProgram.getId())
-                    .build();
-            ImsClassesDto savedPhaseClass = classesService.create(phaseClassDto);
-
-            // 4. Create Batches (Offerings) natively linked to Phase Class
+            // 3. Create Batches (Offerings) natively linked to Course
             int batches = progReq.getNumberOfTerms() > 0 ? progReq.getNumberOfTerms() : 2;
             String label = progReq.getTermLabel() != null && !progReq.getTermLabel().isEmpty() ? progReq.getTermLabel() : "Batch";
 
@@ -357,7 +367,7 @@ public class ImsBootstrapServiceImpl implements ImsBootstrapService {
                         .tenantId(req.getTenantId())
                         .programId(savedProgram.getId())
                         .sessionId(savedSession.getId())
-                        .classId(savedPhaseClass.getId()) // LINK TO CLASS
+                        .courseId(savedCourse.getId()) // LINK TO COURSE
                         .type(OfferingType.COACHING_BATCH)
                         .name(label + " " + subBatchLabel)
                         .startDate(LocalDate.now())

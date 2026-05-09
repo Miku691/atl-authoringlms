@@ -35,8 +35,14 @@ public class ImsSections {
 
         // Internal academic-service mapping
         @ManyToOne(fetch = FetchType.LAZY)
-        @JoinColumn(name = "class_id", nullable = false)
+        @JoinColumn(name = "class_id", nullable = true)
         private ImsClasses imsClass;
+
+        @Column(name = "year_id")
+        private String yearId;
+
+        @Column(name = "course_id")
+        private String courseId;
 
         // Section label (A, B, C)
         @Column(name = "name", nullable = false, length = 50)

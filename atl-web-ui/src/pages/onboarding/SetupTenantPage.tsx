@@ -345,11 +345,13 @@ const InitialSetupPage: React.FC = () => {
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="text-xs font-semibold text-content-secondary uppercase">Name</label>
+                                        <label className="text-xs font-semibold text-content-secondary uppercase">
+                                            {type === 'COLLEGE' ? 'Branch Name' : 'Course Name'}
+                                        </label>
                                         <input
                                             value={prog.name}
                                             onChange={(e) => updateProgram(idx, 'name', e.target.value)}
-                                            placeholder={type === 'COLLEGE' ? "e.g. B.Tech CSE" : "e.g. JEE Mains 2025"}
+                                            placeholder={type === 'COLLEGE' ? "e.g. Computer Science" : "e.g. JEE Mains 2025"}
                                             className="w-full p-2 bg-surface border rounded text-sm"
                                         />
                                     </div>
@@ -358,7 +360,7 @@ const InitialSetupPage: React.FC = () => {
                                         <input
                                             value={prog.code}
                                             onChange={(e) => updateProgram(idx, 'code', e.target.value)}
-                                            placeholder="e.g. CSE"
+                                            placeholder={type === 'COLLEGE' ? "e.g. CSE" : "e.g. JEE"}
                                             className="w-full p-2 bg-surface border rounded text-sm"
                                         />
                                     </div>

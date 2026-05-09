@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Filter, MoreVertical, Calendar, Mail, Phone, ExternalLink, CheckCircle2, XCircle, Clock, Loader2, Send, MessageSquare } from 'lucide-react';
+import { Search, Filter, Calendar, Mail, ExternalLink, CheckCircle2, XCircle, Clock, Loader2, Send, MessageSquare } from 'lucide-react';
 import api from '../../../utils/api';
 import { toast } from 'react-hot-toast';
+import Modal from '../../../components/common/Modal';
 
 const DemoLeadsPage: React.FC = () => {
   const [leads, setLeads] = useState([]);
@@ -214,123 +214,92 @@ const DemoLeadsPage: React.FC = () => {
       </div>
 
       {/* Confirmation Modal: Link Dispatch */}
-      <AnimatePresence>
-        {isConfirmModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }}
-              onClick={() => setIsConfirmModalOpen(false)}
-              className="absolute inset-0 bg-indigo-950/40 backdrop-blur-md" 
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y : 0 }}
-              exit={{ opacity: 0, scale : 0.95, y : 30 }}
-              className="relative w-full max-w-lg bg-surface rounded-[40px] p-12 shadow-3xl border border-border"
-            >
-              <h2 className="text-3xl font-display font-black tracking-tight text-content-primary mb-3 italic">Authorize <span className="text-indigo-600">Meeting Node</span></h2>
-              <p className="text-content-muted font-medium text-[13px] leading-relaxed mb-10 max-w-[90%]">
-                Initiating meeting dispatch for <span className="font-black text-content-primary">{selectedLead?.fullName}</span>. 
-                Requester will receive verified Google Meet telemetry.
-              </p>
-              
-              <div className="space-y-8">
-                <div>
-                  <label className="block text-[10px] font-black text-content-muted uppercase tracking-[0.3em] mb-4 ml-1">Verified Google Meet Link</label>
-                  <div className="relative group">
-                    <input 
-                      type="url" 
-                      placeholder="https://meet.google.com/xxx-xxxx-xxx" 
-                      className="w-full pl-14 pr-6 py-5 bg-chrome/50 border-2 border-transparent focus:border-indigo-600 focus:bg-surface rounded-[25px] outline-none transition-all font-black text-sm tracking-tight shadow-inner"
-                      value={meetingLink}
-                      onChange={(e) => setMeetingLink(e.target.value)}
-                    />
-                    <ExternalLink className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-indigo-600 transition-colors" />
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <button 
-                    onClick={() => setIsConfirmModalOpen(false)}
-                    className="flex-1 py-5 rounded-[25px] font-black text-[11px] uppercase tracking-widest text-content-muted hover:bg-chrome transition-all border border-border"
-                  >
-                    Abort
-                  </button>
-                  <button 
-                    onClick={handleConfirmMeeting}
-                    className="flex-[2] py-5 bg-indigo-600 text-white rounded-[25px] font-black text-[11px] uppercase tracking-widest shadow-2xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-[0.98]"
-                  >
-                    Confirm & Dispatch
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+      <Modal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        title="Authorize Meeting Node"
+        icon={<Send size={18} />}
+        iconVariant="info"
+        size="lg"
+      >
+        <div className="space-y-6">
+          <p className="text-content-muted font-medium text-[13px] leading-relaxed">
+            Initiating meeting dispatch for <span className="font-black text-content-primary">{selectedLead?.fullName}</span>.{' '}
+            Requester will receive verified Google Meet telemetry.
+          </p>
+          <div>
+            <label className="block text-[10px] font-black text-content-muted uppercase tracking-[0.3em] mb-3 ml-1">Verified Google Meet Link</label>
+            <div className="relative group">
+              <input
+                type="url"
+                placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                className="w-full pl-14 pr-6 py-4 bg-chrome/50 border-2 border-transparent focus:border-indigo-600 focus:bg-surface rounded-2xl outline-none transition-all font-black text-sm tracking-tight"
+                value={meetingLink}
+                onChange={(e) => setMeetingLink(e.target.value)}
+              />
+              <ExternalLink className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-indigo-600 transition-colors" />
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={() => setIsConfirmModalOpen(false)}
+              className="flex-1 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-content-muted hover:bg-chrome transition-all border border-border"
+            >
+              Abort
+            </button>
+            <button
+              onClick={handleConfirmMeeting}
+              className="flex-[2] py-4 bg-indigo-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-[0.98]"
+            >
+              Confirm &amp; Dispatch
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       {/* Completion Modal: Feedback Persistence */}
-      <AnimatePresence>
-        {isFeedbackModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }}
-              onClick={() => setIsFeedbackModalOpen(false)}
-              className="absolute inset-0 bg-emerald-950/40 backdrop-blur-md" 
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y : 0 }}
-              exit={{ opacity: 0, scale : 0.95, y : 30 }}
-              className="relative w-full max-w-lg bg-surface rounded-[40px] p-12 shadow-3xl border border-border"
-            >
-              <div className="w-16 h-16 bg-emerald-50 rounded-[22px] flex items-center justify-center text-emerald-600 mb-8 border border-emerald-100 shadow-inner">
-                  <CheckCircle2 size={32} />
-              </div>
-              <h2 className="text-3xl font-display font-black tracking-tight text-content-primary mb-3 italic">Finalize <span className="text-emerald-600">Demo Cycle</span></h2>
-              <p className="text-content-muted font-medium text-[13px] leading-relaxed mb-10 max-w-[90%]">
-                Persist meeting intelligence for <span className="font-black text-content-primary">{selectedLead?.fullName}</span>. 
-                Feedback node is mandatory for conversion audit.
-              </p>
-              
-              <div className="space-y-8">
-                <div>
-                  <label className="block text-[10px] font-black text-content-muted uppercase tracking-[0.3em] mb-4 ml-1">Meeting Intelligence / Feedback</label>
-                  <div className="relative group">
-                    <textarea 
-                      placeholder="ENTER OPERATIONAL FEEDBACK..." 
-                      rows={4}
-                      className="w-full pl-14 pr-6 py-5 bg-chrome/50 border-2 border-transparent focus:border-emerald-600 focus:bg-surface rounded-[25px] outline-none transition-all font-black text-sm tracking-tight shadow-inner resize-none uppercase"
-                      value={feedback}
-                      onChange={(e) => setFeedback(e.target.value)}
-                    />
-                    <MessageSquare className="absolute left-5 top-6 w-5 h-5 text-gray-300 group-focus-within:text-emerald-600 transition-colors" />
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <button 
-                    onClick={() => setIsFeedbackModalOpen(false)}
-                    className="flex-1 py-5 rounded-[25px] font-black text-[11px] uppercase tracking-widest text-content-muted hover:bg-chrome transition-all border border-border"
-                  >
-                    Review Later
-                  </button>
-                  <button 
-                    onClick={handleCompleteMeeting}
-                    className="flex-[2] py-5 bg-emerald-600 text-white rounded-[25px] font-black text-[11px] uppercase tracking-widest shadow-2xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-[0.98]"
-                  >
-                    Commit Intelligence
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+      <Modal
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
+        title="Finalize Demo Cycle"
+        icon={<CheckCircle2 size={18} />}
+        iconVariant="success"
+        size="lg"
+      >
+        <div className="space-y-6">
+          <p className="text-content-muted font-medium text-[13px] leading-relaxed">
+            Persist meeting intelligence for <span className="font-black text-content-primary">{selectedLead?.fullName}</span>.{' '}
+            Feedback node is mandatory for conversion audit.
+          </p>
+          <div>
+            <label className="block text-[10px] font-black text-content-muted uppercase tracking-[0.3em] mb-3 ml-1">Meeting Intelligence / Feedback</label>
+            <div className="relative group">
+              <textarea
+                placeholder="ENTER OPERATIONAL FEEDBACK..."
+                rows={4}
+                className="w-full pl-14 pr-6 py-4 bg-chrome/50 border-2 border-transparent focus:border-emerald-600 focus:bg-surface rounded-2xl outline-none transition-all font-black text-sm tracking-tight resize-none uppercase"
+                value={feedback}
+                onChange={(e) => setFeedback(e.target.value)}
+              />
+              <MessageSquare className="absolute left-5 top-5 w-5 h-5 text-gray-300 group-focus-within:text-emerald-600 transition-colors" />
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={() => setIsFeedbackModalOpen(false)}
+              className="flex-1 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-content-muted hover:bg-chrome transition-all border border-border"
+            >
+              Review Later
+            </button>
+            <button
+              onClick={handleCompleteMeeting}
+              className="flex-[2] py-4 bg-emerald-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all active:scale-[0.98]"
+            >
+              Commit Intelligence
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };
