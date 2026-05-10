@@ -149,7 +149,7 @@ const FinanceDashboardPage: React.FC = () => {
                                         <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} dy={10} />
                                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} tickFormatter={(value) => `${currencySymbol}${value / 1000}k`} />
                                 <Tooltip
@@ -216,7 +216,7 @@ const FinanceDashboardPage: React.FC = () => {
                                 name: summary?.offeringNames?.[id] || id.substring(0, 8),
                                 value: val
                             })).slice(0, 5)}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} />
                                 <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 10 }} />
                                 <Tooltip formatter={(val: any) => [format(val), 'Collection']} />
@@ -279,7 +279,7 @@ interface KPICardProps {
 
 const KPICard: React.FC<KPICardProps> = ({ title, value, icon, trend, trendType }) => (
     <div className="bg-surface p-6 rounded-2xl shadow-sm border border-border flex flex-col justify-between hover:shadow-md transition-all group relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110" />
+        <div className="absolute top-0 right-0 w-24 h-24 bg-brand-subtle rounded-bl-full -mr-10 -mt-10 transition-transform group-hover:scale-110" />
         <div className="flex justify-between items-start relative z-10">
             <div className="p-3 bg-chrome rounded-xl group-hover:bg-surface group-hover:shadow-sm transition-all">{icon}</div>
             <button className="text-gray-300 hover:text-content-secondary"><MoreVertical size={16} /></button>

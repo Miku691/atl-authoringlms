@@ -1,306 +1,261 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { 
-  format, 
-  addMonths, 
-  subMonths, 
-  startOfMonth, 
-  endOfMonth, 
-  startOfWeek, 
-  endOfWeek, 
-  isSameMonth, 
-  isSameDay, 
-  addDays, 
-  eachDayOfInterval,
-  isToday,
-  parseISO
+import {
+  addMonths, subMonths, startOfMonth, endOfMonth,
+  startOfWeek, endOfWeek, format
 } from 'date-fns';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Calendar as CalendarIcon, 
-  Plus, 
-  Clock, 
-  MapPin, 
-  Users, 
-  Filter,
-  GraduationCap,
-  CalendarCheck,
-  Megaphone
-} from 'lucide-react';
-import type { RootState } from '../../../store/store';
-import api from '../../../utils/api';
+import { type RootState } from '../../../store/store';
+import {
+  calendarService,
+  type CalendarEvent,
+  type CalendarEventType,
+} from '../../../api/calendarService';
 import toast from 'react-hot-toast';
 
-interface CalendarEvent {
-  id: String;
-  title: string;
-  description: string;
-  start: string;
-  end: string;
-  type: 'HOLIDAY' | 'CLASS' | 'EXAM' | 'EVENT' | 'MEETING';
-  color: string;
-  location: string;
-  allDay: boolean;
-  metadata?: any;
-}
+// Sub-components
+import CalendarHeader, { type CalendarViewMode } from './calendar/CalendarHeader';
+import CalendarGrid   from './calendar/CalendarGrid';
+import WeekView       from './calendar/WeekView';
+import DayView        from './calendar/DayView';
+import CalendarSidebar from './calendar/CalendarSidebar';
+import EventDetailDrawer from './calendar/EventDetailDrawer';
+import EventFormModal from './calendar/EventFormModal';
+import ConfirmationModal from '../../../components/common/ConfirmationModal';
+
+/** Derived role used for permission checks throughout the calendar */
+type CalendarRole = 'ADMIN' | 'INSTRUCTOR' | 'STUDENT';
+
+const ALL_FILTER_TYPES: CalendarEventType[] = ['HOLIDAY', 'CLASS', 'EXAM', 'EVENT', 'MEETING'];
 
 const InstituteCalendarPage: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
+
+  // ── Derived role ──────────────────────────────────────────────────────────
+  const calendarRole = useMemo<CalendarRole>(() => {
+    const roles = user?.roles || [];
+    if (roles.some(r => r.includes('ADMIN'))) return 'ADMIN';
+    if (roles.some(r => r.includes('INSTRUCTOR') || r.includes('TEACHER'))) return 'INSTRUCTOR';
+    return 'STUDENT';
+  }, [user?.roles]);
+
+  const canAddEvent   = calendarRole === 'ADMIN';
+  const canAddMeeting = calendarRole === 'INSTRUCTOR';
+
+  // ── Navigation & view state ───────────────────────────────────────────────
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [viewMode, setViewMode] = useState<CalendarViewMode>('month');
+
+  // ── Data state ────────────────────────────────────────────────────────────
+  const [events, setEvents]   = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(false);
-  const [viewFilter, setViewFilter] = useState<string[]>(['HOLIDAY', 'CLASS', 'EXAM', 'EVENT', 'MEETING']);
 
-  // Role check
-  const isAdmin = user?.roles?.includes('ADMIN') || user?.roles?.includes('SUPER_ADMIN');
+  // ── Filter state ──────────────────────────────────────────────────────────
+  const [viewFilter, setViewFilter] = useState<CalendarEventType[]>(ALL_FILTER_TYPES);
 
-  useEffect(() => {
-    fetchEvents();
-  }, [currentMonth, user]);
+  // ── Drawer / modal state ──────────────────────────────────────────────────
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
+  const [drawerOpen, setDrawerOpen]       = useState(false);
+  const [formOpen, setFormOpen]           = useState(false);
+  const [editingEvent, setEditingEvent]   = useState<CalendarEvent | null>(null);
+  const [deleteTarget, setDeleteTarget]   = useState<CalendarEvent | null>(null);
 
-  const fetchEvents = async () => {
+  // ── Data fetching ─────────────────────────────────────────────────────────
+  const fetchEvents = useCallback(async () => {
     if (!user?.tenantId) return;
     setLoading(true);
     try {
-      const start = format(startOfWeek(startOfMonth(currentMonth)), 'yyyy-MM-dd');
-      const end = format(endOfWeek(endOfMonth(currentMonth)), 'yyyy-MM-dd');
-      
-      const response = await api.get('/ims-academic-service/calendar/summary', {
-        params: {
-          tenantId: user.tenantId,
-          startDate: start,
-          endDate: end,
-          personId: user.id, // Assuming user.id is the personId (student/instructor id)
-          role: user.roles?.[0]
-        }
+      const monthStart = startOfMonth(currentMonth);
+      const monthEnd   = endOfMonth(currentMonth);
+      const start = format(startOfWeek(monthStart), 'yyyy-MM-dd');
+      const end   = format(endOfWeek(monthEnd), 'yyyy-MM-dd');
+
+      // Resolve personId from role
+      const personId =
+        calendarRole === 'INSTRUCTOR' ? (user.instructorId ?? user.id) :
+        calendarRole === 'STUDENT'    ? (user.studentId ?? user.id)    :
+        undefined;
+
+      const data = await calendarService.getEvents({
+        tenantId: user.tenantId,
+        startDate: start,
+        endDate: end,
+        personId: personId ?? undefined,
+        role: user.roles?.[0],
       });
-      
-      if (response.data.status === 'SUCCESS') {
-        setEvents(response.data.apiData);
-      }
-    } catch (error) {
-      console.error('Failed to fetch calendar events', error);
+      setEvents(data);
+    } catch (err) {
       toast.error('Failed to load calendar events');
     } finally {
       setLoading(false);
     }
+  }, [currentMonth, user, calendarRole]);
+
+  useEffect(() => { fetchEvents(); }, [fetchEvents]);
+
+  // ── Filtered events ───────────────────────────────────────────────────────
+  const filteredEvents = useMemo(
+    () => events.filter(e => viewFilter.includes(e.type as CalendarEventType)),
+    [events, viewFilter]
+  );
+
+  // ── Navigation handlers ───────────────────────────────────────────────────
+  const handlePrevMonth = () => {
+    const prev = subMonths(currentMonth, 1);
+    setCurrentMonth(prev);
+    setSelectedDate(prev);
+  };
+  const handleNextMonth = () => {
+    const next = addMonths(currentMonth, 1);
+    setCurrentMonth(next);
+    setSelectedDate(next);
+  };
+  const handleToday = () => {
+    const today = new Date();
+    setCurrentMonth(today);
+    setSelectedDate(today);
   };
 
-  const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
-  const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
+  // ── Interaction handlers ──────────────────────────────────────────────────
+  const handleEventClick = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setDrawerOpen(true);
+  };
 
-  // Calendar Grid Logic
-  const monthStart = startOfMonth(currentMonth);
-  const monthEnd = endOfMonth(monthStart);
-  const startDate = startOfWeek(monthStart);
-  const endDate = endOfWeek(monthEnd);
+  const handleAddEvent = () => {
+    setEditingEvent(null);
+    setFormOpen(true);
+  };
 
-  const days = useMemo(() => {
-    return eachDayOfInterval({ start: startDate, end: endDate });
-  }, [startDate, endDate]);
+  const handleEditEvent = (event: CalendarEvent) => {
+    setDrawerOpen(false);
+    setEditingEvent(event);
+    setFormOpen(true);
+  };
 
-  const toggleFilter = (type: string) => {
-    setViewFilter(prev => 
+  const handleDeletePrompt = (event: CalendarEvent) => {
+    setDrawerOpen(false);
+    setDeleteTarget(event);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget?.sourceId || !user?.tenantId) return;
+    try {
+      await calendarService.deleteEvent(user.tenantId, deleteTarget.sourceId);
+      toast.success('Event deleted');
+      setDeleteTarget(null);
+      fetchEvents();
+    } catch {
+      toast.error('Failed to delete event');
+    }
+  };
+
+  const toggleFilter = (type: CalendarEventType) =>
+    setViewFilter(prev =>
       prev.includes(type) ? prev.filter(t => t !== type) : [...prev, type]
     );
-  };
 
-  // Filtered Events Mapping
-  const filteredEvents = useMemo(() => {
-    return events.filter(e => viewFilter.includes(e.type));
-  }, [events, viewFilter]);
+  // ── Permission helpers for the selected event ─────────────────────────────
+  const canEditSelectedEvent = useMemo(() => {
+    if (!selectedEvent) return false;
+    if (!selectedEvent.sourceId) return false; // CLASS / EXAM = not editable
+    if (calendarRole === 'ADMIN') return true;
+    // Instructor can only edit their own MEETING
+    return (
+      calendarRole === 'INSTRUCTOR' &&
+      selectedEvent.type === 'MEETING' &&
+      selectedEvent.instructorId === (user?.instructorId ?? user?.id)
+    );
+  }, [selectedEvent, calendarRole, user]);
 
-  const getEventsForDay = (day: Date) => {
-    return filteredEvents.filter(event => isSameDay(parseISO(event.start), day));
-  };
-
-  const selectedDayEvents = useMemo(() => {
-    return getEventsForDay(selectedDate).sort((a, b) => a.start.localeCompare(b.start));
-  }, [selectedDate, filteredEvents]);
+  const canDeleteSelectedEvent = calendarRole === 'ADMIN' && !!selectedEvent?.sourceId;
 
   return (
-    <div className="flex flex-col h-[calc(100vh-120px)] bg-chrome/50 p-6 space-y-6 overflow-hidden">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-surface p-6 rounded-2xl border border-border shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600">
-            <CalendarIcon className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-content-primary">{format(currentMonth, 'MMMM yyyy')}</h1>
-            <p className="text-sm text-content-secondary">Institute Academic & Operations Calendar</p>
-          </div>
-        </div>
+    <div className="flex flex-col h-[calc(100vh-72px)] bg-chrome/30 p-4 gap-4 overflow-hidden">
+      {/* ── Header ── */}
+      <CalendarHeader
+        currentMonth={currentMonth}
+        viewMode={viewMode}
+        canAddEvent={canAddEvent}
+        canAddMeeting={canAddMeeting}
+        onPrevMonth={handlePrevMonth}
+        onNextMonth={handleNextMonth}
+        onToday={handleToday}
+        onViewChange={setViewMode}
+        onAddEvent={handleAddEvent}
+      />
 
-        <div className="flex items-center gap-3">
-          <div className="flex bg-chrome p-1 rounded-xl">
-            <button onClick={prevMonth} className="p-2 hover:bg-surface hover:shadow-sm rounded-lg transition-all text-content-secondary">
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button onClick={() => setCurrentMonth(new Date())} className="px-4 py-2 hover:bg-surface hover:shadow-sm rounded-lg transition-all text-sm font-semibold text-content-primary">
-              Today
-            </button>
-            <button onClick={nextMonth} className="p-2 hover:bg-surface hover:shadow-sm rounded-lg transition-all text-content-secondary">
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-          {isAdmin && (
-            <button className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100">
-              <Plus className="w-4 h-4" />
-              <span>Add Event</span>
-            </button>
-          )}
-        </div>
+      {/* ── Main content ── */}
+      <div className="flex flex-1 gap-4 overflow-hidden min-h-0">
+        {/* Calendar views */}
+        {viewMode === 'month' && (
+          <CalendarGrid
+            currentMonth={currentMonth}
+            selectedDate={selectedDate}
+            events={filteredEvents}
+            loading={loading}
+            onSelectDate={setSelectedDate}
+            onEventClick={handleEventClick}
+          />
+        )}
+        {viewMode === 'week' && (
+          <WeekView
+            selectedDate={selectedDate}
+            events={filteredEvents}
+            onSelectDate={d => { setSelectedDate(d); }}
+            onEventClick={handleEventClick}
+          />
+        )}
+        {viewMode === 'day' && (
+          <DayView
+            selectedDate={selectedDate}
+            events={filteredEvents}
+            onEventClick={handleEventClick}
+          />
+        )}
+
+        {/* Sidebar */}
+        <CalendarSidebar
+          selectedDate={selectedDate}
+          events={filteredEvents}
+          viewFilter={viewFilter}
+          onToggleFilter={toggleFilter}
+          onEventClick={handleEventClick}
+        />
       </div>
 
-      <div className="flex flex-1 gap-6 overflow-hidden">
-        {/* Main Calendar Grid */}
-        <div className="flex-1 bg-surface rounded-3xl border border-border shadow-xl shadow-gray-200/50 overflow-hidden flex flex-col">
-          {/* Week Days Header */}
-          <div className="grid grid-cols-7 border-b border-border bg-chrome/80">
-            {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(day => (
-              <div key={day} className="py-4 text-center text-xs font-bold text-content-muted tracking-widest uppercase">
-                {day}
-              </div>
-            ))}
-          </div>
+      {/* ── Event Detail Drawer ── */}
+      <EventDetailDrawer
+        event={selectedEvent}
+        isOpen={drawerOpen}
+        canEdit={canEditSelectedEvent}
+        canDelete={canDeleteSelectedEvent}
+        onClose={() => setDrawerOpen(false)}
+        onEdit={handleEditEvent}
+        onDelete={handleDeletePrompt}
+      />
 
-          {/* Days Grid */}
-          <div className="grid grid-cols-7 flex-1 overflow-y-auto">
-            {days.map((day, idx) => {
-              const dayEvents = getEventsForDay(day);
-              const isCurrentMonth = isSameMonth(day, monthStart);
-              const isSelected = isSameDay(day, selectedDate);
-              const isCurrentToday = isToday(day);
+      {/* ── Create / Edit Modal ── */}
+      <EventFormModal
+        isOpen={formOpen}
+        tenantId={user?.tenantId || ''}
+        editingEvent={editingEvent}
+        meetingOnly={calendarRole === 'INSTRUCTOR'}
+        defaultDate={selectedDate}
+        onClose={() => setFormOpen(false)}
+        onSaved={fetchEvents}
+      />
 
-              return (
-                <div 
-                  key={idx}
-                  onClick={() => setSelectedDate(day)}
-                  className={`min-h-[120px] p-2 border-r border-b border-border transition-all cursor-pointer group hover:bg-indigo-50/20
-                    ${!isCurrentMonth ? 'bg-chrome/40 opacity-40' : 'bg-surface'}
-                    ${isSelected ? 'ring-2 ring-inset ring-indigo-500 bg-indigo-50/30' : ''}
-                  `}
-                >
-                  <div className="flex justify-between items-start mb-1">
-                    <span className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-all
-                      ${isCurrentToday ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200' : 'text-content-primary'}
-                      ${isSelected && !isCurrentToday ? 'bg-indigo-100 text-indigo-700' : ''}
-                      group-hover:scale-110
-                    `}>
-                      {format(day, 'd')}
-                    </span>
-                  </div>
-
-                  {/* Event Dots/Mini Labels */}
-                  <div className="space-y-1">
-                    {dayEvents.slice(0, 3).map((event, eIdx) => (
-                      <div 
-                        key={eIdx}
-                        className="px-2 py-1 rounded-md text-[10px] font-bold truncate transition-all hover:brightness-95"
-                        style={{ backgroundColor: event.color + '15', color: event.color, borderLeft: `2.5px solid ${event.color}` }}
-                      >
-                        {event.title}
-                      </div>
-                    ))}
-                    {dayEvents.length > 3 && (
-                      <div className="text-[10px] text-content-muted font-bold pl-1">
-                        + {dayEvents.length - 3} more
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Sidebar: Selected Day Details & Filters */}
-        <div className="w-96 flex flex-col gap-6 h-full">
-          {/* Filters */}
-          <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
-            <div className="flex items-center gap-2 mb-4 text-content-primary">
-              <Filter className="w-5 h-5 text-indigo-500" />
-              <h3 className="font-bold">Layer Filters</h3>
-            </div>
-            <div className="space-y-2">
-              {[
-                { type: 'HOLIDAY', label: 'Holidays', icon: <Megaphone className="w-3.5 h-3.5" />, color: '#F59E0B' },
-                { type: 'CLASS', label: 'My Classes', icon: <GraduationCap className="w-3.5 h-3.5" />, color: '#4F46E5' },
-                { type: 'EXAM', label: 'Exams', icon: <CalendarCheck className="w-3.5 h-3.5" />, color: '#EF4444' },
-                { type: 'EVENT', label: 'Institute Events', icon: <Megaphone className="w-3.5 h-3.5" />, color: '#10B981' },
-                { type: 'MEETING', label: 'Meetings', icon: <Clock className="w-3.5 h-3.5" />, color: '#6366F1' }
-              ].map(f => (
-                <button
-                  key={f.type}
-                  onClick={() => toggleFilter(f.type)}
-                  className={`w-full flex items-center justify-between p-2 rounded-xl border transition-all
-                    ${viewFilter.includes(f.type) 
-                      ? 'border-transparent text-white shadow-sm' 
-                      : 'border-border text-content-secondary grayscale opacity-60'}
-                  `}
-                  style={{ backgroundColor: viewFilter.includes(f.type) ? f.color : 'transparent' }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`p-1.5 rounded-md ${viewFilter.includes(f.type) ? 'bg-surface/20' : 'bg-chrome'}`}>
-                      {f.icon}
-                    </div>
-                    <span className="text-xs font-bold uppercase tracking-wide">{f.label}</span>
-                  </div>
-                  {viewFilter.includes(f.type) && <div className="w-1.5 h-1.5 rounded-full bg-surface shadow-sm" />}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Selected Day Details */}
-          <div className="flex-1 bg-surface p-6 rounded-2xl border border-border shadow-sm flex flex-col overflow-hidden">
-            <div className="mb-6 flex justify-between items-center">
-              <div>
-                <h3 className="font-bold text-content-primary">{format(selectedDate, 'EEEE')}</h3>
-                <p className="text-sm text-content-secondary">{format(selectedDate, 'do MMMM')}</p>
-              </div>
-              <div className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg uppercase">
-                {selectedDayEvents.length} Tasks
-              </div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto space-y-4 pr-1 scroll-smooth">
-              {selectedDayEvents.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-40 text-center opacity-40">
-                  <CalendarIcon className="w-10 h-10 mb-2" />
-                  <p className="text-xs font-medium">No events for this day</p>
-                </div>
-              ) : (
-                selectedDayEvents.map((event, idx) => (
-                  <div key={idx} className="group relative pl-4 border-l-4 rounded-r-xl p-3 bg-chrome/50 hover:bg-indigo-50/30 transition-all border-l-indigo-500" style={{ borderLeftColor: event.color }}>
-                    <div className="flex justify-between items-start mb-1">
-                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-surface border border-border shadow-sm uppercase tracking-wide" style={{ color: event.color }}>
-                        {event.type}
-                      </span>
-                      {!event.allDay && (
-                        <div className="flex items-center gap-1 text-[10px] text-content-muted font-bold">
-                          <Clock className="w-3 h-3" />
-                          {format(parseISO(event.start), 'hh:mm a')}
-                        </div>
-                      )}
-                    </div>
-                    <h4 className="text-sm font-bold text-content-primary mb-1 leading-tight">{event.title}</h4>
-                    {event.location && (
-                      <div className="flex items-center gap-1.5 text-[10px] text-content-secondary font-medium">
-                        <MapPin className="w-3 h-3 text-content-muted" />
-                        {event.location}
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* ── Delete confirmation ── */}
+      <ConfirmationModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Calendar Event"
+        message={`Are you sure you want to delete "${deleteTarget?.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
   );
 };

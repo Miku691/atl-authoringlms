@@ -157,7 +157,7 @@ const AdminDashboardHome: React.FC = () => {
                     <button
                         key={idx}
                         onClick={() => navigate(action.path)}
-                        className="flex items-center gap-3 p-4 bg-surface rounded-2xl border border-border shadow-sm hover:shadow-md hover:border-indigo-100 transition-all group text-left"
+                        className="flex items-center gap-3 p-4 bg-surface rounded-2xl border border-border shadow-sm hover:shadow-md hover:border-brand-border transition-all group text-left"
                     >
                         <div className={`p-3 rounded-xl ${action.color} group-hover:scale-110 transition-transform`}>
                             <action.icon className="w-5 h-5" />
@@ -246,7 +246,7 @@ const AdminDashboardHome: React.FC = () => {
                             </div>
                         ) : (
                             announcements.map((item) => (
-                                <div key={item.id} className="p-5 border border-border rounded-2xl hover:bg-chrome/50 hover:border-indigo-100 transition-all group cursor-pointer relative">
+                                <div key={item.id} className="p-5 border border-border rounded-2xl hover:bg-chrome/50 hover:border-brand-border transition-all group cursor-pointer relative">
                                     <div className="absolute top-5 right-5">
                                         <div className={`text-[8px] font-black px-2 py-0.5 rounded-full border uppercase tracking-widest ${item.priority === 'URGENT' ? 'bg-rose-50 text-rose-600 border-rose-100/50' : 'bg-blue-50 text-blue-600 border-blue-100/50'
                                             }`}>

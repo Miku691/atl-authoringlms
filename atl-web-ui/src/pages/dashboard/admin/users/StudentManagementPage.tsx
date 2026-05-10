@@ -21,7 +21,6 @@ import {
     ChevronLeft,
     ChevronRight,
     Filter,
-    Plus,
     Layout
 } from 'lucide-react';
 import StudentDocumentsModal from './StudentDocumentsModal';
@@ -406,73 +405,62 @@ const StudentManagementPage: React.FC = () => {
                 description="Manage and monitor student records across the institution."
                 icon={GraduationCap}
                 actions={
-                    <button
-                        onClick={() => {
-                            setFormData(initialFormState);
-                            setSelectedStudentId(null);
-                            setIsModalOpen(true);
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm font-semibold"
-                    >
-                        <Plus className="w-4 h-4" /> Add Student
-                    </button>
+                    <div className="flex items-center gap-3">
+                        {/* Gender filter */}
+                        <div className="relative w-36">
+                            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted pointer-events-none" />
+                            <select
+                                className="pl-9 pr-3 py-2 block w-full border border-border rounded-lg bg-surface text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none cursor-pointer"
+                                value={genderFilter}
+                                onChange={(e) => {
+                                    setGenderFilter(e.target.value);
+                                    setCurrentPage(0);
+                                }}
+                            >
+                                <option value="">Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        {/* Offering filter */}
+                        <div className="relative w-44">
+                            <Layout className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted pointer-events-none" />
+                            <select
+                                className="pl-9 pr-3 py-2 block w-full border border-border rounded-lg bg-surface text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none cursor-pointer"
+                                value={offeringFilter}
+                                onChange={(e) => {
+                                    setOfferingFilter(e.target.value);
+                                    setCurrentPage(0);
+                                }}
+                            >
+                                <option value="">All Offerings</option>
+                                {offerings.map(o => (
+                                    <option key={o.id} value={o.id}>{o.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Search */}
+                        <div className="relative w-64">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <Search className="h-4 w-4 text-content-muted" />
+                            </div>
+                            <input
+                                type="text"
+                                className="block w-full pl-9 pr-3 py-2 border border-border rounded-lg bg-surface placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
+                                placeholder="Search students..."
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(0);
+                                }}
+                            />
+                        </div>
+                    </div>
                 }
             />
-
-            {/* Filters row */}
-            <div className="bg-surface p-4 rounded-xl shadow-sm border border-border flex flex-col md:flex-row gap-4 items-center">
-                <div className="relative flex-1">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-4 w-4 text-content-muted" />
-                    </div>
-                    <input
-                        type="text"
-                        className="block w-full pl-9 pr-3 py-2 border border-border rounded-lg bg-chrome placeholder-gray-400 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all sm:text-sm"
-                        placeholder="Search by name, email or admission no..."
-                        value={searchTerm}
-                        onChange={(e) => {
-                            setSearchTerm(e.target.value);
-                            setCurrentPage(0);
-                        }}
-                    />
-                </div>
-
-                <div className="flex items-center gap-3 w-full md:w-auto">
-                    <div className="relative flex-1 md:w-40">
-                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
-                        <select
-                            className="pl-9 pr-8 py-2 block w-full border border-border rounded-lg bg-chrome text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none cursor-pointer translate-y-0"
-                            value={genderFilter}
-                            onChange={(e) => {
-                                setGenderFilter(e.target.value);
-                                setCurrentPage(0);
-                            }}
-                        >
-                            <option value="">Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-
-                    <div className="relative flex-1 md:w-48">
-                        <Layout className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-content-muted" />
-                        <select
-                            className="pl-9 pr-8 py-2 block w-full border border-border rounded-lg bg-chrome text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none appearance-none cursor-pointer"
-                            value={offeringFilter}
-                            onChange={(e) => {
-                                setOfferingFilter(e.target.value);
-                                setCurrentPage(0);
-                            }}
-                        >
-                            <option value="">All Offerings</option>
-                            {offerings.map(o => (
-                                <option key={o.id} value={o.id}>{o.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-            </div>
 
             {/* Content Area */}
             <div className="bg-surface rounded-xl shadow-sm border border-border overflow-hidden">

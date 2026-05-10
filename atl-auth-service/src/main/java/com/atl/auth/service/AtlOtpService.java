@@ -53,7 +53,8 @@ public class AtlOtpService {
         atlRedisService.saveValueToRedisWithTTL(otpKey, otp, 5);
 
         // Send OTP via Notification Service
-        sendOtpEmail(email, otp);
+        //commented in dev mode
+        //sendOtpEmail(email, otp);
 
         return AtlSendOtpResponseDto.builder()
                 .username(userObj.getUsername())
@@ -78,7 +79,9 @@ public class AtlOtpService {
         String storedOtp = atlRedisService.getRedisValue(key);
 
         try {
-            isOtpValid = checkAndValidateOtp(storedOtp, verifyOtpDto.getOtp());
+            //commented in dev and making default isOtpValid as true
+            //isOtpValid = checkAndValidateOtp(storedOtp, verifyOtpDto.getOtp());
+            isOtpValid = true;
         } catch (OtpVerificationException e) {
             throw new CustomUnauthorizedException(e.getMessage());
         }
@@ -171,7 +174,8 @@ public class AtlOtpService {
         atlRedisService.saveValueToRedisWithTTL(otpKey, otp, 15);
 
         // Send OTP via Notification Service
-        sendRegistrationOtpEmail(email, otp);
+        //Comment as dev
+        //sendRegistrationOtpEmail(email, otp);
 
         return ApiResponse.<String>builder()
                 .message("OTP sent successfully to " + email)
@@ -208,16 +212,18 @@ public class AtlOtpService {
                     .build();
         }
 
-        if (!storedOtp.equals(verifyDto.getOtp())) {
-            return ApiResponse.<String>builder()
-                    .message("Invalid OTP")
-                    .status(ApplicationConstant.API_FAILED)
-                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                    .build();
-        }
+        //commented as dev
+//        if (!storedOtp.equals(verifyDto.getOtp())) {
+//            return ApiResponse.<String>builder()
+//                    .message("Invalid OTP")
+//                    .status(ApplicationConstant.API_FAILED)
+//                    .statusCode(HttpStatus.BAD_REQUEST.value())
+//                    .build();
+//        }
 
         // OTP is valid, mark as verified in Redis for 15 minutes
         String verifiedKey = ApplicationConstant.REG_VERIFIED_PREFIX + verifyDto.getEmail();
+
         atlRedisService.saveValueToRedisWithTTL(verifiedKey, "true", 15);
         
         // Remove the OTP key after successful verification

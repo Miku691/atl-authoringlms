@@ -132,9 +132,9 @@ const UpgradePlanPage: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className="hidden sm:flex items-center gap-2 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
+                        <div className="hidden sm:flex items-center gap-2 bg-brand-subtle px-3 py-1.5 rounded-full border border-brand-border">
                             <ShieldCheck className="w-4 h-4 text-indigo-600" />
-                            <span className="text-[10px] font-bold text-indigo-700 uppercase tracking-tight">Secure Payment</span>
+                            <span className="text-[10px] font-bold text-brand uppercase tracking-tight">Secure Payment</span>
                         </div>
                     </div>
                 </div>
@@ -199,10 +199,10 @@ const UpgradePlanPage: React.FC = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
-                                    className={`relative flex flex-col p-10 bg-surface rounded-[3rem] border-2 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-100 ${isHighlighted ? 'border-indigo-600' : 'border-border'}`}
+                                    className={`relative flex flex-col p-10 bg-surface rounded-[3rem] border-2 transition-all duration-500 hover:shadow-2xl hover:shadow-indigo-600/10 ${isHighlighted ? 'border-indigo-600' : 'border-border'}`}
                                 >
                                     {isHighlighted && (
-                                        <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-6 py-2 rounded-full shadow-lg shadow-indigo-200">
+                                        <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest px-6 py-2 rounded-full shadow-lg shadow-indigo-600/30">
                                             Most Popular
                                         </div>
                                     )}
@@ -247,8 +247,8 @@ const UpgradePlanPage: React.FC = () => {
                                         onClick={() => handleUpgrade(plan)}
                                         className={`w-full py-5 rounded-[1.5rem] text-sm font-black transition-all flex items-center justify-center gap-3 group ${
                                             isHighlighted
-                                                ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-100'
-                                                : 'bg-slate-900 text-white hover:bg-slate-800'
+                                                ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-xl shadow-indigo-600/20'
+                                                : 'bg-slate-900 text-white hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600'
                                         }`}
                                     >
                                         {processingId === plan.id ? (

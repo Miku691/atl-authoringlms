@@ -160,7 +160,7 @@ const FeeHeadManagementPage: React.FC = () => {
                                 <th className="px-6 py-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-100">
+                        <tbody className="divide-y divide-border">
                             {loading ? (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-12 text-center">
@@ -185,7 +185,7 @@ const FeeHeadManagementPage: React.FC = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-600 uppercase tracking-tight">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 uppercase tracking-tight">
                                                 Active
                                             </span>
                                         </td>
@@ -198,14 +198,14 @@ const FeeHeadManagementPage: React.FC = () => {
                                             <div className="flex justify-end gap-1 opacity-10 md:opacity-0 group-hover:opacity-100 transition-opacity">
                                                 <button
                                                     onClick={() => handleEdit(head)}
-                                                    className="p-2 text-content-muted hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                    className="p-2 text-content-muted hover:text-indigo-600 hover:bg-indigo-500/10 rounded-lg transition-colors"
                                                     title="Edit Head"
                                                 >
                                                     <Edit size={16} />
                                                 </button>
                                                 <button
                                                     onClick={() => confirmDelete(head)}
-                                                    className="p-2 text-content-muted hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                    className="p-2 text-content-muted hover:text-rose-600 hover:bg-rose-500/10 rounded-lg transition-colors"
                                                     title="Remove Head"
                                                 >
                                                     <Trash2 size={16} />

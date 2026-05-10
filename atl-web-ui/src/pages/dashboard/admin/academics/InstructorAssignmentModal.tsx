@@ -80,7 +80,7 @@ const InstructorAssignmentModal: React.FC<Props> = ({ isOpen, onClose, offeringI
             const instList = instRes.status === 'SUCCESS' && instRes.apiData
                 ? (Array.isArray(instRes.apiData) ? instRes.apiData : (instRes.apiData.content || []))
                 : [];
-            
+
             setAllInstructors(instList);
             setOfferingSubjects(subjectsRes.status === 'SUCCESS' && subjectsRes.apiData ? subjectsRes.apiData : []);
 

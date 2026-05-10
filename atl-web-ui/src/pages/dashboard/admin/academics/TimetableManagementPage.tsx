@@ -148,8 +148,8 @@ export default function TimetableManagementPage() {
             const instRes = await instructorService.getInstructorsByTenant(user.tenantId);
             if (instRes.status === 'SUCCESS' && instRes.apiData) {
                 // Defensive check: handle both direct array and Page structure
-                const instList = Array.isArray(instRes.apiData) 
-                    ? instRes.apiData 
+                const instList = Array.isArray(instRes.apiData)
+                    ? instRes.apiData
                     : (instRes.apiData.content || []);
 
                 const enriched = instList
