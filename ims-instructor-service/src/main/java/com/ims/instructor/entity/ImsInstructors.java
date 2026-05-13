@@ -17,6 +17,8 @@ import java.time.LocalDate;
         @Index(name = "idx_instructor_tenant", columnList = "tenant_id"),
         @Index(name = "idx_instructor_user", columnList = "user_id"),
         @Index(name = "idx_instructor_specialization", columnList = "specialization")
+}, uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"tenant_id", "employee_id"})
 })
 @Data
 @Builder

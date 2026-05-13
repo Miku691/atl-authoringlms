@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ImsInstructorsRepo extends JpaRepository<ImsInstructors, String> {
     boolean existsByUserId(String userId);
-    boolean existsByEmployeeId(String employeeId);
+    boolean existsByEmployeeIdAndTenantId(String employeeId, String tenantId);
 
     Optional<ImsInstructors> findByUserId(String userId);
 

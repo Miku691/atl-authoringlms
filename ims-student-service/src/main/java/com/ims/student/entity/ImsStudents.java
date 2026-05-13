@@ -16,6 +16,8 @@ import java.time.LocalDate;
 @Table(name = "IMS_STUDENTS", indexes = {
         @Index(name = "idx_students_tenant", columnList = "tenant_id"),
         @Index(name = "idx_students_admission_no", columnList = "admission_no")
+}, uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"tenant_id", "admission_no"})
 })
 @Data
 @Builder
@@ -54,7 +56,7 @@ public class ImsStudents {
     @Column(name = "blood_group", length = 10)
     private String bloodGroup;
 
-    @Column(name = "admission_no", unique = true)
+    @Column(name = "admission_no")
     private String admissionNo;
 
     @Column(name = "admission_date")

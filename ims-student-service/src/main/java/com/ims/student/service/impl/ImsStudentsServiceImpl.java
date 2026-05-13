@@ -61,7 +61,7 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
         if (dto.getPhone() != null && repo.existsByPhone(dto.getPhone())) {
             throw new ResourceAlreadyExistException(dto.getPhone(), "STUDENT", "Phone No");
         }
-        if (dto.getAdmissionNo() != null && repo.existsByAdmissionNo(dto.getAdmissionNo())) {
+        if (dto.getAdmissionNo() != null && repo.existsByAdmissionNoAndTenantId(dto.getAdmissionNo(), dto.getTenantId())) {
             throw new ResourceAlreadyExistException(dto.getAdmissionNo(), "STUDENT", "Admission No");
         }
 
@@ -95,7 +95,7 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
             throw new ResourceAlreadyExistException(dto.getPhone(), "STUDENT", "Phone No");
         }
         if (dto.getAdmissionNo() != null && !dto.getAdmissionNo().equals(existing.getAdmissionNo())
-                && repo.existsByAdmissionNo(dto.getAdmissionNo())) {
+                && repo.existsByAdmissionNoAndTenantId(dto.getAdmissionNo(), existing.getTenantId())) {
             throw new ResourceAlreadyExistException(dto.getAdmissionNo(), "STUDENT", "Admission No");
         }
 

@@ -3,6 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { studentService, type Student } from '../../../../../api/studentService';
 import { academicService } from '../../../../../api/academicService';
 import AuthenticatedAvatar from '../../../../../components/common/AuthenticatedAvatar';
+import { useSelector } from 'react-redux';
+import { type RootState } from '../../../../../store/store';
+import api from '../../../../../utils/api';
 import {
     User, Book, FileText, Activity, CreditCard, ArrowLeft,
     Mail, Phone, MapPin, Calendar, Droplet, UserCheck, Users, Loader2, X, Trash2, UserPlus, Info,
@@ -364,23 +367,89 @@ const PersonalInfoTab = ({ student, onUpdate }: { student: Student; onUpdate: ()
 };
 
 const AcademicTab = ({ studentId }: { studentId: string }) => {
+    const { user } = useSelector((state: RootState) => state.auth);
+    const tenantId = user?.tenantId;
+    const [tenantType, setTenantType] = useState<string>('SCHOOL');
     const [enrollments, setEnrollments] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const checkType = async () => {
+            if (!user) return;
+            if (user.tenantType) {
+                setTenantType(user.tenantType);
+            } else {
+                try {
+                    const res = await api.get('/ims-academic-service/readiness/status');
+                    if (res.data?.status === 'SUCCESS' && res.data?.apiData?.tenantType) {
+                        setTenantType(res.data.apiData.tenantType);
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch tenant type", err);
+                }
+            }
+        };
+        checkType();
+    }, [user]);
+
+    useEffect(() => {
+        if (!tenantId) return;
+
         const fetchAcademicData = async () => {
             try {
+                // Fetch enrollments
                 const res = await studentService.getStudentEnrollments(studentId);
+                
+                // Fetch dictionaries for resolving parent names
+                let programs: any[] = [];
+                let branches: any[] = [];
+                let years: any[] = [];
+                let courses: any[] = [];
+
+                if (tenantType === 'COLLEGE') {
+                    const [pRes, bRes, yRes] = await Promise.all([
+                        api.get(`/ims-academic-service/programs/tenant/${tenantId}`),
+                        api.get(`/ims-academic-service/branches/tenant/${tenantId}`),
+                        api.get(`/ims-academic-service/years/tenant/${tenantId}`)
+                    ]);
+                    if (pRes.data.status === 'SUCCESS') programs = pRes.data.apiData;
+                    if (bRes.data.status === 'SUCCESS') branches = bRes.data.apiData;
+                    if (yRes.data.status === 'SUCCESS') years = yRes.data.apiData;
+                } else if (tenantType === 'COACHING') {
+                    const [cRes] = await Promise.all([
+                        api.get(`/ims-academic-service/courses/tenant/${tenantId}`)
+                    ]);
+                    if (cRes.data.status === 'SUCCESS') courses = cRes.data.apiData;
+                }
+
                 if (res.status === 'SUCCESS') {
                     const rawEnrollments = res.apiData;
                     const enriched = await Promise.all(rawEnrollments.map(async (enr: any) => {
                         let offeringName = 'Unknown';
                         let sectionName = '';
+                        let parentName = '';
 
                         try {
                             if (enr.offeringId) {
                                 const offRes = await academicService.getOfferingById(enr.offeringId);
-                                if (offRes.status === 'SUCCESS') offeringName = offRes.apiData.name;
+                                if (offRes.status === 'SUCCESS') {
+                                    const offering = offRes.apiData;
+                                    offeringName = offering.name;
+                                    
+                                    if (tenantType === 'COLLEGE') {
+                                        const year = years.find((y: any) => y.id === offering.yearId);
+                                        if (year) {
+                                            const branch = branches.find((b: any) => b.id === year.branchId);
+                                            if (branch) {
+                                                const prog = programs.find((p: any) => p.id === branch.programId);
+                                                parentName = `${prog ? prog.title + ' - ' : ''}${branch.name}`;
+                                            }
+                                        }
+                                    } else if (tenantType === 'COACHING') {
+                                        const course = courses.find((c: any) => c.id === offering.courseId);
+                                        if (course) parentName = course.name;
+                                    }
+                                }
                             }
                             if (enr.sectionId) {
                                 const secRes = await academicService.getSectionById(enr.sectionId);
@@ -390,7 +459,7 @@ const AcademicTab = ({ studentId }: { studentId: string }) => {
                             console.warn("Failed to enrichment info", e);
                         }
 
-                        return { ...enr, offeringName, sectionName };
+                        return { ...enr, offeringName, sectionName, parentName };
                     }));
                     setEnrollments(enriched);
                 }
@@ -402,9 +471,65 @@ const AcademicTab = ({ studentId }: { studentId: string }) => {
             }
         };
         fetchAcademicData();
-    }, [studentId]);
+    }, [studentId, tenantId, tenantType]);
 
     if (loading) return <div className="p-4 text-content-secondary">Loading academic data...</div>;
+
+    const renderHeaders = () => {
+        if (tenantType === 'COLLEGE') {
+            return (
+                <>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Year</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Program / Branch</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Semester</th>
+                </>
+            );
+        } else if (tenantType === 'COACHING') {
+            return (
+                <>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Year</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Course</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Batch</th>
+                </>
+            );
+        } else {
+            return (
+                <>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Year</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Class</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Section</th>
+                </>
+            );
+        }
+    };
+
+    const renderRowCells = (enr: any) => {
+        if (tenantType === 'COLLEGE') {
+            return (
+                <>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-primary">{enr.academicYear}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-content-primary">{enr.parentName || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">{enr.offeringName}</td>
+                </>
+            );
+        } else if (tenantType === 'COACHING') {
+            return (
+                <>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-primary">{enr.academicYear}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-content-primary">{enr.parentName || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">{enr.offeringName}</td>
+                </>
+            );
+        } else {
+            return (
+                <>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-primary">{enr.academicYear}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-content-primary">{enr.offeringName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">{enr.sectionName || '-'}</td>
+                </>
+            );
+        }
+    };
 
     return (
         <div className="bg-surface rounded-xl shadow-sm border border-border p-6">
@@ -415,9 +540,7 @@ const AcademicTab = ({ studentId }: { studentId: string }) => {
                 <table className="min-w-full divide-y divide-border">
                     <thead className="bg-chrome">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Year</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Class</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Section</th>
+                            {renderHeaders()}
                             <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Roll No</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase">Status</th>
                         </tr>
@@ -428,9 +551,7 @@ const AcademicTab = ({ studentId }: { studentId: string }) => {
                         ) : (
                             enrollments.map(enr => (
                                 <tr key={enr.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-primary">{enr.academicYear}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-content-primary">{enr.offeringName}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">{enr.sectionName || '-'}</td>
+                                    {renderRowCells(enr)}
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">{enr.rollNo || '-'}</td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${enr.status === 'ACTIVE' ? 'bg-green-500/10 text-green-600' : 'bg-chrome text-content-primary'

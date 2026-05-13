@@ -35,8 +35,8 @@ public class ImsStaffServiceImpl implements ImsStaffService {
     public ImsStaffDto create(ImsStaffDto dto) {
 
         if (dto.getEmployeeId() == null || dto.getEmployeeId().isEmpty()) {
-            dto.setEmployeeId(generateUniqueEmployeeId());
-        } else if (repo.existsByEmployeeId(dto.getEmployeeId())) {
+            dto.setEmployeeId(generateUniqueEmployeeId(dto.getTenantId()));
+        } else if (repo.existsByEmployeeIdAndTenantId(dto.getEmployeeId(), dto.getTenantId())) {
             throw new ResourceAlreadyExistException(dto.getEmployeeId(), "STAFF", "Employee ID");
         }
 
@@ -82,8 +82,12 @@ public class ImsStaffServiceImpl implements ImsStaffService {
         }
 
         // Broad profile fields
-        if (dto.getEmployeeId() != null)
+        if (dto.getEmployeeId() != null && !dto.getEmployeeId().equals(existing.getEmployeeId())) {
+            if (repo.existsByEmployeeIdAndTenantId(dto.getEmployeeId(), existing.getTenantId())) {
+                throw new ResourceAlreadyExistException(dto.getEmployeeId(), "STAFF", "Employee ID");
+            }
             existing.setEmployeeId(dto.getEmployeeId());
+        }
         if (dto.getJoinDate() != null)
             existing.setJoinDate(dto.getJoinDate());
         if (dto.getDob() != null)
@@ -167,7 +171,7 @@ public class ImsStaffServiceImpl implements ImsStaffService {
         }
     }
 
-    private String generateUniqueEmployeeId() {
+    private String generateUniqueEmployeeId(String tenantId) {
         String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         java.security.SecureRandom random = new java.security.SecureRandom();
         String code;
@@ -177,7 +181,7 @@ public class ImsStaffServiceImpl implements ImsStaffService {
                 sb.append(base.charAt(random.nextInt(base.length())));
             }
             code = com.ims.staff.util.ApplicationConstant.EMP_ID_PREFIX + sb.toString();
-        } while (repo.existsByEmployeeId(code));
+        } while (repo.existsByEmployeeIdAndTenantId(code, tenantId));
         return code;
     }
 }

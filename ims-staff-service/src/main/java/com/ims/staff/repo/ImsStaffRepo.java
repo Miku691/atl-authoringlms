@@ -12,7 +12,7 @@ public interface ImsStaffRepo extends JpaRepository<ImsStaff, String> {
     boolean existsByPhone(String phone);
 
     boolean existsByEmail(String email);
-    boolean existsByEmployeeId(String employeeId);
+    boolean existsByEmployeeIdAndTenantId(String employeeId, String tenantId);
 
     List<ImsStaff> findByTenantId(String tenantId);
 

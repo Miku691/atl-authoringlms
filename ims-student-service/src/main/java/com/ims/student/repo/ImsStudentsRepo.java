@@ -16,7 +16,7 @@ public interface ImsStudentsRepo extends JpaRepository<ImsStudents, String> {
 
     boolean existsByPhone(String phone);
 
-    boolean existsByAdmissionNo(String admissionNo);
+    boolean existsByAdmissionNoAndTenantId(String admissionNo, String tenantId);
 
     Optional<ImsStudents> findByEmail(String email);
 

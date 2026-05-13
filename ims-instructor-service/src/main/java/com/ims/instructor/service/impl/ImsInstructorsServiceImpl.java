@@ -50,8 +50,8 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
         }
 
         if (dto.getEmployeeId() == null || dto.getEmployeeId().isEmpty()) {
-            dto.setEmployeeId(generateUniqueEmployeeId());
-        } else if (repo.existsByEmployeeId(dto.getEmployeeId())) {
+            dto.setEmployeeId(generateUniqueEmployeeId(dto.getTenantId()));
+        } else if (repo.existsByEmployeeIdAndTenantId(dto.getEmployeeId(), dto.getTenantId())) {
             throw new ResourceAlreadyExistException(dto.getEmployeeId(), "INSTRUCTOR", "Employee ID");
         }
 
@@ -75,6 +75,11 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
         existing.setLastName(dto.getLastName());
         existing.setEmail(dto.getEmail());
         existing.setPhone(dto.getPhone());
+        
+        if (dto.getEmployeeId() != null && !dto.getEmployeeId().equals(existing.getEmployeeId())
+                && repo.existsByEmployeeIdAndTenantId(dto.getEmployeeId(), existing.getTenantId())) {
+            throw new ResourceAlreadyExistException(dto.getEmployeeId(), "INSTRUCTOR", "Employee ID");
+        }
         existing.setEmployeeId(dto.getEmployeeId());
         existing.setDob(dto.getDob());
         existing.setGender(dto.getGender());
@@ -171,7 +176,7 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
         }
     }
 
-    private String generateUniqueEmployeeId() {
+    private String generateUniqueEmployeeId(String tenantId) {
         String base = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         java.security.SecureRandom random = new java.security.SecureRandom();
         String code;
@@ -181,7 +186,7 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
                 sb.append(base.charAt(random.nextInt(base.length())));
             }
             code = com.ims.instructor.util.ApplicationConstant.EMP_ID_PREFIX + sb.toString();
-        } while (repo.existsByEmployeeId(code));
+        } while (repo.existsByEmployeeIdAndTenantId(code, tenantId));
         return code;
     }
 }

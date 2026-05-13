@@ -19,6 +19,36 @@ interface ImsClass {
     name: string;
 }
 
+interface Program {
+    id: string;
+    title: string;
+}
+
+interface ImsBranch {
+    id: string;
+    name: string;
+    programId?: string;
+}
+
+interface ImsYear {
+    id: string;
+    name: string;
+    branchId: string;
+    yearNumber: number;
+}
+
+interface ImsCourse {
+    id: string;
+    name: string;
+}
+
+interface Offering {
+    id: string;
+    name: string;
+    yearId?: string;
+    courseId?: string;
+}
+
 const AddStudentPage: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useSelector((state: RootState) => state.auth);
@@ -26,11 +56,19 @@ const AddStudentPage: React.FC = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [actualTenantType, setActualTenantType] = useState<string | null>(null);
 
     // Initial Data
     const [classes, setClasses] = useState<ImsClass[]>([]);
     const [sections, setSections] = useState<Section[]>([]);
     const [availableSections, setAvailableSections] = useState<Section[]>([]);
+    
+    // College & Coaching Data
+    const [programs, setPrograms] = useState<Program[]>([]);
+    const [branches, setBranches] = useState<ImsBranch[]>([]);
+    const [years, setYears] = useState<ImsYear[]>([]);
+    const [courses, setCourses] = useState<ImsCourse[]>([]);
+    const [offerings, setOfferings] = useState<Offering[]>([]);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -47,9 +85,20 @@ const AddStudentPage: React.FC = () => {
         religion: '',
         address: '',
 
-        // Academic
+        // Academic (School)
         selectedClassId: '',
         selectedSectionId: '',
+        
+        // Academic (College)
+        selectedProgramId: '',
+        selectedBranchId: '',
+        selectedYearId: '',
+        
+        // Academic (Coaching)
+        selectedCourseId: '',
+        
+        // Shared Offering
+        selectedOfferingId: '',
         rollNo: '',
 
         // Phase 1 Additional Fields
@@ -67,34 +116,73 @@ const AddStudentPage: React.FC = () => {
     });
 
     useEffect(() => {
-        if (tenantId) {
-            fetchAcademicData();
-        }
-    }, [tenantId]);
+        const checkType = async () => {
+            if (!user) return;
+            if (user.tenantType) {
+                setActualTenantType(user.tenantType);
+                return;
+            }
+            try {
+                const res = await api.get('/ims-academic-service/readiness/status');
+                if (res.data?.status === 'SUCCESS' && res.data?.apiData?.tenantType) {
+                    setActualTenantType(res.data.apiData.tenantType);
+                } else {
+                    setActualTenantType('SCHOOL');
+                }
+            } catch (err) {
+                console.error("Failed to fetch readiness type", err);
+                setActualTenantType('SCHOOL');
+            }
+        };
+        checkType();
+    }, [user]);
 
     useEffect(() => {
-        if (formData.selectedClassId) {
+        if (tenantId && actualTenantType) {
+            fetchAcademicData();
+        }
+    }, [tenantId, actualTenantType]);
+
+    useEffect(() => {
+        if (formData.selectedClassId && actualTenantType === 'SCHOOL') {
             const classSections = sections.filter(s => s.classId === formData.selectedClassId);
             setAvailableSections(classSections);
-            setFormData(prev => ({ ...prev, selectedSectionId: '' }));
         } else {
             setAvailableSections([]);
         }
-    }, [formData.selectedClassId, sections]);
+    }, [formData.selectedClassId, sections, actualTenantType]);
 
 
     const fetchAcademicData = async () => {
         setIsLoading(true);
         try {
-            const [classRes, secRes] = await Promise.all([
-                api.get(`/ims-academic-service/classes/tenant/${tenantId}`),
-                api.get(`/ims-academic-service/sections/tenant/${tenantId}`)
-            ]);
-
-            if (classRes.data.status === 'SUCCESS') setClasses(classRes.data.apiData);
-            if (secRes.data.status === 'SUCCESS') setSections(secRes.data.apiData);
-            else setSections([]);
-
+            if (actualTenantType === 'COLLEGE') {
+                const [progRes, branchRes, yearRes, offRes] = await Promise.all([
+                    api.get(`/ims-academic-service/programs/tenant/${tenantId}`),
+                    api.get(`/ims-academic-service/branches/tenant/${tenantId}`),
+                    api.get(`/ims-academic-service/years/tenant/${tenantId}`),
+                    api.get(`/ims-academic-service/offerings/tenant/${tenantId}`)
+                ]);
+                if (progRes.data.status === 'SUCCESS') setPrograms(progRes.data.apiData);
+                if (branchRes.data.status === 'SUCCESS') setBranches(branchRes.data.apiData);
+                if (yearRes.data.status === 'SUCCESS') setYears(yearRes.data.apiData);
+                if (offRes.data.status === 'SUCCESS') setOfferings(offRes.data.apiData);
+            } else if (actualTenantType === 'COACHING') {
+                const [courseRes, offRes] = await Promise.all([
+                    api.get(`/ims-academic-service/courses/tenant/${tenantId}`),
+                    api.get(`/ims-academic-service/offerings/tenant/${tenantId}`)
+                ]);
+                if (courseRes.data.status === 'SUCCESS') setCourses(courseRes.data.apiData);
+                if (offRes.data.status === 'SUCCESS') setOfferings(offRes.data.apiData);
+            } else {
+                const [classRes, secRes] = await Promise.all([
+                    api.get(`/ims-academic-service/classes/tenant/${tenantId}`),
+                    api.get(`/ims-academic-service/sections/tenant/${tenantId}`)
+                ]);
+                if (classRes.data.status === 'SUCCESS') setClasses(classRes.data.apiData);
+                if (secRes.data.status === 'SUCCESS') setSections(secRes.data.apiData);
+                else setSections([]);
+            }
         } catch (error) {
             console.error(error);
             toast.error("Failed to load academic data. Please ensure academic structure is set up.");
@@ -112,10 +200,40 @@ const AddStudentPage: React.FC = () => {
         }
     };
 
+    const handleAcademicSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => {
+            const newData = { ...prev, [name]: value };
+            if (name === 'selectedProgramId') {
+                newData.selectedBranchId = '';
+                newData.selectedYearId = '';
+                newData.selectedOfferingId = '';
+            } else if (name === 'selectedBranchId') {
+                newData.selectedYearId = '';
+                newData.selectedOfferingId = '';
+            } else if (name === 'selectedYearId') {
+                newData.selectedOfferingId = '';
+            } else if (name === 'selectedCourseId') {
+                newData.selectedOfferingId = '';
+            } else if (name === 'selectedClassId') {
+                newData.selectedSectionId = '';
+            }
+            return newData;
+        });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!formData.selectedClassId) {
+        if (actualTenantType === 'SCHOOL' && !formData.selectedClassId) {
             toast.error("Please select a Class");
+            return;
+        }
+        if (actualTenantType === 'COLLEGE' && !formData.selectedOfferingId) {
+            toast.error("Please select a Semester");
+            return;
+        }
+        if (actualTenantType === 'COACHING' && !formData.selectedOfferingId) {
+            toast.error("Please select a Batch");
             return;
         }
 
@@ -154,20 +272,23 @@ const AddStudentPage: React.FC = () => {
                 const studentId = studentRes.data.apiData.id;
 
                 // 2. Create Enrollment
-                const selectedClass = classes.find(c => c.id === formData.selectedClassId);
-                if (!selectedClass) {
-                    throw new Error("Invalid Class Selection");
-                }
-
-                // Find offeringId from selected section, or find default section 'A'
                 let targetOfferingId = '';
-                if (formData.selectedSectionId) {
-                    const sec = sections.find(s => s.id === formData.selectedSectionId);
-                    if (sec) targetOfferingId = sec.offeringId;
+                
+                if (actualTenantType === 'SCHOOL') {
+                    const selectedClass = classes.find(c => c.id === formData.selectedClassId);
+                    if (!selectedClass) {
+                        throw new Error("Invalid Class Selection");
+                    }
+
+                    if (formData.selectedSectionId) {
+                        const sec = sections.find(s => s.id === formData.selectedSectionId);
+                        if (sec) targetOfferingId = sec.offeringId;
+                    } else {
+                        const defaultSec = sections.find(s => s.classId === formData.selectedClassId && s.name === 'A');
+                        if (defaultSec) targetOfferingId = defaultSec.offeringId;
+                    }
                 } else {
-                    // Fallback to section 'A' for this class
-                    const defaultSec = sections.find(s => s.classId === formData.selectedClassId && s.name === 'A');
-                    if (defaultSec) targetOfferingId = defaultSec.offeringId;
+                    targetOfferingId = formData.selectedOfferingId;
                 }
 
                 if (!targetOfferingId) {
@@ -179,7 +300,7 @@ const AddStudentPage: React.FC = () => {
                 await api.post('/ims-student-service/enrollments', {
                     studentId,
                     offeringId: targetOfferingId,
-                    sectionId: formData.selectedSectionId || null,
+                    sectionId: actualTenantType === 'SCHOOL' ? (formData.selectedSectionId || null) : null,
                     academicYear: new Date().getFullYear() + '-' + (new Date().getFullYear() + 1),
                     rollNo: formData.rollNo ? parseInt(formData.rollNo) : null,
                     status: 'ACTIVE'
@@ -220,37 +341,141 @@ const AddStudentPage: React.FC = () => {
                     <h3 className="text-lg font-semibold text-indigo-600 mb-4 flex items-center gap-2">
                         <BookOpen className="w-5 h-5" /> Academic Enrollment
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div>
-                            <label className="block text-sm font-medium text-content-primary">Class <span className="text-red-500">*</span></label>
-                            <select
-                                name="selectedClassId"
-                                value={formData.selectedClassId}
-                                onChange={handleChange}
-                                className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500"
-                                required
-                            >
-                                <option value="">Select Class</option>
-                                {classes.map(c => (
-                                    <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-content-primary">Section</label>
-                            <select
-                                name="selectedSectionId"
-                                value={formData.selectedSectionId}
-                                onChange={handleChange}
-                                className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
-                                disabled={availableSections.length === 0}
-                            >
-                                <option value="">{availableSections.length === 0 ? 'No Sections' : 'Select Section'}</option>
-                                {availableSections.map(s => (
-                                    <option key={s.id} value={s.id}>{s.name}</option>
-                                ))}
-                            </select>
-                        </div>
+                    <div className={`grid grid-cols-1 md:grid-cols-2 ${actualTenantType === 'COLLEGE' ? 'lg:grid-cols-3' : 'lg:grid-cols-4'} gap-6`}>
+                        {actualTenantType === 'COLLEGE' && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium text-content-primary">Program <span className="text-red-500">*</span></label>
+                                    <select
+                                        name="selectedProgramId"
+                                        value={formData.selectedProgramId}
+                                        onChange={handleAcademicSelectChange}
+                                        className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500"
+                                        required
+                                    >
+                                        <option value="">Select Program</option>
+                                        {programs.map(p => <option key={p.id} value={p.id}>{p.title}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-content-primary">Branch <span className="text-red-500">*</span></label>
+                                    <select
+                                        name="selectedBranchId"
+                                        value={formData.selectedBranchId}
+                                        onChange={handleAcademicSelectChange}
+                                        className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                                        required
+                                        disabled={!formData.selectedProgramId}
+                                    >
+                                        <option value="">Select Branch</option>
+                                        {branches.filter(b => b.programId === formData.selectedProgramId).map(b => (
+                                            <option key={b.id} value={b.id}>{b.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-content-primary">Year <span className="text-red-500">*</span></label>
+                                    <select
+                                        name="selectedYearId"
+                                        value={formData.selectedYearId}
+                                        onChange={handleAcademicSelectChange}
+                                        className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                                        required
+                                        disabled={!formData.selectedBranchId}
+                                    >
+                                        <option value="">Select Year</option>
+                                        {years.filter(y => y.branchId === formData.selectedBranchId).sort((a,b)=>a.yearNumber - b.yearNumber).map(y => (
+                                            <option key={y.id} value={y.id}>{y.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-content-primary">Semester <span className="text-red-500">*</span></label>
+                                    <select
+                                        name="selectedOfferingId"
+                                        value={formData.selectedOfferingId}
+                                        onChange={handleAcademicSelectChange}
+                                        className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                                        required
+                                        disabled={!formData.selectedYearId}
+                                    >
+                                        <option value="">Select Semester</option>
+                                        {offerings.filter(o => o.yearId === formData.selectedYearId).map(o => (
+                                            <option key={o.id} value={o.id}>{o.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </>
+                        )}
+
+                        {actualTenantType === 'COACHING' && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium text-content-primary">Course <span className="text-red-500">*</span></label>
+                                    <select
+                                        name="selectedCourseId"
+                                        value={formData.selectedCourseId}
+                                        onChange={handleAcademicSelectChange}
+                                        className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500"
+                                        required
+                                    >
+                                        <option value="">Select Course</option>
+                                        {courses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-content-primary">Batch <span className="text-red-500">*</span></label>
+                                    <select
+                                        name="selectedOfferingId"
+                                        value={formData.selectedOfferingId}
+                                        onChange={handleAcademicSelectChange}
+                                        className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                                        required
+                                        disabled={!formData.selectedCourseId}
+                                    >
+                                        <option value="">Select Batch</option>
+                                        {offerings.filter(o => o.courseId === formData.selectedCourseId).map(o => (
+                                            <option key={o.id} value={o.id}>{o.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </>
+                        )}
+
+                        {actualTenantType === 'SCHOOL' && (
+                            <>
+                                <div>
+                                    <label className="block text-sm font-medium text-content-primary">Class <span className="text-red-500">*</span></label>
+                                    <select
+                                        name="selectedClassId"
+                                        value={formData.selectedClassId}
+                                        onChange={handleAcademicSelectChange}
+                                        className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500"
+                                        required
+                                    >
+                                        <option value="">Select Class</option>
+                                        {classes.map(c => (
+                                            <option key={c.id} value={c.id}>{c.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-content-primary">Section</label>
+                                    <select
+                                        name="selectedSectionId"
+                                        value={formData.selectedSectionId}
+                                        onChange={handleAcademicSelectChange}
+                                        className="mt-1 w-full p-2 rounded border border-indigo-500/20 bg-surface focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+                                        disabled={availableSections.length === 0}
+                                    >
+                                        <option value="">{availableSections.length === 0 && formData.selectedClassId ? 'No Sections' : 'Select Section'}</option>
+                                        {availableSections.map(s => (
+                                            <option key={s.id} value={s.id}>{s.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </>
+                        )}
                         <div>
                             <label className="block text-sm font-medium text-content-primary">Roll Number</label>
                             <input

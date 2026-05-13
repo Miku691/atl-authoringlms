@@ -18,6 +18,8 @@ import java.time.Instant;
         @Index(name = "idx_staff_tenant", columnList = "tenant_id"),
         @Index(name = "idx_staff_user", columnList = "user_id"),
         @Index(name = "idx_staff_contact", columnList = "phone")
+}, uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"tenant_id", "employee_id"})
 })
 @Data
 @Builder
