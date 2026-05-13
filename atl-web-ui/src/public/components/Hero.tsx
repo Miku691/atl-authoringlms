@@ -98,7 +98,10 @@ const Hero: React.FC<HeroProps> = ({ onBookDemo }) => {
               <button
                 id="hero-cta-start"
                 onClick={() => navigate('/register-institute')}
-                className="flex items-center gap-2 px-8 py-4 text-[15px] font-semibold text-white rounded-full bg-brand hover:bg-brand-hover transition-all duration-150 group shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="flex items-center gap-2 px-8 py-4 text-[15px] font-semibold rounded-full transition-all duration-150 group shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                style={{ background: 'var(--brand)', color: '#FFFFFF' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--brand-hover)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--brand)')}
               >
                 Start for Free
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />

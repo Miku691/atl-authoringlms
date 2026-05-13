@@ -67,6 +67,7 @@ import DemoLeadsPage from './pages/dashboard/platform/DemoLeadsPage';
 import MyProfilePage from './pages/dashboard/student/MyProfilePage';
 import MyAcademicsPage from './pages/dashboard/student/MyAcademicsPage';
 import MyTimetablePage from './pages/dashboard/student/MyTimetablePage';
+import MyExamsPage from './pages/dashboard/student/MyExamsPage';
 import MySyllabusPage from './pages/dashboard/student/MySyllabusPage';
 import MyAttendancePage from './pages/dashboard/student/MyAttendancePage';
 import MyAssignmentsPage from './pages/dashboard/student/MyAssignmentsPage';
@@ -203,6 +204,7 @@ const App: React.FC = () => {
               <Route path="/student/profile" element={<MyProfilePage />} />
               <Route path="/student/academics" element={<MyAcademicsPage />} />
               <Route path="/student/timetable" element={<MyTimetablePage />} />
+              <Route path="/student/exams" element={<MyExamsPage />} />
               <Route path="/student/syllabus" element={<MySyllabusPage />} />
               <Route path="/student/attendance" element={<MyAttendancePage />} />
               <Route path="/student/assignments" element={<MyAssignmentsPage />} />

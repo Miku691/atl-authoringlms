@@ -11,9 +11,13 @@ import {
     AlertCircle,
     Clock,
     FileText,
-    Trophy
+    Trophy,
+    Edit3, 
+    CalendarDays, 
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import MarksEntryGrid from './MarksEntryGrid';
+import Modal from '../../../components/common/Modal';
 
 export default function ExamManagementPage() {
     const { user } = useSelector((state: RootState) => state.auth);
@@ -28,6 +32,19 @@ export default function ExamManagementPage() {
     const [offerings, setOfferings] = useState<ImsOffering[]>([]);
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [schedules, setSchedules] = useState<ExamSchedule[]>([]);
+
+    // Modal States
+    const [isExamModalOpen, setIsExamModalOpen] = useState(false);
+    const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
+    
+    // Grading State
+    const [gradingSchedule, setGradingSchedule] = useState<ExamSchedule | null>(null);
+
+    // Form States
+    const [examForm, setExamForm] = useState({ examName: '', examType: 'INTERNAL', description: '' });
+    const [scheduleForm, setScheduleForm] = useState({
+        offeringId: '', subjectId: '', examDate: '', startTime: '', endTime: '', maxMarks: 100, passMarks: 40, roomNumber: ''
+    });
 
     useEffect(() => {
         if (user?.tenantId) {
@@ -61,6 +78,7 @@ export default function ExamManagementPage() {
             
             const current = sessionsRes?.find((s: any) => s.isCurrent);
             if (current) setSelectedSessionId(current.id);
+            else if (sessionsRes?.length > 0) setSelectedSessionId(sessionsRes[0].id);
         } catch (err) {
             toast.error("Failed to load global data");
         } finally {
@@ -101,6 +119,50 @@ export default function ExamManagementPage() {
         }
     };
 
+    const handleCreateExam = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user?.tenantId) {
+            toast.error("Tenant context missing");
+            return;
+        }
+        if (!selectedSessionId) {
+            toast.error("Please select an academic session first");
+            return;
+        }
+        try {
+            await examService.createExam({
+                ...examForm,
+                tenantId: user.tenantId,
+                academicSessionId: selectedSessionId,
+                isPublished: false
+            });
+            toast.success("Exam created successfully!");
+            setIsExamModalOpen(false);
+            setExamForm({ examName: '', examType: 'INTERNAL', description: '' });
+            fetchExams();
+        } catch (err) {
+            toast.error("Failed to create exam");
+        }
+    };
+
+    const handleCreateSchedule = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user?.tenantId || !selectedExamId) return;
+        try {
+            await examService.createSchedule({
+                ...scheduleForm,
+                examMasterId: selectedExamId,
+                tenantId: user.tenantId
+            });
+            toast.success("Schedule added successfully!");
+            setIsScheduleModalOpen(false);
+            setScheduleForm({ offeringId: '', subjectId: '', examDate: '', startTime: '', endTime: '', maxMarks: 100, passMarks: 40, roomNumber: '' });
+            fetchSchedules();
+        } catch (err) {
+            toast.error("Failed to add schedule");
+        }
+    };
+
     if (loading) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh]">
@@ -133,7 +195,10 @@ export default function ExamManagementPage() {
                         >
                             {sessions.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                         </select>
-                        <button className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-900 transition-all shadow-lg flex items-center gap-2">
+                        <button 
+                            onClick={() => setIsExamModalOpen(true)}
+                            className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-900 transition-all shadow-lg flex items-center gap-2"
+                        >
                             <Plus className="w-4 h-4" />
                             New Exam
                         </button>
@@ -225,13 +290,21 @@ export default function ExamManagementPage() {
                             </div>
                         </div>
                         <button 
-                            className="w-full md:w-auto bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
+                            onClick={() => setIsScheduleModalOpen(true)}
+                            className="w-full md:w-auto bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-slate-900 transition-all shadow-lg"
                         >
                             <Plus className="w-4 h-4" />
                             Add Schedule
                         </button>
                     </div>
 
+                    {gradingSchedule ? (
+                        <MarksEntryGrid 
+                            schedule={gradingSchedule} 
+                            offeringName={offerings.find(o => o.id === gradingSchedule.offeringId)?.name || 'Unknown Offering'} 
+                            onBack={() => setGradingSchedule(null)} 
+                        />
+                    ) : (
                     <div className="bg-surface rounded-3xl border border-border shadow-sm overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
@@ -274,7 +347,13 @@ export default function ExamManagementPage() {
                                                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-600 rounded text-[9px] font-black uppercase border border-emerald-100">Scheduled</span>
                                             </td>
                                             <td className="px-8 py-5 text-right">
-                                                <button className="text-slate-300 hover:text-content-primary"><MoreHorizontal className="w-5 h-5" /></button>
+                                                <button 
+                                                    onClick={() => setGradingSchedule(sch)}
+                                                    className="bg-slate-100 hover:bg-indigo-50 text-indigo-600 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-colors flex items-center gap-1 ml-auto"
+                                                >
+                                                    <Edit3 className="w-3 h-3" />
+                                                    Marks
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -282,8 +361,200 @@ export default function ExamManagementPage() {
                             </table>
                         </div>
                     </div>
+                    )}
                 </div>
             )}
+
+            {/* New Exam Modal */}
+            <Modal
+                isOpen={isExamModalOpen}
+                onClose={() => setIsExamModalOpen(false)}
+                title="Create New Exam"
+                subtitle="Define a new assessment event"
+                icon={<Trophy size={18} />}
+                iconVariant="info"
+                size="sm"
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => setIsExamModalOpen(false)}
+                            className="modal-btn-secondary"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            form="exam-form"
+                            className="modal-btn-primary"
+                        >
+                            Create Exam
+                        </button>
+                    </>
+                }
+            >
+                <form id="exam-form" onSubmit={handleCreateExam} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Exam Name <span className="text-red-500">*</span></label>
+                        <input
+                            type="text"
+                            required
+                            value={examForm.examName}
+                            onChange={(e) => setExamForm({ ...examForm, examName: e.target.value })}
+                            className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                            placeholder="e.g. Mid-Term Fall 2026"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Exam Type <span className="text-red-500">*</span></label>
+                        <select
+                            value={examForm.examType}
+                            onChange={(e) => setExamForm({ ...examForm, examType: e.target.value })}
+                            className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                        >
+                            <option value="INTERNAL">Internal Assessment</option>
+                            <option value="EXTERNAL">External / Final</option>
+                            <option value="MOCK">Mock Exam</option>
+                            <option value="PRACTICAL">Practical</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-content-primary mb-1">Description</label>
+                        <textarea
+                            value={examForm.description}
+                            onChange={(e) => setExamForm({ ...examForm, description: e.target.value })}
+                            className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors resize-none min-h-[90px]"
+                            placeholder="Add any instructions or details..."
+                        />
+                    </div>
+                </form>
+            </Modal>
+
+            {/* Add Schedule Modal */}
+            <Modal
+                isOpen={isScheduleModalOpen}
+                onClose={() => setIsScheduleModalOpen(false)}
+                title="Schedule Exam Subject"
+                subtitle="Assign date and time for a specific offering"
+                icon={<CalendarDays size={18} />}
+                iconVariant="info"
+                size="lg"
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => setIsScheduleModalOpen(false)}
+                            className="modal-btn-secondary"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            form="schedule-form"
+                            className="modal-btn-primary"
+                        >
+                            Save Schedule
+                        </button>
+                    </>
+                }
+            >
+                <form id="schedule-form" onSubmit={handleCreateSchedule} className="space-y-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary mb-1">Class / Offering <span className="text-red-500">*</span></label>
+                            <select
+                                required
+                                value={scheduleForm.offeringId}
+                                onChange={(e) => setScheduleForm({ ...scheduleForm, offeringId: e.target.value })}
+                                className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                            >
+                                <option value="">Select Offering...</option>
+                                {offerings.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary mb-1">Subject <span className="text-red-500">*</span></label>
+                            <select
+                                required
+                                value={scheduleForm.subjectId}
+                                onChange={(e) => setScheduleForm({ ...scheduleForm, subjectId: e.target.value })}
+                                className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                            >
+                                <option value="">Select Subject...</option>
+                                {subjects.map(s => <option key={s.id} value={s.id}>{s.title} ({s.code})</option>)}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary mb-1">Exam Date <span className="text-red-500">*</span></label>
+                            <input
+                                type="date"
+                                required
+                                value={scheduleForm.examDate}
+                                onChange={(e) => setScheduleForm({ ...scheduleForm, examDate: e.target.value })}
+                                className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary mb-1">Start Time <span className="text-red-500">*</span></label>
+                            <input
+                                type="time"
+                                required
+                                value={scheduleForm.startTime}
+                                onChange={(e) => setScheduleForm({ ...scheduleForm, startTime: e.target.value })}
+                                className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary mb-1">End Time <span className="text-red-500">*</span></label>
+                            <input
+                                type="time"
+                                required
+                                value={scheduleForm.endTime}
+                                onChange={(e) => setScheduleForm({ ...scheduleForm, endTime: e.target.value })}
+                                className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary mb-1">Max Marks <span className="text-red-500">*</span></label>
+                            <input
+                                type="number"
+                                required
+                                min="1"
+                                value={scheduleForm.maxMarks}
+                                onChange={(e) => setScheduleForm({ ...scheduleForm, maxMarks: Number(e.target.value) })}
+                                className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary mb-1">Pass Marks <span className="text-red-500">*</span></label>
+                            <input
+                                type="number"
+                                required
+                                min="0"
+                                value={scheduleForm.passMarks}
+                                onChange={(e) => setScheduleForm({ ...scheduleForm, passMarks: Number(e.target.value) })}
+                                className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-content-primary mb-1">Room <span className="text-content-muted">(Optional)</span></label>
+                            <input
+                                type="text"
+                                value={scheduleForm.roomNumber}
+                                onChange={(e) => setScheduleForm({ ...scheduleForm, roomNumber: e.target.value })}
+                                className="w-full mt-1 px-3 py-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
+                                placeholder="e.g. Hall A"
+                            />
+                        </div>
+                    </div>
+                </form>
+            </Modal>
         </div>
     );
 }

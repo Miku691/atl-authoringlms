@@ -72,15 +72,19 @@ export default function MyResultsPage() {
         { label: 'Total Credits', value: '112', icon: Star, color: 'text-emerald-600' }
     ];
 
-    const getGradeInfo = (marks: number | string | null | undefined) => {
-        if (typeof marks === 'string') return { label: marks, color: 'bg-chrome text-content-secondary' };
-        const m = Number(marks) || 0;
-        if (m >= 90) return { label: 'O', color: 'bg-[#dae2ff] text-[#0054d1]' };
-        if (m >= 80) return { label: 'A+', color: 'bg-[#eef2ff] text-[#2a6df4]' };
-        if (m >= 70) return { label: 'A', color: 'bg-[#f0f4ff] text-[#3c5ba9]' };
-        if (m >= 60) return { label: 'B+', color: 'bg-[#fff3ec] text-[#9e3f00]' };
-        if (m >= 50) return { label: 'B', color: 'bg-amber-50 text-amber-700' };
-        return { label: 'F', color: 'bg-[#ffdad6] text-[#ba1a1a]' };
+    const getGradeInfo = (record: MarksRecord) => {
+        if (record.isAbsent) return { label: 'F', color: 'bg-[#ffdad6] text-[#ba1a1a]' };
+        
+        const label = record.gradeLabel || 'N/A';
+        
+        if (label === 'O') return { label, color: 'bg-[#dae2ff] text-[#0054d1]' };
+        if (label === 'A+') return { label, color: 'bg-[#eef2ff] text-[#2a6df4]' };
+        if (label === 'A') return { label, color: 'bg-[#f0f4ff] text-[#3c5ba9]' };
+        if (label === 'B+') return { label, color: 'bg-[#fff3ec] text-[#9e3f00]' };
+        if (label === 'B') return { label, color: 'bg-amber-50 text-amber-700' };
+        if (label === 'F' || label === 'Fail') return { label, color: 'bg-[#ffdad6] text-[#ba1a1a]' };
+        
+        return { label, color: 'bg-chrome text-content-secondary' };
     };
 
     return (
@@ -156,7 +160,7 @@ export default function MyResultsPage() {
                                     </thead>
                                     <tbody className="divide-y divide-[#f1f3f9]">
                                         {results.map((res) => {
-                                            const grade = getGradeInfo(res.marksObtained);
+                                            const grade = getGradeInfo(res);
                                             return (
                                                 <tr key={res.id} className="hover:bg-[#f7f9ff] transition-all group">
                                                     <td className="px-8 py-6">
@@ -179,9 +183,14 @@ export default function MyResultsPage() {
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-6 text-center">
-                                                        <span className={`inline-flex min-w-[32px] justify-center px-2 py-1 rounded-md text-xs font-bold ${grade.color}`}>
-                                                            {res.isAbsent ? 'F' : grade.label}
-                                                        </span>
+                                                        <div className="flex flex-col items-center gap-1">
+                                                            <span className={`inline-flex min-w-[32px] justify-center px-2 py-1 rounded-md text-xs font-bold ${grade.color}`}>
+                                                                {grade.label}
+                                                            </span>
+                                                            {res.gradePoint != null && (
+                                                                <span className="text-[9px] font-bold text-[#64748b]">GP: {res.gradePoint}</span>
+                                                            )}
+                                                        </div>
                                                     </td>
                                                     <td className="px-8 py-6 text-right">
                                                         <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${

@@ -21,6 +21,10 @@ public class ImsMarksRecordDto {
     private boolean isAbsent;
     private String remarks;
     private String tenantId;
+    
+    // Dynamic fields calculated from GradingScale
+    private String gradeLabel;
+    private Double gradePoint;
 }
 
 @Data

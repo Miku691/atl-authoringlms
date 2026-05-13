@@ -99,6 +99,14 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
             condition: () => hasActiveOfferings
         },
         {
+            path: '/student/exams',
+            label: 'My Exams',
+            icon: FileText,
+            roles: ['STUDENT'],
+            setupRequired: true,
+            condition: () => hasActiveOfferings
+        },
+        {
             path: '/student/attendance',
             label: 'My Attendance',
             icon: ListChecks,
