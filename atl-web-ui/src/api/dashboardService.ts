@@ -42,24 +42,92 @@ export const dashboardService = {
         }));
     },
 
-    getOfferingStats: async (tenantId: string): Promise<OfferingStat[]> => {
+    getOfferingStats: async (tenantId: string, tenantType?: string): Promise<OfferingStat[]> => {
         // 1. Get counts
         const statsRes = await api.get(`/ims-student-service/enrollments/stats/offering/tenant/${tenantId}`);
         const rawStats = statsRes.data.apiData || [];
 
         if (rawStats.length === 0) return [];
 
+        let type = tenantType;
+        if (!type) {
+             try {
+                 const readRes = await api.get('/ims-academic-service/readiness/status');
+                 type = readRes.data?.apiData?.tenantType || 'SCHOOL';
+             } catch {
+                 type = 'SCHOOL';
+             }
+        }
+
         // 2. Fetch offering names from academic service
         const offeringIds = rawStats.map((s: any) => s.offeringId);
         try {
             const academicRes = await api.post(`/ims-academic-service/offerings/bulk-fetch`, offeringIds);
             const offerings = academicRes.data.apiData || [];
-            const offeringMap = new Map(offerings.map((o: any) => [o.id, o.name]));
 
-            return rawStats.map((item: any) => ({
-                offeringId: item.offeringId,
-                offeringName: offeringMap.get(item.offeringId) || 'Unknown Offering',
-                count: Number(item.count)
+            let branches: any[] = [];
+            let years: any[] = [];
+            let classes: any[] = [];
+            let courses: any[] = [];
+
+            if (type === 'COLLEGE') {
+                const [bRes, yRes] = await Promise.all([
+                    api.get(`/ims-academic-service/branches/tenant/${tenantId}`),
+                    api.get(`/ims-academic-service/years/tenant/${tenantId}`)
+                ]);
+                branches = bRes.data?.apiData || [];
+                years = yRes.data?.apiData || [];
+            } else if (type === 'SCHOOL') {
+                const cRes = await api.get(`/ims-academic-service/classes/tenant/${tenantId}`);
+                classes = cRes.data?.apiData || [];
+            } else if (type === 'COACHING') {
+                const cRes = await api.get(`/ims-academic-service/courses/tenant/${tenantId}`);
+                courses = cRes.data?.apiData || [];
+            }
+
+            const groupedStats = new Map<string, { name: string, count: number }>();
+
+            rawStats.forEach((item: any) => {
+                const off = offerings.find((o: any) => o.id === item.offeringId);
+                let parentId = item.offeringId;
+                let parentName = off?.name || 'Unknown Offering';
+
+                if (off) {
+                    if (type === 'COLLEGE' && off.yearId) {
+                        const year = years.find(y => y.id === off.yearId);
+                        if (year && year.branchId) {
+                            const branch = branches.find(b => b.id === year.branchId);
+                            if (branch) {
+                                parentId = branch.id;
+                                parentName = branch.name;
+                            }
+                        }
+                    } else if (type === 'SCHOOL' && off.classId) {
+                        const cls = classes.find(c => c.id === off.classId);
+                        if (cls) {
+                            parentId = cls.id;
+                            parentName = cls.name;
+                        }
+                    } else if (type === 'COACHING' && off.courseId) {
+                        const course = courses.find(c => c.id === off.courseId);
+                        if (course) {
+                            parentId = course.id;
+                            parentName = course.name;
+                        }
+                    }
+                }
+
+                if (groupedStats.has(parentId)) {
+                    groupedStats.get(parentId)!.count += Number(item.count);
+                } else {
+                    groupedStats.set(parentId, { name: parentName, count: Number(item.count) });
+                }
+            });
+
+            return Array.from(groupedStats.entries()).map(([id, data]) => ({
+                offeringId: id,
+                offeringName: data.name,
+                count: data.count
             }));
         } catch (error) {
             console.error("Failed to resolve offering names", error);

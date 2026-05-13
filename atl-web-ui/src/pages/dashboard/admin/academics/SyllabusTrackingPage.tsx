@@ -60,6 +60,19 @@ const SyllabusTrackingPage: React.FC = () => {
         }
     }, [selectedOfferingSubjectId]);
 
+    const displayOfferings = React.useMemo(() => {
+        if (user?.tenantType !== 'SCHOOL') return offerings;
+        
+        const uniqueClasses = new Map<string, any>();
+        offerings.forEach(off => {
+            if (off.classId && !uniqueClasses.has(off.classId)) {
+                const displayName = off.parentName || off.name.split(' - ')[0];
+                uniqueClasses.set(off.classId, { ...off, displayName });
+            }
+        });
+        return Array.from(uniqueClasses.values());
+    }, [offerings, user?.tenantType]);
+
     const fetchOfferings = async () => {
         try {
             if (!user?.tenantId) return;
@@ -319,17 +332,24 @@ const SyllabusTrackingPage: React.FC = () => {
             <div className="bg-surface rounded-xl shadow-sm border border-border p-6">
                 <div className="mb-6 grid md:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-content-primary mb-2">Class (Offering)</label>
+                        <label className="block text-sm font-medium text-content-primary mb-2">
+                            {user?.tenantType === 'SCHOOL' ? 'Class Section' : 'Class / Offering'}
+                        </label>
                         <select
                             className="w-full border rounded-lg p-2 bg-chrome outline-none focus:ring-2 focus:ring-indigo-500"
                             value={selectedOfferingId}
                             onChange={(e) => setSelectedOfferingId(e.target.value)}
                         >
-                            <option value="">Select Class</option>
-                            {offerings.map(off => (
-                                <option key={off.id} value={off.id}>{off.name}</option>
+                            <option value="">Select Offering</option>
+                            {displayOfferings.map(off => (
+                                <option key={off.id} value={off.id}>
+                                    {off.displayName || off.name} {off.code && user?.tenantType !== 'SCHOOL' ? `(${off.code})` : ''}
+                                </option>
                             ))}
                         </select>
+                        {user?.tenantType === 'SCHOOL' && selectedOfferingId && (
+                            <p className="text-xs text-indigo-500 mt-1 font-medium">Syllabus applies to all sections of this class.</p>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-content-primary mb-2">Subject</label>

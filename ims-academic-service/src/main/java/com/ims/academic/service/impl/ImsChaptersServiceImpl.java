@@ -24,11 +24,25 @@ public class ImsChaptersServiceImpl implements ImsChaptersService {
 
     @Override
     public ImsChaptersDto create(ImsChaptersDto dto) {
-        ImsOfferingSubject offeringSubject = offeringSubjectRepo.findById(dto.getOfferingSubjectId())
-                .orElseThrow(() -> new ResourceNotFoundException("OfferingSubject ID", dto.getOfferingSubjectId()));
-
         ImsChapters entity = modelMapper.map(dto, ImsChapters.class);
-        entity.setOfferingSubject(offeringSubject);
+
+        if (dto.getOfferingSubjectId() != null) {
+            ImsOfferingSubject offeringSubject = offeringSubjectRepo.findById(dto.getOfferingSubjectId())
+                    .orElseThrow(() -> new ResourceNotFoundException("OfferingSubject ID", dto.getOfferingSubjectId()));
+
+            if (offeringSubject.getOffering() != null && 
+                offeringSubject.getOffering().getClassId() != null) {
+                
+                entity.setLevelId(offeringSubject.getOffering().getClassId());
+                entity.setSubjectId(offeringSubject.getSubject().getId());
+                entity.setOfferingSubject(null);
+            } else {
+                entity.setOfferingSubject(offeringSubject);
+            }
+        } else {
+            entity.setLevelId(dto.getLevelId());
+            entity.setSubjectId(dto.getSubjectId());
+        }
 
         return toDto(repo.save(entity));
     }
@@ -53,8 +67,16 @@ public class ImsChaptersServiceImpl implements ImsChaptersService {
 
     @Override
     public List<ImsChaptersDto> getByOfferingSubjectId(String offeringSubjectId) {
-        return repo.findByOfferingSubjectIdOrderByOrderIndexAsc(offeringSubjectId)
-                .stream()
+        List<ImsChapters> chapters = repo.findByOfferingSubjectIdOrderByOrderIndexAsc(offeringSubjectId);
+        
+        if (chapters.isEmpty()) {
+            ImsOfferingSubject os = offeringSubjectRepo.findById(offeringSubjectId).orElse(null);
+            if (os != null && os.getOffering() != null && os.getOffering().getClassId() != null) {
+                chapters = repo.findByLevelIdAndSubjectIdOrderByOrderIndexAsc(os.getOffering().getClassId(), os.getSubject().getId());
+            }
+        }
+
+        return chapters.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }

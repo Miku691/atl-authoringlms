@@ -31,6 +31,8 @@ import { financeService } from '../../../../api/financeService';
 import type { CollectionSummary } from '../../../../api/financeService';
 import toast from 'react-hot-toast';
 import { useCurrency } from '../../../../context/CurrencyContext';
+import { useSelector } from 'react-redux';
+import { type RootState } from '../../../../store/store';
 
 const FinanceDashboardPage: React.FC = () => {
     const { format, currencySymbol } = useCurrency();
@@ -62,10 +64,12 @@ const FinanceDashboardPage: React.FC = () => {
         fetchData();
     }, []);
 
+    const { user } = useSelector((state: RootState) => state.auth);
+
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const data = await financeService.getCollectionSummary();
+            const data = await financeService.getCollectionSummary(user?.tenantId ?? undefined, user?.tenantType ?? undefined);
             setSummary(data);
         } catch (error) {
             toast.error('Failed to load financial summary');
@@ -208,7 +212,7 @@ const FinanceDashboardPage: React.FC = () => {
                 <div className="bg-surface p-6 rounded-2xl border border-border shadow-sm">
                     <h3 className="font-bold text-content-primary flex items-center gap-2 mb-6">
                         <BarChart3 size={18} className="text-emerald-600" />
-                        Collection by Offering
+                        {user?.tenantType === 'COLLEGE' ? 'Collection by Branch' : user?.tenantType === 'COACHING' ? 'Collection by Course' : 'Collection by Class'}
                     </h3>
                     <div className="h-[250px] w-full">
                         <ResponsiveContainer width="100%" height="100%">

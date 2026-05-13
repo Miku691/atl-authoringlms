@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import ConfirmationModal from '../../../../components/common/ConfirmationModal';
 import PageHeader from '../../../../components/common/PageHeader';
 import Modal from '../../../../components/common/Modal';
+import api from '../../../../utils/api';
 
 export default function TimetableManagementPage() {
     const user = useSelector((state: RootState) => state.auth.user);
@@ -91,7 +92,56 @@ export default function TimetableManagementPage() {
                 ? await academicService.getOfferingsByTenant(user.tenantId)
                 : (instId ? await academicService.getOfferingsByInstructor(instId) : []);
 
-            setOfferings(data);
+            const type = user.tenantType || 'SCHOOL';
+            let programs: any[] = [];
+            let branches: any[] = [];
+            let years: any[] = [];
+            let classes: any[] = [];
+            let courses: any[] = [];
+
+            if (type === 'COLLEGE') {
+                const [pRes, bRes, yRes] = await Promise.all([
+                    api.get(`/ims-academic-service/programs/tenant/${user.tenantId}`).catch(() => ({ data: {} })),
+                    api.get(`/ims-academic-service/branches/tenant/${user.tenantId}`).catch(() => ({ data: {} })),
+                    api.get(`/ims-academic-service/years/tenant/${user.tenantId}`).catch(() => ({ data: {} }))
+                ]);
+                programs = pRes.data?.apiData || [];
+                branches = bRes.data?.apiData || [];
+                years = yRes.data?.apiData || [];
+            } else if (type === 'SCHOOL') {
+                const cRes = await api.get(`/ims-academic-service/classes/tenant/${user.tenantId}`).catch(() => ({ data: {} }));
+                classes = cRes.data?.apiData || [];
+            } else if (type === 'COACHING') {
+                const cRes = await api.get(`/ims-academic-service/courses/tenant/${user.tenantId}`).catch(() => ({ data: {} }));
+                courses = cRes.data?.apiData || [];
+            }
+
+            const enrichedOfferings = data.map((off: any) => {
+                let parentName = '';
+                if (type === 'COLLEGE' && off.yearId) {
+                    const year = years.find(y => y.id === off.yearId);
+                    if (year) {
+                        const branch = branches.find(b => b.id === year.branchId);
+                        if (branch) {
+                            const prog = programs.find(p => p.id === branch.programId);
+                            parentName = `${prog ? prog.title + ' - ' : ''}${branch.name} - `;
+                        }
+                    }
+                } else if (type === 'SCHOOL' && off.classId) {
+                    const cls = classes.find(c => c.id === off.classId);
+                    if (cls) parentName = `${cls.name} - `;
+                } else if (type === 'COACHING' && off.courseId) {
+                    const course = courses.find(c => c.id === off.courseId);
+                    if (course) parentName = `${course.name} - `;
+                }
+
+                return {
+                    ...off,
+                    displayName: `${parentName}${off.name}`
+                };
+            });
+
+            setOfferings(enrichedOfferings);
         } catch (error) {
             console.error('Error fetching offerings:', error);
             toast.error('Failed to load offerings');
@@ -367,7 +417,7 @@ export default function TimetableManagementPage() {
                     <option value="">-- Select Offering --</option>
                     {offerings.map(offering => (
                         <option key={offering.id} value={offering.id}>
-                            {offering.name} ({offering.code})
+                            {offering.displayName || offering.name} {offering.code ? `(${offering.code})` : ''}
                         </option>
                     ))}
                 </select>

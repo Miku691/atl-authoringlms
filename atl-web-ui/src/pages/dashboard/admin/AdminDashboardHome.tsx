@@ -47,7 +47,7 @@ const AdminDashboardHome: React.FC = () => {
                 announcementService.getAnnouncementsByTenant(user.tenantId),
                 dashboardService.getStats(user.tenantId),
                 dashboardService.getGenderStats(user.tenantId),
-                dashboardService.getOfferingStats(user.tenantId),
+                dashboardService.getOfferingStats(user.tenantId, user.tenantType),
                 financeService.getCollectionSummary().catch(() => null),
                 api.get(`/ims-platform-service/api/v1/platform/tenant/${user.tenantId}/subscription`).catch(() => null)
             ]);
@@ -210,7 +210,7 @@ const AdminDashboardHome: React.FC = () => {
             {/* Analytics Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <DashboardChart
-                    title="Student Growth By Class"
+                    title={user?.tenantType === 'COLLEGE' ? "Student Growth By Branch" : user?.tenantType === 'COACHING' ? "Student Growth By Course" : "Student Growth By Class"}
                     data={offeringStats.map(s => ({ name: s.offeringName, value: s.count, id: s.offeringId }))}
                     colors={['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981']}
                     onSegmentClick={(item) => navigate(`/people/students?offeringId=${item.id}`)}

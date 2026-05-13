@@ -11,4 +11,6 @@ public class ImsChaptersDto {
     private String offeringSubjectId;
     private String title;
     private Integer orderIndex;
+    private String levelId;
+    private String subjectId;
 }

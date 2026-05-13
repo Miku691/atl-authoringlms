@@ -33,4 +33,10 @@ public class ImsChapters {
 
     @Column(name = "order_index")
     private Integer orderIndex;
+
+    @Column(name = "level_id")
+    private String levelId;
+
+    @Column(name = "subject_id")
+    private String subjectId;
 }

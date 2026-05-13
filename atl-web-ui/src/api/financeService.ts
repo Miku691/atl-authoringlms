@@ -219,9 +219,88 @@ export const financeService = {
         return response.data.apiData;
     },
 
-    getCollectionSummary: async () => {
+    getCollectionSummary: async (tenantId?: string, tenantType?: string) => {
         const response = await api.get(`${BASE_URL}/stats/collection-summary`);
-        return response.data.apiData;
+        const summary = response.data.apiData;
+
+        if (tenantId && summary?.collectionByOffering) {
+            try {
+                let type = tenantType;
+                if (!type) {
+                     const readRes = await api.get('/ims-academic-service/readiness/status');
+                     type = readRes.data?.apiData?.tenantType || 'SCHOOL';
+                }
+
+                const offeringIds = Object.keys(summary.collectionByOffering);
+                if (offeringIds.length > 0) {
+                    const academicRes = await api.post(`/ims-academic-service/offerings/bulk-fetch`, offeringIds);
+                    const offerings = academicRes.data.apiData || [];
+
+                    let branches: any[] = [];
+                    let years: any[] = [];
+                    let classes: any[] = [];
+                    let courses: any[] = [];
+
+                    if (type === 'COLLEGE') {
+                        const [bRes, yRes] = await Promise.all([
+                            api.get(`/ims-academic-service/branches/tenant/${tenantId}`),
+                            api.get(`/ims-academic-service/years/tenant/${tenantId}`)
+                        ]);
+                        branches = bRes.data?.apiData || [];
+                        years = yRes.data?.apiData || [];
+                    } else if (type === 'SCHOOL') {
+                        const cRes = await api.get(`/ims-academic-service/classes/tenant/${tenantId}`);
+                        classes = cRes.data?.apiData || [];
+                    } else if (type === 'COACHING') {
+                        const cRes = await api.get(`/ims-academic-service/courses/tenant/${tenantId}`);
+                        courses = cRes.data?.apiData || [];
+                    }
+
+                    const groupedCollection = new Map<string, number>();
+                    const newOfferingNames: Record<string, string> = {};
+
+                    Object.entries(summary.collectionByOffering).forEach(([offId, val]) => {
+                        const off = offerings.find((o: any) => o.id === offId);
+                        let parentId = offId;
+                        let parentName = summary.offeringNames?.[offId] || 'Unknown';
+
+                        if (off) {
+                            if (type === 'COLLEGE' && off.yearId) {
+                                const year = years.find(y => y.id === off.yearId);
+                                if (year && year.branchId) {
+                                    const branch = branches.find(b => b.id === year.branchId);
+                                    if (branch) {
+                                        parentId = branch.id;
+                                        parentName = branch.name;
+                                    }
+                                }
+                            } else if (type === 'SCHOOL' && off.classId) {
+                                const cls = classes.find(c => c.id === off.classId);
+                                if (cls) {
+                                    parentId = cls.id;
+                                    parentName = cls.name;
+                                }
+                            } else if (type === 'COACHING' && off.courseId) {
+                                const course = courses.find(c => c.id === off.courseId);
+                                if (course) {
+                                    parentId = course.id;
+                                    parentName = course.name;
+                                }
+                            }
+                        }
+
+                        groupedCollection.set(parentId, (groupedCollection.get(parentId) || 0) + Number(val));
+                        newOfferingNames[parentId] = parentName;
+                    });
+
+                    summary.collectionByOffering = Object.fromEntries(groupedCollection);
+                    summary.offeringNames = newOfferingNames;
+                }
+            } catch (err) {
+                console.error("Failed to aggregate collection summary by hierarchy", err);
+            }
+        }
+        return summary;
     },
 
     // Installment Plans
