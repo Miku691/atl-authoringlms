@@ -10,6 +10,7 @@ public interface FeeStructureRepository extends JpaRepository<FeeStructure, Stri
     List<FeeStructure> findAllByTenantId(String tenantId);
 
     List<FeeStructure> findAllByOfferingIdAndTenantId(String offeringId, String tenantId);
+    List<FeeStructure> findAllByLevelIdAndTenantId(String levelId, String tenantId);
 
     boolean existsByFeeHeadId(String feeHeadId);
 }

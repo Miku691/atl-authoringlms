@@ -34,5 +34,8 @@ public interface OfferingServiceClient {
         private String name;
         private String status;
         private String tenantId;
+        private String classId;
+        private String yearId;
+        private String courseId;
     }
 }

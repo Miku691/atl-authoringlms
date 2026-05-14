@@ -35,7 +35,8 @@ import java.util.stream.Collectors;
 /**
  * Production-grade implementation of the operational calendar service.
  * Aggregates: institute events (holidays, events, meetings), exam schedules,
- * and recurring timetable classes — all filtered by tenant, date range, and role.
+ * and recurring timetable classes — all filtered by tenant, date range, and
+ * role.
  */
 @Service
 @RequiredArgsConstructor
@@ -136,7 +137,8 @@ public class ImsCalendarServiceImpl implements ImsCalendarService {
         event.setStartDate(dto.getStartDate());
         event.setEndDate(dto.getEndDate());
         event.setType(dto.getType().toUpperCase());
-        event.setTargetAudience(dto.getTargetAudience() != null ? dto.getTargetAudience().toUpperCase() : event.getTargetAudience());
+        event.setTargetAudience(
+                dto.getTargetAudience() != null ? dto.getTargetAudience().toUpperCase() : event.getTargetAudience());
         event.setFullDay(dto.isFullDay());
         event.setColor(resolveColor(dto.getType(), dto.getColor()));
         event.setLocation(dto.getLocation());
@@ -168,28 +170,36 @@ public class ImsCalendarServiceImpl implements ImsCalendarService {
     // ──────────────────────────────────────────────────────────
 
     /**
-     * Normalises the raw JWT role string to a canonical short form used throughout the service.
+     * Normalises the raw JWT role string to a canonical short form used throughout
+     * the service.
      * e.g. "TENANT_ADMIN" → "ADMIN", "ROLE_INSTRUCTOR" → "TEACHER"
      */
     private String normalizeRole(String role) {
-        if (role == null) return null;
+        if (role == null)
+            return null;
         String upper = role.toUpperCase();
-        if (upper.contains("STUDENT")) return "STUDENT";
-        if (upper.contains("INSTRUCTOR") || upper.contains("TEACHER")) return "TEACHER";
-        if (upper.contains("ADMIN")) return "ADMIN";
+        if (upper.contains("STUDENT"))
+            return "STUDENT";
+        if (upper.contains("INSTRUCTOR") || upper.contains("TEACHER"))
+            return "TEACHER";
+        if (upper.contains("ADMIN"))
+            return "ADMIN";
         return upper;
     }
 
     private boolean isVisibleToRole(ImsInstituteEvents event, String normalizedRole) {
         String audience = event.getTargetAudience();
-        if (audience == null || "ALL".equalsIgnoreCase(audience)) return true;
-        if (normalizedRole == null) return false;
+        if (audience == null || "ALL".equalsIgnoreCase(audience))
+            return true;
+        if (normalizedRole == null)
+            return false;
         return audience.equalsIgnoreCase(normalizedRole) || "ADMIN".equalsIgnoreCase(normalizedRole);
     }
 
     /**
      * Fetches the relevant timetable entries for a person depending on their role.
-     * Admin receives all entries for the tenant; instructor by their id; student by offering ids.
+     * Admin receives all entries for the tenant; instructor by their id; student by
+     * offering ids.
      */
     private List<ImsTimetableEntries> fetchTimetableEntries(String personId, String normalizedRole, String tenantId) {
         if ("TEACHER".equals(normalizedRole)) {
@@ -198,8 +208,8 @@ public class ImsCalendarServiceImpl implements ImsCalendarService {
 
         if ("STUDENT".equals(normalizedRole)) {
             try {
-                ApiResponse<List<ImsStudentEnrollmentsDto>> enrollmentRes =
-                        studentClient.getEnrollmentsByStudentId(personId);
+                ApiResponse<List<ImsStudentEnrollmentsDto>> enrollmentRes = studentClient
+                        .getEnrollmentsByStudentId(personId);
                 if (enrollmentRes == null || enrollmentRes.getApiData() == null) {
                     return Collections.emptyList();
                 }
@@ -224,7 +234,8 @@ public class ImsCalendarServiceImpl implements ImsCalendarService {
     }
 
     /**
-     * Expands recurring weekly timetable entries into discrete single-day CLASS events
+     * Expands recurring weekly timetable entries into discrete single-day CLASS
+     * events
      * for the given date range, using the resolved subject name map.
      */
     private List<CalendarEventDto> expandRecurringClasses(
@@ -235,7 +246,8 @@ public class ImsCalendarServiceImpl implements ImsCalendarService {
 
         for (ImsTimetableEntries entry : entries) {
             ImsTimetableSlots slot = entry.getTimetableSlot();
-            if (slot == null || slot.getDayOfWeek() == null) continue;
+            if (slot == null || slot.getDayOfWeek() == null)
+                continue;
 
             DayOfWeek targetDay = DayOfWeek.of(slot.getDayOfWeek());
             String subjectName = subjectNames.getOrDefault(entry.getSubjectId(), "Class");
@@ -331,7 +343,8 @@ public class ImsCalendarServiceImpl implements ImsCalendarService {
 
     /** Batch-resolves subject display names by a list of subject IDs. */
     private Map<String, String> resolveSubjectNamesByIds(List<String> subjectIds) {
-        if (subjectIds == null || subjectIds.isEmpty()) return Collections.emptyMap();
+        if (subjectIds == null || subjectIds.isEmpty())
+            return Collections.emptyMap();
         return subjectsRepo.findAllById(subjectIds).stream()
                 .collect(Collectors.toMap(ImsSubjects::getId, ImsSubjects::getTitle));
     }
@@ -341,15 +354,17 @@ public class ImsCalendarServiceImpl implements ImsCalendarService {
      * based on the event type.
      */
     private String resolveColor(String type, String overrideColor) {
-        if (overrideColor != null && !overrideColor.isBlank()) return overrideColor;
-        if (type == null) return "#6366F1";
+        if (overrideColor != null && !overrideColor.isBlank())
+            return overrideColor;
+        if (type == null)
+            return "#6366F1";
         return switch (type.toUpperCase()) {
             case "HOLIDAY" -> "#F59E0B";
-            case "EXAM"    -> "#EF4444";
+            case "EXAM" -> "#EF4444";
             case "MEETING" -> "#6366F1";
-            case "EVENT"   -> "#10B981";
-            case "CLASS"   -> "#4F46E5";
-            default        -> "#6366F1";
+            case "EVENT" -> "#10B981";
+            case "CLASS" -> "#4F46E5";
+            default -> "#6366F1";
         };
     }
 }

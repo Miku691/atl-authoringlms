@@ -13,6 +13,8 @@ export interface ImsOffering {
     classId?: string;
     yearId?: string;
     courseId?: string;
+    parentName?: string;
+    displayName?: string;
 }
 
 export interface ImsBranch {
@@ -129,7 +131,21 @@ export const academicService = {
         return response.data;
     },
 
-    // Branches, Years, Courses
+    getBranchesByTenant: async (tenantId: string) => {
+        const response = await api.get(`/ims-academic-service/branches/tenant/${tenantId}`);
+        return response.data.apiData;
+    },
+
+    getYearsByTenant: async (tenantId: string) => {
+        const response = await api.get(`/ims-academic-service/years/tenant/${tenantId}`);
+        return response.data.apiData;
+    },
+
+    getCoursesByTenant: async (tenantId: string) => {
+        const response = await api.get(`/ims-academic-service/courses/tenant/${tenantId}`);
+        return response.data.apiData;
+    },
+
     getBranchesByProgram: async (tenantId: string, programId: string) => {
         const response = await api.get(`/ims-academic-service/branches/tenant/${tenantId}/program/${programId}`);
         return response.data.apiData;

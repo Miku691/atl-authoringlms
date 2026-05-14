@@ -31,8 +31,11 @@ public class FeeStructure {
     @Column(nullable = false)
     private String feeHeadId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String offeringId;
+
+    @Column(nullable = true)
+    private String levelId;
 
     @Column(nullable = false)
     private BigDecimal amount;

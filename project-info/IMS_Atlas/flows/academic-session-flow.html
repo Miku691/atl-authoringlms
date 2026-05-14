@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Session Flow - IMS Atlas</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="logo">IMS Atlas</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">System Overview</a></li>
+            <li><strong>Services</strong></li>
+            <li><a href="../services/atl-gateway-service.html">Gateway Service</a></li>
+            <li><a href="../services/atl-auth-service.html">Auth Service</a></li>
+            <li><a href="../services/ims-academic-service.html">Academic Service</a></li>
+            <li><strong>Key Flows</strong></li>
+            <li><a href="auth-flow.html">Authentication Flow</a></li>
+            <li><a href="academic-session-flow.html">Academic Session Flow</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Academic Session Lifecycle & Flow</h1>
+            <p>This flow explains how academic sessions are created, managed, and used to drive the institutional calendar.</p>
+        </header>
+
+        <section class="diagram-card">
+            <h2>Session Lifecycle Diagram</h2>
+            <div class="mermaid">
+                stateDiagram-v2
+                [*] --> DRAFT : Creation via Wizard
+                DRAFT --> ENROLLMENT_OPEN : Open Enrollment
+                ENROLLMENT_OPEN --> ACTIVE : Start Session
+                ACTIVE --> YEP : Year End Process
+                YEP --> CLOSED : Final Closure
+                CLOSED --> [*]
+
+                state DRAFT {
+                    [*] --> DefineDetails
+                    DefineDetails --> SelectSource : Optional Cloning
+                    SelectSource --> CloneStructure : POST /clone-structure
+                    CloneStructure --> VerifyOfferings
+                    VerifyOfferings --> [*]
+                }
+            </div>
+        </section>
+
+        <section>
+            <h2>Step-by-Step Flow</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>1. Definition & Creation</h3>
+                    <p>Admin uses the <strong>Session Setup Wizard</strong> in the Web UI to define the session name (e.g., "2026-2027") and date range. A <code>POST /sessions</code> request is sent to the Academic Service.</p>
+                </div>
+                <div class="card">
+                    <h3>2. Structural Cloning</h3>
+                    <p>If a source session is selected, the UI calls <code>POST /sessions/{id}/clone-structure</code>. The <code>AcademicSessionCloneService</code> recursively copies Offerings, Subjects, Instructors, and Class Mappings.</p>
+                </div>
+                <div class="card">
+                    <h3>3. State Management</h3>
+                    <p>The session moves from <strong>DRAFT</strong> to <strong>ENROLLMENT_OPEN</strong>. This transition allows the Student Service to begin enrolling students into the offerings defined within this session.</p>
+                </div>
+                <div class="card">
+                    <h3>4. Operational Activation</h3>
+                    <p>When the academic term begins, the session is marked as <strong>ACTIVE</strong>. This enables attendance tracking, exam scheduling, and daily operations.</p>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Technical Implementation Details</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Responsibility</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>AcademicSession</code> Entity</td>
+                        <td>Stores metadata, status, and <code>isLocked</code> flag.</td>
+                    </tr>
+                    <tr>
+                        <td><code>AcademicSessionCloneService</code></td>
+                        <td>Handles deep-copy logic for offerings and mappings across sessions.</td>
+                    </tr>
+                    <tr>
+                        <td><code>SessionManagementPage.tsx</code></td>
+                        <td>React-based wizard for guided session setup.</td>
+                    </tr>
+                    <tr>
+                        <td><code>AcademicReadinessService</code></td>
+                        <td>Validates that a session exists and has offerings before allowing operations.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section>
+            <h2>How to Use This Feature</h2>
+            <div class="info-box">
+                <p><strong>Scenario: Starting a New Year</strong></p>
+                <ol>
+                    <li>Go to <strong>Academics &rarr; Academic Sessions</strong>.</li>
+                    <li>Click <strong>+ New Session Setup</strong>.</li>
+                    <li>In Step 2, select the <strong>Current Session</strong> as the source to clone your entire class/subject structure.</li>
+                    <li>Verify the cloned offerings in the "Offerings" page.</li>
+                    <li>Change status to <strong>Open Enrollment</strong> once you are ready to accept students.</li>
+                </ol>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

@@ -51,9 +51,54 @@ const FeeStructurePage: React.FC = () => {
                 academicService.getOfferingsByTenant(user!.tenantId!),
                 academicService.getSessionsByTenant(user!.tenantId!)
             ]);
+            let processedOfferings = [...offeringData];
+
+            if (user?.tenantType === 'COLLEGE') {
+                try {
+                    const [branchesData, yearsData] = await Promise.all([
+                        academicService.getBranchesByTenant(user!.tenantId!),
+                        academicService.getYearsByTenant(user!.tenantId!)
+                    ]);
+                    
+                    const branchesMap = new Map<string, any>(branchesData.map((b: any) => [b.id, b]));
+                    const yearsMap = new Map<string, any>(yearsData.map((y: any) => [y.id, y]));
+                    
+                    processedOfferings = processedOfferings.map(off => {
+                        if (off.yearId) {
+                            const year = yearsMap.get(off.yearId);
+                            if (year) {
+                                const branch = branchesMap.get(year.branchId);
+                                const displayName = branch ? `${branch.name} - ${year.name}` : year.name;
+                                return { ...off, displayName };
+                            }
+                        }
+                        return off;
+                    });
+                } catch (e) {
+                    console.error("Failed to fetch college hierarchy", e);
+                }
+            } else if (user?.tenantType === 'COACHING') {
+                try {
+                    const coursesData = await academicService.getCoursesByTenant(user!.tenantId!);
+                    const coursesMap = new Map<string, any>(coursesData.map((c: any) => [c.id, c]));
+                    
+                    processedOfferings = processedOfferings.map(off => {
+                        if (off.courseId) {
+                            const course = coursesMap.get(off.courseId);
+                            if (course) {
+                                return { ...off, displayName: course.name };
+                            }
+                        }
+                        return off;
+                    });
+                } catch (e) {
+                    console.error("Failed to fetch coaching hierarchy", e);
+                }
+            }
+
             setStructures(structData);
             setFeeHeads(headData);
-            setOfferings(offeringData);
+            setOfferings(processedOfferings);
             setSessions(sessionData);
 
             // Set default academic year to current session if available
@@ -97,13 +142,60 @@ const FeeStructurePage: React.FC = () => {
     };
 
     const getHeadName = (id: string) => feeHeads.find(h => h.id === id)?.name || id;
-    const getOfferingName = (id: string) => offerings.find(o => o.id === id)?.name || id;
+    const displayOfferings = React.useMemo(() => {
+        const uniqueGroups = new Map<string, ImsOffering>();
+        
+        offerings.forEach(off => {
+            let key = off.id; // default to no grouping
+            
+            if (user?.tenantType === 'SCHOOL' && off.classId) {
+                key = off.classId;
+            } else if (user?.tenantType === 'COLLEGE' && off.yearId) {
+                key = off.yearId;
+            } else if (user?.tenantType === 'COACHING' && off.courseId) {
+                key = off.courseId;
+            }
+
+            if (!uniqueGroups.has(key)) {
+                // If it's a grouped key (not the original ID), we use the parent name or split the string
+                const isGrouped = key !== off.id;
+                const displayName = off.displayName || (isGrouped ? (off.parentName || off.name.split(' - ')[0]) : off.name);
+                uniqueGroups.set(key, { ...off, displayName });
+            }
+        });
+        
+        return Array.from(uniqueGroups.values());
+    }, [offerings, user?.tenantType]);
+
+    const getOfferingName = (id: string | null, levelId?: string) => {
+        if (id) {
+            const off = offerings.find(o => o.id === id);
+            return off ? (off.displayName || off.name) : id;
+        }
+        if (levelId) {
+            const off = offerings.find(o => o.classId === levelId || o.yearId === levelId || o.courseId === levelId);
+            return off ? (off.displayName || off.parentName || off.name.split(' - ')[0]) : levelId;
+        }
+        return 'Unknown';
+    };
 
     const filteredStructures = structures.filter(s => {
-        const matchesOffering = selectedOfferingId === 'ALL' || s.offeringId === selectedOfferingId;
+        // If s.offeringId is null but levelId exists, see if it matches the selected offering's classId
+        let matchesOffering = false;
+        if (selectedOfferingId === 'ALL') {
+            matchesOffering = true;
+        } else {
+            const selectedOff = offerings.find(o => o.id === selectedOfferingId);
+            if (s.offeringId === selectedOfferingId) {
+                matchesOffering = true;
+            } else if (s.levelId && selectedOff && (s.levelId === selectedOff.classId || s.levelId === selectedOff.yearId || s.levelId === selectedOff.courseId)) {
+                matchesOffering = true;
+            }
+        }
+
         const matchesSearch = searchTerm === '' ||
             getHeadName(s.feeHeadId).toLowerCase().includes(searchTerm.toLowerCase()) ||
-            getOfferingName(s.offeringId).toLowerCase().includes(searchTerm.toLowerCase());
+            getOfferingName(s.offeringId, s.levelId).toLowerCase().includes(searchTerm.toLowerCase());
         return matchesOffering && matchesSearch;
     });
 
@@ -126,7 +218,7 @@ const FeeStructurePage: React.FC = () => {
             <div className="bg-surface rounded-xl shadow-sm border border-border">
                 <div className="p-6 border-b border-border bg-chrome/30">
                     <div className="flex items-center gap-4 flex-wrap">
-                        <span className="text-[10px] font-black text-content-muted uppercase tracking-widest px-1">Filter by Class:</span>
+                        <span className="text-[10px] font-black text-content-muted uppercase tracking-widest px-1">Filter by {user?.tenantType === 'SCHOOL' ? 'Class' : user?.tenantType === 'COLLEGE' ? 'Year' : 'Course'}:</span>
                         <div className="flex items-center gap-2 flex-wrap">
                             <button
                                 onClick={() => setSelectedOfferingId('ALL')}
@@ -137,7 +229,7 @@ const FeeStructurePage: React.FC = () => {
                             >
                                 All Classes
                             </button>
-                            {offerings.map(offering => (
+                            {displayOfferings.map(offering => (
                                 <button
                                     key={offering.id}
                                     onClick={() => setSelectedOfferingId(offering.id)}
@@ -146,7 +238,7 @@ const FeeStructurePage: React.FC = () => {
                                         : 'bg-surface text-content-secondary border border-border hover:border-indigo-300 hover:text-indigo-600'
                                         }`}
                                 >
-                                    {offering.name}
+                                    {offering.displayName || offering.name}
                                 </button>
                             ))}
                         </div>
@@ -192,7 +284,7 @@ const FeeStructurePage: React.FC = () => {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-2">
                                                 <Layers className="w-4 h-4 text-indigo-500" />
-                                                <span className="text-sm font-medium text-content-primary">{getOfferingName(s.offeringId)}</span>
+                                                <span className="text-sm font-medium text-content-primary">{getOfferingName(s.offeringId, s.levelId)}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-content-primary">{getHeadName(s.feeHeadId)}</td>
@@ -230,9 +322,9 @@ const FeeStructurePage: React.FC = () => {
                 <form id="fee-struct-form" onSubmit={handleCreate} className="space-y-4">
                     <div>
                         <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>Offering (Class/Batch)</label>
-                        <select required className="w-full px-4 py-2.5 border rounded-xl outline-none" style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} value={newStructure.offeringId} onChange={e => setNewStructure({ ...newStructure, offeringId: e.target.value })}>
-                            <option value="">-- Select Offering --</option>
-                            {offerings.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
+                        <select required className="w-full px-4 py-2.5 border rounded-xl outline-none" style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} value={newStructure.offeringId || ''} onChange={e => setNewStructure({ ...newStructure, offeringId: e.target.value })}>
+                            <option value="">-- Select {user?.tenantType === 'SCHOOL' ? 'Class' : user?.tenantType === 'COLLEGE' ? 'Year/Branch' : 'Course'} --</option>
+                            {displayOfferings.map(o => <option key={o.id} value={o.id}>{o.displayName || o.name}</option>)}
                         </select>
                     </div>
                     <div>

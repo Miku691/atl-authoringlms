@@ -21,8 +21,9 @@ public class FeeStructureDTO {
     @NotBlank(message = "Fee head ID is mandatory")
     private String feeHeadId;
 
-    @NotBlank(message = "Offering ID is mandatory")
     private String offeringId;
+
+    private String levelId;
 
     @NotNull(message = "Amount is mandatory")
     @Positive(message = "Amount must be positive")

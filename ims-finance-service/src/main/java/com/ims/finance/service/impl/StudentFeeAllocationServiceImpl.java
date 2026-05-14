@@ -15,6 +15,7 @@ import com.ims.finance.repository.StudentFeeRecordRepository;
 import com.ims.finance.service.StudentFeeAllocationService;
 import com.ims.finance.util.SecurityUtils;
 import com.ims.finance.client.StudentServiceClient;
+import com.ims.finance.client.OfferingServiceClient;
 import com.ims.finance.util.ApiResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
     private final FeeInstallmentScheduleRepository scheduleRepository;
     private final StudentFeeConcessionRepository concessionRepository;
     private final FeeDiscountRepository feeDiscountRepository;
+    private final OfferingServiceClient offeringServiceClient;
 
     public StudentFeeAllocationServiceImpl(FeeStructureRepository feeStructureRepository,
             StudentFeeRecordRepository studentFeeRecordRepository,
@@ -42,7 +44,8 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
             FeeInstallmentPlanRepository planRepository,
             FeeInstallmentScheduleRepository scheduleRepository,
             StudentFeeConcessionRepository concessionRepository,
-            FeeDiscountRepository feeDiscountRepository) {
+            FeeDiscountRepository feeDiscountRepository,
+            OfferingServiceClient offeringServiceClient) {
         this.feeStructureRepository = feeStructureRepository;
         this.studentFeeRecordRepository = studentFeeRecordRepository;
         this.studentServiceClient = studentServiceClient;
@@ -50,6 +53,7 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
         this.scheduleRepository = scheduleRepository;
         this.concessionRepository = concessionRepository;
         this.feeDiscountRepository = feeDiscountRepository;
+        this.offeringServiceClient = offeringServiceClient;
     }
 
     @Override
@@ -102,6 +106,27 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
         } else {
             // 2. Fallback to old behavior (lump sum)
             List<FeeStructure> structures = feeStructureRepository.findAllByOfferingIdAndTenantId(offeringId, tenantId);
+
+            ApiResponse<OfferingServiceClient.OfferingResponse> response = offeringServiceClient.getOfferingById(offeringId);
+            if (response != null && "SUCCESS".equals(response.getStatus()) && response.getApiData() != null) {
+                String classId = response.getApiData().getClassId();
+                String yearId = response.getApiData().getYearId();
+                String courseId = response.getApiData().getCourseId();
+                
+                String levelId = null;
+                if (classId != null && !classId.isEmpty()) {
+                    levelId = classId;
+                } else if (yearId != null && !yearId.isEmpty()) {
+                    levelId = yearId;
+                } else if (courseId != null && !courseId.isEmpty()) {
+                    levelId = courseId;
+                }
+
+                if (levelId != null) {
+                    List<FeeStructure> levelStructures = feeStructureRepository.findAllByLevelIdAndTenantId(levelId, tenantId);
+                    structures.addAll(levelStructures);
+                }
+            }
 
             for (FeeStructure structure : structures) {
                 // Check if record already exists to prevent duplicates

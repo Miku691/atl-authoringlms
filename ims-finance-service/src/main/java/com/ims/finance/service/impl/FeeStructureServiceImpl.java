@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.ims.finance.client.OfferingServiceClient;
+import com.ims.finance.util.ApiResponse;
 
 /**
  * Implementation of FeeStructureService.
@@ -22,23 +24,53 @@ public class FeeStructureServiceImpl implements FeeStructureService {
     private final FeeStructureRepository feeStructureRepository;
     private final FeeHeadRepository feeHeadRepository;
     private final ModelMapper modelMapper;
+    private final OfferingServiceClient offeringServiceClient;
 
     public FeeStructureServiceImpl(FeeStructureRepository feeStructureRepository,
             FeeHeadRepository feeHeadRepository,
-            ModelMapper modelMapper) {
+            ModelMapper modelMapper,
+            OfferingServiceClient offeringServiceClient) {
         this.feeStructureRepository = feeStructureRepository;
         this.feeHeadRepository = feeHeadRepository;
         this.modelMapper = modelMapper;
+        this.offeringServiceClient = offeringServiceClient;
     }
 
     @Override
     public FeeStructureDTO createFeeStructure(FeeStructureDTO feeStructureDTO) {
-        // Validate Fee Head exists
         if (!feeHeadRepository.existsById(feeStructureDTO.getFeeHeadId())) {
             throw new ResourceNotFoundException("feeHeadId", feeStructureDTO.getFeeHeadId());
         }
+        
         FeeStructure feeStructure = modelMapper.map(feeStructureDTO, FeeStructure.class);
         feeStructure.setTenantId(SecurityUtils.getCurrentTenantId());
+
+        if (feeStructureDTO.getOfferingId() != null) {
+            ApiResponse<OfferingServiceClient.OfferingResponse> response = 
+                offeringServiceClient.getOfferingById(feeStructureDTO.getOfferingId());
+            
+            if (response != null && "SUCCESS".equals(response.getStatus()) && response.getApiData() != null) {
+                String classId = response.getApiData().getClassId();
+                String yearId = response.getApiData().getYearId();
+                String courseId = response.getApiData().getCourseId();
+                
+                if (classId != null && !classId.isEmpty()) {
+                    feeStructure.setLevelId(classId);
+                    feeStructure.setOfferingId(null);
+                } else if (yearId != null && !yearId.isEmpty()) {
+                    feeStructure.setLevelId(yearId);
+                    feeStructure.setOfferingId(null);
+                } else if (courseId != null && !courseId.isEmpty()) {
+                    feeStructure.setLevelId(courseId);
+                    feeStructure.setOfferingId(null);
+                } else {
+                    feeStructure.setOfferingId(feeStructureDTO.getOfferingId());
+                }
+            } else {
+                feeStructure.setOfferingId(feeStructureDTO.getOfferingId());
+            }
+        }
+
         FeeStructure saved = feeStructureRepository.save(feeStructure);
         return modelMapper.map(saved, FeeStructureDTO.class);
     }
@@ -54,7 +86,39 @@ public class FeeStructureServiceImpl implements FeeStructureService {
     @Override
     public List<FeeStructureDTO> getFeeStructuresByOffering(String offeringId) {
         String tenantId = SecurityUtils.getCurrentTenantId();
-        return feeStructureRepository.findAllByOfferingIdAndTenantId(offeringId, tenantId).stream()
+        
+        List<FeeStructure> structures = feeStructureRepository.findAllByOfferingIdAndTenantId(offeringId, tenantId);
+        
+        ApiResponse<OfferingServiceClient.OfferingResponse> response = 
+            offeringServiceClient.getOfferingById(offeringId);
+            
+        if (response != null && "SUCCESS".equals(response.getStatus()) && response.getApiData() != null) {
+            String classId = response.getApiData().getClassId();
+            String yearId = response.getApiData().getYearId();
+            String courseId = response.getApiData().getCourseId();
+            
+            String levelId = null;
+            if (classId != null && !classId.isEmpty()) {
+                levelId = classId;
+            } else if (yearId != null && !yearId.isEmpty()) {
+                levelId = yearId;
+            } else if (courseId != null && !courseId.isEmpty()) {
+                levelId = courseId;
+            }
+
+            if (levelId != null) {
+                List<FeeStructure> levelStructures = feeStructureRepository.findAllByLevelIdAndTenantId(levelId, tenantId);
+                // In case the frontend explicitly needs the offeringId returned so it can match the filter
+                levelStructures.forEach(ls -> {
+                    if (ls.getOfferingId() == null) {
+                        ls.setOfferingId(offeringId);
+                    }
+                });
+                structures.addAll(levelStructures);
+            }
+        }
+
+        return structures.stream()
                 .map(fs -> modelMapper.map(fs, FeeStructureDTO.class))
                 .collect(Collectors.toList());
     }

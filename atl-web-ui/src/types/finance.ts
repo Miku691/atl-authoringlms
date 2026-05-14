@@ -12,7 +12,8 @@ export interface FeeHead {
 export interface FeeStructure {
     id?: string;
     feeHeadId: string;
-    offeringId: string;
+    offeringId: string | null;
+    levelId?: string;
     amount: number;
     academicYear: string;
     tenantId?: string;
