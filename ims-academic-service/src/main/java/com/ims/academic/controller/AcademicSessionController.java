@@ -29,6 +29,13 @@ public class AcademicSessionController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Structure cloned successfully", null));
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<AcademicSessionDto>> updateStatus(
+            @PathVariable String id,
+            @RequestParam String status) {
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Status updated", service.updateStatus(id, status)));
+    }
+
     @PostMapping
     public ResponseEntity<ApiResponse<AcademicSessionDto>> create(@RequestBody AcademicSessionDto dto) {
         return new ResponseEntity<>(

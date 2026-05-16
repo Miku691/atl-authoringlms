@@ -27,4 +27,13 @@ public class InternalFinanceController {
         fiscalClosingService.allocateAndCarryForward(request, tenantId);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Finance transition processed", null));
     }
+
+    @PostMapping("/bulk-allocate-and-carry-forward")
+    public ResponseEntity<ApiResponse<Void>> bulkAllocateAndCarryForward(
+            @RequestBody java.util.List<Map<String, String>> requests,
+            @RequestHeader(name = "X-Tenant-Id") String tenantId) {
+        
+        fiscalClosingService.bulkAllocateAndCarryForward(requests, tenantId);
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK.value(), "Bulk finance transitions processed", null));
+    }
 }

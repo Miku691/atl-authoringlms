@@ -89,6 +89,10 @@
                         <td>Stores metadata, status, and <code>isLocked</code> flag.</td>
                     </tr>
                     <tr>
+                        <td><code>PATCH /sessions/{id}/status</code></td>
+                        <td>Atomic endpoint for session transitions with <strong>Academic Readiness</strong> validation.</td>
+                    </tr>
+                    <tr>
                         <td><code>AcademicSessionCloneService</code></td>
                         <td>Handles deep-copy logic for offerings and mappings across sessions.</td>
                     </tr>
@@ -96,16 +100,26 @@
                         <td><code>SessionManagementPage.tsx</code></td>
                         <td>React-based wizard for guided session setup.</td>
                     </tr>
-                    <tr>
-                        <td><code>AcademicReadinessService</code></td>
-                        <td>Validates that a session exists and has offerings before allowing operations.</td>
-                    </tr>
                 </tbody>
             </table>
         </section>
 
         <section>
-            <h2>How to Use This Feature</h2>
+            <h2>Validation & Safety Guards</h2>
+            <div class="card-grid">
+                <div class="card">
+                    <h3>Readiness Guard</h3>
+                    <p>The system prevents moving a session to <strong>ACTIVE</strong> if core components (Programs, Offerings, Subject Mappings) are missing.</p>
+                </div>
+                <div class="card">
+                    <h3>Immutable Closure</h3>
+                    <p>Once a session is <strong>CLOSED</strong>, it is automatically locked (<code>isLocked = true</code>) to prevent accidental data mutation.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">How to Use This Feature</h2>
             <div class="info-box">
                 <p><strong>Scenario: Starting a New Year</strong></p>
                 <ol>
@@ -115,6 +129,70 @@
                     <li>Verify the cloned offerings in the "Offerings" page.</li>
                     <li>Change status to <strong>Open Enrollment</strong> once you are ready to accept students.</li>
                 </ol>
+            </div>
+        </section>
+
+        <section class="mt-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-4">Production-Grade Guardrails</h2>
+            <div class="card-grid">
+                <div class="card bg-blue-50">
+                    <h3>Cross-Service Integrity</h3>
+                    <ul class="text-sm space-y-2 mt-2">
+                        <li>• Student Service validates Session Status before enrollment.</li>
+                        <li>• Finance Service performs batch allocation for promotions.</li>
+                        <li>• Arrears are automatically carried forward during transition.</li>
+                    </ul>
+                </div>
+                <div class="card bg-purple-50">
+                    <h3>Auto-Governance</h3>
+                    <ul class="text-sm space-y-2 mt-2">
+                        <li>• Activating a new session auto-closes the previous one.</li>
+                        <li>• CLOSED sessions are automatically locked.</li>
+                        <li>• Readiness Modal prevents activation if structure is incomplete.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-12">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6 text-center">Session State Machine</h2>
+            <div class="overflow-x-auto">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>Allowed Actions</th>
+                            <th>Enrollment?</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm">
+                        <tr>
+                            <td class="font-bold text-slate-500">DRAFT</td>
+                            <td>Initial creation. Structural setup only.</td>
+                            <td>Modify structure, Clone.</td>
+                            <td class="text-red-500 font-bold">BLOCKED</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-blue-600">ENROLLMENT_OPEN</td>
+                            <td>Structure frozen. Admissions active.</td>
+                            <td>New Student Registration.</td>
+                            <td class="text-green-500 font-bold">ALLOWED</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-green-600">ACTIVE</td>
+                            <td>Operational current session.</td>
+                            <td>Attendance, Exams, Grading.</td>
+                            <td class="text-green-500 font-bold">ALLOWED</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-red-600">CLOSED</td>
+                            <td>Session finished. Immutable archive.</td>
+                            <td>View Only. Locked.</td>
+                            <td class="text-red-500 font-bold">BLOCKED</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </section>
     </main>

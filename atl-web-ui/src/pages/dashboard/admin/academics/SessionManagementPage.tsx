@@ -46,6 +46,11 @@ const SessionManagementPage: React.FC = () => {
         sourceSessionId: '' // For cloning
     });
 
+    const [readinessError, setReadinessError] = useState<{
+        message: string;
+        components: string[];
+    } | null>(null);
+
     useEffect(() => {
         if (tenantId) fetchSessions();
     }, [tenantId]);
@@ -108,9 +113,25 @@ const SessionManagementPage: React.FC = () => {
         try {
             await api.patch(`/ims-academic-service/sessions/${sessionId}/status?status=${newStatus}`);
             toast.success(`Session status updated to ${newStatus}`);
+            setReadinessError(null);
             fetchSessions();
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Failed to update status");
+            const message = error.response?.data?.message || "Failed to update status";
+            
+            // Check if it's a readiness error (structured or legacy)
+            const responseData = error.response?.data;
+            if (responseData?.apiData && Array.isArray(responseData.apiData)) {
+                setReadinessError({ 
+                    message: responseData.message, 
+                    components: responseData.apiData 
+                });
+            } else if (message.includes("Missing components:")) {
+                const componentsPart = message.split("Missing components:")[1];
+                const components = componentsPart.split(",").map((c: string) => c.trim());
+                setReadinessError({ message, components });
+            } else {
+                toast.error(message);
+            }
         }
     };
 
@@ -368,6 +389,71 @@ const SessionManagementPage: React.FC = () => {
                             </div>
                         </div>
                     )}
+                </div>
+            </Modal>
+
+            {/* Readiness Error Modal */}
+            <Modal
+                isOpen={!!readinessError}
+                onClose={() => setReadinessError(null)}
+                title="Activation Blocked"
+                icon={<AlertCircle className="text-red-500" />}
+                footer={
+                    <button
+                        onClick={() => setReadinessError(null)}
+                        className="modal-btn-primary"
+                    >
+                        I'll Fix It
+                    </button>
+                }
+            >
+                <div className="space-y-4">
+                    <div className="p-4 rounded-2xl bg-red-50 border border-red-100 flex gap-3 dark:bg-red-500/10 dark:border-red-500/20">
+                        <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
+                        <p className="text-sm text-red-700 dark:text-red-400 font-medium">
+                            This session cannot be activated yet because some institutional components are missing or incomplete.
+                        </p>
+                    </div>
+
+                    <div className="space-y-2">
+                        <h4 className="text-sm font-bold text-content-primary px-1">Required Actions:</h4>
+                        <div className="grid gap-2">
+                            {readinessError?.components.map((comp, idx) => {
+                                let label = comp.replace(/_/g, ' ');
+                                if (comp.startsWith('SUBJECT_MAPPING_MISSING_')) {
+                                    const offeringName = comp.replace('SUBJECT_MAPPING_MISSING_', '').replace(/_/g, ' ');
+                                    label = `Map subjects to ${offeringName}`;
+                                } else if (comp === 'PROGRAM') {
+                                    label = 'Define at least one Academic Program';
+                                } else if (comp === 'ACADEMIC_SESSION') {
+                                    label = 'Configure session metadata';
+                                } else if (comp === 'TENANT_SETTINGS_CLASSES_CONFIG') {
+                                    label = 'Configure Institution Structure in Settings';
+                                } else if (comp === 'OFFERINGS_MISSING') {
+                                    label = 'Create Class/Semester Offerings';
+                                }
+
+                                return (
+                                    <div key={idx} className="flex items-center justify-between p-3 rounded-xl bg-chrome border border-border group hover:border-indigo-500/30 transition-colors">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500 dark:bg-red-500/10 shrink-0">
+                                                <AlertCircle className="w-4 h-4" />
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-semibold text-content-primary leading-none">{label}</span>
+                                                <span className="text-[10px] text-content-muted mt-1 uppercase tracking-wider">Configuration Required</span>
+                                            </div>
+                                        </div>
+                                        <ArrowRight className="w-4 h-4 text-content-muted group-hover:text-indigo-500 transition-colors" />
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <p className="text-xs text-content-secondary px-1 italic">
+                        Tip: Map subjects to all classes and ensure instructors are assigned before activating.
+                    </p>
                 </div>
             </Modal>
         </div>

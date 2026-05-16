@@ -2,17 +2,45 @@ import React, { useState, useEffect } from 'react';
 import { 
     BarChart3, PieChart as PieChartIcon, TrendingUp, DollarSign, Download
 } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../../store/store';
+import { academicService, type AcademicSession } from '../../../../api/academicService';
 import { financeService } from '../../../../api/financeService';
 import type { Budget } from '../../../../types/finance';
 import toast from 'react-hot-toast';
 
 export const BudgetReportPage: React.FC = () => {
+    const { user } = useSelector((state: RootState) => state.auth);
     const [reportData, setReportData] = useState<Budget[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [academicYear, setAcademicYear] = useState('2023-24');
+    const [isLoading, setIsLoading] = useState(false);
+    const [academicYear, setAcademicYear] = useState('');
+    const [sessions, setSessions] = useState<AcademicSession[]>([]);
 
     useEffect(() => {
-        fetchReport();
+        if (user?.tenantId) {
+            fetchSessions();
+        }
+    }, [user?.tenantId]);
+
+    const fetchSessions = async () => {
+        try {
+            const sessionData = await academicService.getSessionsByTenant(user!.tenantId!);
+            setSessions(sessionData);
+            const currentSession = sessionData.find((s: AcademicSession) => s.isCurrent);
+            if (currentSession) {
+                setAcademicYear(currentSession.name);
+            } else if (sessionData.length > 0) {
+                setAcademicYear(sessionData[0].name);
+            }
+        } catch (error) {
+            toast.error('Failed to load academic sessions');
+        }
+    };
+
+    useEffect(() => {
+        if (academicYear) {
+            fetchReport();
+        }
     }, [academicYear]);
 
     const fetchReport = async () => {
@@ -43,9 +71,14 @@ export const BudgetReportPage: React.FC = () => {
                         value={academicYear}
                         onChange={(e) => setAcademicYear(e.target.value)}
                         className="px-3 py-2 border border-blue-100 rounded-lg outline-none bg-surface text-sm font-semibold text-blue-600 shadow-sm"
+                        disabled={sessions.length === 0}
                     >
-                        <option value="2023-24">2023-24</option>
-                        <option value="2024-25">2024-25</option>
+                        {sessions.length === 0 && <option value="">Loading...</option>}
+                        {sessions.map(s => (
+                            <option key={s.id} value={s.name}>
+                                {s.name} {s.isCurrent ? '(Current)' : ''}
+                            </option>
+                        ))}
                     </select>
                     <button className="p-2 text-content-secondary hover:bg-chrome rounded-lg transition-colors">
                         <Download className="h-5 w-5" />

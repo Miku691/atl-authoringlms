@@ -86,7 +86,14 @@ public class ImsStudentEnrollmentsServiceImpl implements ImsStudentEnrollmentsSe
                     || offeringResponse.getApiData() == null) {
                 throw new ResourceNotFoundException("Offering ID", offeringId);
             }
-            // Optional: Check status (ENROLLMENT_OPEN or ACTIVE)
+            
+            // Critical Validation: Only allow enrollment in OPEN or ACTIVE sessions
+            String sessionStatus = offeringResponse.getApiData().getSessionStatus();
+            if ("DRAFT".equals(sessionStatus) || "CLOSED".equals(sessionStatus)) {
+                throw new IllegalStateException("Enrollment is not allowed for this offering. Session is in " + sessionStatus + " state.");
+            }
+        } catch (ResourceNotFoundException | IllegalStateException e) {
+            throw e;
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid Offering ID or Academic Service unavailable: " + offeringId);
         }
@@ -111,6 +118,8 @@ public class ImsStudentEnrollmentsServiceImpl implements ImsStudentEnrollmentsSe
         
         validateOffering(dto.getTargetOfferingId());
 
+        List<Map<String, String>> financeRequests = new java.util.ArrayList<>();
+
         for (String studentId : dto.getStudentIds()) {
             Optional<ImsStudentEnrollments> currentOpt = repo.findByStudentIdAndStatusAndTenantId(studentId, "ACTIVE", tenantId);
             
@@ -125,29 +134,36 @@ public class ImsStudentEnrollmentsServiceImpl implements ImsStudentEnrollmentsSe
                 repo.save(active);
             }
 
-            // 2. Create new enrollment
-            ImsStudentEnrollments next = ImsStudentEnrollments.builder()
-                    .studentId(studentId)
-                    .offeringId(dto.getTargetOfferingId())
-                    .academicYear(dto.getTargetAcademicYear())
-                    .tenantId(tenantId)
-                    .status("ACTIVE")
-                    .build();
-            
-            repo.save(next);
+            // 2. Create new enrollment ONLY if not a passout
+            if (!"COMPLETED".equalsIgnoreCase(dto.getNewStatus()) && !"COMPLETED".equalsIgnoreCase(dto.getAction())) {
+                ImsStudentEnrollments next = ImsStudentEnrollments.builder()
+                        .studentId(studentId)
+                        .offeringId(dto.getTargetOfferingId())
+                        .academicYear(dto.getTargetAcademicYear())
+                        .tenantId(tenantId)
+                        .status("ACTIVE")
+                        .build();
+                
+                repo.save(next);
 
-            // 3. Trigger Finance Orchestration (Async or Sync)
-            try {
-                Map<String, String> financeReq = new HashMap<>();
+                // 3. Prepare Finance Request
+                Map<String, String> financeReq = new java.util.HashMap<>();
                 financeReq.put("studentId", studentId);
                 financeReq.put("targetOfferingId", dto.getTargetOfferingId());
                 financeReq.put("targetAcademicYear", dto.getTargetAcademicYear());
                 financeReq.put("sourceAcademicYear", sourceYear);
-                
-                financeClient.triggerPromotionFinance(financeReq);
+                financeRequests.add(financeReq);
+            } else {
+                log.info("Student {} marked as COMPLETED. No new enrollment created.", studentId);
+            }
+        }
+
+        // 4. Batch Trigger Finance Orchestration
+        if (!financeRequests.isEmpty()) {
+            try {
+                financeClient.bulkTriggerPromotionFinance(financeRequests);
             } catch (Exception e) {
-                log.error("Failed to trigger finance orchestration for student {}: {}", studentId, e.getMessage());
-                // In a production system, this should probably be queued/retried
+                log.error("Failed to trigger bulk finance orchestration: {}", e.getMessage());
             }
         }
     }

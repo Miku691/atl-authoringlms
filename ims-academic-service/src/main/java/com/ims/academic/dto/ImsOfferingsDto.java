@@ -26,4 +26,5 @@ public class ImsOfferingsDto {
     private String courseId;
     private String metadata;
     private OfferingStatus status;
+    private String sessionStatus; // Added for cross-service validation
 }

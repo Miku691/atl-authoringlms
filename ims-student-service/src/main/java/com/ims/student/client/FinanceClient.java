@@ -16,4 +16,7 @@ public interface FinanceClient {
      */
     @PostMapping("/finance/internal/allocate-and-carry-forward")
     ApiResponse<Void> triggerPromotionFinance(@RequestBody Map<String, String> request);
+
+    @PostMapping("/finance/internal/bulk-allocate-and-carry-forward")
+    ApiResponse<Void> bulkTriggerPromotionFinance(@RequestBody java.util.List<Map<String, String>> requests);
 }

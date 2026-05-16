@@ -20,6 +20,7 @@ public class AcademicSessionServiceImpl implements AcademicSessionService {
 
     private final AcademicSessionRepo repo;
     private final ImsProgramsRepo programRepo;
+    private final AcademicReadinessServiceImpl readinessService;
     private final ModelMapper modelMapper;
 
     @Override
@@ -76,6 +77,50 @@ public class AcademicSessionServiceImpl implements AcademicSessionService {
         return repo.findByProgramId(programId).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public AcademicSessionDto updateStatus(String id, String status) {
+        AcademicSession existing = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Session ID", id));
+
+        AcademicSession.SessionStatus newStatus = AcademicSession.SessionStatus.valueOf(status);
+
+        // Security/Business Rule: Cannot move from CLOSED or YEP back to ACTIVE easily
+        if (existing.getStatus() == AcademicSession.SessionStatus.CLOSED) {
+            throw new IllegalStateException("Cannot change status of a CLOSED session.");
+        }
+
+        // Readiness check for ACTIVE status
+        if (newStatus == AcademicSession.SessionStatus.ACTIVE) {
+            var readiness = readinessService.checkReadiness(existing.getTenantId());
+            if (!readiness.isReady()) {
+                throw new com.ims.academic.exception.ReadinessValidationException(readiness.getMissingComponents());
+            }
+
+            // Auto-Archive: Close any other ACTIVE sessions for this tenant
+            List<AcademicSession> activeSessions = repo.findByTenantId(existing.getTenantId()).stream()
+                    .filter(s -> s.getStatus() == AcademicSession.SessionStatus.ACTIVE && !s.getId().equals(id))
+                    .collect(Collectors.toList());
+            
+            for (AcademicSession active : activeSessions) {
+                active.setStatus(AcademicSession.SessionStatus.CLOSED);
+                active.setLocked(true);
+                active.setCurrent(false);
+                repo.save(active);
+            }
+
+            existing.setCurrent(true); // Make this one the current session
+        }
+
+        existing.setStatus(newStatus);
+        
+        // Auto-lock if CLOSED
+        if (newStatus == AcademicSession.SessionStatus.CLOSED) {
+            existing.setLocked(true);
+        }
+
+        return toDto(repo.save(existing));
     }
 
     @Override

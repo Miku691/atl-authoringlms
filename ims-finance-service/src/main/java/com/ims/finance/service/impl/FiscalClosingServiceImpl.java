@@ -12,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,7 @@ public class FiscalClosingServiceImpl implements FiscalClosingService {
     private final StudentFeeRecordRepository studentFeeRecordRepository;
     private final FeeHeadRepository feeHeadRepository;
     private final StudentFeeAllocationServiceImpl studentFeeAllocationService;
+    private final com.ims.finance.client.OfferingServiceClient offeringServiceClient;
 
     @Override
     @Transactional
@@ -72,5 +75,64 @@ public class FiscalClosingServiceImpl implements FiscalClosingService {
 
         // 2. Allocate New Fees
         studentFeeAllocationService.allocateFeesToStudentInternal(studentId, targetOfferingId, targetAcademicYear, tenantId);
+    }
+
+    @Override
+    @Transactional
+    public void bulkAllocateAndCarryForward(List<Map<String, String>> requests, String tenantId) {
+        if (requests == null || requests.isEmpty()) return;
+
+        log.info("Processing bulk financial transition for {} requests in tenant {}", requests.size(), tenantId);
+
+        // Pre-fetch Arrears Head
+        FeeHead arrearsHead = feeHeadRepository.findByTenantIdAndName(tenantId, "Arrears")
+                .orElseGet(() -> {
+                    FeeHead newHead = new FeeHead();
+                    newHead.setName("Arrears");
+                    newHead.setDescription("Previous Year Dues");
+                    newHead.setTenantId(tenantId);
+                    return feeHeadRepository.save(newHead);
+                });
+
+        // Optimization: Cache offering data per targetOfferingId
+        Map<String, com.ims.finance.client.OfferingServiceClient.OfferingResponse> offeringCache = new java.util.HashMap<>();
+
+        for (Map<String, String> request : requests) {
+            String studentId = request.get("studentId");
+            String targetOfferingId = request.get("targetOfferingId");
+            String targetAcademicYear = request.get("targetAcademicYear");
+            String sourceAcademicYear = request.get("sourceAcademicYear");
+
+            // 1. Handle Arrears Carry-Forward
+            if (sourceAcademicYear != null && !"UNKNOWN".equals(sourceAcademicYear)) {
+                BigDecimal totalBalance = studentFeeRecordRepository.sumBalanceByStudentAndYear(studentId, sourceAcademicYear, tenantId);
+                if (totalBalance != null && totalBalance.compareTo(BigDecimal.ZERO) > 0) {
+                    if (!studentFeeRecordRepository.existsByStudentIdAndFeeHeadIdAndOfferingIdAndAcademicYear(
+                            studentId, arrearsHead.getId(), targetOfferingId, targetAcademicYear)) {
+                        
+                        StudentFeeRecord arrearsRecord = new StudentFeeRecord();
+                        arrearsRecord.setStudentId(studentId);
+                        arrearsRecord.setFeeHeadId(arrearsHead.getId());
+                        arrearsRecord.setOfferingId(targetOfferingId);
+                        arrearsRecord.setAcademicYear(targetAcademicYear);
+                        arrearsRecord.setAmountDue(totalBalance);
+                        arrearsRecord.setAmountPaid(BigDecimal.ZERO);
+                        arrearsRecord.setBalance(totalBalance);
+                        arrearsRecord.setDueDate(LocalDate.now());
+                        arrearsRecord.setStatus(StudentFeeRecord.FeeStatus.UNPAID);
+                        arrearsRecord.setTenantId(tenantId);
+                        studentFeeRecordRepository.save(arrearsRecord);
+                    }
+                }
+            }
+
+            // 2. Allocate New Fees (Using Cache)
+            com.ims.finance.client.OfferingServiceClient.OfferingResponse offeringData = offeringCache.computeIfAbsent(targetOfferingId, id -> {
+                var resp = offeringServiceClient.getOfferingById(id);
+                return (resp != null && "SUCCESS".equals(resp.getStatus())) ? resp.getApiData() : null;
+            });
+
+            studentFeeAllocationService.allocateFeesToStudentInternal(studentId, targetOfferingId, targetAcademicYear, tenantId, offeringData);
+        }
     }
 }

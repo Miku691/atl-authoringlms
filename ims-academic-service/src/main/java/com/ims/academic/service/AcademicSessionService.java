@@ -13,6 +13,8 @@ public interface AcademicSessionService {
     List<AcademicSessionDto> getByProgram(String programId);
 
     List<AcademicSessionDto> getByTenant(String tenantId);
+    
+    AcademicSessionDto updateStatus(String id, String status);
 
     void delete(String id);
 }

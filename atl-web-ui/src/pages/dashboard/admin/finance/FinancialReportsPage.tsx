@@ -13,11 +13,18 @@ import type { Transaction, OutstandingFee, IncomeExpenseReport } from '../../../
 import toast from 'react-hot-toast';
 import { format } from 'date-fns';
 import { useCurrency } from '../../../../context/CurrencyContext';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../../../../store/store';
+import { academicService, type AcademicSession, type ImsOffering } from '../../../../api/academicService';
 
 export const FinancialReportsPage: React.FC = () => {
+    const { user } = useSelector((state: RootState) => state.auth);
     const [activeTab, setActiveTab] = useState<'daybook' | 'outstanding' | 'income-expense'>('daybook');
     const { format: formatCurrency } = useCurrency();
     const [isLoading, setIsLoading] = useState(false);
+    
+    const [offerings, setOfferings] = useState<ImsOffering[]>([]);
+    const [sessions, setSessions] = useState<AcademicSession[]>([]);
 
     // Day Book state
     const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'));
@@ -27,12 +34,76 @@ export const FinancialReportsPage: React.FC = () => {
     const [outstandingFees, setOutstandingFees] = useState<OutstandingFee[]>([]);
 
     // Income/Expense state
-    const [academicYear, setAcademicYear] = useState('2023-24');
+    const [academicYear, setAcademicYear] = useState('');
     const [incomeExpenseData, setIncomeExpenseData] = useState<IncomeExpenseReport | null>(null);
+
+    useEffect(() => {
+        if (user?.tenantId) {
+            fetchInitialData();
+        }
+    }, [user?.tenantId]);
+
+    const fetchInitialData = async () => {
+        try {
+            const [offeringsData, sessionsData] = await Promise.all([
+                academicService.getOfferingsByTenant(user!.tenantId!),
+                academicService.getSessionsByTenant(user!.tenantId!)
+            ]);
+            
+            let processedOfferings = [...offeringsData];
+            if (user?.tenantType === 'COLLEGE') {
+                try {
+                    const [branchesData, yearsData] = await Promise.all([
+                        academicService.getBranchesByTenant(user!.tenantId!),
+                        academicService.getYearsByTenant(user!.tenantId!)
+                    ]);
+                    const branchesMap = new Map(branchesData.map((b: any) => [b.id, b]));
+                    const yearsMap = new Map(yearsData.map((y: any) => [y.id, y]));
+                    processedOfferings = processedOfferings.map(off => {
+                        if (off.yearId) {
+                            const year = yearsMap.get(off.yearId) as any;
+                            if (year) {
+                                const branch = branchesMap.get(year.branchId) as any;
+                                return { ...off, displayName: branch ? `${branch.name} - ${year.name}` : year.name };
+                            }
+                        }
+                        return off;
+                    });
+                } catch (e) {}
+            } else if (user?.tenantType === 'COACHING') {
+                try {
+                    const coursesData = await academicService.getCoursesByTenant(user!.tenantId!);
+                    const coursesMap = new Map(coursesData.map((c: any) => [c.id, c]));
+                    processedOfferings = processedOfferings.map(off => {
+                        if (off.courseId) {
+                            const course = coursesMap.get(off.courseId) as any;
+                            if (course) return { ...off, displayName: course.name };
+                        }
+                        return off;
+                    });
+                } catch (e) {}
+            }
+            setOfferings(processedOfferings);
+            setSessions(sessionsData);
+            
+            const currentSession = sessionsData.find((s: AcademicSession) => s.isCurrent);
+            if (currentSession) setAcademicYear(currentSession.name);
+            else if (sessionsData.length > 0) setAcademicYear(sessionsData[0].name);
+            
+        } catch (error) {
+            console.error("Failed to fetch initial report context", error);
+        }
+    };
 
     useEffect(() => {
         fetchData();
     }, [activeTab, selectedDate, academicYear]);
+
+    const getOfferingName = (id: string | null | undefined) => {
+        if (!id) return '-';
+        const off = offerings.find(o => o.id === id);
+        return off ? (off.displayName || off.name) : id;
+    };
 
     const fetchData = async () => {
         try {
@@ -77,7 +148,7 @@ export const FinancialReportsPage: React.FC = () => {
                     <thead className="bg-chrome">
                         <tr>
                             <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Transaction ID</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Student ID</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Student</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Mode</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-content-secondary uppercase tracking-wider">Reference</th>
                             <th className="px-6 py-3 text-right text-xs font-medium text-content-secondary uppercase tracking-wider">Amount</th>
@@ -92,7 +163,16 @@ export const FinancialReportsPage: React.FC = () => {
                             dayBookTransactions.map((t: any) => (
                                 <tr key={t.id} className="hover:bg-chrome">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-content-primary">{t.id.substring(0, 8)}...</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">{t.studentId}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap">
+                                        {t.studentName ? (
+                                            <>
+                                                <div className="text-sm font-bold text-content-primary">{t.studentName}</div>
+                                                <div className="text-xs text-content-secondary">{t.studentId}</div>
+                                            </>
+                                        ) : (
+                                            <div className="text-sm text-content-primary">{t.studentId}</div>
+                                        )}
+                                    </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">
                                         <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold">
                                             {t.paymentMode}
@@ -142,7 +222,11 @@ export const FinancialReportsPage: React.FC = () => {
                                         <div className="text-sm font-bold text-content-primary">{f.studentName}</div>
                                         <div className="text-xs text-content-secondary">{f.enrollmentId}</div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">{f.offeringId}</td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-content-secondary">
+                                        <div className="px-3 py-1 bg-surface border border-border rounded-lg inline-block font-medium">
+                                            {getOfferingName(f.offeringId)}
+                                        </div>
+                                    </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">{formatCurrency(f.totalAllocated)}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-red-600">{formatCurrency(f.totalOverdue)}</td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-content-primary">{formatCurrency(f.balance)}</td>
@@ -161,10 +245,13 @@ export const FinancialReportsPage: React.FC = () => {
                 <select
                     value={academicYear}
                     onChange={(e) => setAcademicYear(e.target.value)}
-                    className="border border-border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+                    className="border border-border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-blue-500 bg-surface"
+                    disabled={sessions.length === 0}
                 >
-                    <option value="2023-24">2023-24</option>
-                    <option value="2024-25">2024-25</option>
+                    {sessions.length === 0 && <option value="">Loading...</option>}
+                    {sessions.map(s => (
+                        <option key={s.id} value={s.name}>{s.name} {s.isCurrent ? '(Current)' : ''}</option>
+                    ))}
                 </select>
                 <div className="flex space-x-2">
                     <button className="p-2 text-content-secondary hover:bg-chrome rounded-lg"><Download className="h-5 w-5" /></button>

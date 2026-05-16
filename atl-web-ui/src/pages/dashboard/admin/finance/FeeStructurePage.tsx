@@ -332,7 +332,17 @@ const FeeStructurePage: React.FC = () => {
                         <select required className="w-full px-4 py-2.5 border rounded-xl outline-none" style={{ background: 'var(--bg-surface-2)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} value={newStructure.feeHeadId} onChange={e => setNewStructure({ ...newStructure, feeHeadId: e.target.value })}>
                             <option value="">-- Select Fee Head --</option>
                             {feeHeads.map(h => {
-                                const isMapped = structures.some(s => s.offeringId === newStructure.offeringId && s.feeHeadId === h.id);
+                                const selectedOff = offerings.find(o => o.id === newStructure.offeringId);
+                                const isMapped = structures.some(s => {
+                                    if (s.feeHeadId !== h.id) return false;
+                                    if (s.offeringId === newStructure.offeringId) return true;
+                                    if (s.levelId && selectedOff) {
+                                        return s.levelId === selectedOff.classId || 
+                                               s.levelId === selectedOff.yearId || 
+                                               s.levelId === selectedOff.courseId;
+                                    }
+                                    return false;
+                                });
                                 return (
                                     <option key={h.id} value={h.id} disabled={isMapped}>
                                         {h.name} {isMapped ? '(Already Mapped)' : ''}

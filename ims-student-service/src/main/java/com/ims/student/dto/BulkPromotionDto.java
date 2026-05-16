@@ -15,4 +15,5 @@ public class BulkPromotionDto {
     private String targetAcademicYear;
     private List<String> studentIds;
     private String action; // PROMOTE, REPEAT, COMPLETED
+    private String newStatus; // To match frontend payload
 }

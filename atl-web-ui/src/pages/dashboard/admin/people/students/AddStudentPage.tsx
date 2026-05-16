@@ -6,6 +6,7 @@ import api from '../../../../../utils/api';
 import toast from 'react-hot-toast';
 import { User, BookOpen, Save, Loader2 } from 'lucide-react';
 import CustomDatePicker from '../../../../../components/common/CustomDatePicker';
+import SubscriptionLockedOverlay from '../../components/SubscriptionLockedOverlay';
 
 interface Section {
     id: string;
@@ -57,6 +58,8 @@ const AddStudentPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [actualTenantType, setActualTenantType] = useState<string | null>(null);
+    const [subLimits, setSubLimits] = useState<{ planName: string; maxStudents: number; currentStudents: number } | null>(null);
+    const [isCheckingLimits, setIsCheckingLimits] = useState(true);
 
     // Initial Data
     const [classes, setClasses] = useState<ImsClass[]>([]);
@@ -135,7 +138,31 @@ const AddStudentPage: React.FC = () => {
             }
         };
         checkType();
-    }, [user]);
+        if (tenantId) checkLimits();
+    }, [user, tenantId]);
+
+    const checkLimits = async () => {
+        try {
+            setIsCheckingLimits(true);
+            const [subRes, statsRes] = await Promise.all([
+                api.get(`/ims-platform-service/api/v1/platform/tenant/${tenantId}/subscription`),
+                api.get(`/ims-platform-service/api/v1/platform/tenant/stats/${tenantId}`)
+            ]);
+
+            const subData = subRes.data.apiData || subRes.data;
+            const statsData = statsRes.data.apiData || statsRes.data;
+
+            setSubLimits({
+                planName: subData.planName,
+                maxStudents: subData.maxStudents,
+                currentStudents: statsData.studentCount
+            });
+        } catch (error) {
+            console.error("Failed to check subscription limits", error);
+        } finally {
+            setIsCheckingLimits(false);
+        }
+    };
 
     useEffect(() => {
         if (tenantId && actualTenantType) {
@@ -326,7 +353,20 @@ const AddStudentPage: React.FC = () => {
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
+        <div className="max-w-4xl mx-auto p-6 relative">
+            {isCheckingLimits ? (
+                <div className="fixed inset-0 z-[100] bg-surface/50 backdrop-blur-sm flex items-center justify-center">
+                    <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+                </div>
+            ) : subLimits && subLimits.maxStudents > 0 && subLimits.currentStudents >= subLimits.maxStudents ? (
+                <SubscriptionLockedOverlay
+                    planName={subLimits.planName}
+                    reason="STUDENT_LIMIT"
+                    currentCount={subLimits.currentStudents}
+                    maxLimit={subLimits.maxStudents}
+                />
+            ) : null}
+
             <div className="flex justify-between items-center mb-6">
                 <div>
                     <h1 className="text-2xl font-bold text-content-primary">Add New Student</h1>

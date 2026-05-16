@@ -18,4 +18,6 @@ public class ImsOfferingsDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private String status; // ACTIVE, INACTIVE, UPCOMING
+    private String sessionId;
+    private String sessionStatus;
 }

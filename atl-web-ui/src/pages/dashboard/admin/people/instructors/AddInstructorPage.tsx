@@ -23,6 +23,7 @@ import PageHeader from '../../../../../components/common/PageHeader';
 import FloatingLabelInput from '../../../../../components/common/FloatingLabelInput';
 import CustomDatePicker from '../../../../../components/common/CustomDatePicker';
 import CustomSelect from '../../../../../components/common/CustomSelect';
+import SubscriptionLockedOverlay from '../../components/SubscriptionLockedOverlay';
 
 interface ValidationErrors {
     [key: string]: string;
@@ -35,6 +36,8 @@ const AddInstructorPage: React.FC = () => {
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState<ValidationErrors>({});
+    const [subLimits, setSubLimits] = useState<{ planName: string; maxTeachers: number; currentTeachers: number } | null>(null);
+    const [isCheckingLimits, setIsCheckingLimits] = useState(true);
 
     const initialFormState = {
         firstName: '',
@@ -53,6 +56,35 @@ const AddInstructorPage: React.FC = () => {
     };
 
     const [formData, setFormData] = useState(initialFormState);
+
+    React.useEffect(() => {
+        if (tenantId) {
+            checkLimits();
+        }
+    }, [tenantId]);
+
+    const checkLimits = async () => {
+        try {
+            setIsCheckingLimits(true);
+            const [subRes, statsRes] = await Promise.all([
+                api.get(`/ims-platform-service/api/v1/platform/tenant/${tenantId}/subscription`),
+                api.get(`/ims-platform-service/api/v1/platform/tenant/stats/${tenantId}`)
+            ]);
+
+            const subData = subRes.data.apiData || subRes.data;
+            const statsData = statsRes.data.apiData || statsRes.data;
+
+            setSubLimits({
+                planName: subData.planName,
+                maxTeachers: subData.maxTeachers,
+                currentTeachers: statsData.instructorCount
+            });
+        } catch (error) {
+            console.error("Failed to check subscription limits", error);
+        } finally {
+            setIsCheckingLimits(false);
+        }
+    };
 
     const validateForm = (): boolean => {
         const newErrors: ValidationErrors = {};
@@ -148,6 +180,19 @@ const AddInstructorPage: React.FC = () => {
 
     return (
         <div className="space-y-6">
+            {isCheckingLimits ? (
+                <div className="fixed inset-0 z-[100] bg-surface/50 backdrop-blur-sm flex items-center justify-center">
+                    <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
+                </div>
+            ) : subLimits && subLimits.maxTeachers > 0 && subLimits.currentTeachers >= subLimits.maxTeachers ? (
+                <SubscriptionLockedOverlay
+                    planName={subLimits.planName}
+                    reason="TEACHER_LIMIT"
+                    currentCount={subLimits.currentTeachers}
+                    maxLimit={subLimits.maxTeachers}
+                />
+            ) : null}
+
             <div className="flex items-center gap-4">
                 <button
                     onClick={() => navigate(-1)}

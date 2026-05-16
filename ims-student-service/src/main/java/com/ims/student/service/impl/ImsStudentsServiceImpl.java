@@ -47,11 +47,13 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
         com.ims.student.dto.SubscriptionLimitsDto limits = platformClient.getTenantLimits(dto.getTenantId());
         long currentCount = repo.countByTenantId(dto.getTenantId());
 
-        if (limits.getMaxStudents() != null && currentCount >= limits.getMaxStudents()) {
-            throw new com.ims.student.exception.LimitExceededException(
-                String.format("Current plan '%s' allows only %d students. Please upgrade to add more.", 
-                limits.getPlanName(), limits.getMaxStudents())
-            );
+        if (limits != null && limits.getMaxStudents() != null && limits.getMaxStudents() > 0) {
+            if (currentCount >= limits.getMaxStudents()) {
+                throw new com.ims.student.exception.LimitExceededException(
+                    String.format("Limit Reached: Your current plan '%s' allows only %d students. You already have %d students. Please upgrade to add more.", 
+                    limits.getPlanName(), limits.getMaxStudents(), currentCount)
+                );
+            }
         }
 
         // Global uniqueness checks

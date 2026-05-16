@@ -53,8 +53,16 @@ const SubscriptionLockedOverlay: React.FC<SubscriptionLockedOverlayProps> = ({
     const details = getReasonDetails();
     const Icon = details.icon;
 
+    const getBackUrl = () => {
+        switch (reason) {
+            case 'STUDENT_LIMIT': return '/people/students';
+            case 'TEACHER_LIMIT': return '/people/instructors';
+            default: return '/dashboard';
+        }
+    };
+
     return (
-        <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[100] bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4">
             <div className="bg-surface rounded-[3rem] p-8 md:p-12 max-w-2xl w-full shadow-2xl relative overflow-hidden border border-border">
                 {/* Decorative Gradients */}
                 <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -77,7 +85,7 @@ const SubscriptionLockedOverlay: React.FC<SubscriptionLockedOverlayProps> = ({
                         </span>
                     </p>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                    <div className="flex flex-col gap-4 w-full max-w-md">
                         <button
                             onClick={() => navigate('/billing/upgrade')}
                             className="flex items-center justify-center gap-3 py-5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-3xl text-sm font-black uppercase tracking-widest transition-all shadow-2xl shadow-indigo-600/30 group active:scale-95"
@@ -87,12 +95,20 @@ const SubscriptionLockedOverlay: React.FC<SubscriptionLockedOverlayProps> = ({
                             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                         </button>
                         
-                        <button
-                            onClick={() => navigate('/billing/subscription')}
-                            className="flex items-center justify-center gap-3 py-5 bg-chrome hover:bg-chrome text-content-secondary rounded-3xl text-sm font-black uppercase tracking-widest transition-all active:scale-95"
-                        >
-                            View Plan Details
-                        </button>
+                        <div className="grid grid-cols-2 gap-4">
+                            <button
+                                onClick={() => navigate(getBackUrl())}
+                                className="flex items-center justify-center gap-3 py-4 bg-chrome hover:bg-chrome/80 text-content-secondary rounded-2xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 border border-border"
+                            >
+                                Back to List
+                            </button>
+                            <button
+                                onClick={() => navigate('/billing/subscription')}
+                                className="flex items-center justify-center gap-3 py-4 bg-chrome hover:bg-chrome/80 text-content-secondary rounded-2xl text-xs font-black uppercase tracking-widest transition-all active:scale-95 border border-border"
+                            >
+                                Plan Details
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -42,6 +42,7 @@ public class ImsOfferingsServiceImpl implements ImsOfferingsService {
         ImsOfferingsDto dto = modelMapper.map(entity, ImsOfferingsDto.class);
         if (entity.getSession() != null) {
             dto.setSessionId(entity.getSession().getId());
+            dto.setSessionStatus(entity.getSession().getStatus().name()); // Capture status for cross-service validation
             if (entity.getSession().getProgram() != null) {
                 dto.setProgramId(entity.getSession().getProgram().getId());
             }

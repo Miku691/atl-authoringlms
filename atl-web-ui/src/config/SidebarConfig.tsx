@@ -182,6 +182,7 @@ export const getSidebarConfig = (tenantType: 'SCHOOL' | 'COLLEGE' | 'COACHING' |
                     subItems: [
                         { path: '/people/students/all', label: 'All Students', icon: Users, roles: ['TENANT_ADMIN', 'INSTRUCTOR'] },
                         { path: '/people/students/add', label: 'Add Student', icon: UserCircle, roles: ['TENANT_ADMIN'] },
+                        { path: '/people/students/bulk', label: 'Bulk Admission', icon: FileText, roles: ['TENANT_ADMIN'] },
                         { path: '/people/students/guardians', label: 'Guardians', icon: Users, roles: ['TENANT_ADMIN'] },
                         { path: '/people/students/reports', label: 'Reports', icon: BarChart3, roles: ['TENANT_ADMIN'] },
                     ]

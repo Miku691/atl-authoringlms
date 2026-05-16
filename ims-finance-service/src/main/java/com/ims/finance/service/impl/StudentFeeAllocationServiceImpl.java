@@ -64,6 +64,10 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
     }
 
     public void allocateFeesToStudentInternal(String studentId, String offeringId, String academicYear, String tenantId) {
+        allocateFeesToStudentInternal(studentId, offeringId, academicYear, tenantId, null);
+    }
+
+    public void allocateFeesToStudentInternal(String studentId, String offeringId, String academicYear, String tenantId, OfferingServiceClient.OfferingResponse preFetchedOffering) {
         // 1. Check for installment plans first
         List<FeeInstallmentPlan> plans = planRepository.findByOfferingIdAndTenantId(offeringId, tenantId);
         // We assume there's one active plan per offering/academic year.
@@ -107,11 +111,18 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
             // 2. Fallback to old behavior (lump sum)
             List<FeeStructure> structures = feeStructureRepository.findAllByOfferingIdAndTenantId(offeringId, tenantId);
 
-            ApiResponse<OfferingServiceClient.OfferingResponse> response = offeringServiceClient.getOfferingById(offeringId);
-            if (response != null && "SUCCESS".equals(response.getStatus()) && response.getApiData() != null) {
-                String classId = response.getApiData().getClassId();
-                String yearId = response.getApiData().getYearId();
-                String courseId = response.getApiData().getCourseId();
+            OfferingServiceClient.OfferingResponse offeringData = preFetchedOffering;
+            if (offeringData == null) {
+                ApiResponse<OfferingServiceClient.OfferingResponse> response = offeringServiceClient.getOfferingById(offeringId);
+                if (response != null && "SUCCESS".equals(response.getStatus()) && response.getApiData() != null) {
+                    offeringData = response.getApiData();
+                }
+            }
+
+            if (offeringData != null) {
+                String classId = offeringData.getClassId();
+                String yearId = offeringData.getYearId();
+                String courseId = offeringData.getCourseId();
                 
                 String levelId = null;
                 if (classId != null && !classId.isEmpty()) {
@@ -166,9 +177,16 @@ public class StudentFeeAllocationServiceImpl implements StudentFeeAllocationServ
         if (response != null && "SUCCESS".equalsIgnoreCase(response.getStatus()) && response.getApiData() != null) {
             List<StudentServiceClient.StudentResponse> students = response.getApiData();
 
+            // Fetch offering data once for efficiency
+            OfferingServiceClient.OfferingResponse offeringData = null;
+            ApiResponse<OfferingServiceClient.OfferingResponse> offResponse = offeringServiceClient.getOfferingById(offeringId);
+            if (offResponse != null && "SUCCESS".equals(offResponse.getStatus())) {
+                offeringData = offResponse.getApiData();
+            }
+
             // 2. Allocate fees for each student
             for (StudentServiceClient.StudentResponse student : students) {
-                allocateFeesToStudentInternal(student.getId(), offeringId, academicYear, tenantId);
+                allocateFeesToStudentInternal(student.getId(), offeringId, academicYear, tenantId, offeringData);
             }
         }
     }

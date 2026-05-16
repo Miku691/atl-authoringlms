@@ -35,4 +35,17 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT
         );
     }
+
+    @ExceptionHandler(com.ims.instructor.exception.LimitExceededException.class)
+    public ResponseEntity<ApiResponse<String>> limitExceededExceptionHandler(com.ims.instructor.exception.LimitExceededException ex){
+        return new ResponseEntity<>(
+                ApiResponse.<String>builder()
+                        .status(ApplicationConstant.API_FAILED)
+                        .statusCode(HttpStatus.FORBIDDEN.value())
+                        .message(ex.getMessage())
+                        .apiData(null)
+                        .build(),
+                HttpStatus.FORBIDDEN
+        );
+    }
 }

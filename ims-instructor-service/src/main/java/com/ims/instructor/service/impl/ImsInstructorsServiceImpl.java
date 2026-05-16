@@ -42,11 +42,13 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
         com.ims.instructor.dto.SubscriptionLimitsDto limits = platformClient.getTenantLimits(dto.getTenantId());
         long currentCount = repo.countByTenantId(dto.getTenantId());
 
-        if (limits.getMaxTeachers() != null && currentCount >= limits.getMaxTeachers()) {
-            throw new com.ims.instructor.exception.LimitExceededException(
-                    String.format("Current plan '%s' allows only %d teachers. Please upgrade to add more.",
-                            limits.getPlanName(), limits.getMaxTeachers())
-            );
+        if (limits != null && limits.getMaxTeachers() != null && limits.getMaxTeachers() > 0) {
+            if (currentCount >= limits.getMaxTeachers()) {
+                throw new com.ims.instructor.exception.LimitExceededException(
+                        String.format("Limit Reached: Your current plan '%s' allows only %d teachers. You already have %d teachers. Please upgrade to add more.",
+                                limits.getPlanName(), limits.getMaxTeachers(), currentCount)
+                );
+            }
         }
 
         if (dto.getEmployeeId() == null || dto.getEmployeeId().isEmpty()) {

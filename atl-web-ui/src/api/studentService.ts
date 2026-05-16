@@ -35,9 +35,10 @@ export interface BulkAdmissionRequest {
     lastName: string;
     email?: string;
     phone?: string;
-    admissionNo: string;
+    gender?: string;
+    dob?: string;
+    admissionNo?: string;
     offeringId: string;
-    // guardians...
 }
 
 export const studentService = {

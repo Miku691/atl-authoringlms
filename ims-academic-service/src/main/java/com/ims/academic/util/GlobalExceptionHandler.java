@@ -35,4 +35,30 @@ public class GlobalExceptionHandler {
                 HttpStatus.CONFLICT
         );
     }
+
+    @ExceptionHandler(com.ims.academic.exception.ReadinessValidationException.class)
+    public ResponseEntity<ApiResponse<java.util.List<String>>> readinessValidationExceptionHandler(com.ims.academic.exception.ReadinessValidationException ex){
+        return new ResponseEntity<>(
+                ApiResponse.<java.util.List<String>>builder()
+                        .status(ApplicationConstant.API_FAILED)
+                        .statusCode(HttpStatus.UNPROCESSABLE_ENTITY.value())
+                        .message(ex.getMessage())
+                        .apiData(ex.getMissingComponents())
+                        .build(),
+                HttpStatus.UNPROCESSABLE_ENTITY
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<String>> generalExceptionHandler(Exception ex){
+        return new ResponseEntity<>(
+                ApiResponse.<String>builder()
+                        .status(ApplicationConstant.API_FAILED)
+                        .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                        .message("An unexpected error occurred: " + ex.getMessage())
+                        .apiData(null)
+                        .build(),
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
 }
