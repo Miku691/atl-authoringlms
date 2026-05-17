@@ -64,4 +64,8 @@ public interface ImsStudentsRepo extends JpaRepository<ImsStudents, String> {
             "AND (e.isDeleted IS NULL OR e.isDeleted = false) " +
             "AND (s.isDeleted IS NULL OR s.isDeleted = false)")
     List<ImsStudents> findByOfferingIn(String tenantId, List<String> offeringIds);
+
+    @Query("SELECT COUNT(s) FROM ImsStudents s WHERE s.tenantId = :tenantId AND MONTH(s.dob) = :month AND DAY(s.dob) = :day AND (s.isDeleted IS NULL OR s.isDeleted = false)")
+    long countTodayBirthdays(@Param("tenantId") String tenantId, @Param("month") int month, @Param("day") int day);
 }
+

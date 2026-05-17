@@ -37,6 +37,19 @@ public class ImsAnnouncementServiceImpl implements ImsAnnouncementService {
     }
 
     @Override
+    @Transactional
+    public ImsAnnouncementDto update(String id, ImsAnnouncementDto dto) {
+        ImsAnnouncement entity = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Announcement", id));
+        entity.setTitle(dto.getTitle());
+        entity.setContent(dto.getContent());
+        entity.setTargetAudience(dto.getTargetAudience());
+        entity.setPriority(dto.getPriority());
+        entity.setExpiryDate(dto.getExpiryDate());
+        return toDto(repo.save(entity));
+    }
+
+    @Override
     public ImsAnnouncementDto getById(String id) {
         return repo.findById(id)
                 .map(this::toDto)
@@ -46,6 +59,14 @@ public class ImsAnnouncementServiceImpl implements ImsAnnouncementService {
     @Override
     public List<ImsAnnouncementDto> getByTenantId(String tenantId) {
         return repo.findByTenantIdOrderByCreatedAtDesc(tenantId)
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ImsAnnouncementDto> getFilteredAnnouncements(String tenantId, String audience, String priority, String search) {
+        return repo.findFilteredAnnouncements(tenantId, audience, priority, search)
                 .stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());

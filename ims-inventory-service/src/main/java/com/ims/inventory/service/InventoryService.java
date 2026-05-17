@@ -7,6 +7,7 @@ public interface InventoryService {
     // Categories
     List<InventoryCategoryDTO> getAllCategories();
     InventoryCategoryDTO createCategory(InventoryCategoryDTO dto);
+    InventoryCategoryDTO updateCategory(String id, InventoryCategoryDTO dto);
     void deleteCategory(String id);
 
     // Items
@@ -18,6 +19,7 @@ public interface InventoryService {
     // Suppliers
     List<SupplierDTO> getAllSuppliers();
     SupplierDTO createSupplier(SupplierDTO dto);
+    SupplierDTO updateSupplier(String id, SupplierDTO dto);
     void deleteSupplier(String id);
 
     // Transactions

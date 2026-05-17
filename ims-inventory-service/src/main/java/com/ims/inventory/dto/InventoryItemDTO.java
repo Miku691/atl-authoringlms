@@ -18,4 +18,5 @@ public class InventoryItemDTO {
     private String unit;
     private Double currentStock;
     private Double reorderLevel;
+    private String itemType;
 }

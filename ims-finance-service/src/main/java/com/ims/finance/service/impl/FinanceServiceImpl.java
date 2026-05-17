@@ -217,6 +217,31 @@ public class FinanceServiceImpl implements FinanceService {
             feeDistribution.add(item);
         }
 
+        // 4. Annual Fee Summary (Jan to Dec)
+        int currentYear = LocalDate.now().getYear();
+        List<Object[]> annualSummaryData = studentFeeRecordRepository.sumAnnualFeeSummary(tenantId, currentYear);
+        List<Map<String, Object>> annualFeeSummary = new ArrayList<>();
+        String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+        for (int i = 1; i <= 12; i++) {
+            BigDecimal total = BigDecimal.ZERO;
+            BigDecimal collected = BigDecimal.ZERO;
+            BigDecimal remaining = BigDecimal.ZERO;
+            for (Object[] row : annualSummaryData) {
+                if (((Number) row[0]).intValue() == i) {
+                    total = row[1] != null ? (BigDecimal) row[1] : BigDecimal.ZERO;
+                    collected = row[2] != null ? (BigDecimal) row[2] : BigDecimal.ZERO;
+                    remaining = row[3] != null ? (BigDecimal) row[3] : BigDecimal.ZERO;
+                    break;
+                }
+            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("month", monthNames[i - 1]);
+            map.put("total", total);
+            map.put("collected", collected);
+            map.put("remaining", remaining);
+            annualFeeSummary.add(map);
+        }
+
         // offeringNames already populated above
 
         return CollectionSummaryDTO.builder()
@@ -229,8 +254,10 @@ public class FinanceServiceImpl implements FinanceService {
                 .pendingReceivables(pendingReceivables)
                 .monthlyTrend(monthlyTrend)
                 .feeDistribution(feeDistribution)
+                .annualFeeSummary(annualFeeSummary)
                 .build();
     }
+
 
     @Override
     @Transactional

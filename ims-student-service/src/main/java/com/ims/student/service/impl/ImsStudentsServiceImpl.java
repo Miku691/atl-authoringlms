@@ -268,4 +268,11 @@ public class ImsStudentsServiceImpl implements ImsStudentsService {
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public long getTodayBirthdaysCount(String tenantId) {
+        java.time.LocalDate now = java.time.LocalDate.now();
+        return repo.countTodayBirthdays(tenantId, now.getMonthValue(), now.getDayOfMonth());
+    }
 }
+

@@ -11,6 +11,7 @@ const SupplierManagementPage: React.FC = () => {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null);
     const [formData, setFormData] = useState<Partial<Supplier>>({
@@ -62,10 +63,10 @@ const SupplierManagementPage: React.FC = () => {
     };
 
     const handleDelete = async (id: string) => {
-        if (!window.confirm('Are you sure you want to delete this supplier?')) return;
         try {
             await inventoryService.deleteSupplier(id);
             toast.success('Supplier deleted');
+            setDeleteConfirmId(null);
             fetchSuppliers();
         } catch (error) {
             toast.error('Failed to delete supplier');
@@ -158,7 +159,7 @@ const SupplierManagementPage: React.FC = () => {
                                         <Edit2 size={16} />
                                     </button>
                                     <button 
-                                        onClick={() => handleDelete(supplier.id)}
+                                        onClick={() => setDeleteConfirmId(supplier.id)}
                                         className="p-1.5 text-content-muted hover:text-red-600 hover:bg-red-50 rounded"
                                     >
                                         <Trash2 size={16} />
@@ -280,6 +281,42 @@ const SupplierManagementPage: React.FC = () => {
                         />
                     </div>
                 </form>
+            </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <Modal
+                isOpen={!!deleteConfirmId}
+                onClose={() => setDeleteConfirmId(null)}
+                title="Confirm Supplier Deletion"
+                footer={
+                    <>
+                        <button
+                            type="button"
+                            onClick={() => setDeleteConfirmId(null)}
+                            className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-2xl font-bold transition-colors"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => deleteConfirmId && handleDelete(deleteConfirmId)}
+                            className="px-5 py-2 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-500/20 flex items-center justify-center gap-2"
+                        >
+                            <Trash2 size={16} />
+                            <span>Delete Supplier</span>
+                        </button>
+                    </>
+                }
+            >
+                <div className="py-4 text-content-secondary flex items-center gap-4">
+                    <div className="p-3 bg-red-500/10 rounded-2xl text-red-500 border border-red-500/20">
+                        <Trash2 size={24} />
+                    </div>
+                    <div>
+                        <p className="font-bold text-content-primary mb-1">Are you sure you want to delete this supplier?</p>
+                        <p className="text-xs text-content-muted">This action cannot be undone and will permanently remove vendor contact records.</p>
+                    </div>
+                </div>
             </Modal>
         </div>
     );

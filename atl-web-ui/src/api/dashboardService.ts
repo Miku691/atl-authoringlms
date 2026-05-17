@@ -137,5 +137,22 @@ export const dashboardService = {
                 count: Number(item.count)
             }));
         }
+    },
+
+    getTodayBirthdays: async (tenantId: string): Promise<{ students: number; employees: number }> => {
+        try {
+            const [studentRes, instructorRes] = await Promise.all([
+                api.get(`/ims-student-service/students/birthdays/today/tenant/${tenantId}`),
+                api.get(`/ims-instructor-service/instructors/birthdays/today/tenant/${tenantId}`)
+            ]);
+            return {
+                students: studentRes.data?.apiData || 0,
+                employees: instructorRes.data?.apiData || 0
+            };
+        } catch (error) {
+            console.error("Failed to fetch birthday counts", error);
+            return { students: 0, employees: 0 };
+        }
     }
 };
+

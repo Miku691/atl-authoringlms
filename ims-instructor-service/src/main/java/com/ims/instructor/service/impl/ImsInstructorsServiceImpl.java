@@ -191,4 +191,11 @@ public class ImsInstructorsServiceImpl implements ImsInstructorsService {
         } while (repo.existsByEmployeeIdAndTenantId(code, tenantId));
         return code;
     }
+
+    @Override
+    public long getTodayBirthdaysCount(String tenantId) {
+        java.time.LocalDate now = java.time.LocalDate.now();
+        return repo.countTodayBirthdays(tenantId, now.getMonthValue(), now.getDayOfMonth());
+    }
 }
+

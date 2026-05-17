@@ -197,4 +197,17 @@ public class ImsStudentsController {
                                                 .apiData(list)
                                                 .build());
         }
+
+        @GetMapping("/birthdays/today/tenant/{tenantId}")
+        @PreAuthorize("isAuthenticated()")
+        public ResponseEntity<ApiResponse<Long>> getTodayBirthdaysCount(@PathVariable String tenantId) {
+                return ResponseEntity.ok(
+                                ApiResponse.<Long>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Today's birthday count fetched successfully")
+                                                .apiData(service.getTodayBirthdaysCount(tenantId))
+                                                .build());
+        }
 }
+

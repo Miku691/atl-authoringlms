@@ -22,4 +22,6 @@ public class CollectionSummaryDTO {
     private BigDecimal pendingReceivables;
     private List<Map<String, Object>> monthlyTrend;
     private List<Map<String, Object>> feeDistribution;
+    private List<Map<String, Object>> annualFeeSummary;
 }
+

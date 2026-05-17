@@ -43,4 +43,10 @@ public interface StudentFeeRecordRepository extends JpaRepository<StudentFeeReco
 
     @Query("SELECT SUM(s.balance) FROM StudentFeeRecord s WHERE s.studentId = :studentId AND s.academicYear = :year AND s.tenantId = :tenantId")
     BigDecimal sumBalanceByStudentAndYear(@Param("studentId") String studentId, @Param("year") String year, @Param("tenantId") String tenantId);
+
+    @Query("SELECT MONTH(s.dueDate) as month, SUM(s.amountDue) as total, SUM(s.amountPaid) as collected, SUM(s.balance) as remaining " +
+           "FROM StudentFeeRecord s WHERE s.tenantId = :tenantId AND YEAR(s.dueDate) = :year " +
+           "GROUP BY MONTH(s.dueDate)")
+    List<Object[]> sumAnnualFeeSummary(@Param("tenantId") String tenantId, @Param("year") int year);
 }
+

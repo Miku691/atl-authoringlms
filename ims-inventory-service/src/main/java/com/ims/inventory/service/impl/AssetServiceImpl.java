@@ -46,6 +46,7 @@ public class AssetServiceImpl implements AssetService {
         Asset existing = assetRepository.findById(id).orElseThrow();
         existing.setName(dto.getName());
         existing.setCategoryId(dto.getCategoryId());
+        existing.setItemId(dto.getItemId());
         existing.setSerialNumber(dto.getSerialNumber());
         existing.setPurchaseDate(dto.getPurchaseDate());
         existing.setPurchaseValue(dto.getPurchaseValue());

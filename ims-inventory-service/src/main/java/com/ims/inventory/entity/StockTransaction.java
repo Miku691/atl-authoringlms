@@ -1,6 +1,7 @@
 package com.ims.inventory.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,8 +18,9 @@ import java.util.UUID;
 @AllArgsConstructor
 public class StockTransaction {
     @Id
-    @Builder.Default
-    private String id = UUID.randomUUID().toString();
+    @GeneratedValue
+    @UuidGenerator
+    private String id;
     private String itemId;
     private String supplierId; // Null for internal usage
     private Double quantity;
@@ -31,7 +33,15 @@ public class StockTransaction {
     private String remarks;
     private String tenantId;
 
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null || this.id.isEmpty()) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
+
     public enum TransactionType {
         IN, OUT
     }
 }
+

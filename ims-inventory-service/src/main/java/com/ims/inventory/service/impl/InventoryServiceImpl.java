@@ -50,6 +50,14 @@ public class InventoryServiceImpl implements InventoryService {
     }
 
     @Override
+    public InventoryCategoryDTO updateCategory(String id, InventoryCategoryDTO dto) {
+        InventoryCategory existing = categoryRepository.findById(id).orElseThrow();
+        existing.setName(dto.getName());
+        existing.setDescription(dto.getDescription());
+        return modelMapper.map(categoryRepository.save(existing), InventoryCategoryDTO.class);
+    }
+
+    @Override
     public void deleteCategory(String id) {
         categoryRepository.deleteById(id);
     }
@@ -60,6 +68,7 @@ public class InventoryServiceImpl implements InventoryService {
         return itemRepository.findByTenantId(tenantId).stream()
                 .map(item -> {
                     InventoryItemDTO dto = modelMapper.map(item, InventoryItemDTO.class);
+                    dto.setItemType(item.getItemType() != null ? item.getItemType().name() : "CONSUMABLE");
                     categoryRepository.findById(item.getCategoryId())
                             .ifPresent(cat -> dto.setCategoryName(cat.getName()));
                     return dto;
@@ -72,7 +81,19 @@ public class InventoryServiceImpl implements InventoryService {
         InventoryItem item = modelMapper.map(dto, InventoryItem.class);
         item.setTenantId(SecurityUtils.getCurrentTenantId());
         item.setCurrentStock(0.0);
-        return modelMapper.map(itemRepository.save(item), InventoryItemDTO.class);
+        if (dto.getItemType() != null && !dto.getItemType().isEmpty()) {
+            try {
+                item.setItemType(InventoryItem.ItemType.valueOf(dto.getItemType().toUpperCase()));
+            } catch (Exception e) {
+                item.setItemType(InventoryItem.ItemType.CONSUMABLE);
+            }
+        } else {
+            item.setItemType(InventoryItem.ItemType.CONSUMABLE);
+        }
+        InventoryItem saved = itemRepository.save(item);
+        InventoryItemDTO result = modelMapper.map(saved, InventoryItemDTO.class);
+        result.setItemType(saved.getItemType().name());
+        return result;
     }
 
     @Override
@@ -83,7 +104,17 @@ public class InventoryServiceImpl implements InventoryService {
         existing.setDescription(dto.getDescription());
         existing.setUnit(dto.getUnit());
         existing.setReorderLevel(dto.getReorderLevel());
-        return modelMapper.map(itemRepository.save(existing), InventoryItemDTO.class);
+        if (dto.getItemType() != null && !dto.getItemType().isEmpty()) {
+            try {
+                existing.setItemType(InventoryItem.ItemType.valueOf(dto.getItemType().toUpperCase()));
+            } catch (Exception e) {
+                // keep existing
+            }
+        }
+        InventoryItem saved = itemRepository.save(existing);
+        InventoryItemDTO result = modelMapper.map(saved, InventoryItemDTO.class);
+        result.setItemType(saved.getItemType().name());
+        return result;
     }
 
     @Override
@@ -104,6 +135,17 @@ public class InventoryServiceImpl implements InventoryService {
         Supplier supplier = modelMapper.map(dto, Supplier.class);
         supplier.setTenantId(SecurityUtils.getCurrentTenantId());
         return modelMapper.map(supplierRepository.save(supplier), SupplierDTO.class);
+    }
+
+    @Override
+    public SupplierDTO updateSupplier(String id, SupplierDTO dto) {
+        Supplier existing = supplierRepository.findById(id).orElseThrow();
+        existing.setName(dto.getName());
+        existing.setContactPerson(dto.getContactPerson());
+        existing.setPhone(dto.getPhone());
+        existing.setEmail(dto.getEmail());
+        existing.setAddress(dto.getAddress());
+        return modelMapper.map(supplierRepository.save(existing), SupplierDTO.class);
     }
 
     @Override

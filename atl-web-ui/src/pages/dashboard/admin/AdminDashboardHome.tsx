@@ -10,7 +10,7 @@ import SubscriptionLockedOverlay from './components/SubscriptionLockedOverlay';
 import {
     Users, BookOpen, GraduationCap, TrendingUp, Bell,
     PlusCircle, Calendar, ShieldCheck, ArrowUpRight, Clock, MapPin,
-    LayoutDashboard, UserPlus, FileText, Settings, CreditCard
+    LayoutDashboard, UserPlus, FileText, Settings, CreditCard, Cake
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { financeService } from '../../../api/financeService';
@@ -25,6 +25,7 @@ const AdminDashboardHome: React.FC = () => {
     const [genderStats, setGenderStats] = useState<GenderStat[]>([]);
     const [offeringStats, setOfferingStats] = useState<OfferingStat[]>([]);
     const [financeSummary, setFinanceSummary] = useState<any>(null);
+    const [birthdayCounts, setBirthdayCounts] = useState<{ students: number; employees: number }>({ students: 0, employees: 0 });
     const [currentTime, setCurrentTime] = useState(new Date());
     const [loading, setLoading] = useState(true);
 
@@ -43,13 +44,14 @@ const AdminDashboardHome: React.FC = () => {
         if (!user?.tenantId) return;
         setLoading(true);
         try {
-            const [announcRes, statsData, gStats, oStats, fSummary, subRes] = await Promise.all([
+            const [announcRes, statsData, gStats, oStats, fSummary, subRes, bDays] = await Promise.all([
                 announcementService.getAnnouncementsByTenant(user.tenantId),
                 dashboardService.getStats(user.tenantId),
                 dashboardService.getGenderStats(user.tenantId),
                 dashboardService.getOfferingStats(user.tenantId, user.tenantType),
                 financeService.getCollectionSummary().catch(() => null),
-                api.get(`/ims-platform-service/api/v1/platform/tenant/${user.tenantId}/subscription`).catch(() => null)
+                api.get(`/ims-platform-service/api/v1/platform/tenant/${user.tenantId}/subscription`).catch(() => null),
+                dashboardService.getTodayBirthdays(user.tenantId).catch(() => ({ students: 0, employees: 0 }))
             ]);
             setAnnouncements(announcRes.apiData || []);
             setStats(statsData);
@@ -57,6 +59,7 @@ const AdminDashboardHome: React.FC = () => {
             setOfferingStats(oStats);
             setFinanceSummary(fSummary);
             setSubscription(subRes?.data?.apiData || subRes?.data || null);
+            setBirthdayCounts(bDays);
         } catch (error) {
             console.error("Dashboard data fetch failed", error);
             toast.error("Failed to load some dashboard metrics");
@@ -125,6 +128,14 @@ const AdminDashboardHome: React.FC = () => {
         { label: 'Add Program', icon: PlusCircle, path: '/academics/offerings', color: 'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400' },
         { label: 'Post Notice', icon: Bell, path: '/communication/announcements', color: 'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400' },
     ];
+
+    const currentMonthTrend = financeSummary?.monthlyTrend?.[financeSummary.monthlyTrend.length - 1] || { month: new Date().toLocaleString('default', { month: 'short' }), income: 0, expense: 0 };
+
+    const annualFeeData = financeSummary?.annualFeeSummary ? financeSummary.annualFeeSummary.map((item: any) => ({
+        name: item.month,
+        value: item.collected,
+        fill: '#6366f1'
+    })) : [];
 
     return (
         <div className="space-y-8 pb-12">
@@ -207,6 +218,67 @@ const AdminDashboardHome: React.FC = () => {
                 ))}
             </div>
 
+            {/* Financial Analytics Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <DashboardChart
+                    title={`Income Vs Expense Of ${currentMonthTrend.month}`}
+                    data={[
+                        { name: 'Income', value: currentMonthTrend.income, fill: '#10b981' },
+                        { name: 'Expense', value: currentMonthTrend.expense, fill: '#ef4444' }
+                    ]}
+                    colors={['#10b981', '#ef4444']}
+                    unit="currency"
+                    onSegmentClick={() => navigate('/finance/dashboard')}
+                />
+                <DashboardChart
+                    title="Annual Fee Summary"
+                    data={annualFeeData}
+                    colors={['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#0ea5e9']}
+                    unit="currency"
+                    defaultView="bar"
+                    hideToggle={true}
+                    onSegmentClick={() => navigate('/finance/dashboard')}
+                />
+            </div>
+
+            {/* Birthday Cards Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-surface p-6 rounded-3xl border border-border shadow-sm hover:shadow-xl hover:border-pink-100 transition-all duration-500 group relative overflow-hidden flex flex-col justify-between cursor-pointer" onClick={() => navigate('/people/students')}>
+                    <div className="flex items-center justify-between relative z-10">
+                        <div>
+                            <p className="text-[10px] font-black text-content-muted uppercase tracking-widest">Student Today Birthday</p>
+                            <p className="text-4xl font-black text-content-primary mt-2">{loading ? '...' : birthdayCounts.students}</p>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-pink-50 dark:bg-pink-500/10 text-pink-600 dark:text-pink-400 group-hover:bg-pink-600 group-hover:text-white transition-colors">
+                            <Cake className="w-7 h-7" />
+                        </div>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between relative z-10 text-[10px]">
+                        <span className="font-bold text-content-secondary uppercase tracking-tighter">Wishes & Cards Sent Automatically</span>
+                        <ArrowUpRight className="w-4 h-4 text-slate-200 group-hover:text-pink-500 transition-colors" />
+                    </div>
+                    <div className="absolute -right-4 -bottom-4 w-32 h-32 rounded-full bg-pink-50/40 group-hover:bg-pink-100/60 blur-2xl transition-colors"></div>
+                </div>
+
+                <div className="bg-surface p-6 rounded-3xl border border-border shadow-sm hover:shadow-xl hover:border-purple-100 transition-all duration-500 group relative overflow-hidden flex flex-col justify-between cursor-pointer" onClick={() => navigate('/people/instructors')}>
+                    <div className="flex items-center justify-between relative z-10">
+                        <div>
+                            <p className="text-[10px] font-black text-content-muted uppercase tracking-widest">Employee Today Birthday</p>
+                            <p className="text-4xl font-black text-content-primary mt-2">{loading ? '...' : birthdayCounts.employees}</p>
+                        </div>
+                        <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                            <Cake className="w-7 h-7" />
+                        </div>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between relative z-10 text-[10px]">
+                        <span className="font-bold text-content-secondary uppercase tracking-tighter">Wishes & Cards Sent Automatically</span>
+                        <ArrowUpRight className="w-4 h-4 text-slate-200 group-hover:text-purple-500 transition-colors" />
+                    </div>
+                    <div className="absolute -right-4 -bottom-4 w-32 h-32 rounded-full bg-purple-50/40 group-hover:bg-purple-100/60 blur-2xl transition-colors"></div>
+                </div>
+            </div>
+
+
             {/* Analytics Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <DashboardChart
@@ -228,6 +300,7 @@ const AdminDashboardHome: React.FC = () => {
                 <div className="lg:col-span-2 bg-surface rounded-3xl border border-border shadow-sm overflow-hidden flex flex-col">
                     <div className="p-6 border-b border-border flex justify-between items-center bg-chrome/30">
                         <h3 className="text-lg font-black text-content-primary flex items-center gap-3">
+
                             <div className="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-lg"><Bell className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /></div>
                             ANNOUNCEMENTS
                         </h3>

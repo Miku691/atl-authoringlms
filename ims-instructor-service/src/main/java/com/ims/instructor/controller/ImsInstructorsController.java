@@ -145,4 +145,16 @@ public class ImsInstructorsController {
                                                 .apiData(null)
                                                 .build());
         }
+
+        @GetMapping("/birthdays/today/tenant/{tenantId}")
+        public ResponseEntity<ApiResponse<Long>> getTodayBirthdaysCount(@PathVariable String tenantId) {
+                return ResponseEntity.ok(
+                                ApiResponse.<Long>builder()
+                                                .status("SUCCESS")
+                                                .statusCode(HttpStatus.OK.value())
+                                                .message("Today's birthday count fetched successfully")
+                                                .apiData(service.getTodayBirthdaysCount(tenantId))
+                                                .build());
+        }
 }
+

@@ -25,6 +25,7 @@
             <li><a href="services/ims-instructor-service.html">Instructor Service</a></li>
             <li><a href="services/ims-staff-service.html">Staff Service</a></li>
             <li><a href="services/ims-platform-service.html">Platform Service</a></li>
+            <li><a href="services/ims-inventory-service.html">Inventory Service</a></li>
             <li><strong>Key Flows</strong></li>
             <li><a href="flows/auth-flow.html">Authentication Flow</a></li>
             <li><a href="flows/academic-session-flow.html">Academic Session Flow</a></li>
@@ -54,6 +55,7 @@
                 Instructor[Instructor Service]
                 Staff[Staff Service]
                 Platform[Platform Service]
+                Inventory[Inventory Service]
                 end
 
                 Client --> WebUI
@@ -66,6 +68,7 @@
                 Gateway --> Instructor
                 Gateway --> Staff
                 Gateway --> Platform
+                Gateway --> Inventory
 
                 Academic -.-> Discovery
                 Student -.-> Discovery
@@ -73,6 +76,7 @@
                 Staff -.-> Discovery
                 Auth -.-> Discovery
                 Platform -.-> Discovery
+                Inventory -.-> Discovery
                 Gateway -.-> Discovery
             </div>
         </section>
@@ -100,6 +104,11 @@
                     <h3>ims-academic-service</h3>
                     <p>Manages academic structures, including years, terms, subjects, and curriculum offerings.</p>
                     <a href="services/ims-academic-service.html">View Details &rarr;</a>
+                </div>
+                <div class="card">
+                    <h3>ims-inventory-service</h3>
+                    <p>Manages institutional inventory, asset registers, stock transactions, and suppliers.</p>
+                    <a href="services/ims-inventory-service.html">View Details &rarr;</a>
                 </div>
             </div>
         </section>

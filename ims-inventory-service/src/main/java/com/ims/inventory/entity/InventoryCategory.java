@@ -1,8 +1,7 @@
 package com.ims.inventory.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.hibernate.annotations.UuidGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,9 +17,18 @@ import java.util.UUID;
 @AllArgsConstructor
 public class InventoryCategory {
     @Id
-    @Builder.Default
-    private String id = UUID.randomUUID().toString();
+    @GeneratedValue
+    @UuidGenerator
+    private String id;
     private String name;
     private String description;
     private String tenantId;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.id == null || this.id.isEmpty()) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
 }
+

@@ -26,4 +26,7 @@ public interface ImsInstructorsService {
     long countByTenant(String tenantId);
 
     void grantAccess(String id);
+
+    long getTodayBirthdaysCount(String tenantId);
 }
+

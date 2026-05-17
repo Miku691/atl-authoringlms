@@ -29,6 +29,19 @@ public class InventoryController {
         return ResponseEntity.ok(Map.of("apiData", inventoryService.createCategory(dto)));
     }
 
+    /**
+     * Updates an existing inventory category.
+     *
+     * @param id category unique identifier
+     * @param dto updated category details
+     * @return updated category data wrapped in response map
+     */
+    @PutMapping("/categories/{id}")
+    @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'INVENTORY_MANAGER')")
+    public ResponseEntity<Map<String, Object>> updateCategory(@PathVariable String id, @RequestBody InventoryCategoryDTO dto) {
+        return ResponseEntity.ok(Map.of("apiData", inventoryService.updateCategory(id, dto)));
+    }
+
     @DeleteMapping("/categories/{id}")
     @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<Void> deleteCategory(@PathVariable String id) {
@@ -73,6 +86,19 @@ public class InventoryController {
     @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'INVENTORY_MANAGER')")
     public ResponseEntity<Map<String, Object>> createSupplier(@RequestBody SupplierDTO dto) {
         return ResponseEntity.ok(Map.of("apiData", inventoryService.createSupplier(dto)));
+    }
+
+    /**
+     * Updates an existing supplier record.
+     *
+     * @param id supplier unique identifier
+     * @param dto updated supplier details
+     * @return updated supplier data wrapped in response map
+     */
+    @PutMapping("/suppliers/{id}")
+    @PreAuthorize("hasAnyRole('TENANT_ADMIN', 'INVENTORY_MANAGER')")
+    public ResponseEntity<Map<String, Object>> updateSupplier(@PathVariable String id, @RequestBody SupplierDTO dto) {
+        return ResponseEntity.ok(Map.of("apiData", inventoryService.updateSupplier(id, dto)));
     }
 
     @DeleteMapping("/suppliers/{id}")

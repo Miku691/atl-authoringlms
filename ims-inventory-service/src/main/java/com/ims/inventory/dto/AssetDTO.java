@@ -16,6 +16,7 @@ public class AssetDTO {
     private String name;
     private String categoryId;
     private String categoryName;
+    private String itemId;
     private String serialNumber;
     private LocalDate purchaseDate;
     private Double purchaseValue;

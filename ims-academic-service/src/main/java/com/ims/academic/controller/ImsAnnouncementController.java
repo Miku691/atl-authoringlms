@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * REST Controller for managing institutional announcements.
+ */
 @RestController
 @RequestMapping("/announcements")
 @RequiredArgsConstructor
@@ -17,6 +20,12 @@ public class ImsAnnouncementController {
 
     private final ImsAnnouncementService service;
 
+    /**
+     * Creates a new announcement.
+     *
+     * @param dto announcement details
+     * @return created announcement data
+     */
     @PostMapping
     public ResponseEntity<ApiResponse<ImsAnnouncementDto>> create(@RequestBody ImsAnnouncementDto dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -28,6 +37,30 @@ public class ImsAnnouncementController {
                         .build());
     }
 
+    /**
+     * Updates an existing announcement.
+     *
+     * @param id identifier of the announcement
+     * @param dto updated announcement details
+     * @return updated announcement data
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ImsAnnouncementDto>> update(@PathVariable String id, @RequestBody ImsAnnouncementDto dto) {
+        return ResponseEntity.ok(
+                ApiResponse.<ImsAnnouncementDto>builder()
+                        .status("SUCCESS")
+                        .statusCode(HttpStatus.OK.value())
+                        .message("Announcement updated successfully")
+                        .apiData(service.update(id, dto))
+                        .build());
+    }
+
+    /**
+     * Retrieves an announcement by its ID.
+     *
+     * @param id identifier of the announcement
+     * @return announcement data
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ImsAnnouncementDto>> getById(@PathVariable String id) {
         return ResponseEntity.ok(
@@ -39,6 +72,12 @@ public class ImsAnnouncementController {
                         .build());
     }
 
+    /**
+     * Retrieves all announcements for a tenant.
+     *
+     * @param tenantId tenant identifier
+     * @return list of announcements
+     */
     @GetMapping("/tenant/{tenantId}")
     public ResponseEntity<ApiResponse<List<ImsAnnouncementDto>>> getByTenantId(@PathVariable String tenantId) {
         return ResponseEntity.ok(
@@ -50,6 +89,37 @@ public class ImsAnnouncementController {
                         .build());
     }
 
+    /**
+     * Retrieves filtered announcements for a tenant.
+     *
+     * @param tenantId tenant identifier
+     * @param audience target audience filter
+     * @param priority priority filter
+     * @param search search text filter
+     * @return list of filtered announcements
+     */
+    @GetMapping("/tenant/{tenantId}/filter")
+    public ResponseEntity<ApiResponse<List<ImsAnnouncementDto>>> getFiltered(
+            @PathVariable String tenantId,
+            @RequestParam(required = false) String audience,
+            @RequestParam(required = false) String priority,
+            @RequestParam(required = false) String search) {
+        return ResponseEntity.ok(
+                ApiResponse.<List<ImsAnnouncementDto>>builder()
+                        .status("SUCCESS")
+                        .statusCode(HttpStatus.OK.value())
+                        .message("Filtered announcements fetched successfully")
+                        .apiData(service.getFilteredAnnouncements(tenantId, audience, priority, search))
+                        .build());
+    }
+
+    /**
+     * Retrieves active announcements for a specific audience.
+     *
+     * @param tenantId tenant identifier
+     * @param audience target audience
+     * @return list of active announcements
+     */
     @GetMapping("/tenant/{tenantId}/active")
     public ResponseEntity<ApiResponse<List<ImsAnnouncementDto>>> getActive(
             @PathVariable String tenantId,
@@ -63,6 +133,12 @@ public class ImsAnnouncementController {
                         .build());
     }
 
+    /**
+     * Deletes an announcement by its ID.
+     *
+     * @param id identifier of the announcement
+     * @return confirmation response
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable String id) {
         service.delete(id);

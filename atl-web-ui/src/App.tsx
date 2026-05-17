@@ -75,6 +75,7 @@ import MyFinancePage from './pages/dashboard/student/MyFinancePage';
 import WardFinancePage from './pages/dashboard/guardian/WardFinancePage';
 import AssignmentManagementPage from './pages/dashboard/admin/operations/AssignmentManagementPage';
 import AnnouncementManagementPage from './pages/dashboard/admin/communication/AnnouncementManagementPage';
+import MessageManagementPage from './pages/dashboard/admin/communication/MessageManagementPage';
 import TeacherDashboard from './pages/dashboard/teacher/TeacherDashboard';
 import InstructorClassHubPage from './pages/dashboard/teacher/InstructorClassHubPage';
 import ExamManagementPage from './pages/dashboard/teacher/ExamManagementPage';
@@ -282,6 +283,7 @@ const App: React.FC = () => {
 
               {/* Communication */}
               <Route path="/communication/announcements" element={<AnnouncementManagementPage />} />
+              <Route path="/communication/messages" element={<MessageManagementPage />} />
               <Route path="/communication/*" element={<ComingSoonPage />} />
 
               {/* Billing */}

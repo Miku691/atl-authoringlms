@@ -16,6 +16,9 @@ interface DashboardChartProps {
     title: string;
     data: ChartData[];
     colors?: string[];
+    unit?: string;
+    defaultView?: 'pie' | 'bar';
+    hideToggle?: boolean;
     onSegmentClick?: (data: ChartData) => void;
 }
 
@@ -23,9 +26,12 @@ const DashboardChart: React.FC<DashboardChartProps> = ({
     title,
     data,
     colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'],
+    unit,
+    defaultView = 'pie',
+    hideToggle = false,
     onSegmentClick
 }) => {
-    const [view, setView] = useState<'pie' | 'bar'>('pie');
+    const [view, setView] = useState<'pie' | 'bar'>(defaultView);
 
     const total = data.reduce((sum, item) => sum + item.value, 0);
 
@@ -41,9 +47,9 @@ const DashboardChart: React.FC<DashboardChartProps> = ({
                 <div className="bg-slate-900 border border-slate-700 p-3 rounded-xl shadow-2xl backdrop-blur-md bg-opacity-90">
                     <p className="text-[10px] font-black text-content-muted uppercase tracking-widest mb-1">{payload[0].name}</p>
                     <p className="text-sm font-black text-white">
-                        {payload[0].value} {payload[0].value === 1 ? 'Student' : 'Students'}
+                        {unit === 'currency' ? `₹${payload[0].value.toLocaleString()}` : `${payload[0].value} ${unit || (payload[0].value === 1 ? 'Student' : 'Students')}`}
                         <span className="ml-2 text-indigo-400">
-                            ({((payload[0].value / total) * 100).toFixed(1)}%)
+                            ({total > 0 ? ((payload[0].value / total) * 100).toFixed(1) : 0}%)
                         </span>
                     </p>
                 </div>
@@ -51,6 +57,7 @@ const DashboardChart: React.FC<DashboardChartProps> = ({
         }
         return null;
     };
+
 
     return (
         <div className="bg-surface rounded-3xl border border-border shadow-sm overflow-hidden flex flex-col group hover:shadow-xl hover:border-indigo-100 transition-all duration-500">
@@ -62,22 +69,24 @@ const DashboardChart: React.FC<DashboardChartProps> = ({
                     {title.toUpperCase()}
                 </h3>
 
-                <div className="flex bg-chrome p-1 rounded-xl">
-                    <button
-                        onClick={() => setView('pie')}
-                        className={`p-1.5 rounded-lg transition-all ${view === 'pie' ? 'bg-surface shadow-sm text-indigo-600' : 'text-content-muted hover:text-content-secondary'}`}
-                        title="Pie View"
-                    >
-                        <PieIcon className="w-4 h-4" />
-                    </button>
-                    <button
-                        onClick={() => setView('bar')}
-                        className={`p-1.5 rounded-lg transition-all ${view === 'bar' ? 'bg-surface shadow-sm text-indigo-600' : 'text-content-muted hover:text-content-secondary'}`}
-                        title="Bar View"
-                    >
-                        <BarChart3 className="w-4 h-4" />
-                    </button>
-                </div>
+                {!hideToggle && (
+                    <div className="flex bg-chrome p-1 rounded-xl">
+                        <button
+                            onClick={() => setView('pie')}
+                            className={`p-1.5 rounded-lg transition-all ${view === 'pie' ? 'bg-surface shadow-sm text-indigo-600' : 'text-content-muted hover:text-content-secondary'}`}
+                            title="Pie View"
+                        >
+                            <PieIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => setView('bar')}
+                            className={`p-1.5 rounded-lg transition-all ${view === 'bar' ? 'bg-surface shadow-sm text-indigo-600' : 'text-content-muted hover:text-content-secondary'}`}
+                            title="Bar View"
+                        >
+                            <BarChart3 className="w-4 h-4" />
+                        </button>
+                    </div>
+                )}
             </div>
 
             <div className="p-6 h-[320px] relative">

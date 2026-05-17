@@ -13,6 +13,7 @@ export interface InventoryItem {
   unit: string;
   currentStock: number;
   reorderLevel: number;
+  itemType?: 'CONSUMABLE' | 'ASSET';
 }
 
 export interface Supplier {
@@ -45,6 +46,7 @@ export interface Asset {
   name: string;
   categoryId: string;
   categoryName?: string;
+  itemId?: string;
   serialNumber: string;
   purchaseDate: string;
   purchaseValue: number;

@@ -28,7 +28,9 @@ export interface CollectionSummary {
     pendingReceivables: number;
     monthlyTrend: { month: string; income: number; expense: number }[];
     feeDistribution: { name: string; value: number }[];
+    annualFeeSummary?: { month: string; total: number; collected: number; remaining: number }[];
 }
+
 
 const BASE_URL = '/ims-finance-service/api/v1/finance';
 

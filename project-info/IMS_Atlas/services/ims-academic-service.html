@@ -42,6 +42,7 @@
                 graph LR
                 Gateway --> Academic[Academic Service]
                 Academic --> DB[(Academic DB)]
+                Academic --> Notification[Notification Service]
             </div>
         </section>
 
@@ -51,6 +52,8 @@
                 <li><strong>Curriculum Management:</strong> Defining courses, subjects, and topics.</li>
                 <li><strong>Academic Calendar:</strong> Managing academic years and terms.</li>
                 <li><strong>Offerings:</strong> Scheduling subject offerings for specific terms.</li>
+                <li><strong>Announcements:</strong> Managing institutional announcements with audience filtering and expiry dates.</li>
+                <li><strong>Messages & Broadcasts:</strong> Orchestrating multi-channel broadcasts (Email + In-App) and persisting broadcast history and user notifications.</li>
             </ul>
         </section>
     </main>

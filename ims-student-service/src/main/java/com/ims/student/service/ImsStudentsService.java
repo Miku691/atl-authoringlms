@@ -36,4 +36,6 @@ public interface ImsStudentsService {
     List<ImsStudentsDto> getByOffering(String tenantId, String offeringId);
 
     List<ImsStudentsDto> getByInstructorId(String instructorId, String tenantId);
+
+    long getTodayBirthdaysCount(String tenantId);
 }

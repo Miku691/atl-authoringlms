@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Service - IMS Atlas</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        <div class="logo">IMS Atlas</div>
+        <ul class="nav-links">
+            <li><a href="../index.html">System Overview</a></li>
+            <li><strong>Services</strong></li>
+            <li><a href="atl-gateway-service.html">Gateway Service</a></li>
+            <li><a href="atl-auth-service.html">Auth Service</a></li>
+            <li><a href="atl-discovery-server.html">Discovery Server</a></li>
+            <li><a href="atl-web-ui.html">Web UI</a></li>
+            <li><a href="ims-academic-service.html">Academic Service</a></li>
+            <li><a href="ims-student-service.html">Student Service</a></li>
+            <li><a href="ims-instructor-service.html">Instructor Service</a></li>
+            <li><a href="ims-staff-service.html">Staff Service</a></li>
+            <li><a href="ims-platform-service.html">Platform Service</a></li>
+            <li><a href="ims-inventory-service.html">Inventory Service</a></li>
+            <li><strong>Key Flows</strong></li>
+            <li><a href="../flows/auth-flow.html">Authentication Flow</a></li>
+            <li><a href="../flows/academic-session-flow.html">Academic Session Flow</a></li>
+        </ul>
+    </nav>
+
+    <main class="main-content">
+        <header class="header">
+            <h1>Inventory Service (`ims-inventory-service`)</h1>
+            <p>Manages institutional inventory, asset registers, stock transactions, and suppliers.</p>
+        </header>
+
+        <section class="diagram-card">
+            <h2>Context & Unified Catalog Map</h2>
+            <div class="mermaid">
+                graph LR
+                Gateway[API Gateway] --> Inventory[Inventory Service]
+                Inventory --> DB[(Inventory DB)]
+                Inventory -.-> Finance[Finance Service]
+                
+                subgraph Unified Catalog & Assets
+                    Cat[Inventory Category] --> Item[Inventory Item: CONSUMABLE / ASSET]
+                    Item -->|itemId| Asset[Asset Register Instance]
+                end
+            </div>
+        </section>
+
+        <section>
+            <h2>Responsibilities & Architecture</h2>
+            <ul>
+                <li><strong>Unified Master Catalog (`InventoryItem`):</strong> Centralized item catalog supporting both consumables (`CONSUMABLE`) and capital equipment (`ASSET`). Tracks aggregate stock quantities and reorder thresholds.</li>
+                <li><strong>Asset Register (`Asset`):</strong> Maintaining official records of individual physical property instances, unique serial numbers, custodianship, locations, and status (`ACTIVE`, `UNDER_MAINTENANCE`, `DISPOSED`), explicitly linked back to master catalog items (`itemId`).</li>
+                <li><strong>Stock Management:</strong> Tracking inventory stock levels, low-stock alerts, and departmental reorder requirements.</li>
+                <li><strong>Suppliers:</strong> Managing vendor contacts, office addresses, and purchasing relationships.</li>
+                <li><strong>Stock Transactions:</strong> Recording stock inflows (purchases) and outflows (usage) with audit trails, and triggering external purchase expense records in the Finance service.</li>
+            </ul>
+        </section>
+    </main>
+</body>
+
+</html>

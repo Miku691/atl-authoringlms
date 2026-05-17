@@ -21,4 +21,8 @@ public interface ImsInstructorsRepo extends JpaRepository<ImsInstructors, String
     Page<ImsInstructors> findByTenantId(String tenantId, Pageable pageable);
 
     long countByTenantId(String tenantId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(i) FROM ImsInstructors i WHERE i.tenantId = :tenantId AND MONTH(i.dob) = :month AND DAY(i.dob) = :day AND (i.status IS NULL OR i.status = 'ACTIVE' OR i.status = 'active')")
+    long countTodayBirthdays(@org.springframework.data.repository.query.Param("tenantId") String tenantId, @org.springframework.data.repository.query.Param("month") int month, @org.springframework.data.repository.query.Param("day") int day);
 }
+

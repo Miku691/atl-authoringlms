@@ -49,12 +49,41 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Override
     @Transactional
     public ExpenseDTO recordExpense(ExpenseDTO dto) {
-        ExpenseCategory category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Expense category not found"));
+        String tenantId = SecurityUtils.getCurrentTenantId();
+        if (tenantId == null && dto.getTenantId() != null) {
+            tenantId = dto.getTenantId();
+        }
+        final String currentTenantId = tenantId;
+
+        ExpenseCategory category;
+        if (dto.getCategoryId() != null && !dto.getCategoryId().isEmpty()) {
+            category = categoryRepository.findById(dto.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Expense category not found"));
+        } else if (dto.getCategoryName() != null && !dto.getCategoryName().isEmpty()) {
+            List<ExpenseCategory> existingCats = categoryRepository.findByTenantId(currentTenantId);
+            category = existingCats.stream()
+                    .filter(c -> c.getName().equalsIgnoreCase(dto.getCategoryName()))
+                    .findFirst()
+                    .orElseGet(() -> {
+                        ExpenseCategory newCat = new ExpenseCategory();
+                        newCat.setName(dto.getCategoryName());
+                        newCat.setDescription("System generated category for " + dto.getCategoryName());
+                        newCat.setTenantId(currentTenantId);
+                        return categoryRepository.save(newCat);
+                    });
+        } else {
+            throw new RuntimeException("Expense category ID or Name must be provided");
+        }
 
         Expense expense = modelMapper.map(dto, Expense.class);
         expense.setCategory(category);
-        expense.setTenantId(SecurityUtils.getCurrentTenantId());
+        expense.setTenantId(currentTenantId);
+        if (expense.getPaymentMethod() == null || expense.getPaymentMethod().isEmpty()) {
+            expense.setPaymentMethod("CASH");
+        }
+        if (expense.getExpenseDate() == null) {
+            expense.setExpenseDate(java.time.LocalDate.now());
+        }
         
         expense = expenseRepository.save(expense);
         

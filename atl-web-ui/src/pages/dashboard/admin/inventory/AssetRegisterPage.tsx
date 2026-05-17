@@ -15,22 +15,25 @@ import {
   DollarSign
 } from 'lucide-react';
 import { inventoryService } from '../../../../api/inventoryService';
-import type { Asset, InventoryCategory } from '../../../../types/inventory';
+import type { Asset, InventoryCategory, InventoryItem } from '../../../../types/inventory';
 import toast from 'react-hot-toast';
 import Modal from '../../../../components/common/Modal';
 
 const AssetRegisterPage: React.FC = () => {
   const [assets, setAssets] = useState<Asset[]>([]);
   const [categories, setCategories] = useState<InventoryCategory[]>([]);
+  const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const [formData, setFormData] = useState<Partial<Asset>>({
     name: '',
     categoryId: '',
+    itemId: '',
     serialNumber: '',
     purchaseDate: new Date().toISOString().split('T')[0],
     purchaseValue: 0,
@@ -45,12 +48,14 @@ const AssetRegisterPage: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [assetsData, catsData] = await Promise.all([
+      const [assetsData, catsData, itemsData] = await Promise.all([
         inventoryService.getAssets(),
-        inventoryService.getCategories()
+        inventoryService.getCategories(),
+        inventoryService.getItems()
       ]);
       setAssets(assetsData);
       setCategories(catsData);
+      setItems(itemsData);
     } catch (error) {
       toast.error('Failed to fetch data');
     } finally {
@@ -67,6 +72,7 @@ const AssetRegisterPage: React.FC = () => {
       setFormData({
         name: '',
         categoryId: categories[0]?.id || '',
+        itemId: '',
         serialNumber: '',
         purchaseDate: new Date().toISOString().split('T')[0],
         purchaseValue: 0,
@@ -75,6 +81,20 @@ const AssetRegisterPage: React.FC = () => {
       });
     }
     setIsModalOpen(true);
+  };
+
+  const handleMasterItemSelect = (itemId: string) => {
+    const selectedItem = items.find(i => i.id === itemId);
+    if (selectedItem) {
+      setFormData(prev => ({
+        ...prev,
+        itemId: selectedItem.id,
+        name: selectedItem.name,
+        categoryId: selectedItem.categoryId
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, itemId: '' }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -95,10 +115,10 @@ const AssetRegisterPage: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Delete this asset record?')) return;
     try {
       await inventoryService.deleteAsset(id);
       toast.success('Asset record deleted');
+      setDeleteConfirmId(null);
       fetchData();
     } catch (error) {
       toast.error('Failed to delete asset');
@@ -165,10 +185,18 @@ const AssetRegisterPage: React.FC = () => {
             
             <h3 className="text-lg font-bold text-content-primary truncate" title={asset.name}>{asset.name}</h3>
             <div className="flex flex-col gap-1 mt-1">
-                <span className="text-xs text-indigo-500 font-bold bg-indigo-500/10 w-fit px-2 py-0.5 rounded">
-                    {asset.categoryName || 'General Asset'}
-                </span>
-                <p className="text-xs text-content-muted font-mono flex items-center gap-1.5">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-indigo-500 font-bold bg-indigo-500/10 w-fit px-2 py-0.5 rounded">
+                      {asset.categoryName || 'General Asset'}
+                  </span>
+                  {asset.itemId && (
+                    <span className="text-[10px] text-purple-600 font-extrabold bg-purple-50 border border-purple-200 px-2 py-0.5 rounded flex items-center gap-1">
+                      <Package size={10} />
+                      LINKED TO CATALOG
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-content-muted font-mono flex items-center gap-1.5 mt-1">
                     <Tag size={12} />
                     {asset.serialNumber}
                 </p>
@@ -197,7 +225,7 @@ const AssetRegisterPage: React.FC = () => {
                 <Edit2 size={16} />
               </button>
               <button 
-                onClick={() => handleDelete(asset.id)}
+                onClick={() => setDeleteConfirmId(asset.id)}
                 className="p-2 text-content-muted hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
               >
                 <Trash2 size={16} />
@@ -240,6 +268,22 @@ const AssetRegisterPage: React.FC = () => {
         }
       >
         <form id="asset-form" onSubmit={handleSubmit} className="p-4 space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-content-primary mb-1">Link to Master Catalog Item (Optional)</label>
+            <select
+              value={formData.itemId || ''}
+              onChange={(e) => handleMasterItemSelect(e.target.value)}
+              className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none bg-surface text-indigo-600 font-bold"
+            >
+              <option value="">-- Independent Asset (No Master Item Link) --</option>
+              {items.filter(i => i.itemType === 'ASSET').map(item => (
+                <option key={item.id} value={item.id}>
+                  {item.name} ({item.categoryName}) - Stock: {item.currentStock}
+                </option>
+              ))}
+            </select>
+            <p className="text-[11px] text-content-muted mt-1">Selecting a master item auto-fills the asset name and category.</p>
+          </div>
           <div>
             <label className="block text-sm font-bold text-content-primary mb-1">Asset Name *</label>
             <input
@@ -325,6 +369,42 @@ const AssetRegisterPage: React.FC = () => {
             </select>
           </div>
         </form>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        isOpen={!!deleteConfirmId}
+        onClose={() => setDeleteConfirmId(null)}
+        title="Confirm Asset Deletion"
+        footer={
+          <>
+            <button
+              type="button"
+              onClick={() => setDeleteConfirmId(null)}
+              className="px-4 py-2 text-content-secondary hover:bg-chrome rounded-2xl font-bold transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => deleteConfirmId && handleDelete(deleteConfirmId)}
+              className="px-5 py-2 bg-red-600 text-white rounded-2xl font-bold hover:bg-red-700 transition-all shadow-lg shadow-red-500/20 flex items-center justify-center gap-2"
+            >
+              <Trash2 size={16} />
+              <span>Delete Asset</span>
+            </button>
+          </>
+        }
+      >
+        <div className="py-4 text-content-secondary flex items-center gap-4">
+          <div className="p-3 bg-red-500/10 rounded-2xl text-red-500 border border-red-500/20">
+            <Trash2 size={24} />
+          </div>
+          <div>
+            <p className="font-bold text-content-primary mb-1">Are you sure you want to delete this asset record?</p>
+            <p className="text-xs text-content-muted">This action cannot be undone and will permanently remove the asset registration details.</p>
+          </div>
+        </div>
       </Modal>
     </div>
   );
